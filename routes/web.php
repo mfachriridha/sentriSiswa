@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -7,5 +8,6 @@ Route::get('/', function () {
 });
 
 Route::get('/layout', function(){
+    // App::setLocale('id');
     return view('layouts.app');
 });
