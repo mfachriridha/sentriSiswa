@@ -1,250 +1,172 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard Siswa')
-
-@section('sidebar-menu')
-<a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg bg-blue-600 text-white font-medium transition">
-    <i class="bi bi-grid-1x2-fill"></i> Dashboard
-</a>
-
-<div class="pt-4 pb-2 text-xs font-semibold text-slate-500 uppercase px-4">Absensi</div>
-
-<a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
-    <i class="bi bi-camera-fill"></i> Absensi Masuk
-</a>
-
-<a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
-    <i class="bi bi-box-arrow-left"></i> Absensi Pulang
-</a>
-
-<a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
-    <i class="bi bi-clock-history"></i> Riwayat Absensi
-</a>
-
-<div class="pt-4 pb-2 text-xs font-semibold text-slate-500 uppercase px-4">Akun</div>
-
-<a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
-    <i class="bi bi-person-circle"></i> Profil Saya
-</a>
-
-<a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
-    <i class="bi bi-bar-chart-fill"></i> Poin Saya
-</a>
-
-<a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
-    <i class="bi bi-box-arrow-right"></i> Logout
-</a>
-@endsection
+@section('title', 'Presensi - SentriSiswa')
 
 @section('content')
-<!-- Header Info -->
-<div class="mb-8">
-    <h1 class="text-2xl font-bold text-gray-900">Dashboard Siswa</h1>
-    <p class="text-gray-600 mt-1">Rabu, 5 Mei 2026 | Kelas: XII IPA 1</p>
+<!-- Header -->
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+    <div>
+        <h1 class="text-2xl font-extrabold tracking-tight text-slate-900">Presensi Siswa</h1>
+        <p class="text-sm text-slate-500 mt-0.5">{{ now()->translatedFormat('l, d F Y') }} &middot; Kelas XII IPA 1</p>
+    </div>
+    <span class="badge badge-blue self-start">Aktif</span>
 </div>
 
-<!-- Status Poin -->
-<div class="card mb-8 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+<!-- Poin -->
+<div class="card !bg-gradient-to-r !from-blue-50 !to-indigo-50 !border-blue-100 mb-6">
     <div class="flex items-center justify-between">
         <div>
-            <p class="text-sm text-blue-600 font-medium">Poin Pelanggaran</p>
-            <p class="text-3xl font-bold text-blue-900 mt-1">95</p>
-            <p class="text-xs text-blue-700 mt-1">Dari saldo awal 100</p>
+            <p class="text-xs font-bold text-blue-500 uppercase tracking-wide">Poin Pelanggaran</p>
+            <p class="stat-value text-blue-900 mt-1">95<span class="text-sm font-medium text-blue-400">/100</span></p>
+            <p class="text-xs text-blue-600 mt-0.5">Saldo awal 100 poin</p>
         </div>
-        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-            <i class="bi bi-star-fill text-3xl text-blue-600"></i>
-        </div>
-    </div>
-</div>
-
-<!-- Absensi Buttons -->
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-    <!-- Absensi Masuk -->
-    <div class="card hover:shadow-md transition cursor-pointer" onclick="showModal('absenMasukModal')">
-        <div class="flex items-center gap-4">
-            <div class="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center">
-                <i class="bi bi-camera-fill text-3xl text-green-600"></i>
-            </div>
-            <div class="flex-1">
-                <h3 class="text-lg font-bold text-gray-900">Absensi Masuk</h3>
-                <p class="text-sm text-gray-600">Ambil selfie & validasi GPS</p>
-                <p class="text-xs text-gray-500 mt-1">Batas: 07:30 WIB</p>
-            </div>
-            <span class="badge-success">Bisa Absen</span>
-        </div>
-    </div>
-
-    <!-- Absensi Pulang -->
-    <div class="card hover:shadow-md transition cursor-pointer" onclick="showModal('absenPulangModal')">
-        <div class="flex items-center gap-4">
-            <div class="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center">
-                <i class="bi bi-box-arrow-left text-3xl text-orange-600"></i>
-            </div>
-            <div class="flex-1">
-                <h3 class="text-lg font-bold text-gray-900">Absensi Pulang</h3>
-                <p class="text-sm text-gray-600">Ambil selfie & validasi GPS</p>
-                <p class="text-xs text-gray-500 mt-1">Mulai: 15:30 WIB</p>
-            </div>
-            <span class="badge-warning">Belum Waktu</span>
+        <div class="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center">
+            <i class="bi bi-star-fill text-2xl text-blue-500"></i>
         </div>
     </div>
 </div>
 
-<!-- Today's Status -->
-<div class="card mb-8">
-    <h3 class="text-lg font-bold mb-4">Status Absensi Hari Ini</h3>
-    <div class="flex items-center gap-4 p-4 bg-green-50 rounded-lg border border-green-200">
-        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-            <i class="bi bi-check-circle-fill text-2xl text-green-600"></i>
+<!-- Presensi Cards -->
+<div class="grid lg:grid-cols-2 gap-5 mb-6">
+    <!-- Presensi Masuk -->
+    <div class="card anim-up">
+        <div class="flex items-start justify-between mb-5">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
+                    <i class="bi bi-sunrise-fill text-emerald-600 text-lg"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-slate-900">Presensi Masuk</h3>
+                    <p class="text-xs text-slate-500">Batas 07:30 WIB</p>
+                </div>
+            </div>
+            <span class="badge badge-green">Bisa Presensi</span>
+        </div>
+
+        <div class="bg-slate-900 rounded-xl h-44 flex items-center justify-center mb-4">
+            <div class="text-center text-white/60">
+                <i class="bi bi-camera-fill text-4xl mb-2 block"></i>
+                <p class="text-sm font-medium">Kamera Selfie</p>
+                <p class="text-xs text-white/40 mt-1">Pastikan wajah terlihat jelas</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3 p-3 bg-emerald-50 border border-emerald-200 rounded-xl mb-4">
+            <i class="bi bi-geo-alt-fill text-emerald-600"></i>
+            <div>
+                <p class="text-xs font-bold text-emerald-800">Dalam Area Sekolah</p>
+                <p class="text-[10px] text-emerald-600">106.588123, -6.119123</p>
+            </div>
+        </div>
+
+        <button onclick="submitPresensi('masuk')" class="btn-brand w-full !py-3">
+            <i class="bi bi-check-circle"></i> Submit Presensi Masuk
+        </button>
+    </div>
+
+    <!-- Presensi Pulang -->
+    <div class="card anim-up" style="animation-delay:.1s">
+        <div class="flex items-start justify-between mb-5">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center">
+                    <i class="bi bi-sunset-fill text-orange-600 text-lg"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-slate-900">Presensi Pulang</h3>
+                    <p class="text-xs text-slate-500">Mulai 15:30 WIB</p>
+                </div>
+            </div>
+            <span class="badge badge-amber">Belum Waktu</span>
+        </div>
+
+        <div class="bg-slate-900 rounded-xl h-44 flex items-center justify-center mb-4 opacity-60">
+            <div class="text-center text-white/40">
+                <i class="bi bi-camera-fill text-4xl mb-2 block"></i>
+                <p class="text-sm font-medium">Kamera Selfie</p>
+                <p class="text-xs mt-1">Akan aktif pukul 15:30</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3 p-3 bg-slate-100 border border-slate-200 rounded-xl mb-4">
+            <i class="bi bi-clock text-slate-400"></i>
+            <p class="text-xs font-medium text-slate-500">Menunggu waktu presensi pulang</p>
+        </div>
+
+        <button disabled class="btn-outline w-full !py-3 opacity-50 cursor-not-allowed">
+            <i class="bi bi-check-circle"></i> Submit Presensi Pulang
+        </button>
+    </div>
+</div>
+
+<!-- Status Hari Ini -->
+<div class="card mb-6 anim-up" style="animation-delay:.15s">
+    <h3 class="font-bold text-slate-900 mb-4">Status Hari Ini</h3>
+    <div class="flex items-center gap-4 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl">
+        <div class="w-11 h-11 bg-emerald-100 rounded-full flex items-center justify-center shrink-0">
+            <i class="bi bi-check-circle-fill text-emerald-600 text-xl"></i>
         </div>
         <div class="flex-1">
-            <p class="font-semibold text-green-800">Anda Sudah Absen Masuk</p>
-            <p class="text-sm text-green-700">Pukul 07:15 WIB | Lokasi: Valid</p>
+            <p class="font-bold text-emerald-800">Sudah Presensi Masuk</p>
+            <p class="text-sm text-emerald-700">07:15 WIB &middot; Lokasi valid</p>
         </div>
-        <button onclick="showModal('viewTodayPhoto')" class="btn-secondary !py-1.5 !px-3 text-sm">
-            <i class="bi bi-eye"></i> Lihat Foto
+        <button onclick="showPhoto()" class="btn-outline !py-2 !px-3 text-xs">
+            <i class="bi bi-image"></i> Foto
         </button>
     </div>
 </div>
 
-<!-- Riwayat Singkat -->
-<div class="card">
+<!-- Riwayat -->
+<div class="card anim-up" style="animation-delay:.2s">
     <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-bold">Riwayat Absensi</h3>
-        <a href="#" class="text-sm text-blue-600 hover:text-blue-800">Lihat Semua</a>
+        <h3 class="font-bold text-slate-900">Riwayat Presensi</h3>
+        <span class="text-xs font-semibold text-blue-600 cursor-pointer hover:underline">Lihat Semua</span>
     </div>
-    <div class="space-y-3">
-        <div class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg">
+    <div class="space-y-2">
+        <div class="flex items-center justify-between p-3 hover:bg-slate-50 rounded-xl transition">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                    <i class="bi bi-check-lg text-green-600"></i>
-                </div>
-                <div>
-                    <p class="text-sm font-medium">Selasa, 4 Mei 2026</p>
-                    <p class="text-xs text-gray-500">Masuk: 07:10 | Pulang: 15:45</p>
-                </div>
+                <div class="w-9 h-9 bg-emerald-100 rounded-full flex items-center justify-center"><i class="bi bi-check-lg text-emerald-600"></i></div>
+                <div><p class="text-sm font-semibold">Selasa, 4 Mei 2026</p><p class="text-xs text-slate-500">Masuk 07:10 &middot; Pulang 15:45</p></div>
             </div>
-            <span class="badge-success">Hadir</span>
+            <span class="badge badge-green">Hadir</span>
         </div>
-        <div class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg">
+        <div class="flex items-center justify-between p-3 hover:bg-slate-50 rounded-xl transition">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
-                    <i class="bi bi-exclamation-lg text-yellow-600"></i>
-                </div>
-                <div>
-                    <p class="text-sm font-medium">Senin, 3 Mei 2026</p>
-                    <p class="text-xs text-gray-500">Masuk: 07:40 | Pulang: 15:50</p>
-                </div>
+                <div class="w-9 h-9 bg-amber-100 rounded-full flex items-center justify-center"><i class="bi bi-exclamation-lg text-amber-600"></i></div>
+                <div><p class="text-sm font-semibold">Senin, 3 Mei 2026</p><p class="text-xs text-slate-500">Masuk 07:40 &middot; Pulang 15:50</p></div>
             </div>
-            <span class="badge-warning">Terlambat</span>
+            <span class="badge badge-amber">Terlambat</span>
+        </div>
+        <div class="flex items-center justify-between p-3 hover:bg-slate-50 rounded-xl transition">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 bg-red-100 rounded-full flex items-center justify-center"><i class="bi bi-x-lg text-red-600"></i></div>
+                <div><p class="text-sm font-semibold">Minggu, 2 Mei 2026</p><p class="text-xs text-slate-500">Tidak presensi</p></div>
+            </div>
+            <span class="badge badge-red">Alpha</span>
         </div>
     </div>
 </div>
-@endsection
 
-@push('scripts')
+<!-- Foto Modal -->
+<div id="photoModal" class="hidden fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4" onclick="if(event.target===this)closePhoto()">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-5 anim-fade" onclick="event.stopPropagation()">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="font-bold">Foto Presensi Masuk</h3>
+            <button onclick="closePhoto()" class="text-slate-400 hover:text-slate-600"><i class="bi bi-x-lg text-xl"></i></button>
+        </div>
+        <div class="bg-slate-100 rounded-xl h-56 flex items-center justify-center mb-4">
+            <i class="bi bi-person-fill text-6xl text-slate-300"></i>
+        </div>
+        <div class="text-xs text-slate-500 space-y-1">
+            <p><i class="bi bi-clock mr-1"></i> 07:15 WIB</p>
+            <p><i class="bi bi-geo-alt mr-1"></i> 106.588123, -6.119123</p>
+            <p class="text-emerald-600 font-medium"><i class="bi bi-check-circle mr-1"></i> Hadir</p>
+        </div>
+    </div>
+</div>
+
 <script>
-    function showModal(modalId) {
-        document.getElementById(modalId).classList.remove('hidden');
-        document.getElementById('modal-overlay').classList.remove('hidden');
-    }
-
-    function hideModal(modalId) {
-        document.getElementById(modalId).classList.add('hidden');
-        document.getElementById('modal-overlay').classList.add('hidden');
-    }
+function submitPresensi(j) { alert('UI Only: Presensi '+j+' berhasil!\nNotifikasi akan dikirim ke orang tua via WhatsApp.'); }
+function showPhoto() { document.getElementById('photoModal').classList.remove('hidden'); }
+function closePhoto() { document.getElementById('photoModal').classList.add('hidden'); }
 </script>
-@endpush
-
-<!-- Modal Overlay -->
-<div id="modal-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50"></div>
-
-<!-- Absensi Masuk Modal -->
-<div id="absenMasukModal" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-2xl z-50 w-full max-w-lg p-6">
-    <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-bold">Absensi Masuk</h3>
-        <button onclick="hideModal('absenMasukModal')" class="text-gray-500 hover:text-gray-700">
-            <i class="bi bi-x-lg"></i>
-        </button>
-    </div>
-
-    <div class="space-y-4">
-        <!-- Camera Preview -->
-        <div class="bg-gray-900 rounded-lg h-64 flex items-center justify-center">
-            <div class="text-center text-white">
-                <i class="bi bi-camera-fill text-5xl mb-3"></i>
-                <p class="text-sm">Kamera Selfie</p>
-                <p class="text-xs text-gray-400 mt-1">Pastikan wajah terlihat jelas</p>
-            </div>
-        </div>
-
-        <!-- GPS Status -->
-        <div class="p-3 bg-green-50 border border-green-200 rounded-lg">
-            <div class="flex items-center gap-2">
-                <i class="bi bi-geo-alt-fill text-green-600"></i>
-                <p class="text-sm font-medium text-green-800">GPS: Dalam Area Sekolah</p>
-            </div>
-            <p class="text-xs text-green-700 mt-1">106.588123, -6.119123</p>
-        </div>
-
-        <!-- Preview Photo -->
-        <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-            <i class="bi bi-image text-4xl text-gray-400 mb-2"></i>
-            <p class="text-sm text-gray-600">Preview Selfie</p>
-            <p class="text-xs text-gray-500">Ukuran maks. 500KB</p>
-        </div>
-
-        <!-- Submit Button -->
-        <button onclick="alert('UI Only: Absensi masuk berhasil!'); hideModal('absenMasukModal')" class="btn-primary w-full py-3">
-            <i class="bi bi-check-circle"></i> Submit Absensi Masuk
-        </button>
-    </div>
-</div>
-
-<!-- Absensi Pulang Modal -->
-<div id="absenPulangModal" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-2xl z-50 w-full max-w-lg p-6">
-    <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-bold">Absensi Pulang</h3>
-        <button onclick="hideModal('absenPulangModal')" class="text-gray-500 hover:text-gray-700">
-            <i class="bi bi-x-lg"></i>
-        </button>
-    </div>
-
-    <div class="space-y-4">
-        <div class="bg-gray-900 rounded-lg h-64 flex items-center justify-center">
-            <div class="text-center text-white">
-                <i class="bi bi-camera-fill text-5xl mb-3"></i>
-                <p class="text-sm">Kamera Selfie Pulang</p>
-            </div>
-        </div>
-
-        <div class="p-3 bg-green-50 border border-green-200 rounded-lg">
-            <div class="flex items-center gap-2">
-                <i class="bi bi-geo-alt-fill text-green-600"></i>
-                <p class="text-sm font-medium text-green-800">GPS: Dalam Area Sekolah</p>
-            </div>
-        </div>
-
-        <button onclick="alert('UI Only: Absensi pulang berhasil!'); hideModal('absenPulangModal')" class="btn-primary w-full py-3">
-            <i class="bi bi-check-circle"></i> Submit Absensi Pulang
-        </button>
-    </div>
-</div>
-
-<!-- View Today Photo Modal -->
-<div id="viewTodayPhoto" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl shadow-2xl z-50 w-full max-w-md p-6">
-    <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-bold">Foto Absensi Hari Ini</h3>
-        <button onclick="hideModal('viewTodayPhoto')" class="text-gray-500 hover:text-gray-700">
-            <i class="bi bi-x-lg"></i>
-        </button>
-    </div>
-    <div class="bg-gray-200 rounded-lg h-64 flex items-center justify-center mb-4">
-        <i class="bi bi-image text-6xl text-gray-400"></i>
-    </div>
-    <div class="text-sm text-gray-600">
-        <p><i class="bi bi-clock"></i> Pukul: 07:15 WIB</p>
-        <p class="mt-1"><i class="bi bi-geo-alt"></i> GPS: 106.588123, -6.119123</p>
-        <p class="mt-1"><i class="bi bi-check-circle text-green-600"></i> Status: Hadir</p>
-    </div>
-</div>
+@endsection

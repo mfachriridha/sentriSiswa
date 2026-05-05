@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
 
 Route::get('/', function () {
     return view('landing');
@@ -9,6 +10,21 @@ Route::get('/', function () {
 Route::prefix('auth')->name('auth.')->group(function () {
     Route::view('/login', 'auth.login')->name('login');
     Route::view('/register', 'auth.register')->name('register');
+    
+    Route::post('/login', function () {
+        $role = request()->input('role');
+        $username = request()->input('username');
+        
+        Session::put('user_role', $role);
+        Session::put('user_name', $username);
+        
+        return redirect()->route($role . '.dashboard');
+    })->name('login.post');
+    
+    Route::get('/logout', function () {
+        Session::flush();
+        return redirect()->route('landing');
+    })->name('logout');
 });
 
 Route::prefix('kesiswaan')->name('kesiswaan.')->group(function () {
@@ -35,7 +51,6 @@ Route::prefix('bk')->name('bk.')->group(function () {
 
 Route::prefix('siswa')->name('siswa.')->group(function () {
     Route::view('/', 'siswa.dashboard')->name('dashboard');
-    Route::view('/presensi', 'siswa.presensi')->name('presensi');
 });
 
 Route::prefix('profile')->name('profile.')->group(function () {
