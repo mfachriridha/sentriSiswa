@@ -56,7 +56,7 @@
                     <i class="bi bi-person-circle"></i> Profil
                 </a>
                 <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
-                    <i class="bi bi-person-circle"></i> Pengaturan
+                    <i class="bi bi-gear-fill"></i> Pengaturan
                 </a>
                 
                 <form action="#" method="POST" class="mt-4">

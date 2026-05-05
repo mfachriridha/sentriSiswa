@@ -1,0 +1,420 @@
+╭─── Claude Code v2.1.116 ─────────────────────────────────────────────────────╮
+│                                                    │ Tips for getting        │
+│               Welcome back shiroboy!               │ started                 │
+│                                                    │ Run /init to create a … │
+│                       ▐▛███▜▌                      │ ─────────────────────── │
+│                      ▝▜█████▛▘                     │ Recent activity         │
+│                        ▘▘ ▝▝                       │ No recent activity      │
+│      qwen3.5:397b-cloud · API Usage Billing ·      │                         │
+│      shiroboy‘s Individual Org                     │                         │
+│                 C:\wamp64\www\qwen                 │                         │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+
+ ⚠Auth conflict: Both a token (ANTHROPIC_AUTH_TOKEN) and an API key (/login managed key) are set. This may lead to unexpected behavior.
+    · Trying to use ANTHROPIC_AUTH_TOKEN? claude /logout
+    · Trying to use /login managed key? Unset the ANTHROPIC_AUTH_TOKEN environment variable.
+
+❯ /effort                                                                       
+  ⎿  Set effort level to max (this session only): Maximum capability with deepest
+      reasoning
+
+❯ /plan                                                                         
+  ⎿  Enabled plan mode
+
+❯ Buatkan saya website absensi responsive (dekstop/mobile) laravel-mysql untuk  
+  siswa SMA menggunakan geolocation & geofencing (koordinatnya untuk awal: [ [  
+  [ 106.5879572, -6.1189071, 0.0 ], [ 106.5879126, -6.1190248, 0.0 ], [         
+  106.5878338, -6.1193271, 0.0 ], [ 106.587985, -6.1193648, 0.0 ], [            
+  106.5881357, -6.1193823, 0.0 ], [ 106.5881603, -6.1193038, 0.0 ], [           
+  106.5882247, -6.1189731, 0.0 ], [ 106.5879572, -6.1189071, 0.0 ] ] ] } } ),   
+  dengan menggunakan selfie, serta ada whatsapp gateaway didalamnya yang akan   
+  terkirim ke orang tuanya ketika siswa sudah melakukan absen dengan selfi di   
+  lokasi dan wali kelas menekan tombol simpan maka akan otomatis terkirim ke    
+  orang tua kalau anaknya hadir disekolah. Karena saya belum mendapatkan        
+  WhatsApp gateway-nya cukup seperti tampilkan ke halaman baru atau pop-up      
+  kalau memang fungsinya bisa. Karena absen seperti ini untuk di awal masuk dan 
+   pulang saja, maka untuk guru mapel hanya bisa absen dengan data yang sudah   
+  ada di awal absen (siswa tidak perlu selfi lagi), dan lihat apakah siswa-nya  
+  lengkap, dan guru mapel cukup tekan simpan dan tidak akan terkirim notifikasi 
+   ke orang tua. Baik, selanjutnya untuk guru BK (bimbingan konseling) dia bisa 
+   mengawasi data absen di semua kelas, dan bisa melakukan rekap untuk kelas    
+  tertentu (jika guru BK sebagai wali kelas kelas tertentu), dan seluruh kelas, 
+   tentu jika guru BK tersebut menjadi wali kelas, maka dia juga punya fitur    
+  wali kelas di kelasnya sendiri. Baik, selanjutnya adalah kesiswaan, dimana    
+  kesiswaan sendiri seperti super admin, dimana dia bisa memberikan role ke     
+  guru-guru, seperti dia wali kelas untuk kelas mana, dan lain-lain, serta juga 
+   sebagai seorang master-data, dimana dia memiliki data guru serta siswa       
+  lengkap, dan juga bisa mengubah serta mengupload datanya tersebut. Untuk data 
+   yang di upload (csv/excel) untuk sekarang bagi guru, cukup nama-nya,         
+  NIP-nya; bagi siswa, cukup nama dan NIS/NISN saja (jika di file yang di       
+  upload ada data kelasnya maka bisa ditambahkan kelasnya sekaligus, jika tidak 
+   ada maka tidak mengapa, nanti manual saja kesiswaa yang menambahkan), serta  
+  juga bisa kesiswaan bisa menambahkan kelas baru jika dibutuhkan, selanjutnya  
+  kesiswaan juga bisa memberikan poin pelanggaran bagi siswa yang melanggar     
+  tata tertib (setiap siswa diawal memilki saldo poin 100), jadi ketika         
+  ditambahkan poin yang dimiliki siswa berkurang, dan setiap pekan maka orang   
+  tua akan mendapat notifikasi di whatsapp kalau anaknya melakukan pelanggaran  
+  apa dan siswa poin yang dimiliki berapa seperti itu. Baik, nama websitenya    
+  adalah Sentri Siswa. Baik, website tersebut memilki landing page dimana       
+  didalamnya ada place holder untuk pdf, yang dimana nanti saya (yang coba      
+  login sebagai kesiswaan) akan upload tata tertib sehingga baik guru/siswa     
+  akan melihat tata tertibnya dulu yang bisa di full screen ataupun di          
+  download. Baik, untuk registrasi harus masukkan NIP bagi guru dan NIS/NISN    
+  untuk siswa dan di cek terlebih dahulu apakah datanya ada, jika ada maka akan 
+   dimunculkan NIP/NIS/NISN dan nama lengkapnya, selanjutnya tinggal            
+  menambahkan data didalamnya seperti untuk guru ada username, email, password, 
+   dan nomor hp whatsapp aktif; untuk siswa,username, email, password, nomor hp 
+   whatsapp aktif (siswa dan orang tua/wali). Baik, selanjutnya untuk login     
+  cukup input username dan password, dan akan otomatis bisa jadi guru/siswa,    
+  tentu jika guru mapel dia sebagai wali kelas tertentu maka dia punya fitur    
+  wali kelas di kelas itu, dan tentu jika guru bk punya dia sebagai wali kelas  
+  tertentu, maka dia juga punya fitur wali kelas di kelas tersebut, yang        
+  meng-assign guru itu adalah kesiswaan, dan kesiswaan punya username sendiri   
+  dan password sendiri yang sudah didaftarkan diawal (pada saat develop). Baik, 
+   guru mapel/bk/wali kelas, bisa menambahkan datanya sendiri lebih lengkap di  
+  profil mereka (seperti foto profil, dll yang biasa ada di guru pada umumnya   
+  di indonesia), untuk siswa tentu datanya bisa ditambahkan sesuai yang ada di  
+  buku rapot mereka dan tidak lupa foto profil mereka. Baik, selanjutnya yang   
+  bisa melihat data siswanya lengkap (sesuai dengan data profil siswa yang      
+  sudah ditambahkan), semua guru bisa melihatnya lengkap, mau di kelas manapun. 
+   Baik, selanjutnya untuk ukuran foto selfinya dibatasi, jangan terlalu besar  
+  sehingga bisa memakan waktu untuk mengirimkannya ke orang tua. Baik untuk     
+  sementara seperti itu dulu.                                                   
+
+● Saya akan membuat rencana komprehensif untuk website absensi "Sentri Siswa"
+  dengan semua fitur yang Anda minta. Mari saya mulai dengan mengeksplorasi
+  struktur proyek yang ada.
+
+● 2 Explore agents finished (ctrl+o to expand)
+   ├ Explore Laravel structure · 49 tool uses · 31.1k tokens
+   │ ⎿  Done
+   └ Check existing patterns · 11 tool uses · 17.2k tokens
+     ⎿  Done
+
+● Saya telah mendapatkan gambaran lengkap tentang codebase Anda. Proyek Laravel
+  13 sudah ada di C:\wamp64\www\sentriSiswa dengan struktur dasar yang siap
+  dikembangkan. Mari saya buat rencana komprehensif untuk Sentri Siswa.
+
+● Updated plan
+  ⎿  /plan to preview
+
+● Saya telah membuat rencana komprehensif untuk Sentri Siswa. Berikut
+  ringkasannya:
+
+  Rencana Sentri Siswa - Sistem Absensi SMA
+
+  Apa yang Sudah Ada
+
+  - ✅ Laravel 13 terinstall di C:\wamp64\www\sentriSiswa
+  - ✅ Database MySQL sentri_siswa terkonfigurasi
+  - ✅ Folder views per-role sudah ada (masih kosong)
+  - ✅ Layout utama dengan Tailwind CSS 4 + Bootstrap Icons
+
+  Yang Akan Dibangun
+
+  Database (8 tabel baru):
+  - users (extended dengan role), students, teachers, classes, attendances,
+  geofences, violations, weekly_notifications
+
+  Fitur Utama:
+  1. Auth: Login/Register dengan NIP (guru) atau NIS/NISN (siswa)
+  2. Absensi Siswa: Selfie + GPS validation dengan polygon geofencing (koordinat
+   yang Anda berikan)
+  3. Absensi Guru: Mapel (tanpa selfie), Wali Kelas (dengan notif WA), BK
+  (monitoring semua kelas)
+  4. Kesiswaan: Super admin + master data (upload CSV guru/siswa, assign wali
+  kelas, poin pelanggaran)
+  5. WhatsApp Gateway: Pop-up notification (fallback sampai API tersedia)
+  6. Poin Pelanggaran: Saldo awal 100, notifikasi mingguan ke ortu
+  7. Landing Page: PDF viewer tata tertib
+
+  Services yang Dibuat:
+  - GeofencingService.php - Point-in-polygon algorithm
+  - ImageUploadService.php - Resize selfie max 500KB
+  - WhatsAppService.php - Notification handler
+
+  Estimasi: ~42 jam implementasi
+
+  Apakah Anda ingin saya mulai implementasi? Atau ada yang ingin disesuaikan
+  dari rencana ini?
+  ⎿  Invalid tool parameters
+  ⎿  Invalid tool parameters
+  ⎿  Tool use rejected
+
+● Baik, saya akan buatkan prompt AI untuk frontend Sentri Siswa yang bisa Anda
+  gunakan untuk generate frontend secara terpisah.
+
+● Write(FRONTEND_PROMPT.md)
+  ⎿  Wrote 3 lines to FRONTEND_PROMPT.md
+      2 # Prompt AI untuk Frontend Sentri Siswa
+      3 Buatkan aplikasi frontend website absensi "Sentri Siswa" untuk SM
+        A menggunakan React.js dengan Tailwind CSS yang responsive (deskt
+        op/mobile), dengan struktur sebagai berikut: Landing page menampi
+        lkan PDF viewer fullscreen untuk tata tertib sekolah yang bisa di
+        gkinkan guru mendaftar dengan NIP dan siswa dengan NIS/NISN yang 
+        akan memvalidasi data terlebih dahulu lalu menampilkan form lengk
+        ap (username, email, password, nomor WhatsApp untuk guru, dan tam
+        bahan nomor WhatsApp orang tua untuk siswa); halaman login sederh
+        ana dengan username dan password yang otomatis mendeteksi role u
+     … +48 lines (ctrl+o to expand)
+
+● Saya telah membuat prompt AI untuk frontend Sentri Siswa di file
+  C:\wamp64\www\qwen\FRONTEND_PROMPT.md.
+
+  Prompt Frontend (1 Paragraf Lengkap)
+
+  Prompt tersebut mencakup:
+
+  1. Landing Page - PDF viewer tata tertib (fullscreen + download)
+  2. Auth - Registrasi dengan validasi NIP/NIS, login username+password
+  3. Dashboard Kesiswaan - Master data (CRUD + upload CSV), manajemen kelas,
+  assign wali kelas, upload PDF tata tertib, poin pelanggaran
+  4. Dashboard Wali Kelas - Daftar siswa, absensi masuk/pulang dengan view foto 
+  selfie siswa + GPS, verifikasi, ubah status absensi, tombol simpan → buka tab 
+  baru dengan konfirmasi berhasil
+  5. Dashboard Guru Mapel - Absensi tanpa selfie, simpan tanpa notif
+  6. Dashboard Guru BK - Monitoring semua kelas, rekap per-kelas/seluruh kelas,
+  fitur wali kelas jika di-assign
+  7. Dashboard Siswa - Absensi masuk/pulang dengan kamera + geofencing, preview
+  selfie, riwayat absensi, profil
+  8. WhatsApp Popup - Fallback notification dengan tombol "Kirim via WhatsApp"
+  9. Teknis - React.js, Tailwind CSS, responsive, react-webcam (max 500KB),
+  react-pdf, axios, React Router, role-based access control
+
+  ---
+  Apakah prompt frontend ini sudah sesuai? Atau ada yang perlu direvisi sebelum
+  saya lanjut ke bagian backend Laravel-nya?
+
+✻ Cooked for 5m 14s
+
+❯ sorry untuk promptnya ada yang salah, seharusnya tidak perlu lagi buka        
+  whatsapp web, karena kan nanti menggunakan whatsapp gateway, jadi ketika wali 
+   kelas klik simpan cukup muncul modal, data siswa berhasil disimpan dan       
+  dikirim, disitu backendnya nanti jalan langsung otomatis kirim absen ke       
+  orangtua/wali dengan nomor whatsapp yang didaftarkan oleh siswa tersebut.     
+  Baik, lalu kesiswaan selain bisa meng-assign wali kelas ke kelas tertentu,    
+  kesiswaan juga kan pemegang data guru juga kan, nah disitu juga dia bisa      
+  menambahkan dia sebagai BK atau mapel-mapel lainnya, ketika ditambahkan juga  
+  role BK, maka punya akses BK, dan sejenisnya. Baik, silahkan edit lagi        
+  promptnya                                                                     
+
+● Update(FRONTEND_PROMPT.md)
+  ⎿  Added 1 line, removed 1 line
+      1  # Prompt AI untuk Frontend Sentri Siswa
+      2  
+      3 -Buatkan aplikasi frontend website absensi "Sentri Siswa" untuk S
+        -MA menggunakan React.js dengan Tailwind CSS yang responsive (des
+        -ktop/mobile), dengan struktur sebagai berikut: Landing page mena
+        -mpilkan PDF viewer fullscreen untuk tata tertib sekolah yang bis
+        -a di-download dan ada tombol login/register; halaman registrasi 
+        -memungkinkan guru mendaftar dengan NIP dan siswa dengan NIS/NISN
+        - yang akan memvalidasi data terlebih dahulu lalu menampilkan for
+        -m lengkap (username, email, password, nomor WhatsApp untuk guru,
+        - dan tambahan nomor WhatsApp orang tua untuk siswa); halaman log
+        -in sederhana dengan username dan password yang otomatis mendetek
+        -si role user; dashboard kesiswaan (super admin) memiliki menu un
+        -tuk master data (CRUD guru dan siswa dengan upload CSV/Excel, ma
+        -najemen kelas dengan fitur tambah/edit kelas, assign wali kelas 
+        -ke kelas tertentu), manajemen role (menentukan guru mana sebagai
+        - wali kelas kelas mana dan guru BK mana yang jadi wali kelas), u
+        -pload PDF tata tertib, dan pemberian poin pelanggaran siswa (set
+        -iap siswa mulai dengan 100 poin); dashboard wali kelas menampilk
+        -an daftar siswa kelas yang diampu dengan fitur absensi masuk dan
+        - pulang dimana wali kelas bisa melihat foto selfie yang diambil 
+        -siswa beserta koordinat GPS, memverifikasi keaslian absensi, men
+        -gubah status absensi jika diperlukan, dan tombol simpan yang ket
+        -ika diklik akan membuka tab baru menampilkan konfirmasi "Data ab
+        -sensi berhasil disimpan dan notifikasi telah dikirim ke orang tu
+        -a siswa"; dashboard guru mapel menampilkan daftar kelas yang men
+        -gajar dengan fitur absensi tanpa selfie (hanya menampilkan dafta
+        -r siswa untuk ditandai kehadirannya) dan tombol simpan tanpa not
+        -ifikasi; dashboard guru BK menampilkan monitoring absensi semua 
+        -kelas dengan filter per-kelas dan rekap seluruh kelas, plus fitu
+        -r khusus wali kelas jika BK tersebut di-assign sebagai wali kela
+        -s; dashboard siswa menampilkan tombol absensi masuk dan pulang y
+        -ang masing-masing membuka kamera untuk selfie dengan validasi ge
+        -ofencing (tampilkan pesan error jika di luar area sekolah), prev
+        -iew hasil selfie sebelum submit, riwayat absensi pribadi, dan pr
+        -ofil siswa yang bisa dilengkapi dengan foto profil; setiap role 
+        -memiliki navigation sidebar yang responsive dengan menu yang dis
+        -esuaikan berdasarkan role, header dengan informasi user dan logo
+        -ut, dan footer dengan credit "SMAN 11 Kab. Tangerang"; komponen 
+        -WhatsApp Notification Popup dibuat sebagai fallback yang menampi
+        -lkan pesan template "Siswa [nama] telah hadir di sekolah pada [t
+        -anggal] [jam]" dengan tombol "Kirim via WhatsApp" yang akan memb
+        -uka WhatsApp Web dengan pesan terformat; komponen upload CSV/Exc
+        -el memiliki preview data sebelum upload dengan validasi format; 
+        -komponen PDF viewer menggunakan react-pdf dengan controls fullsc
+        -reen dan download; semua form menggunakan validasi real-time den
+        -gan error messages yang jelas; state management menggunakan Reac
+        -t Context atau Zustand untuk global state seperti user authentic
+        -ation dan role-based access control; untuk geofencing gunakan br
+        -owser Geolocation API dengan polygon coordinates yang akan dikon
+        -figurasi di backend; styling menggunakan Tailwind CSS dengan cus
+        -tom color scheme yang profesional untuk pendidikan; pastikan sem
+        -ua halaman mobile-responsive dengan hamburger menu untuk sidebar
+        - di mobile; tambahkan loading states dan toast notifications unt
+        -uk semua aksi; buat komponen reusable untuk Card, Table, Modal, 
+        -Button, Input, Select, dan File Upload; implementasi routing men
+        -ggunakan React Router dengan protected routes berdasarkan role; 
+        -untuk kamera selfie gunakan react-webcam dengan constraints maks
+        -imal 500KB untuk ukuran file; tampilkan loading spinner saat pro
+        -ses upload dan geolocation lookup; semua API calls menggunakan a
+        -xios dengan interceptors untuk handling authentication token.   
+      3 +Buatkan aplikasi frontend website absensi "Sentri Siswa" untuk S
+        +MA menggunakan React.js dengan Tailwind CSS yang responsive (des
+        +ktop/mobile), dengan struktur sebagai berikut: Landing page mena
+        +mpilkan PDF viewer fullscreen untuk tata tertib sekolah yang bis
+        +a di-download dan ada tombol login/register; halaman registrasi 
+        +memungkinkan guru mendaftar dengan NIP dan siswa dengan NIS/NISN
+        + yang akan memvalidasi data terlebih dahulu lalu menampilkan for
+        +m lengkap (username, email, password, nomor WhatsApp untuk guru,
+        + dan tambahan nomor WhatsApp orang tua untuk siswa); halaman log
+        +in sederhana dengan username dan password yang otomatis mendetek
+        +si role user; dashboard kesiswaan (super admin) memiliki menu un
+        +tuk master data (CRUD guru dan siswa dengan upload CSV/Excel, ma
+        +najemen kelas dengan fitur tambah/edit kelas, assign role guru s
+        +ebagai wali kelas atau guru BK atau guru mapel ke kelas tertentu
+        + - ketika guru di-assign role tambahan seperti BK maka otomatis 
+        +mendapat akses fitur BK, manajemen role terintegrasi dengan data
+        + guru karena kesiswaan memegang data master guru), upload PDF ta
+        +ta tertib, dan pemberian poin pelanggaran siswa (setiap siswa mu
+        +lai dengan 100 poin); dashboard wali kelas menampilkan daftar si
+        +swa kelas yang diampu dengan fitur absensi masuk dan pulang dima
+        +na wali kelas bisa melihat foto selfie yang diambil siswa besert
+        +a koordinat GPS, memverifikasi keaslian absensi, mengubah status
+        + absensi jika diperlukan, dan tombol simpan yang ketika diklik a
+        +kan menampilkan modal konfirmasi "Data absensi berhasil disimpan
+        + dan dikirim" tanpa membuka tab baru karena backend akan otomati
+        +s mengirim notifikasi WhatsApp ke orang tua siswa menggunakan no
+        +mor yang terdaftar; dashboard guru mapel menampilkan daftar kela
+        +s yang mengajar dengan fitur absensi tanpa selfie (hanya menampi
+        +lkan daftar siswa untuk ditandai kehadirannya) dan tombol simpan
+        + tanpa notifikasi; dashboard guru BK menampilkan monitoring abse
+        +nsi semua kelas dengan filter per-kelas dan rekap seluruh kelas,
+        + plus fitur khusus wali kelas jika BK tersebut di-assign sebagai
+        + wali kelas; dashboard siswa menampilkan tombol absensi masuk da
+        +n pulang yang masing-masing membuka kamera untuk selfie dengan v
+        +alidasi geofencing (tampilkan pesan error jika di luar area seko
+        +lah), preview hasil selfie sebelum submit, riwayat absensi priba
+        +di, dan profil siswa yang bisa dilengkapi dengan foto profil; se
+        +tiap role memiliki navigation sidebar yang responsive dengan men
+        +u yang disesuaikan berdasarkan role, header dengan informasi use
+        +r dan logout, dan footer dengan credit "SMAN 11 Kab. Tangerang";
+        + komponen Modal Notifikasi ditampilkan setelah wali kelas klik s
+        +impan dengan pesan "Data siswa [nama] berhasil disimpan dan noti
+        +fikasi telah dikirim ke orang tua via WhatsApp"; komponen upload
+        + CSV/Excel memiliki preview data sebelum upload dengan validasi 
+        +format; komponen PDF viewer menggunakan react-pdf dengan control
+        +s fullscreen dan download; semua form menggunakan validasi real-
+        +time dengan error messages yang jelas; state management mengguna
+        +kan React Context atau Zustand untuk global state seperti user a
+        +uthentication dan role-based access control; untuk geofencing gu
+        +nakan browser Geolocation API dengan polygon coordinates yang ak
+        +an dikonfigurasi di backend; styling menggunakan Tailwind CSS de
+        +ngan custom color scheme yang profesional untuk pendidikan; past
+        +ikan semua halaman mobile-responsive dengan hamburger menu untuk
+        + sidebar di mobile; tambahkan loading states dan toast notificat
+        +ions untuk semua aksi; buat komponen reusable untuk Card, Table,
+        + Modal, Button, Input, Select, dan File Upload; implementasi rou
+        +ting menggunakan React Router dengan protected routes berdasarka
+        +n role; untuk kamera selfie gunakan react-webcam dengan constrai
+        +nts maksimal 500KB untuk ukuran file; tampilkan loading spinner 
+        +saat proses upload dan geolocation lookup; semua API calls mengg
+        +unakan axios dengan interceptors untuk handling authentication t
+        +oken.                                                           
+
+● Prompt telah diperbaiki dengan perubahan berikut:
+
+  1. WhatsApp Gateway - Tombol simpan wali kelas sekarang menampilkan modal
+  "Data absensi berhasil disimpan dan dikirim" tanpa membuka tab baru, karena
+  backend akan otomatis mengirim WhatsApp ke ortu via gateway
+  2. Manajemen Role Kesiswaan - Kesiswaan bisa assign role guru sebagai wali 
+  kelas, guru BK, atau guru mapel. Ketika guru di-assign role tambahan (misal:
+  BK), otomatis mendapat akses fitur tersebut. Manajemen role terintegrasi
+  dengan data master guru yang dipegang kesiswaan.
+
+  ---
+  Prompt lengkap yang sudah diupdate ada di
+  C:\wamp64\www\qwen\FRONTEND_PROMPT.md.
+
+  Apakah prompt frontend ini sudah sesuai? Atau ada yang perlu direvisi lagi
+  sebelum saya lanjut ke bagian backend Laravel-nya?
+
+✻ Brewed for 30s
+
+❯ oh sorry, ternyata saya bisa upload .md filenya dengan nama DESIGN.md, ralat  
+  untuk 1 paragraf, silahkan dibuat panjang dan sedetail mungkin, ketika sudah  
+  selesai dibuat nanti saya akan lihat sebelum saya kirimkan ke AI-nya. Baik,   
+  silahkan di edit lagi promptnya                                               
+
+● Write(DESIGN.md)  ⎿  Error writing file
+
+  Read 1 file (ctrl+o to expand)
+  ⎿  Interrupted · What should Claude do instead?
+
+❯ oh sorry, ternyata saya bisa upload .md filenya dengan nama DESIGN.md, ralat  
+  untuk 1 paragraf, silahkan dibuat panjang dan sedetail mungkin, ketika sudah  
+  selesai dibuat nanti saya akan lihat sebelum saya kirimkan ke AI-nya. Baik,   
+  silahkan di edit lagi promptnya                                               
+
+● Write(DESIGN.md)
+  ⎿  Wrote 920 lines to DESIGN.md
+      2 # Sentri Siswa - Frontend Design Specification
+      3 ## Overview
+      4 
+      5 Bangun aplikasi frontend website absensi "Sentri Siswa" untuk SMA
+         menggunakan **React.js 18+** dengan **Tailwind CSS 3.4+** yang f
+        onent-based yang modular, maintainable, dan scalable.itektur comp
+      6 
+      7 ---
+      8 
+      9 ## Tech Stack & Libraries
+     … +1009 lines (ctrl+o to expand)
+
+● Saya telah membuat file DESIGN.md yang sangat detail di
+  C:\wamp64\www\qwen\DESIGN.md.
+
+  Isi Design Specification mencakup:
+
+  25 Halaman/Fitur Lengkap:
+
+  1. Landing Page - PDF viewer tata tertib
+  2. Register - Validasi NIP/NIS, form lengkap guru/siswa
+  3. Login - Username + password
+  4. Dashboard Layout - Sidebar, header, footer responsive
+  5. Kesiswaan - Master data guru, siswa, kelas, role, upload tata tertib, poin
+  pelanggaran
+  6. Wali Kelas - Absensi dengan view foto selfie siswa, modal success (bukan
+  tab baru)
+  7. Guru Mapel - Absensi tanpa selfie, tanpa notif WA
+  8. Guru BK - Monitoring semua kelas, rekap, plus fitur wali kelas jika
+  di-assign
+  9. Siswa - Absensi masuk/pulang dengan kamera + geofencing, riwayat, profil
+  10. Profil Guru - Data lengkap + upload foto
+
+  Komponen & Teknis:
+
+  - 25 Komponen Reusable (Button, Modal, Table, dll)
+  - State Management - Auth Context + Zustand
+  - Routing Structure - Protected routes per role
+  - API Integration - Axios config + endpoint list
+  - Styling - Color scheme, typography, spacing
+  - Performance - Lazy loading, debouncing, caching
+  - Error Handling - Global boundary, form validation
+
+  Poin Penting yang Direvisi:
+
+  ✅ Modal success setelah wali kelas klik simpan (bukan tab baru)
+  ✅ Backend otomatis kirim WA via gateway ke ortu
+  ✅ Guru bisa multi-role (Mapel + Wali Kelas, BK + Wali Kelas)
+  ✅ Kesiswaan assign role terintegrasi master data guru
+
+  ---
+  Silakan review file DESIGN.md tersebut. Jika sudah sesuai, saya akan lanjut ke
+   implementasi backend Laravel-nya di folder C:\wamp64\www\qwen\.
+
+✻ Baked for 1m 29s
+
+※ recap: Saya sedang membuat website absensi "Sentri Siswa" dengan Laravel + MySQL. Saya baru saja membuat file DESIGN.md yang berisi spesifikasi frontend lengkap untuk Anda berikan ke AI frontend.下一步 Anda perlu review file tersebut, lalu saya akan lanjut implementasi backend Laravel-nya. (disable recaps in /config)
