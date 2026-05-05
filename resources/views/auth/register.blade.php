@@ -1,5 +1,7 @@
 @extends('layouts.guest')
 
+@section('title', 'Register')
+
 @section('content')
 <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
     <div class="w-full max-w-lg">
@@ -137,7 +139,7 @@
         <div class="mt-6 text-center">
             <p class="text-sm text-gray-600">
                 Sudah punya akun?
-                <a href="#" class="font-medium text-blue-600 hover:text-blue-800">Login sekarang</a>
+                <a href="{{ route('auth.login') }}" class="font-medium text-blue-600 hover:text-blue-800">Login sekarang</a>
             </p>
         </div>
     </div>
