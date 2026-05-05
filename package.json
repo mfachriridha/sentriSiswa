@@ -3,8 +3,9 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build": "vite build",
-        "dev": "vite"
+        "build": "pnpm vite build",
+        "dev": "pnpm vite",
+        "preview": "pnpm vite preview"
     },
     "devDependencies": {
         "@tailwindcss/vite": "^4.0.0",

@@ -11,7 +11,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <style>
@@ -21,7 +20,7 @@
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #888; border-radius: 10px; }
     </style>
-    
+
     @stack('styles')
 </head>
 <body class="bg-gray-50 text-gray-900">
@@ -42,11 +41,11 @@
                 </a>
 
                 <div class="pt-4 pb-2 text-xs font-semibold text-slate-500 uppercase px-4">Menu Utama</div>
-                
+
                 <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
                     <i class="bi bi-camera-fill"></i> Presensi
                 </a>
-                
+
                 <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
                     <i class="bi bi-clock-history"></i> Riwayat Presensi
                 </a>
@@ -58,7 +57,7 @@
                 <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition">
                     <i class="bi bi-gear-fill"></i> Pengaturan
                 </a>
-                
+
                 <form action="#" method="POST" class="mt-4">
                     @csrf
                     <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-red-400 hover:bg-red-900/20 hover:text-red-300 transition">
