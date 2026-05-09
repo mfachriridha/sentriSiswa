@@ -54,8 +54,8 @@
 </head>
 <body class="bg-slate-50 text-slate-900 antialiased">
     <?php
-    $currentRole = Session::get('user_role', request()->query('role', 'kesiswaan'));
-    $userName = Session::get('user_name', 'Admin Kesiswaan');
+    $currentRole = Session::get('user_role', request()->query('role', 'siswa'));
+    $userName = Session::get('user_name', 'Ahmad Fauzi');
 
     $roleLabels = [
         'kesiswaan' => 'Kesiswaan', 'bk' => 'BK', 'walikelas' => 'Wali Kelas',
@@ -113,13 +113,27 @@
                     <a href="#" class="sidebar-link text-slate-700"><i class="bi bi-exclamation-triangle"></i> Poin Pelanggaran</a>
 
                 @elseif($currentRole === 'siswa')
-                    <a href="{{ route('siswa.dashboard') }}" class="sidebar-link {{ request()->routeIs('siswa.dashboard') ? 'active' : 'text-slate-700' }}"><i class="bi bi-grid"></i> Dashboard</a>
-                    <a href="{{ route('siswa.dashboard') }}" class="sidebar-link text-slate-700"><i class="bi bi-camera"></i> Presensi</a>
-                    <a href="#" class="sidebar-link text-slate-700"><i class="bi bi-bar-chart"></i> Poin Saya</a>
+                    <a href="{{ route('siswa.dashboard') }}" class="sidebar-link {{ request()->routeIs('siswa.dashboard') ? 'active' : 'text-slate-700' }}">
+                        <i class="bi bi-grid"></i> Dashboard
+                    </a>
+                    <a href="{{ route('siswa.kehadiran') }}" class="sidebar-link {{ request()->routeIs('siswa.kehadiran') ? 'active' : 'text-slate-700' }}">
+                        <i class="bi bi-camera"></i> Kehadiran
+                    </a>
+                    <a href="{{ route('siswa.riwayat') }}" class="sidebar-link {{ request()->routeIs('siswa.riwayat') ? 'active' : 'text-slate-700' }}">
+                        <i class="bi bi-clock-history"></i> Riwayat Kehadiran
+                    </a>
+                    <a href="{{ route('siswa.poin') }}" class="sidebar-link {{ request()->routeIs('siswa.poin') ? 'active' : 'text-slate-700' }}">
+                        <i class="bi bi-star"></i> Poin Saya
+                    </a>
                 @endif
 
                 <p class="px-3 py-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest pt-2">Akun</p>
-                <a href="{{ route('profile.index') }}" class="sidebar-link text-slate-700"><i class="bi bi-person-circle"></i> Profil</a>
+                <a href="{{ route('profile.index') }}" class="sidebar-link {{ request()->routeIs('profile.*') ? 'active' : 'text-slate-700' }}">
+                    <i class="bi bi-person-circle"></i> Profil
+                </a>
+                <a href="{{ route('siswa.biodata') }}" class="sidebar-link {{ request()->routeIs('siswa.biodata') ? 'active' : 'text-slate-700' }}">
+                    <i class="bi bi-journal-text"></i> Biodata
+                </a>
                 <a href="{{ route('landing') }}" class="sidebar-link text-rose-600 hover:bg-rose-50"><i class="bi bi-box-arrow-right"></i> Keluar</a>
             </nav>
         </aside>
