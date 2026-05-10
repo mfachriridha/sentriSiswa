@@ -32,10 +32,25 @@ class AdminController extends Controller
 
         $file = $request->file('csv_file');
         $handle = fopen($file->getRealPath(), 'r');
-        $header = fgetcsv($handle); // skip header
+
+        // Baca baris pertama untuk deteksi delimiter & BOM
+        $firstLine = fgets($handle);
+        if ($firstLine === false) {
+            fclose($handle);
+            return back()->with('error', 'File CSV kosong.');
+        }
+
+        // Hapus BOM (﻿)
+        $firstLine = preg_replace('/^\xEF\xBB\xBF/', '', $firstLine);
+
+        // Deteksi delimiter: kalau ada ";" pakai ";", kalau tidak pakai ","
+        $delimiter = (str_contains($firstLine, ';')) ? ';' : ',';
+
+        // Parse header
+        $header = str_getcsv(trim($firstLine), $delimiter);
         $imported = 0;
 
-        while (($row = fgetcsv($handle)) !== false) {
+        while (($row = fgetcsv($handle, 0, $delimiter)) !== false) {
             if (count($row) < 4) continue;
 
             $nama = trim($row[0] ?? '');

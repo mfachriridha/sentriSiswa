@@ -68,8 +68,8 @@
             <input type="file" name="csv_file" accept=".csv" class="mt-3 text-xs">
         </div>
         <div class="bg-blue-50 border border-blue-200 rounded-xl p-3 text-xs text-blue-700">
-            <strong>Template:</strong> "Nama","Jenis Kelamin","NIS","Kelas","NISN"<br>
-            <strong>Contoh:</strong> "Ahmad Fauzi","Laki-laki","S001","XII IPA 1","0087654321"
+            <strong>Template:</strong> Nama;Jenis Kelamin;NIS;Kelas;NISN<br>
+            <strong>Contoh:</strong> "ABYAN MUNADHIL";"Laki-laki";"252610001";"10. 1";"0104227920"
         </div>
         <div class="flex gap-3 pt-2"><button type="button" onclick="closeModal()" class="btn-outline flex-1 !py-2.5">Batal</button><button type="submit" class="btn-brand flex-1 !py-2.5">Upload</button></div>
     </form>
