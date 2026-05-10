@@ -74,32 +74,7 @@
             <nav class="flex-1 overflow-y-auto p-3 space-y-0.5">
                 <p class="px-3 py-2 text-[10px] font-bold text-muted uppercase tracking-widest">Menu</p>
 
-                @if($currentRole === 'kesiswaan')
-                    <a href="{{ route('kesiswaan.dashboard') }}" class="sidebar-link {{ request()->routeIs('kesiswaan.*') ? 'active' : '' }}"><i class="bi bi-grid"></i> Dashboard</a>
-                    <a href="{{ route('kesiswaan.master-data') }}" class="sidebar-link {{ request()->routeIs('kesiswaan.master-data') ? 'active' : '' }}"><i class="bi bi-database"></i> Master Data</a>
-                    <a href="{{ route('kesiswaan.manajemen-role') }}" class="sidebar-link {{ request()->routeIs('kesiswaan.manajemen-role') ? 'active' : '' }}"><i class="bi bi-person-gear"></i> Manajemen Role</a>
-                    <a href="#" class="sidebar-link"><i class="bi bi-diagram-3"></i> Manajemen Kelas</a>
-                    <a href="{{ route('kesiswaan.poin-pelanggaran') }}" class="sidebar-link {{ request()->routeIs('kesiswaan.poin-pelanggaran') ? 'active' : '' }}"><i class="bi bi-exclamation-triangle"></i> Poin Pelanggaran</a>
-                    <a href="#" class="sidebar-link"><i class="bi bi-file-pdf"></i> Upload Tata Tertib</a>
-
-                @elseif($currentRole === 'walikelas')
-                    <a href="{{ route('walikelas.dashboard') }}" class="sidebar-link {{ request()->routeIs('walikelas.dashboard') ? 'active' : '' }}"><i class="bi bi-grid"></i> Dashboard</a>
-                    <a href="#" class="sidebar-link"><i class="bi bi-camera"></i> Presensi Masuk</a>
-                    <a href="#" class="sidebar-link"><i class="bi bi-box-arrow-left"></i> Presensi Pulang</a>
-                    <a href="{{ route('walikelas.monitoring') }}" class="sidebar-link {{ request()->routeIs('walikelas.monitoring') ? 'active' : '' }}"><i class="bi bi-clock-history"></i> Riwayat Presensi</a>
-
-                @elseif($currentRole === 'guru-mapel')
-                    <a href="{{ route('guru-mapel.dashboard') }}" class="sidebar-link {{ request()->routeIs('guru-mapel.*') ? 'active' : '' }}"><i class="bi bi-grid"></i> Dashboard</a>
-                    <a href="#" class="sidebar-link"><i class="bi bi-calendar-check"></i> Presensi Kelas</a>
-                    <a href="#" class="sidebar-link"><i class="bi bi-clock-history"></i> Riwayat Presensi</a>
-
-                @elseif($currentRole === 'bk')
-                    <a href="{{ route('bk.dashboard') }}" class="sidebar-link {{ request()->routeIs('bk.dashboard') ? 'active' : '' }}"><i class="bi bi-grid"></i> Dashboard</a>
-                    <a href="{{ route('bk.monitoring') }}" class="sidebar-link {{ request()->routeIs('bk.monitoring') ? 'active' : '' }}"><i class="bi bi-eye"></i> Monitoring</a>
-                    <a href="{{ route('bk.rekap-presensi') }}" class="sidebar-link {{ request()->routeIs('bk.rekap-presensi') ? 'active' : '' }}"><i class="bi bi-bar-chart"></i> Rekap Presensi</a>
-                    <a href="#" class="sidebar-link"><i class="bi bi-exclamation-triangle"></i> Poin Pelanggaran</a>
-
-                @elseif($currentRole === 'siswa')
+                @if($currentRole === 'siswa')
                     <a href="{{ route('siswa.dashboard') }}" class="sidebar-link {{ request()->routeIs('siswa.dashboard') ? 'active' : '' }}"><i class="bi bi-grid"></i> Dashboard</a>
                     <a href="{{ route('siswa.kehadiran') }}" class="sidebar-link {{ request()->routeIs('siswa.kehadiran') ? 'active' : '' }}"><i class="bi bi-camera"></i> Kehadiran</a>
                     <a href="{{ route('siswa.riwayat') }}" class="sidebar-link {{ request()->routeIs('siswa.riwayat') ? 'active' : '' }}"><i class="bi bi-clock-history"></i> Riwayat Kehadiran</a>
