@@ -2,15 +2,9 @@
 
 @section('title', 'Dashboard - SentriSiswa')
 
-@section('content')
-<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-    <div>
-        <h1 class="text-2xl font-extrabold tracking-tight text-slate-900">Dashboard</h1>
-        <p class="text-sm text-slate-500 mt-0.5">{{ now()->translatedFormat('l, d F Y') }} &middot; Kelas XII IPA 1</p>
-    </div>
-    <span class="badge badge-blue self-start">Ahmad Fauzi</span>
-</div>
+@section('page-title', 'Dashboard')
 
+@section('content')
 <!-- Stat Cards -->
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
     <div class="card anim-up">
@@ -39,14 +33,10 @@
 <div class="grid gap-5 mb-6">
     <div class="card anim-up" style="animation-delay:.1s">
         <h3 class="font-bold text-slate-900 mb-4">Aksi Cepat</h3>
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
             <a href="{{ route('siswa.kehadiran') }}" class="flex flex-col items-center gap-2 p-4 border-2 border-slate-200 rounded-xl hover:border-emerald-300 hover:bg-emerald-50/50 transition-all group">
                 <i class="bi bi-camera-fill text-2xl text-emerald-500 group-hover:scale-110 transition-transform"></i>
-                <span class="text-xs font-bold text-slate-700">Presensi Masuk</span>
-            </a>
-            <a href="{{ route('siswa.kehadiran') }}" class="flex flex-col items-center gap-2 p-4 border-2 border-slate-200 rounded-xl hover:border-orange-300 hover:bg-orange-50/50 transition-all group">
-                <i class="bi bi-box-arrow-left text-2xl text-orange-500 group-hover:scale-110 transition-transform"></i>
-                <span class="text-xs font-bold text-slate-700">Presensi Pulang</span>
+                <span class="text-xs font-bold text-slate-700">Presensi</span>
             </a>
             <a href="{{ route('siswa.riwayat') }}" class="flex flex-col items-center gap-2 p-4 border-2 border-slate-200 rounded-xl hover:border-blue-300 hover:bg-blue-50/50 transition-all group">
                 <i class="bi bi-clock-history text-2xl text-blue-500 group-hover:scale-110 transition-transform"></i>

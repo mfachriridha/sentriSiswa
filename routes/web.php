@@ -60,6 +60,7 @@ Route::prefix('siswa')->name('siswa.')->group(function () {
     Route::view('/riwayat', 'siswa.riwayat')->name('riwayat');
     Route::view('/poin', 'siswa.poin')->name('poin');
     Route::view('/biodata', 'siswa.biodata')->name('biodata');
+    Route::view('/pengaturan', 'siswa.pengaturan')->name('pengaturan');
 });
 
 Route::prefix('profile')->name('profile.')->group(function () {

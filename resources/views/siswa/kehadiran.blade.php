@@ -2,14 +2,9 @@
 
 @section('title', 'Kehadiran - SentriSiswa')
 
-@section('content')
-<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-    <div>
-        <h1 class="text-2xl font-extrabold tracking-tight text-slate-900">Kehadiran</h1>
-        <p class="text-sm text-slate-500 mt-0.5">{{ now()->translatedFormat('l, d F Y') }} &middot; Kelas XII IPA 1</p>
-    </div>
-</div>
+@section('page-title', 'Kehadiran')
 
+@section('content')
 <div class="grid lg:grid-cols-5 gap-5">
     <!-- Kiri: Selfie + Lokasi -->
     <div class="lg:col-span-3 space-y-5">

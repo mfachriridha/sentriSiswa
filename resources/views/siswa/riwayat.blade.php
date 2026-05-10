@@ -2,17 +2,13 @@
 
 @section('title', 'Riwayat Kehadiran - SentriSiswa')
 
+@section('page-title', 'Riwayat Kehadiran')
+
 @section('content')
-<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-    <div>
-        <h1 class="text-2xl font-extrabold tracking-tight text-slate-900">Riwayat Kehadiran</h1>
-        <p class="text-sm text-slate-500 mt-0.5">Kelas XII IPA 1 &middot; Semester Genap 2025/2026</p>
-    </div>
-    <div class="flex gap-2">
+<div class="flex justify-end mb-6">
         <select class="input-field !w-auto !py-1.5 !text-xs">
             <option>Bulan Ini</option><option>Bulan Lalu</option><option>Semester Ini</option>
         </select>
-    </div>
 </div>
 
 <!-- Ringkasan Bulanan -->

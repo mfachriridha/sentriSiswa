@@ -2,14 +2,9 @@
 
 @section('title', 'Poin Saya - SentriSiswa')
 
-@section('content')
-<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-    <div>
-        <h1 class="text-2xl font-extrabold tracking-tight text-slate-900">Poin Saya</h1>
-        <p class="text-sm text-slate-500 mt-0.5">Saldo poin pelanggaran &mdash; awal 100</p>
-    </div>
-</div>
+@section('page-title', 'Poin Saya')
 
+@section('content')
 <!-- Poin Card -->
 <div class="card !bg-gradient-to-br !from-blue-50 !to-indigo-50 !border-blue-100 mb-6 anim-up">
     <div class="flex items-center justify-between">

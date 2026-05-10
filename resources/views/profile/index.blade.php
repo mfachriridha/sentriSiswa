@@ -2,15 +2,10 @@
 
 @section('title', 'Profil - SentriSiswa')
 
+@section('page-title', 'Profil')
+
 @section('content')
 <?php $role = \Illuminate\Support\Facades\Session::get('user_role', request()->query('role', 'kesiswaan')); ?>
-
-<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-    <div>
-        <h1 class="text-2xl font-extrabold tracking-tight text-slate-900">Profil Saya</h1>
-        <p class="text-sm text-slate-500 mt-0.5">Kelola informasi pribadi Anda</p>
-    </div>
-</div>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
     <!-- Profile Card -->

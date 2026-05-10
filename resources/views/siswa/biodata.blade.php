@@ -2,14 +2,9 @@
 
 @section('title', 'Biodata - SentriSiswa')
 
-@section('content')
-<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-    <div>
-        <h1 class="text-2xl font-extrabold tracking-tight text-slate-900">Biodata</h1>
-        <p class="text-sm text-slate-500 mt-0.5">Keterangan tentang diri peserta didik</p>
-    </div>
-</div>
+@section('page-title', 'Biodata')
 
+@section('content')
 <!-- Foto + Identitas Ringkas -->
 <div class="card anim-up mb-5">
     <div class="flex flex-col sm:flex-row gap-6 items-start">
