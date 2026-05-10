@@ -64,13 +64,13 @@
             <a href="{{ route('auth.register') }}" class="text-[#0062a0] hover:text-[#001e40] font-bold">Daftar di sini</a>
         </p>
 
-        <!-- Info Dummy -->
+        <!-- Info Demo -->
         <div class="mt-6 p-3 bg-[#d0e4ff] border border-[#0062a0]/20 rounded-lg">
-            <p class="text-[11px] font-bold text-[#00497a] uppercase tracking-wider">Demo Siswa</p>
-            <p class="text-xs text-[#00497a] mt-1">
-                Email: <span class="font-semibold">siswa@sentrisiswa.sch.id</span><br>
-                Kata Sandi: <span class="font-semibold">siswa123</span>
-            </p>
+            <p class="text-[11px] font-bold text-[#00497a] uppercase tracking-wider">Akun Demo</p>
+            <div class="text-xs text-[#00497a] mt-1 space-y-1">
+                <p><span class="font-semibold">Admin:</span> admin@sentrisiswa.sch.id / admin123</p>
+                <p><span class="font-semibold">Siswa:</span> siswa@sentrisiswa.sch.id / siswa123</p>
+            </div>
         </div>
 
     </div>
