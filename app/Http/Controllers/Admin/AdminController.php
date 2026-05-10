@@ -209,6 +209,17 @@ class AdminController extends Controller
         ]);
     }
 
+    public function downloadSiswaTemplate()
+    {
+        $content = "Nama;Jenis Kelamin;NIS;Kelas;NISN\n";
+        $content .= "BUDI SANTORO;Laki-laki;123456789;10 IPA 1;1234567891\n";
+
+        return response($content, 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="template_siswa.csv"',
+        ]);
+    }
+
     // ─── Classes (manajemen kelas) ───
     public function kelas()
     {

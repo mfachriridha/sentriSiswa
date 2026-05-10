@@ -9,7 +9,7 @@
     <div class="flex gap-2">
         <a href="{{ route('admin.siswa.tambah') }}" class="btn-brand !text-xs"><i class="bi bi-plus-lg"></i> Tambah Siswa</a>
         <button onclick="showModal()" class="btn-outline !text-xs"><i class="bi bi-upload"></i> Upload CSV</button>
-        <a href="#" onclick="alert('UI Only: Download template CSV')" class="btn-outline !text-xs"><i class="bi bi-download"></i> Template CSV</a>
+        <a href="{{ route('admin.siswa.template') }}" class="btn-outline !text-xs"><i class="bi bi-download"></i> Template CSV</a>
     </div>
 </div>
 

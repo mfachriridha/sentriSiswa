@@ -73,6 +73,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::post('/siswa/import', [AdminController::class, 'previewCsv'])->name('siswa.import');
     Route::get('/siswa/preview', [AdminController::class, 'preview'])->name('siswa.preview');
     Route::post('/siswa/import/confirm', [AdminController::class, 'importCsv'])->name('siswa.import.confirm');
+    Route::get('/siswa/template', [AdminController::class, 'downloadSiswaTemplate'])->name('siswa.template');
 
     // Poin Pelanggaran
     Route::get('/poin', [AdminController::class, 'poin'])->name('poin');
