@@ -56,7 +56,8 @@ Route::prefix('admin')->name('admin.')->middleware('auth.session')->group(functi
 
     // Tata Tertib
     Route::get('/tata-tertib', [AdminController::class, 'tataTertib'])->name('tata-tertib');
-    Route::post('/tata-tertib', [AdminController::class, 'uploadTataTertib'])->name('tata-tertib.upload');
+    Route::post('/tata-tertib', [AdminController::class, 'uploadTataTertib'])->name('tata-terbib.upload');
+    Route::delete('/tata-tertib', [AdminController::class, 'deleteTataTertib'])->name('tata-tertib.delete');
 
     // Laporan
     Route::view('/laporan', 'admin.laporan')->name('laporan');

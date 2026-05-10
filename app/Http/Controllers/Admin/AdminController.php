@@ -263,13 +263,29 @@ class AdminController extends Controller
         return back()->with('success', "Pelanggaran ditambahkan. Poin {$student->name}: {$student->fresh()->poin}");
     }
 
-    public function tataTertib() { return view('admin.tata-tertib'); }
+    public function tataTertib()
+    {
+        $pdfPath = 'storage/tata-tertib/tata_tertib.pdf';
+        $hasPdf = file_exists(public_path($pdfPath));
+        $fileSize = $hasPdf ? filesize(public_path($pdfPath)) : null;
+        $lastModified = $hasPdf ? filemtime(public_path($pdfPath)) : null;
+        return view('admin.tata-tertib', compact('hasPdf', 'pdfPath', 'fileSize', 'lastModified'));
+    }
 
     public function uploadTataTertib(Request $request)
     {
         $request->validate(['pdf' => 'required|file|mimes:pdf|max:10240']);
         $request->file('pdf')->storeAs('tata-tertib', 'tata_tertib.pdf', 'public');
         return back()->with('success', 'PDF Tata Tertib berhasil diunggah.');
+    }
+
+    public function deleteTataTertib()
+    {
+        $path = public_path('storage/tata-tertib/tata_tertib.pdf');
+        if (file_exists($path)) {
+            unlink($path);
+        }
+        return back()->with('success', 'PDF Tata Tertib berhasil dihapus.');
     }
 
     public function profile() { return view('admin.profile'); }
