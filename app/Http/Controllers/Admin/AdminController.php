@@ -23,10 +23,10 @@ class AdminController extends Controller
         ]);
     }
 
-    // ─── Classes (manajemen school_classes) ───
-    public function school_classes()
+    // ─── Classes (manajemen kelas) ───
+    public function kelas()
     {
-        return view('admin.school_classes', [
+        return view('admin.kelas', [
             'classes' => SchoolClass::withCount('students')->latest()->get(),
         ]);
     }
@@ -201,7 +201,7 @@ class AdminController extends Controller
             $nama = trim($row[0] ?? ''); $jk = trim($row[1] ?? '');
             $nis = trim($row[2] ?? ''); $class = trim($row[3] ?? ''); $nisn = trim($row[4] ?? '');
             if (empty($nama) || empty($nis)) continue;
-            $rows[] = ['nama' => $nama, 'gender' => $jk, 'nis' => $nis, 'school_classes' => $class, 'nisn' => $nisn];
+            $rows[] = ['nama' => $nama, 'gender' => $jk, 'nis' => $nis, 'kelas' => $class, 'nisn' => $nisn];
         }
         fclose($handle);
         if (empty($rows)) return back()->with('error', 'Tidak ada data valid di file CSV.');
@@ -222,7 +222,7 @@ class AdminController extends Controller
         if (empty($rows)) return redirect()->route('admin.siswa')->with('error', 'Tidak ada data CSV untuk disimpan.');
         $imported = 0;
         foreach ($rows as $row) {
-            $class = !empty($row['school_classes']) ? SchoolClass::firstOrCreate(['name' => $row['school_classes']]) : null;
+            $class = !empty($row['kelas']) ? SchoolClass::firstOrCreate(['name' => $row['kelas']]) : null;
             Student::create([
                 'name' => $row['nama'], 'gender' => $row['gender'], 'nis' => $row['nis'],
                 'school_class_id' => $class?->id, 'nisn' => $row['nisn'] ?: null,
