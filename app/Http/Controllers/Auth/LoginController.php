@@ -10,24 +10,17 @@ use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
-    public function showSiswaLogin()
+    public function showLogin()
     {
         return view('auth.login');
     }
 
-    public function showAdminLogin()
-    {
-        return view('admin.login');
-    }
-
-    public function login(Request $request, string $expectedRole)
+    public function login(Request $request)
     {
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
-
-        $credentials['role'] = $expectedRole;
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();

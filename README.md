@@ -43,11 +43,14 @@ php artisan key:generate
 php artisan serve
 ```
 
-### Login Demo (Frontend Only)
+### Login
 
 | Role | Email | Password |
 |---|---|---|
+| Admin | `admin@sentrisiswa.sch.id` | `admin123` |
 | Siswa | `siswa@sentrisiswa.sch.id` | `siswa123` |
+
+Semua login melalui `/auth/login`. Role otomatis terdeteksi dari akun.
 
 ## Status
 

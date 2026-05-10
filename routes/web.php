@@ -7,15 +7,12 @@ Route::get('/', function () {
     return view('landing');
 })->name('landing');
 
-// Auth routes
+// Auth routes — satu login untuk semua role
 Route::prefix('auth')->name('auth.')->group(function () {
-    Route::get('/login', [LoginController::class, 'showSiswaLogin'])->name('login');
+    Route::get('/login', [LoginController::class, 'showLogin'])->name('login');
+    Route::post('/login', [LoginController::class, 'login'])->name('login.post');
     Route::view('/register', 'auth.register')->name('register');
-    Route::post('/login', function () {
-        return app(LoginController::class)->login(request(), 'siswa');
-    })->name('login.post');
-    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-    Route::get('/logout', [LoginController::class, 'logout'])->name('logout.get');
+    Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
 });
 
 // Siswa
@@ -30,11 +27,6 @@ Route::prefix('siswa')->name('siswa.')->group(function () {
 
 // Admin
 Route::prefix('admin')->name('admin.')->group(function () {
-    Route::get('/login', [LoginController::class, 'showAdminLogin'])->name('login');
-    Route::post('/login', function () {
-        return app(LoginController::class)->login(request(), 'admin');
-    })->name('login.post');
-
     Route::view('/', 'admin.dashboard')->name('dashboard');
     Route::view('/guru', 'admin.guru')->name('guru');
     Route::view('/guru/tambah', 'admin.guru-form')->name('guru.tambah');

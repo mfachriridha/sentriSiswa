@@ -60,7 +60,7 @@
         <!-- Sidebar -->
         <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 border-r border-[#c3c6d1]/30 bg-white -translate-x-full lg:translate-x-0 lg:relative transition-transform duration-300 flex flex-col">
             <div class="p-5 border-b border-[#c3c6d1]/30">
-                <a href="{{ route('landing') }}" class="flex items-center gap-2.5">
+                <a href="{{ $currentRole === 'admin' ? route('admin.dashboard') : route('siswa.dashboard') }}" class="flex items-center gap-2.5">
                     <span class="w-9 h-9 bg-[#001e40] rounded-xl flex items-center justify-center text-white shadow-sm">
                         <i class="bi bi-mortarboard-fill text-lg"></i>
                     </span>
@@ -96,7 +96,7 @@
                 @elseif($currentRole === 'siswa')
                 <a href="{{ route('siswa.pengaturan') }}" class="sidebar-link {{ request()->routeIs('siswa.pengaturan') ? 'active' : '' }}"><i class="bi bi-gear"></i> Pengaturan</a>
                 @endif
-                <a href="{{ route('auth.logout.get') }}" class="sidebar-link text-[#ba1a1a] hover:bg-[#ffdad6]"><i class="bi bi-box-arrow-right"></i> Keluar</a>
+                <a href="{{ route('auth.logout') }}" class="sidebar-link text-[#ba1a1a] hover:bg-[#ffdad6]"><i class="bi bi-box-arrow-right"></i> Keluar</a>
             </nav>
         </aside>
 
@@ -141,7 +141,7 @@
             <i class="bi bi-gear"></i> {{ $currentRole === 'admin' ? 'Dashboard' : 'Pengaturan' }}
         </a>
         <hr class="border-[#c3c6d1]/30 mx-3">
-        <a href="{{ route('auth.logout.get') }}" class="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-[#ba1a1a] hover:bg-[#ffdad6] transition">
+        <a href="{{ route('auth.logout') }}" class="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-[#ba1a1a] hover:bg-[#ffdad6] transition">
             <i class="bi bi-box-arrow-right"></i> Keluar
         </a>
     </div>
