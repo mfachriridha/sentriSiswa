@@ -33,7 +33,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/guru/tambah', function () { return view('admin.guru-form'); })->name('guru.tambah');
     Route::get('/guru/edit', function () { return view('admin.guru-form'); })->name('guru.edit');
     Route::get('/siswa', [AdminController::class, 'siswa'])->name('siswa');
-    Route::post('/siswa/import', [AdminController::class, 'importCsv'])->name('siswa.import');
+    Route::post('/siswa/import', [AdminController::class, 'previewCsv'])->name('siswa.import');
+    Route::get('/siswa/preview', [AdminController::class, 'preview'])->name('siswa.preview');
+    Route::post('/siswa/import/confirm', [AdminController::class, 'importCsv'])->name('siswa.import.confirm');
     Route::get('/siswa/tambah', function () { return view('admin.siswa-form'); })->name('siswa.tambah');
     Route::get('/siswa/edit', function () { return view('admin.siswa-form'); })->name('siswa.edit');
     Route::view('/kelas', 'admin.kelas')->name('kelas');
