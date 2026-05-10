@@ -46,21 +46,36 @@
 </head>
 <body class="bg-[#f8f9fa] text-[#191c1d] antialiased">
     <?php
-    $currentRole = Session::get('user_role', request()->query('role', 'siswa'));
-    $userName = Session::get('user_name', 'Ahmad Fauzi');
+    $user = Auth::user();
+    $currentRole = $user?->role ?? 'siswa';
+    $userName = $user?->name ?? 'Pengguna';
 
     $roleLabels = [
-        'kesiswaan' => 'Kesiswaan', 'bk' => 'BK', 'walikelas' => 'Wali Kelas',
-        'guru-mapel' => 'Guru Mapel', 'siswa' => 'Siswa', 'admin' => 'Admin'
+        'bk' => 'BK', 'wali_kelas' => 'Wali Kelas',
+        'siswa' => 'Siswa', 'admin' => 'Admin'
     ];
     $roleLabel = $roleLabels[$currentRole] ?? 'Admin';
+
+    $dashboardRoute = match ($currentRole) {
+        'admin' => route('admin.dashboard'),
+        'wali_kelas' => route('wali-kelas.dashboard'),
+        'bk' => route('bk.dashboard'),
+        default => route('siswa.dashboard'),
+    };
+
+    $profileRoute = match ($currentRole) {
+        'admin' => route('admin.profile'),
+        'wali_kelas' => route('wali-kelas.dashboard'),
+        'bk' => route('bk.dashboard'),
+        default => route('siswa.pengaturan'),
+    };
     ?>
 
     <div class="flex h-screen overflow-hidden">
         <!-- Sidebar -->
         <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 border-r border-[#c3c6d1]/30 bg-white -translate-x-full lg:translate-x-0 lg:relative transition-transform duration-300 flex flex-col">
             <div class="p-5 border-b border-[#c3c6d1]/30">
-                <a href="{{ $currentRole === 'admin' ? route('admin.dashboard') : route('siswa.dashboard') }}" class="flex items-center gap-2.5">
+                <a href="{{ $dashboardRoute }}" class="flex items-center gap-2.5">
                     <span class="w-9 h-9 bg-[#001e40] rounded-xl flex items-center justify-center text-white shadow-sm">
                         <i class="bi bi-mortarboard-fill text-lg"></i>
                     </span>
@@ -83,6 +98,14 @@
                     <a href="{{ route('admin.poin') }}" class="sidebar-link {{ request()->routeIs('admin.poin') ? 'active' : '' }}"><i class="bi bi-exclamation-triangle"></i> Poin Pelanggaran</a>
                     <a href="{{ route('admin.laporan') }}" class="sidebar-link {{ request()->routeIs('admin.laporan') ? 'active' : '' }}"><i class="bi bi-bar-chart"></i> Laporan</a>
                     <a href="{{ route('admin.integrasi') }}" class="sidebar-link {{ request()->routeIs('admin.integrasi') ? 'active' : '' }}"><i class="bi bi-plug"></i> Integrasi</a>
+                @elseif($currentRole === 'wali_kelas')
+                    <a href="{{ route('wali-kelas.dashboard') }}" class="sidebar-link {{ request()->routeIs('wali-kelas.dashboard') ? 'active' : '' }}"><i class="bi bi-grid"></i> Dashboard</a>
+                    <a href="#" class="sidebar-link opacity-50"><i class="bi bi-camera"></i> Verifikasi Selfie</a>
+                    <a href="#" class="sidebar-link opacity-50"><i class="bi bi-bar-chart"></i> Rekap Kehadiran</a>
+                @elseif($currentRole === 'bk')
+                    <a href="{{ route('bk.dashboard') }}" class="sidebar-link {{ request()->routeIs('bk.dashboard') ? 'active' : '' }}"><i class="bi bi-grid"></i> Dashboard</a>
+                    <a href="#" class="sidebar-link opacity-50"><i class="bi bi-eye"></i> Monitoring Kelas</a>
+                    <a href="#" class="sidebar-link opacity-50"><i class="bi bi-bar-chart"></i> Rekap Kehadiran</a>
                 @elseif($currentRole === 'siswa')
                     <a href="{{ route('siswa.dashboard') }}" class="sidebar-link {{ request()->routeIs('siswa.dashboard') ? 'active' : '' }}"><i class="bi bi-grid"></i> Dashboard</a>
                     <a href="{{ route('siswa.kehadiran') }}" class="sidebar-link {{ request()->routeIs('siswa.kehadiran') ? 'active' : '' }}"><i class="bi bi-camera"></i> Kehadiran</a>
@@ -137,7 +160,7 @@
 
     <!-- Avatar Dropdown -->
     <div id="avatar-dropdown" class="fixed z-[100] w-44 bg-white border border-[#c3c6d1]/30 rounded-lg shadow-lg py-1" style="display:none">
-        <a href="{{ $currentRole === 'admin' ? route('admin.profile') : route('siswa.pengaturan') }}" class="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-[#191c1d] hover:bg-[#d5e3ff] transition">
+        <a href="{{ $profileRoute }}" class="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-[#191c1d] hover:bg-[#d5e3ff] transition">
             <i class="bi bi-gear"></i> {{ $currentRole === 'admin' ? 'Profil' : 'Pengaturan' }}
         </a>
         <hr class="border-[#c3c6d1]/30 mx-3">

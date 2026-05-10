@@ -5,59 +5,172 @@
 @section('page-title', 'Manajemen Guru')
 
 @section('content')
+@if(session('success'))
+<div class="mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-xs font-semibold text-emerald-700 flex items-center gap-2 anim-up">
+    <i class="bi bi-check-circle-fill"></i> {{ session('success') }}
+    <button onclick="this.parentElement.remove()" class="ml-auto text-emerald-400 hover:text-emerald-600"><i class="bi bi-x"></i></button>
+</div>
+@endif
+@if(session('error'))
+<div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-xs font-semibold text-red-700 flex items-center gap-2 anim-up">
+    <i class="bi bi-x-circle-fill"></i> {{ session('error') }}
+    <button onclick="this.parentElement.remove()" class="ml-auto text-red-400 hover:text-red-600"><i class="bi bi-x"></i></button>
+</div>
+@endif
+@if($errors->any())
+<div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-xs font-semibold text-red-700 anim-up">
+    @foreach($errors->all() as $error)
+        <p><i class="bi bi-x-circle-fill mr-1"></i> {{ $error }}</p>
+    @endforeach
+    <button onclick="this.parentElement.remove()" class="ml-auto text-red-400 hover:text-red-600"><i class="bi bi-x"></i></button>
+</div>
+@endif
+
 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
     <div class="flex gap-2">
-        <a href="{{ route('admin.guru.tambah') }}" class="btn-brand !text-xs"><i class="bi bi-plus-lg"></i> Tambah Guru</a>
-        <button onclick="showModal()" class="btn-outline !text-xs"><i class="bi bi-upload"></i> Upload CSV</button>
-        <a href="#" onclick="alert('UI Only: Download template CSV')" class="btn-outline !text-xs"><i class="bi bi-download"></i> Template CSV</a>
+        <button onclick="showModal()" class="btn-brand !text-xs"><i class="bi bi-plus-lg"></i> Tambah Guru</button>
     </div>
 </div>
 
 <div class="card anim-up">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-        <h3 class="font-bold text-slate-900">Data Guru <span class="text-sm font-medium text-muted">(42)</span></h3>
-        <input type="text" class="input-field !w-48 !py-1.5 !text-xs" placeholder="Cari nama / NIP...">
+        <h3 class="font-bold text-slate-900">Data Guru <span class="text-sm font-medium text-muted">({{ $teachers->count() }})</span></h3>
     </div>
     <div class="table-container">
         <table class="w-full">
             <thead>
-                <tr><th class="table-header">NIP</th><th class="table-header">Nama</th><th class="table-header">JK</th><th class="table-header">Mapel</th><th class="table-header">Wali Kelas</th><th class="table-header">WA</th><th class="table-header text-center">Aksi</th></tr>
+                <tr>
+                    <th class="table-header">NIP</th>
+                    <th class="table-header">Nama</th>
+                    <th class="table-header">Role</th>
+                    <th class="table-header">Kelas</th>
+                    <th class="table-header">Status</th>
+                    <th class="table-header text-center">Aksi</th>
+                </tr>
             </thead>
             <tbody>
-                <tr><td class="table-cell">1234567890</td><td class="table-cell font-semibold">Budi Santoso, S.Pd</td><td class="table-cell">L</td><td class="table-cell">Matematika</td><td class="table-cell">XII IPA 1</td><td class="table-cell">081234567890</td><td class="table-cell-aksi"><div class="flex items-center justify-center gap-1"><button onclick="alert('Lihat detail guru')" class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold border border-[#c3c6d1] text-[#43474f] hover:bg-[#edeeef] transition cursor-pointer"><i class="bi bi-eye"></i> Lihat</button><a href="{{ route('admin.guru.edit') }}" class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 transition"><i class="bi bi-pencil"></i> Ubah</a><button onclick="alert('Hapus Budi Santoso?')" class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold bg-red-600 text-white hover:bg-red-700 transition cursor-pointer"><i class="bi bi-trash"></i> Hapus</button></div></td></tr>
-                <tr><td class="table-cell">0987654321</td><td class="table-cell font-semibold">Siti Nurhaliza, M.Pd</td><td class="table-cell">P</td><td class="table-cell">Biologi, BK</td><td class="table-cell">—</td><td class="table-cell">081298765432</td><td class="table-cell-aksi"><div class="flex items-center justify-center gap-1"><button onclick="alert('Lihat detail guru')" class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold border border-[#c3c6d1] text-[#43474f] hover:bg-[#edeeef] transition cursor-pointer"><i class="bi bi-eye"></i> Lihat</button><a href="{{ route('admin.guru.edit') }}" class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 transition"><i class="bi bi-pencil"></i> Ubah</a><button onclick="alert('Hapus Siti Nurhaliza?')" class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold bg-red-600 text-white hover:bg-red-700 transition cursor-pointer"><i class="bi bi-trash"></i> Hapus</button></div></td></tr>
+                @forelse($teachers as $teacher)
+                <tr>
+                    <td class="table-cell text-xs">{{ $teacher->nip ?? '—' }}</td>
+                    <td class="table-cell font-semibold">{{ $teacher->name }}</td>
+                    <td class="table-cell">
+                        @if($teacher->role === 'wali_kelas')
+                            <span class="badge badge-blue">Wali Kelas</span>
+                        @else
+                            <span class="badge badge-amber">BK</span>
+                        @endif
+                    </td>
+                    <td class="table-cell text-xs">
+                        @foreach($teacher->teacherClasses as $tc)
+                            {{ $tc->schoolClass->name }}@if(!$loop->last), @endif
+                        @endforeach
+                        @if($teacher->teacherClasses->isEmpty())
+                            —
+                        @endif
+                    </td>
+                    <td class="table-cell">
+                        @if($teacher->is_active)
+                            <span class="badge badge-green">Aktif</span>
+                        @else
+                            <span class="badge badge-red">Belum Registrasi</span>
+                        @endif
+                    </td>
+                    <td class="table-cell-aksi">
+                        <div class="flex items-center justify-center gap-1">
+                            <button onclick="editGuru({{ $teacher->id }})" class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 transition cursor-pointer">
+                                <i class="bi bi-pencil"></i> Ubah
+                            </button>
+                            <form action="{{ route('admin.guru.destroy', $teacher) }}" method="POST" class="inline" onsubmit="return confirm('Hapus guru {{ $teacher->name }}?')">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold bg-red-600 text-white hover:bg-red-700 transition cursor-pointer">
+                                    <i class="bi bi-trash"></i> Hapus
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                @empty
+                <tr><td colspan="6" class="table-cell text-center text-muted py-8">Belum ada data guru.</td></tr>
+                @endforelse
             </tbody>
         </table>
     </div>
 </div>
 
-<!-- CSV Upload Modal -->
+<!-- Add/Edit Modal -->
 <div id="modalOverlay" class="hidden fixed inset-0 z-50 bg-black/40" onclick="closeModal()"></div>
-<div id="modalBox" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
-    <div class="flex justify-between items-center mb-4"><h3 class="font-bold text-lg">Upload CSV Guru</h3><button onclick="closeModal()" class="text-slate-400 hover:text-slate-600"><i class="bi bi-x-lg text-xl"></i></button></div>
-    <p class="text-xs text-slate-500 mb-4">Upload file CSV dengan kolom: <strong>Nama, Jenis Kelamin, NIP</strong></p>
-    <div class="border-2 border-dashed border-slate-200 rounded-xl p-6 text-center mb-4">
-        <i class="bi bi-cloud-upload text-3xl text-slate-300 mb-2 block"></i>
-        <p class="text-sm text-slate-600">Klik atau drag file</p>
-        <p class="text-xs text-slate-400">.csv (max 2MB)</p>
-        <button class="btn-outline !py-2 !text-xs mt-3">Pilih File</button>
+<div id="modalBox" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-white rounded-2xl shadow-xl w-full max-w-md p-6 anim-up">
+    <div class="flex justify-between items-center mb-4">
+        <h3 id="modalTitle" class="font-bold text-lg">Tambah Guru</h3>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600"><i class="bi bi-x-lg text-xl"></i></button>
     </div>
-    <div class="bg-blue-50 border border-blue-200 rounded-xl p-3 text-xs text-blue-700">
-        <strong>Template:</strong> "Nama","Jenis Kelamin","NIP"<br>
-        <strong>Contoh:</strong> "Budi Santoso","Laki-laki","1234567890"
-    </div>
-    <div class="flex gap-3 pt-2"><button type="button" onclick="closeModal()" class="btn-outline flex-1 !py-2.5">Batal</button><button type="button" onclick="alert('UI Only: CSV diupload!');closeModal()" class="btn-brand flex-1 !py-2.5">Upload</button></div>
+
+    <form id="guruForm" method="POST" action="{{ route('admin.guru.store') }}" class="space-y-4">
+        @csrf
+        <input type="hidden" name="_method" id="formMethod" value="POST">
+
+        <div>
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Nama Lengkap</label>
+            <input type="text" name="name" id="guruName" required class="input-field" placeholder="Nama lengkap dengan gelar">
+        </div>
+        <div>
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">NIP</label>
+            <input type="text" name="nip" id="guruNip" class="input-field" placeholder="19920912 202221 2 018" maxlength="22" inputmode="numeric">
+            <p class="text-[10px] text-muted mt-1">Kosongkan jika tidak ada NIP</p>
+        </div>
+        <div>
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Role</label>
+            <select name="role" id="guruRole" required class="input-field">
+                <option value="wali_kelas">Wali Kelas</option>
+                <option value="bk">BK</option>
+            </select>
+        </div>
+
+        <div class="flex gap-3 pt-2">
+            <button type="button" onclick="closeModal()" class="btn-outline flex-1 !py-2.5">Batal</button>
+            <button type="submit" class="btn-brand flex-1 !py-2.5">
+                <span class="btn-text"><i class="bi bi-check-circle"></i> Simpan</span>
+                <span class="btn-loading hidden"><i class="bi bi-hourglass-split animate-spin"></i> Menyimpan...</span>
+            </button>
+        </div>
+    </form>
 </div>
 
 @push('scripts')
 <script>
-function showModal() {
+function showModal(user = null) {
     document.getElementById('modalOverlay').classList.remove('hidden');
     document.getElementById('modalBox').classList.remove('hidden');
+    const form = document.getElementById('guruForm');
+    document.getElementById('guruName').value = user ? user.name : '';
+    document.getElementById('guruNip').value = user ? (user.nip || '') : '';
+    document.getElementById('guruRole').value = user ? user.role : 'wali_kelas';
+    document.getElementById('modalTitle').textContent = user ? 'Edit Guru' : 'Tambah Guru';
+    document.getElementById('formMethod').value = user ? 'PUT' : 'POST';
+    form.action = user ? '/admin/guru/' + user.id : '{{ route("admin.guru.store") }}';
 }
+
 function closeModal() {
     document.getElementById('modalOverlay').classList.add('hidden');
     document.getElementById('modalBox').classList.add('hidden');
+}
+
+function setLoading(btn, loading) {
+    const t = btn.querySelector('.btn-text'), l = btn.querySelector('.btn-loading');
+    if (t) t.classList.toggle('hidden', loading);
+    if (l) l.classList.toggle('hidden', !loading);
+    btn.disabled = loading;
+}
+
+document.getElementById('guruForm').addEventListener('submit', function() {
+    setLoading(this.querySelector('[type="submit"]'), true);
+});
+
+function editGuru(id) {
+    fetch('/admin/guru/' + id + '/edit?_ajax=1', { headers: {'Accept': 'application/json'} })
+        .then(r => r.json())
+        .then(user => showModal(user))
+        .catch(() => alert('Gagal memuat data guru.'));
 }
 </script>
 @endpush

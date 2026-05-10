@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
@@ -26,15 +25,20 @@ class LoginController extends Controller
             $request->session()->regenerate();
 
             $user = Auth::user();
-            Session::put('user_role', $user->role);
-            Session::put('user_name', $user->name);
-            Session::put('user_email', $user->email);
 
-            return redirect()->intended(
-                $user->role === 'admin'
-                    ? route('admin.dashboard')
-                    : route('siswa.dashboard')
-            );
+            if (! $user->is_active && $user->role !== 'admin') {
+                Auth::logout();
+                throw ValidationException::withMessages([
+                    'email' => 'Akun belum diaktivasi. Silakan lengkapi registrasi terlebih dahulu.',
+                ]);
+            }
+
+            return redirect()->intended(match ($user->role) {
+                'admin' => route('admin.dashboard'),
+                'wali_kelas' => route('wali-kelas.dashboard'),
+                'bk' => route('bk.dashboard'),
+                default => route('siswa.dashboard'),
+            });
         }
 
         throw ValidationException::withMessages([
@@ -47,7 +51,6 @@ class LoginController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        Session::flush();
 
         return redirect()->route('landing');
     }

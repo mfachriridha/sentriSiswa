@@ -10,7 +10,7 @@ class AuthenticateSession
 {
     public function handle(Request $request, Closure $next)
     {
-        if (!Auth::check() && !session()->has('user_role')) {
+        if (! Auth::check()) {
             return redirect()->route('auth.login');
         }
 

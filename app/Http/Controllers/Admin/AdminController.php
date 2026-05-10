@@ -8,6 +8,7 @@ use App\Models\SchoolClass;
 use App\Models\Student;
 use App\Models\StudentParent;
 use App\Models\StudentViolation;
+use App\Models\User;
 use App\Models\Violation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -23,6 +24,81 @@ class AdminController extends Controller
         ]);
     }
 
+    // ─── Guru ───
+    public function guru()
+    {
+        $teachers = User::whereIn('role', ['wali_kelas', 'bk'])
+            ->with('teacherClasses.schoolClass')
+            ->latest()
+            ->get();
+
+        return view('admin.guru', compact('teachers'));
+    }
+
+    public function storeGuru(Request $request)
+    {
+        $data = $request->validate([
+            'name' => 'required|string|max:200',
+            'nip' => 'nullable|regex:/^[0-9\s]+$/|max:22|unique:users,nip',
+            'role' => 'required|in:wali_kelas,bk',
+        ]);
+
+        $nip = $data['nip'] ? trim($data['nip']) : null;
+        $email = $nip
+            ? preg_replace('/\s+/', '', $nip).'@sentrisiswa.sch.id'
+            : strtolower(preg_replace('/[^a-z]/', '', $data['name'])).'@sentrisiswa.sch.id';
+
+        $user = User::create([
+            'name' => $data['name'],
+            'nip' => $nip,
+            'email' => $email,
+            'role' => $data['role'],
+            'is_active' => false,
+            'password' => Hash::make('password123'),
+        ]);
+
+        return back()->with('success', 'Guru berhasil ditambahkan.');
+    }
+
+    public function editGuru(User $user)
+    {
+        $user->load('teacherClasses.schoolClass');
+
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json($user);
+        }
+
+        return view('admin.guru-form', compact('user'));
+    }
+
+    public function updateGuru(Request $request, User $user)
+    {
+        $data = $request->validate([
+            'name' => 'required|string|max:200',
+            'nip' => 'nullable|regex:/^[0-9\s]+$/|max:22|unique:users,nip,'.$user->id,
+            'role' => 'required|in:wali_kelas,bk',
+        ]);
+
+        $user->update([
+            'name' => $data['name'],
+            'nip' => $data['nip'] ? trim($data['nip']) : null,
+            'role' => $data['role'],
+        ]);
+
+        return back()->with('success', 'Data guru berhasil diperbarui.');
+    }
+
+    public function destroyGuru(User $user)
+    {
+        if ($user->role === 'admin') {
+            return back()->with('error', 'Admin tidak dapat dihapus.');
+        }
+
+        $user->delete();
+
+        return back()->with('success', 'Guru berhasil dihapus.');
+    }
+
     // ─── Classes (manajemen kelas) ───
     public function kelas()
     {
@@ -35,13 +111,15 @@ class AdminController extends Controller
     {
         $data = $request->validate(['name' => 'required|string|max:50|unique:school_classes,name']);
         SchoolClass::create($data);
+
         return back()->with('success', 'Kelas berhasil ditambahkan.');
     }
 
     public function updateClass(Request $request, SchoolClass $class)
     {
-        $data = $request->validate(['name' => 'required|string|max:50|unique:school_classes,name,' . $class->id]);
+        $data = $request->validate(['name' => 'required|string|max:50|unique:school_classes,name,'.$class->id]);
         $class->update($data);
+
         return back()->with('success', 'Kelas berhasil diperbarui.');
     }
 
@@ -51,6 +129,7 @@ class AdminController extends Controller
             return back()->with('error', 'Kelas tidak bisa dihapus karena masih memiliki siswa.');
         }
         $class->delete();
+
         return back()->with('success', 'Kelas berhasil dihapus.');
     }
 
@@ -58,6 +137,7 @@ class AdminController extends Controller
     public function siswa()
     {
         $students = Student::with(['schoolClass', 'father', 'mother'])->latest()->get();
+
         return view('admin.siswa', ['students' => $students, 'totalStudents' => $students->count()]);
     }
 
@@ -80,7 +160,7 @@ class AdminController extends Controller
         ]);
 
         $class = null;
-        if (!empty($data['class_name'])) {
+        if (! empty($data['class_name'])) {
             $class = SchoolClass::firstOrCreate(['name' => $data['class_name']]);
         }
 
@@ -100,13 +180,13 @@ class AdminController extends Controller
             'admission_date' => $data['admission_date'] ?? null,
         ]);
 
-        if (!empty($data['father_name'])) {
+        if (! empty($data['father_name'])) {
             StudentParent::create(['student_id' => $student->id, 'type' => 'father', 'name' => $data['father_name'], 'job' => $data['father_job'] ?? null, 'phone' => $data['father_phone'] ?? null]);
         }
-        if (!empty($data['mother_name'])) {
+        if (! empty($data['mother_name'])) {
             StudentParent::create(['student_id' => $student->id, 'type' => 'mother', 'name' => $data['mother_name'], 'job' => $data['mother_job'] ?? null, 'phone' => $data['mother_phone'] ?? null]);
         }
-        if (!empty($data['guardian_name'])) {
+        if (! empty($data['guardian_name'])) {
             Guardian::create(['student_id' => $student->id, 'name' => $data['guardian_name'], 'job' => $data['guardian_job'] ?? null, 'phone' => $data['guardian_phone'] ?? null, 'address' => $data['guardian_address'] ?? null]);
         }
 
@@ -116,6 +196,7 @@ class AdminController extends Controller
     public function editSiswa(Student $student)
     {
         $student->load(['schoolClass', 'father', 'mother', 'guardian']);
+
         return view('admin.siswa-form', ['student' => $student]);
     }
 
@@ -138,7 +219,7 @@ class AdminController extends Controller
         ]);
 
         $class = null;
-        if (!empty($data['class_name'])) {
+        if (! empty($data['class_name'])) {
             $class = SchoolClass::firstOrCreate(['name' => $data['class_name']]);
         }
 
@@ -158,19 +239,19 @@ class AdminController extends Controller
             'admission_date' => $data['admission_date'] ?? null,
         ]);
 
-        if (!empty($data['father_name'])) {
+        if (! empty($data['father_name'])) {
             StudentParent::updateOrCreate(
                 ['student_id' => $student->id, 'type' => 'father'],
                 ['name' => $data['father_name'], 'job' => $data['father_job'] ?? null, 'phone' => $data['father_phone'] ?? null]
             );
         }
-        if (!empty($data['mother_name'])) {
+        if (! empty($data['mother_name'])) {
             StudentParent::updateOrCreate(
                 ['student_id' => $student->id, 'type' => 'mother'],
                 ['name' => $data['mother_name'], 'job' => $data['mother_job'] ?? null, 'phone' => $data['mother_phone'] ?? null]
             );
         }
-        if (!empty($data['guardian_name'])) {
+        if (! empty($data['guardian_name'])) {
             Guardian::updateOrCreate(
                 ['student_id' => $student->id],
                 ['name' => $data['guardian_name'], 'job' => $data['guardian_job'] ?? null, 'phone' => $data['guardian_phone'] ?? null, 'address' => $data['guardian_address'] ?? null]
@@ -183,6 +264,7 @@ class AdminController extends Controller
     public function destroyStudent(Student $student)
     {
         $student->delete();
+
         return back()->with('success', 'Siswa berhasil dihapus.');
     }
 
@@ -192,37 +274,56 @@ class AdminController extends Controller
         $file = $request->file('csv_file');
         $handle = fopen($file->getRealPath(), 'r');
         $firstLine = fgets($handle);
-        if ($firstLine === false) { fclose($handle); return back()->with('error', 'File CSV kosong.'); }
+        if ($firstLine === false) {
+            fclose($handle);
+
+            return back()->with('error', 'File CSV kosong.');
+        }
         $firstLine = preg_replace('/^\xEF\xBB\xBF/', '', $firstLine);
         $delimiter = str_contains($firstLine, ';') ? ';' : ',';
         $rows = [];
         while (($row = fgetcsv($handle, 0, $delimiter)) !== false) {
-            if (count($row) < 4) continue;
-            $nama = trim($row[0] ?? ''); $jk = trim($row[1] ?? '');
-            $nis = trim($row[2] ?? ''); $class = trim($row[3] ?? ''); $nisn = trim($row[4] ?? '');
-            if (empty($nama) || empty($nis)) continue;
+            if (count($row) < 4) {
+                continue;
+            }
+            $nama = trim($row[0] ?? '');
+            $jk = trim($row[1] ?? '');
+            $nis = trim($row[2] ?? '');
+            $class = trim($row[3] ?? '');
+            $nisn = trim($row[4] ?? '');
+            if (empty($nama) || empty($nis)) {
+                continue;
+            }
             $rows[] = ['nama' => $nama, 'gender' => $jk, 'nis' => $nis, 'kelas' => $class, 'nisn' => $nisn];
         }
         fclose($handle);
-        if (empty($rows)) return back()->with('error', 'Tidak ada data valid di file CSV.');
+        if (empty($rows)) {
+            return back()->with('error', 'Tidak ada data valid di file CSV.');
+        }
         session()->put('csv_rows', $rows);
+
         return redirect()->route('admin.siswa.preview');
     }
 
     public function preview()
     {
         $rows = session('csv_rows', []);
-        if (empty($rows)) return redirect()->route('admin.siswa')->with('error', 'Tidak ada data CSV untuk dipratinjau.');
+        if (empty($rows)) {
+            return redirect()->route('admin.siswa')->with('error', 'Tidak ada data CSV untuk dipratinjau.');
+        }
+
         return view('admin.siswa-preview', ['rows' => $rows, 'total' => count($rows)]);
     }
 
     public function importCsv()
     {
         $rows = session('csv_rows', []);
-        if (empty($rows)) return redirect()->route('admin.siswa')->with('error', 'Tidak ada data CSV untuk disimpan.');
+        if (empty($rows)) {
+            return redirect()->route('admin.siswa')->with('error', 'Tidak ada data CSV untuk disimpan.');
+        }
         $imported = 0;
         foreach ($rows as $row) {
-            $class = !empty($row['kelas']) ? SchoolClass::firstOrCreate(['name' => $row['kelas']]) : null;
+            $class = ! empty($row['kelas']) ? SchoolClass::firstOrCreate(['name' => $row['kelas']]) : null;
             Student::create([
                 'name' => $row['nama'], 'gender' => $row['gender'], 'nis' => $row['nis'],
                 'school_class_id' => $class?->id, 'nisn' => $row['nisn'] ?: null,
@@ -230,6 +331,7 @@ class AdminController extends Controller
             $imported++;
         }
         session()->forget('csv_rows');
+
         return redirect()->route('admin.siswa')->with('success', "{$imported} siswa berhasil diimpor.");
     }
 
@@ -269,6 +371,7 @@ class AdminController extends Controller
         $hasPdf = file_exists(public_path($pdfPath));
         $fileSize = $hasPdf ? filesize(public_path($pdfPath)) : null;
         $lastModified = $hasPdf ? filemtime(public_path($pdfPath)) : null;
+
         return view('admin.tata-tertib', compact('hasPdf', 'pdfPath', 'fileSize', 'lastModified'));
     }
 
@@ -276,6 +379,7 @@ class AdminController extends Controller
     {
         $request->validate(['pdf' => 'required|file|mimes:pdf|max:10240']);
         $request->file('pdf')->storeAs('tata-tertib', 'tata_tertib.pdf', 'public');
+
         return back()->with('success', 'PDF Tata Tertib berhasil diunggah.');
     }
 
@@ -285,23 +389,30 @@ class AdminController extends Controller
         if (file_exists($path)) {
             unlink($path);
         }
+
         return back()->with('success', 'PDF Tata Tertib berhasil dihapus.');
     }
 
-    public function profile() { return view('admin.profile'); }
+    public function profile()
+    {
+        return view('admin.profile');
+    }
 
     public function updateProfile(Request $request)
     {
         $user = auth()->user();
         $data = $request->validate([
             'name' => 'required|string|max:200',
-            'email' => 'required|email|unique:users,email,' . $user->id,
+            'email' => 'required|email|unique:users,email,'.$user->id,
             'password' => 'nullable|string|min:6|confirmed',
         ]);
         $user->update(['name' => $data['name'], 'email' => $data['email']]);
-        if (!empty($data['password'])) $user->update(['password' => Hash::make($data['password'])]);
+        if (! empty($data['password'])) {
+            $user->update(['password' => Hash::make($data['password'])]);
+        }
         session()->put('user_name', $user->name);
         session()->put('user_email', $user->email);
+
         return back()->with('success', 'Profil berhasil diperbarui.');
     }
 }

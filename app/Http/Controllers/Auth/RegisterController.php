@@ -1,0 +1,133 @@
+<?php
+
+namespace App\Http\Controllers\Auth;
+
+use App\Http\Controllers\Controller;
+use App\Models\Student;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
+
+class RegisterController extends Controller
+{
+    public function showForm()
+    {
+        return view('auth.register');
+    }
+
+    public function validateNip(Request $request)
+    {
+        $request->validate(['nip' => ['required', 'regex:/^[0-9\s]+$/']]);
+
+        $nip = trim($request->input('nip'));
+
+        $user = User::where('nip', $nip)->where('is_active', false)->first();
+
+        if (! $user) {
+            return response()->json([
+                'valid' => false,
+                'message' => 'NIP tidak ditemukan atau akun sudah diaktivasi.',
+            ]);
+        }
+
+        return response()->json([
+            'valid' => true,
+            'nip' => $user->nip,
+            'name' => $user->name,
+        ]);
+    }
+
+    public function validateNis(Request $request)
+    {
+        $data = $request->validate([
+            'nis' => ['required', 'regex:/^[0-9]+$/'],
+            'nisn' => ['required', 'regex:/^[0-9]+$/'],
+        ]);
+
+        $student = Student::where('nis', $data['nis'])
+            ->where('nisn', $data['nisn'])
+            ->whereNull('user_id')
+            ->first();
+
+        if (! $student) {
+            return response()->json([
+                'valid' => false,
+                'message' => 'NIS/NISN tidak ditemukan atau akun sudah diaktivasi.',
+            ]);
+        }
+
+        return response()->json([
+            'valid' => true,
+            'nis' => $student->nis,
+            'nisn' => $student->nisn,
+            'name' => $student->name,
+        ]);
+    }
+
+    public function register(Request $request)
+    {
+        $data = $request->validate([
+            'role' => ['required', 'in:guru,siswa'],
+            'email' => ['required', 'email', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $password = Hash::make($data['password']);
+
+        if ($data['role'] === 'guru') {
+            $request->validate(['nip' => ['required']]);
+
+            $nip = trim($request->input('nip'));
+
+            $user = User::where('nip', $nip)->where('is_active', false)->first();
+
+            if (! $user) {
+                throw ValidationException::withMessages([
+                    'nip' => 'NIP tidak valid atau akun sudah diaktivasi.',
+                ]);
+            }
+
+            $user->update([
+                'email' => $data['email'],
+                'password' => $password,
+                'is_active' => true,
+            ]);
+
+            Auth::login($user);
+
+            return redirect()->intended(route('wali-kelas.dashboard'));
+        }
+
+        $siswaData = $request->validate([
+            'nis' => ['required', 'regex:/^[0-9]+$/'],
+            'nisn' => ['required', 'regex:/^[0-9]+$/'],
+        ]);
+
+        $student = Student::where('nis', $siswaData['nis'])
+            ->where('nisn', $siswaData['nisn'])
+            ->whereNull('user_id')
+            ->first();
+
+        if (! $student) {
+            throw ValidationException::withMessages([
+                'nis' => 'NIS/NISN tidak valid atau akun sudah diaktivasi.',
+            ]);
+        }
+
+        $user = User::create([
+            'name' => $student->name,
+            'email' => $data['email'],
+            'password' => $password,
+            'role' => 'siswa',
+            'is_active' => true,
+        ]);
+
+        $student->update(['user_id' => $user->id]);
+
+        Auth::login($user);
+
+        return redirect()->intended(route('siswa.dashboard'));
+    }
+}
