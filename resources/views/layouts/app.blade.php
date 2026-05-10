@@ -51,9 +51,9 @@
 
     $roleLabels = [
         'kesiswaan' => 'Kesiswaan', 'bk' => 'BK', 'walikelas' => 'Wali Kelas',
-        'guru-mapel' => 'Guru Mapel', 'siswa' => 'Siswa'
+        'guru-mapel' => 'Guru Mapel', 'siswa' => 'Siswa', 'admin' => 'Admin'
     ];
-    $roleLabel = $roleLabels[$currentRole] ?? 'Kesiswaan';
+    $roleLabel = $roleLabels[$currentRole] ?? 'Admin';
     ?>
 
     <div class="flex h-screen overflow-hidden">
@@ -74,7 +74,16 @@
             <nav class="flex-1 overflow-y-auto p-3 space-y-0.5">
                 <p class="px-3 py-2 text-[10px] font-bold text-muted uppercase tracking-widest">Menu</p>
 
-                @if($currentRole === 'siswa')
+                @if($currentRole === 'admin')
+                    <a href="{{ route('admin.dashboard') }}" class="sidebar-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"><i class="bi bi-grid"></i> Dashboard</a>
+                    <a href="{{ route('admin.guru') }}" class="sidebar-link {{ request()->routeIs('admin.guru') ? 'active' : '' }}"><i class="bi bi-people"></i> Manajemen Guru</a>
+                    <a href="{{ route('admin.siswa') }}" class="sidebar-link {{ request()->routeIs('admin.siswa') ? 'active' : '' }}"><i class="bi bi-mortarboard"></i> Manajemen Siswa</a>
+                    <a href="{{ route('admin.kelas') }}" class="sidebar-link {{ request()->routeIs('admin.kelas') ? 'active' : '' }}"><i class="bi bi-diagram-3"></i> Manajemen Kelas</a>
+                    <a href="{{ route('admin.tata-tertib') }}" class="sidebar-link {{ request()->routeIs('admin.tata-tertib') ? 'active' : '' }}"><i class="bi bi-file-pdf"></i> Tata Tertib</a>
+                    <a href="{{ route('admin.poin') }}" class="sidebar-link {{ request()->routeIs('admin.poin') ? 'active' : '' }}"><i class="bi bi-exclamation-triangle"></i> Poin Pelanggaran</a>
+                    <a href="{{ route('admin.laporan') }}" class="sidebar-link {{ request()->routeIs('admin.laporan') ? 'active' : '' }}"><i class="bi bi-bar-chart"></i> Laporan</a>
+                    <a href="{{ route('admin.log') }}" class="sidebar-link {{ request()->routeIs('admin.log') ? 'active' : '' }}"><i class="bi bi-clock-history"></i> Log Aktivitas</a>
+                @elseif($currentRole === 'siswa')
                     <a href="{{ route('siswa.dashboard') }}" class="sidebar-link {{ request()->routeIs('siswa.dashboard') ? 'active' : '' }}"><i class="bi bi-grid"></i> Dashboard</a>
                     <a href="{{ route('siswa.kehadiran') }}" class="sidebar-link {{ request()->routeIs('siswa.kehadiran') ? 'active' : '' }}"><i class="bi bi-camera"></i> Kehadiran</a>
                     <a href="{{ route('siswa.riwayat') }}" class="sidebar-link {{ request()->routeIs('siswa.riwayat') ? 'active' : '' }}"><i class="bi bi-clock-history"></i> Riwayat Kehadiran</a>
@@ -82,7 +91,11 @@
                 @endif
 
                 <p class="px-3 py-2 text-[10px] font-bold text-muted uppercase tracking-widest pt-2">Akun</p>
+                @if($currentRole === 'admin')
+                <a href="{{ route('admin.dashboard') }}" class="sidebar-link"><i class="bi bi-person-circle"></i> Profil</a>
+                @elseif($currentRole === 'siswa')
                 <a href="{{ route('siswa.pengaturan') }}" class="sidebar-link {{ request()->routeIs('siswa.pengaturan') ? 'active' : '' }}"><i class="bi bi-gear"></i> Pengaturan</a>
+                @endif
                 <a href="{{ route('landing') }}" class="sidebar-link text-[#ba1a1a] hover:bg-[#ffdad6]"><i class="bi bi-box-arrow-right"></i> Keluar</a>
             </nav>
         </aside>

@@ -15,7 +15,6 @@ Route::prefix('auth')->name('auth.')->group(function () {
         $email = request()->input('email');
         $password = request()->input('password');
         
-        // Dummy data — hanya akun siswa yang aktif
         if ($email === 'siswa@sentrisiswa.sch.id' && $password === 'siswa123') {
             Session::put('user_role', 'siswa');
             Session::put('user_name', 'Ahmad Fauzi');
@@ -39,6 +38,33 @@ Route::prefix('siswa')->name('siswa.')->group(function () {
     Route::view('/poin', 'siswa.poin')->name('poin');
     Route::view('/biodata', 'siswa.biodata')->name('biodata');
     Route::view('/pengaturan', 'siswa.pengaturan')->name('pengaturan');
+});
+
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::view('/login', 'admin.login')->name('login');
+    
+    Route::post('/login', function () {
+        $email = request()->input('email');
+        $password = request()->input('password');
+        
+        if ($email === 'admin@sentrisiswa.sch.id' && $password === 'admin123') {
+            Session::put('user_role', 'admin');
+            Session::put('user_name', 'Admin Kesiswaan');
+            Session::put('user_email', 'admin@sentrisiswa.sch.id');
+            return redirect()->route('admin.dashboard');
+        }
+        
+        return redirect()->route('admin.login')->with('error', 'Email atau kata sandi salah.');
+    })->name('login.post');
+    
+    Route::view('/', 'admin.dashboard')->name('dashboard');
+    Route::view('/guru', 'admin.guru')->name('guru');
+    Route::view('/siswa', 'admin.siswa')->name('siswa');
+    Route::view('/kelas', 'admin.kelas')->name('kelas');
+    Route::view('/tata-tertib', 'admin.tata-tertib')->name('tata-tertib');
+    Route::view('/poin', 'admin.poin-pelanggaran')->name('poin');
+    Route::view('/laporan', 'admin.laporan')->name('laporan');
+    Route::view('/log', 'admin.log')->name('log');
 });
 
 Route::prefix('profile')->name('profile.')->group(function () {
