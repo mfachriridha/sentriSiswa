@@ -26,12 +26,17 @@ class AdminController extends Controller
     }
 
     // ─── Guru ───
-    public function guru()
+    public function guru(Request $request)
     {
+        $perPage = $request->input('per_page', 25);
+        $perPage = in_array((int) $perPage, [25, 50, 100]) ? (int) $perPage : 25;
+
         $teachers = User::whereIn('role', ['wali_kelas', 'bk'])
             ->with('teacherClasses.schoolClass')
             ->latest()
-            ->get();
+            ->paginate($perPage)
+            ->appends($request->only('per_page'));
+
         $classes = SchoolClass::orderBy('name')->get();
 
         return view('admin.guru', compact('teachers', 'classes'));
@@ -221,11 +226,14 @@ class AdminController extends Controller
     }
 
     // ─── Classes (manajemen kelas) ───
-    public function kelas()
+    public function kelas(Request $request)
     {
-        return view('admin.kelas', [
-            'classes' => SchoolClass::withCount('students')->latest()->get(),
-        ]);
+        $perPage = $request->input('per_page', 25);
+        $perPage = in_array((int) $perPage, [25, 50, 100]) ? (int) $perPage : 25;
+
+        $classes = SchoolClass::withCount('students')->latest()->paginate($perPage)->appends($request->only('per_page'));
+
+        return view('admin.kelas', compact('classes'));
     }
 
     public function storeClass(Request $request)
@@ -254,12 +262,50 @@ class AdminController extends Controller
         return back()->with('success', 'Kelas berhasil dihapus.');
     }
 
-    // ─── Students ───
-    public function siswa()
+    public function classStudents(SchoolClass $schoolClass)
     {
-        $students = Student::with(['schoolClass', 'father', 'mother', 'user'])->latest()->get();
+        $students = $schoolClass->students()->with('user')->orderBy('name')->get();
 
-        return view('admin.siswa', ['students' => $students, 'totalStudents' => $students->count()]);
+        return response()->json($students);
+    }
+
+    public function assignStudentToClass(Request $request, SchoolClass $schoolClass)
+    {
+        $data = $request->validate(['nis' => 'required|string|exists:students,nis']);
+
+        $student = Student::where('nis', $data['nis'])->first();
+
+        $student->update(['school_class_id' => $schoolClass->id]);
+
+        return response()->json(['success' => true, 'message' => 'Siswa berhasil ditambahkan ke kelas.']);
+    }
+
+    public function removeStudentFromClass(Request $request, SchoolClass $schoolClass)
+    {
+        $data = $request->validate(['student_id' => 'required|exists:students,id']);
+
+        Student::where('id', $data['student_id'])
+            ->where('school_class_id', $schoolClass->id)
+            ->update(['school_class_id' => null]);
+
+        return response()->json(['success' => true, 'message' => 'Siswa berhasil dikeluarkan dari kelas.']);
+    }
+
+    // ─── Students ───
+    public function siswa(Request $request)
+    {
+        $perPage = $request->input('per_page', 25);
+        $perPage = in_array((int) $perPage, [25, 50, 100]) ? (int) $perPage : 25;
+
+        $students = Student::with(['schoolClass', 'father', 'mother', 'user'])
+            ->latest()
+            ->paginate($perPage)
+            ->appends($request->only('per_page'));
+
+        return view('admin.siswa', [
+            'students' => $students,
+            'totalStudents' => Student::count(),
+        ]);
     }
 
     public function storeStudent(Request $request)

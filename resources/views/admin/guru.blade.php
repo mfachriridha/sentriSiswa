@@ -28,7 +28,7 @@
 
 <div class="card anim-up">
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-        <h3 class="font-bold text-slate-900">Data Guru <span class="text-sm font-medium text-muted">({{ $teachers->count() }})</span></h3>
+        <h3 class="font-bold text-slate-900">Data Guru <span class="text-sm font-medium text-muted">({{ $teachers->total() }})</span></h3>
     </div>
     <div class="table-container">
         <table class="w-full">
@@ -43,7 +43,7 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse($teachers as $teacher)
+                @forelse($teachers as $i => $teacher)
                 <tr>
                     <td class="table-cell text-xs">{{ $teacher->nip ?? '—' }}</td>
                     <td class="table-cell font-semibold">{{ $teacher->name }}</td>
@@ -89,6 +89,7 @@
             </tbody>
         </table>
     </div>
+    @include('components.pagination', ['data' => $teachers])
 </div>
 
 <!-- Add/Edit Modal -->

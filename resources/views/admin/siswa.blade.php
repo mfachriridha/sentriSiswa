@@ -41,7 +41,7 @@
                 $father = $s->parents->firstWhere('type', 'father');
                 ?>
                 <tr data-id="{{ $s->id }}">
-                    <td class="table-cell">{{ $i + 1 }}</td>
+                    <td class="table-cell">{{ $students->firstItem() + $i }}</td>
                     <td class="table-cell font-mono"><strong>{{ $s->nis }}</strong></td>
                     <td class="table-cell font-semibold">{{ $s->name }}</td>
                     <td class="table-cell">{{ $s->schoolClass?->name ?? '—' }}</td>
@@ -68,6 +68,7 @@
             </tbody>
         </table>
     </div>
+    @include('components.pagination', ['data' => $students])
 </div>
 
 <!-- Detail Modal (JIRA-style wide) -->
