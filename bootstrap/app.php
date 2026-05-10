@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Middleware\AuthenticateSession;
 use App\Http\Middleware\CheckRole;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -14,9 +13,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'auth.session' => AuthenticateSession::class,
             'role' => CheckRole::class,
         ]);
+
+        $middleware->redirectGuestsTo(fn () => route('auth.login'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

@@ -20,7 +20,7 @@ Route::prefix('auth')->name('auth.')->group(function () {
     Route::post('/register', [RegisterController::class, 'register'])->name('register.post');
 });
 
-Route::prefix('siswa')->name('siswa.')->middleware(['auth.session', 'role:siswa'])->group(function () {
+Route::prefix('siswa')->name('siswa.')->middleware(['auth', 'role:siswa'])->group(function () {
     Route::view('/', 'siswa.dashboard')->name('dashboard');
     Route::get('/kehadiran', [SiswaController::class, 'kehadiran'])->name('kehadiran');
     Route::post('/kehadiran', [SiswaController::class, 'storeAttendance'])->name('kehadiran.store');
@@ -30,17 +30,17 @@ Route::prefix('siswa')->name('siswa.')->middleware(['auth.session', 'role:siswa'
     Route::view('/pengaturan', 'siswa.pengaturan')->name('pengaturan');
 });
 
-Route::prefix('wali-kelas')->name('wali-kelas.')->middleware(['auth.session', 'role:wali_kelas'])->group(function () {
+Route::prefix('wali-kelas')->name('wali-kelas.')->middleware(['auth', 'role:wali_kelas'])->group(function () {
     Route::get('/', [WaliKelasController::class, 'dashboard'])->name('dashboard');
     Route::post('/confirm/{attendance}', [WaliKelasController::class, 'confirm'])->name('confirm');
     Route::post('/update-status/{attendance}', [WaliKelasController::class, 'updateStatus'])->name('update-status');
 });
 
-Route::prefix('bk')->name('bk.')->middleware(['auth.session', 'role:bk'])->group(function () {
+Route::prefix('bk')->name('bk.')->middleware(['auth', 'role:bk'])->group(function () {
     Route::view('/', 'bk.dashboard')->name('dashboard');
 });
 
-Route::prefix('admin')->name('admin.')->middleware(['auth.session', 'role:admin'])->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::get('/profile', [AdminController::class, 'profile'])->name('profile');
     Route::put('/profile', [AdminController::class, 'updateProfile'])->name('profile.update');
@@ -51,6 +51,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth.session', 'role:admin'
     Route::get('/guru/{user}/edit', [AdminController::class, 'editGuru'])->name('guru.edit');
     Route::put('/guru/{user}', [AdminController::class, 'updateGuru'])->name('guru.update');
     Route::delete('/guru/{user}', [AdminController::class, 'destroyGuru'])->name('guru.destroy');
+    Route::post('/guru/import', [AdminController::class, 'previewGuruCsv'])->name('guru.import');
+    Route::get('/guru/preview', [AdminController::class, 'previewGuru'])->name('guru.preview');
+    Route::post('/guru/import/confirm', [AdminController::class, 'importGuruCsv'])->name('guru.import.confirm');
+    Route::get('/guru/template', [AdminController::class, 'downloadGuruTemplate'])->name('guru.template');
 
     // Kelas
     Route::get('/kelas', [AdminController::class, 'kelas'])->name('kelas');

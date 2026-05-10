@@ -8,6 +8,7 @@ use App\Models\SchoolClass;
 use App\Models\Student;
 use App\Models\StudentParent;
 use App\Models\StudentViolation;
+use App\Models\TeacherClass;
 use App\Models\User;
 use App\Models\Violation;
 use Illuminate\Http\Request;
@@ -31,8 +32,9 @@ class AdminController extends Controller
             ->with('teacherClasses.schoolClass')
             ->latest()
             ->get();
+        $classes = SchoolClass::orderBy('name')->get();
 
-        return view('admin.guru', compact('teachers'));
+        return view('admin.guru', compact('teachers', 'classes'));
     }
 
     public function storeGuru(Request $request)
@@ -41,6 +43,8 @@ class AdminController extends Controller
             'name' => 'required|string|max:200',
             'nip' => 'nullable|regex:/^[0-9\s]+$/|max:22|unique:users,nip',
             'role' => 'required|in:wali_kelas,bk',
+            'class_ids' => 'nullable|array',
+            'class_ids.*' => 'exists:school_classes,id',
         ]);
 
         $nip = $data['nip'] ? trim($data['nip']) : null;
@@ -57,6 +61,8 @@ class AdminController extends Controller
             'password' => Hash::make('password123'),
         ]);
 
+        $this->syncTeacherClasses($user, $data['role'], $data['class_ids'] ?? []);
+
         return back()->with('success', 'Guru berhasil ditambahkan.');
     }
 
@@ -65,7 +71,12 @@ class AdminController extends Controller
         $user->load('teacherClasses.schoolClass');
 
         if (request()->ajax() || request()->wantsJson()) {
-            return response()->json($user);
+            $classes = SchoolClass::orderBy('name')->get();
+
+            return response()->json([
+                'user' => $user,
+                'classes' => $classes,
+            ]);
         }
 
         return view('admin.guru-form', compact('user'));
@@ -77,6 +88,8 @@ class AdminController extends Controller
             'name' => 'required|string|max:200',
             'nip' => 'nullable|regex:/^[0-9\s]+$/|max:22|unique:users,nip,'.$user->id,
             'role' => 'required|in:wali_kelas,bk',
+            'class_ids' => 'nullable|array',
+            'class_ids.*' => 'exists:school_classes,id',
         ]);
 
         $user->update([
@@ -85,7 +98,22 @@ class AdminController extends Controller
             'role' => $data['role'],
         ]);
 
+        $this->syncTeacherClasses($user, $data['role'], $data['class_ids'] ?? []);
+
         return back()->with('success', 'Data guru berhasil diperbarui.');
+    }
+
+    protected function syncTeacherClasses(User $user, string $role, array $classIds): void
+    {
+        TeacherClass::where('user_id', $user->id)->delete();
+
+        foreach ($classIds as $classId) {
+            TeacherClass::create([
+                'user_id' => $user->id,
+                'school_class_id' => $classId,
+                'role' => $role,
+            ]);
+        }
     }
 
     public function destroyGuru(User $user)
@@ -97,6 +125,88 @@ class AdminController extends Controller
         $user->delete();
 
         return back()->with('success', 'Guru berhasil dihapus.');
+    }
+
+    public function previewGuruCsv(Request $request)
+    {
+        $request->validate(['csv_file' => 'required|file|mimes:csv,txt']);
+        $file = $request->file('csv_file');
+        $handle = fopen($file->getRealPath(), 'r');
+        $firstLine = fgets($handle);
+        if ($firstLine === false) {
+            fclose($handle);
+
+            return back()->with('error', 'File CSV kosong.');
+        }
+        $firstLine = preg_replace('/^\xEF\xBB\xBF/', '', $firstLine);
+        $delimiter = str_contains($firstLine, ';') ? ';' : ',';
+        $rows = [];
+        while (($row = fgetcsv($handle, 0, $delimiter)) !== false) {
+            $nama = trim($row[0] ?? '');
+            $nip = trim($row[1] ?? '');
+            if (empty($nama)) {
+                continue;
+            }
+            $rows[] = ['nama' => $nama, 'nip' => $nip !== '-' ? $nip : ''];
+        }
+        fclose($handle);
+        if (empty($rows)) {
+            return back()->with('error', 'Tidak ada data valid di file CSV.');
+        }
+        session()->put('guru_csv_rows', $rows);
+
+        return redirect()->route('admin.guru.preview');
+    }
+
+    public function previewGuru()
+    {
+        $rows = session('guru_csv_rows', []);
+        if (empty($rows)) {
+            return redirect()->route('admin.guru')->with('error', 'Tidak ada data CSV untuk dipratinjau.');
+        }
+
+        return view('admin.guru-preview', ['rows' => $rows, 'total' => count($rows)]);
+    }
+
+    public function importGuruCsv()
+    {
+        $rows = session('guru_csv_rows', []);
+        if (empty($rows)) {
+            return redirect()->route('admin.guru')->with('error', 'Tidak ada data CSV untuk disimpan.');
+        }
+        $imported = 0;
+        foreach ($rows as $row) {
+            $nip = ! empty($row['nip']) ? trim($row['nip']) : null;
+            $email = $nip
+                ? preg_replace('/\s+/', '', $nip).'@sentrisiswa.sch.id'
+                : strtolower(preg_replace('/[^a-z]/', '', $row['nama'])).'@sentrisiswa.sch.id';
+
+            User::updateOrCreate(
+                ['email' => $email],
+                [
+                    'name' => $row['nama'],
+                    'nip' => $nip,
+                    'role' => 'wali_kelas',
+                    'is_active' => false,
+                    'password' => Hash::make('password123'),
+                ]
+            );
+            $imported++;
+        }
+        session()->forget('guru_csv_rows');
+
+        return redirect()->route('admin.guru')->with('success', "{$imported} guru berhasil diimpor.");
+    }
+
+    public function downloadGuruTemplate()
+    {
+        $content = "Nama;NIP\n";
+        $content .= "BUDI SANTOSO, S.Pd;19920912 202221 2 018\n";
+
+        return response($content, 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="template_guru.csv"',
+        ]);
     }
 
     // ─── Classes (manajemen kelas) ───
@@ -136,7 +246,7 @@ class AdminController extends Controller
     // ─── Students ───
     public function siswa()
     {
-        $students = Student::with(['schoolClass', 'father', 'mother'])->latest()->get();
+        $students = Student::with(['schoolClass', 'father', 'mother', 'user'])->latest()->get();
 
         return view('admin.siswa', ['students' => $students, 'totalStudents' => $students->count()]);
     }

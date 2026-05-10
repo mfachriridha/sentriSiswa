@@ -17,18 +17,12 @@
     <button onclick="this.parentElement.remove()" class="ml-auto text-red-400 hover:text-red-600"><i class="bi bi-x"></i></button>
 </div>
 @endif
-@if($errors->any())
-<div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-xs font-semibold text-red-700 anim-up">
-    @foreach($errors->all() as $error)
-        <p><i class="bi bi-x-circle-fill mr-1"></i> {{ $error }}</p>
-    @endforeach
-    <button onclick="this.parentElement.remove()" class="ml-auto text-red-400 hover:text-red-600"><i class="bi bi-x"></i></button>
-</div>
-@endif
 
 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
     <div class="flex gap-2">
         <button onclick="showModal()" class="btn-brand !text-xs"><i class="bi bi-plus-lg"></i> Tambah Guru</button>
+        <button onclick="showCsvModal()" class="btn-outline !text-xs"><i class="bi bi-upload"></i> Upload CSV</button>
+        <a href="{{ route('admin.guru.template') }}" class="btn-outline !text-xs"><i class="bi bi-download"></i> Template CSV</a>
     </div>
 </div>
 
@@ -99,7 +93,7 @@
 
 <!-- Add/Edit Modal -->
 <div id="modalOverlay" class="hidden fixed inset-0 z-50 bg-black/40" onclick="closeModal()"></div>
-<div id="modalBox" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-white rounded-2xl shadow-xl w-full max-w-md p-6 anim-up">
+<div id="modalBox" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-white rounded-2xl shadow-xl w-full max-w-md p-6 anim-up max-h-[90vh] overflow-y-auto">
     <div class="flex justify-between items-center mb-4">
         <h3 id="modalTitle" class="font-bold text-lg">Tambah Guru</h3>
         <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600"><i class="bi bi-x-lg text-xl"></i></button>
@@ -120,15 +114,38 @@
         </div>
         <div>
             <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Role</label>
-            <select name="role" id="guruRole" required class="input-field">
+            <select name="role" id="guruRole" required class="input-field" onchange="toggleClassPicker()">
                 <option value="wali_kelas">Wali Kelas</option>
                 <option value="bk">BK</option>
             </select>
         </div>
 
+        <div id="waliKelasPicker">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Kelas yang Dipegang</label>
+            <select class="input-field" id="wkelasSelect">
+                <option value="">— Pilih Kelas —</option>
+                @foreach($classes as $cls)
+                <option value="{{ $cls->id }}">{{ $cls->name }}</option>
+                @endforeach
+            </select>
+            <input type="hidden" name="class_ids[]" id="wkelasHidden">
+        </div>
+
+        <div id="bkPicker" class="hidden">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Kelas yang Dimonitor</label>
+            <div class="max-h-40 overflow-y-auto border border-[#c3c6d1] rounded-lg p-2 space-y-1">
+                @foreach($classes as $cls)
+                <label class="flex items-center gap-2 px-2 py-1 hover:bg-slate-50 rounded cursor-pointer">
+                    <input type="checkbox" name="class_ids[]" value="{{ $cls->id }}" class="bkCheckbox rounded">
+                    <span class="text-xs">{{ $cls->name }}</span>
+                </label>
+                @endforeach
+            </div>
+        </div>
+
         <div class="flex gap-3 pt-2">
             <button type="button" onclick="closeModal()" class="btn-outline flex-1 !py-2.5">Batal</button>
-            <button type="submit" class="btn-brand flex-1 !py-2.5">
+            <button type="submit" class="btn-brand flex-1 !py-2.5" id="modalSubmit">
                 <span class="btn-text"><i class="bi bi-check-circle"></i> Simpan</span>
                 <span class="btn-loading hidden"><i class="bi bi-hourglass-split animate-spin"></i> Menyimpan...</span>
             </button>
@@ -136,23 +153,97 @@
     </form>
 </div>
 
+<!-- CSV Upload Modal -->
+<div id="csvOverlay" class="hidden fixed inset-0 z-50 bg-black/40" onclick="closeCsvModal()"></div>
+<div id="csvBox" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-white rounded-2xl shadow-xl w-full max-w-md p-6 anim-up">
+    <div class="flex justify-between items-center mb-4">
+        <h3 class="font-bold text-lg">Upload CSV Guru</h3>
+        <button onclick="closeCsvModal()" class="text-slate-400 hover:text-slate-600"><i class="bi bi-x-lg text-xl"></i></button>
+    </div>
+    <form action="{{ route('admin.guru.import') }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        <p class="text-xs text-slate-500 mb-4">Upload file CSV dengan kolom: <strong>Nama;NIP</strong></p>
+        <div class="border-2 border-dashed border-slate-200 rounded-xl p-6 text-center mb-4">
+            <i class="bi bi-cloud-upload text-3xl text-slate-300 mb-2 block"></i>
+            <p class="text-sm text-slate-600">Klik untuk pilih file</p>
+            <p class="text-xs text-slate-400">.csv (max 2MB)</p>
+            <input type="file" name="csv_file" accept=".csv" required class="mt-3 text-xs">
+        </div>
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-3 text-xs text-blue-700 mb-4">
+            <strong>Format:</strong> "Nama";"NIP"<br>
+            <strong>Contoh:</strong> "BUDI SANTOSO, S.Pd";"19920912 202221 2 018"<br>
+            NIP boleh kosong (gunakan "-")
+        </div>
+        <div class="flex gap-3 pt-2">
+            <button type="button" onclick="closeCsvModal()" class="btn-outline flex-1 !py-2.5">Batal</button>
+            <button type="submit" class="btn-brand flex-1 !py-2.5">
+                <span class="btn-text"><i class="bi bi-search"></i> Preview</span>
+            </button>
+        </div>
+    </form>
+</div>
+
 @push('scripts')
 <script>
+function toggleClassPicker() {
+    const role = document.getElementById('guruRole').value;
+    document.getElementById('waliKelasPicker').classList.toggle('hidden', role !== 'wali_kelas');
+    document.getElementById('bkPicker').classList.toggle('hidden', role !== 'bk');
+}
+
+function setClassIds(ids) {
+    if (document.getElementById('guruRole').value === 'wali_kelas') {
+        document.getElementById('wkelasSelect').value = ids[0] || '';
+        document.getElementById('wkelasHidden').value = ids[0] || '';
+    } else {
+        document.querySelectorAll('.bkCheckbox').forEach(cb => {
+            cb.checked = ids.includes(parseInt(cb.value));
+        });
+    }
+}
+
+function getClassIds() {
+    if (document.getElementById('guruRole').value === 'wali_kelas') {
+        const v = document.getElementById('wkelasSelect').value;
+        document.getElementById('wkelasHidden').value = v;
+        return v ? [v] : [];
+    }
+    return Array.from(document.querySelectorAll('.bkCheckbox:checked')).map(cb => cb.value);
+}
+
 function showModal(user = null) {
     document.getElementById('modalOverlay').classList.remove('hidden');
     document.getElementById('modalBox').classList.remove('hidden');
-    const form = document.getElementById('guruForm');
     document.getElementById('guruName').value = user ? user.name : '';
     document.getElementById('guruNip').value = user ? (user.nip || '') : '';
     document.getElementById('guruRole').value = user ? user.role : 'wali_kelas';
     document.getElementById('modalTitle').textContent = user ? 'Edit Guru' : 'Tambah Guru';
     document.getElementById('formMethod').value = user ? 'PUT' : 'POST';
+    const form = document.getElementById('guruForm');
     form.action = user ? '/admin/guru/' + user.id : '{{ route("admin.guru.store") }}';
+
+    if (user && user.teacher_classes && user.teacher_classes.length > 0) {
+        const ids = user.teacher_classes.map(tc => tc.school_class_id);
+        setClassIds(ids);
+    } else {
+        setClassIds([]);
+    }
+
+    toggleClassPicker();
 }
 
 function closeModal() {
     document.getElementById('modalOverlay').classList.add('hidden');
     document.getElementById('modalBox').classList.add('hidden');
+}
+
+function showCsvModal() {
+    document.getElementById('csvOverlay').classList.remove('hidden');
+    document.getElementById('csvBox').classList.remove('hidden');
+}
+function closeCsvModal() {
+    document.getElementById('csvOverlay').classList.add('hidden');
+    document.getElementById('csvBox').classList.add('hidden');
 }
 
 function setLoading(btn, loading) {
@@ -162,14 +253,26 @@ function setLoading(btn, loading) {
     btn.disabled = loading;
 }
 
-document.getElementById('guruForm').addEventListener('submit', function() {
-    setLoading(this.querySelector('[type="submit"]'), true);
+document.getElementById('guruForm').addEventListener('submit', function(e) {
+    const role = document.getElementById('guruRole').value;
+    const classIds = getClassIds();
+    if (classIds.length === 0) {
+        e.preventDefault();
+        alert('Pilih minimal satu kelas.');
+        return;
+    }
+    setLoading(document.getElementById('modalSubmit'), true);
+});
+
+// Sync wali_kelas dropdown to hidden input
+document.getElementById('wkelasSelect').addEventListener('change', function() {
+    document.getElementById('wkelasHidden').value = this.value;
 });
 
 function editGuru(id) {
     fetch('/admin/guru/' + id + '/edit?_ajax=1', { headers: {'Accept': 'application/json'} })
         .then(r => r.json())
-        .then(user => showModal(user))
+        .then(data => showModal(data.user))
         .catch(() => alert('Gagal memuat data guru.'));
 }
 </script>

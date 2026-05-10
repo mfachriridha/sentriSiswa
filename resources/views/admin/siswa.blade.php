@@ -33,23 +33,26 @@
     </div>
     <div class="table-container">
         <table class="w-full">
-            <thead><tr><th class="table-header">No.</th><th class="table-header">NIS</th><th class="table-header">NISN</th><th class="table-header">Nama</th><th class="table-header">Kelas</th><th class="table-header">JK</th><th class="table-header">Nomor HP Siswa</th><th class="table-header">Nomor HP Orang Tua</th><th class="table-header">Aksi</th></tr></thead>
+            <thead><tr><th class="table-header">No.</th><th class="table-header">NIS</th><th class="table-header">Nama</th><th class="table-header">Kelas</th><th class="table-header">JK</th><th class="table-header">Status</th><th class="table-header">Aksi</th></tr></thead>
             <tbody>
                 @forelse($students as $i => $s)
                 <?php
                 $mother = $s->parents->firstWhere('type', 'mother');
                 $father = $s->parents->firstWhere('type', 'father');
-                $parentPhone = $mother?->phone ?? $father?->phone ?? '—';
                 ?>
                 <tr data-id="{{ $s->id }}">
                     <td class="table-cell">{{ $i + 1 }}</td>
                     <td class="table-cell font-mono"><strong>{{ $s->nis }}</strong></td>
-                    <td class="table-cell font-mono">{{ $s->nisn ?? '—' }}</td>
                     <td class="table-cell font-semibold">{{ $s->name }}</td>
                     <td class="table-cell">{{ $s->schoolClass?->name ?? '—' }}</td>
                     <td class="table-cell">{{ $s->gender }}</td>
-                    <td class="table-cell">—</td>
-                    <td class="table-cell">{{ $parentPhone }}</td>
+                    <td class="table-cell">
+                        @if($s->user_id)
+                            <span class="badge badge-green">Aktif</span>
+                        @else
+                            <span class="badge badge-red">Belum Registrasi</span>
+                        @endif
+                    </td>
                     <td class="table-cell-aksi">
                         <div class="flex items-center justify-center gap-1">
                             <button onclick='lihatDetail({!! json_encode(array_merge($s->toArray(), ["schoolClass_name" => $s->schoolClass?->name, "father" => $father?->toArray(), "mother" => $mother?->toArray()]), JSON_HEX_APOS | JSON_HEX_QUOT) !!})' class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold border border-[#c3c6d1] text-[#43474f] hover:bg-[#edeeef] transition cursor-pointer"><i class="bi bi-eye"></i> Lihat</button>
@@ -60,7 +63,7 @@
                     </td>
                 </tr>
                 @empty
-                <tr><td class="table-cell text-center text-muted" colspan="9">Belum ada data siswa. Upload CSV atau tambah manual.</td></tr>
+                <tr><td class="table-cell text-center text-muted" colspan="7">Belum ada data siswa. Upload CSV atau tambah manual.</td></tr>
                 @endforelse
             </tbody>
         </table>
