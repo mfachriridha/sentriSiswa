@@ -136,8 +136,8 @@
 
     <!-- Avatar Dropdown -->
     <div id="avatar-dropdown" class="fixed z-[100] w-44 bg-white border border-[#c3c6d1]/30 rounded-lg shadow-lg py-1" style="display:none">
-        <a href="{{ $currentRole === 'admin' ? route('admin.dashboard') : route('siswa.pengaturan') }}" class="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-[#191c1d] hover:bg-[#d5e3ff] transition">
-            <i class="bi bi-gear"></i> {{ $currentRole === 'admin' ? 'Dashboard' : 'Pengaturan' }}
+        <a href="{{ $currentRole === 'admin' ? route('admin.profile') : route('siswa.pengaturan') }}" class="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-[#191c1d] hover:bg-[#d5e3ff] transition">
+            <i class="bi bi-gear"></i> {{ $currentRole === 'admin' ? 'Profil' : 'Pengaturan' }}
         </a>
         <hr class="border-[#c3c6d1]/30 mx-3">
         <a href="{{ route('auth.logout') }}" class="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-[#ba1a1a] hover:bg-[#ffdad6] transition">
