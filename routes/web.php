@@ -64,6 +64,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/kelas/{schoolClass}/students', [AdminController::class, 'classStudents'])->name('kelas.students');
     Route::post('/kelas/{schoolClass}/assign', [AdminController::class, 'assignStudentToClass'])->name('kelas.assign');
     Route::post('/kelas/{schoolClass}/remove', [AdminController::class, 'removeStudentFromClass'])->name('kelas.remove');
+    Route::get('/siswa/search', [AdminController::class, 'searchStudents'])->name('siswa.search');
+    Route::get('/siswa/{student}/detail', [AdminController::class, 'studentDetail'])->name('siswa.detail');
 
     // Siswa
     Route::get('/siswa', [AdminController::class, 'siswa'])->name('siswa');

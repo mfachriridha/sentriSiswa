@@ -9,6 +9,7 @@
     <button onclick="showModal('tambah')" class="btn-brand !text-xs"><i class="bi bi-plus-lg"></i> Tambah Kelas</button>
 </div>
 
+<div id="flashArea">
 @if(session('success'))
 <div class="mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-xs font-semibold text-emerald-700 flex items-center gap-2">
     <i class="bi bi-check-circle-fill"></i> {{ session('success') }}
@@ -21,6 +22,7 @@
     <button onclick="this.parentElement.remove()" class="ml-auto text-red-400 hover:text-red-600"><i class="bi bi-x"></i></button>
 </div>
 @endif
+</div>
 
 <div class="card anim-up">
     <h3 class="font-bold text-slate-900 mb-4">Data Kelas <span class="text-sm font-medium text-muted">({{ $classes->total() }})</span></h3>
@@ -53,7 +55,7 @@
     @include('components.pagination', ['data' => $classes])
 </div>
 
-<!-- Edit Modal -->
+<!-- Edit Kelas Modal -->
 <div id="modalOverlay" class="hidden fixed inset-0 z-50 bg-black/40" onclick="closeModal()"></div>
 <div id="modalBox" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-white rounded-2xl shadow-xl w-full max-w-sm p-6"></div>
 
@@ -61,92 +63,188 @@
 <div id="kelasOverlay" class="hidden fixed inset-0 z-50 bg-black/40" onclick="closeKelasModal()"></div>
 <div id="kelasBox" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-white rounded-2xl shadow-xl w-full max-w-3xl p-6 max-h-[90vh] overflow-y-auto anim-up"></div>
 
+<!-- Student Detail Overlay -->
+<div id="detailOverlay" class="hidden fixed inset-0 z-[60] bg-black/40" onclick="closeDetail()"></div>
+<div id="detailBox" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[60] bg-white rounded-2xl shadow-xl w-full max-w-3xl p-6 max-h-[90vh] overflow-y-auto anim-up"></div>
+
+<!-- Toast -->
+<div id="toast" class="hidden fixed top-4 right-4 z-[200] px-4 py-3 rounded-lg shadow-lg text-sm font-semibold text-white anim-up"></div>
+
 @push('scripts')
 <script>
+function showToast(msg, type) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'fixed top-4 right-4 z-[200] px-4 py-3 rounded-lg shadow-lg text-sm font-semibold text-white anim-up ' + (type === 'success' ? 'bg-emerald-600' : 'bg-red-600');
+    t.classList.remove('hidden');
+    setTimeout(() => t.classList.add('hidden'), 3000);
+}
+
+function setLoading(btn, loading) {
+    const t = btn.querySelector('.btn-text'), l = btn.querySelector('.btn-loading');
+    if (t) t.classList.toggle('hidden', loading);
+    if (l) l.classList.toggle('hidden', !loading);
+    btn.disabled = loading;
+}
+
+// ── CRUD Modal ──
 function showModal(type, id, name) {
     const box = document.getElementById('modalBox');
-    let title = type === 'tambah' ? 'Tambah Kelas' : 'Edit Kelas';
-    let action = type === 'tambah'
+    const title = type === 'tambah' ? 'Tambah Kelas' : 'Edit Kelas';
+    const action = type === 'tambah'
         ? '{{ route("admin.kelas.store") }}'
         : '{{ route("admin.kelas.update", "__ID__") }}'.replace('__ID__', id);
-    let method = type === 'tambah' ? '' : '@method("PUT")';
+    const method = type === 'tambah' ? '' : '@method("PUT")';
     box.innerHTML = `<div class="flex justify-between items-center mb-4"><h3 class="font-bold text-lg">${title}</h3><button onclick="closeModal()" class="text-slate-400 hover:text-slate-600"><i class="bi bi-x-lg text-xl"></i></button></div>
-        <form action="${action}" method="POST" class="space-y-3">
+        <form action="${action}" method="POST" class="space-y-3" onsubmit="setLoading(this.querySelector('[type=submit]'), true)">
             @csrf ${method}
             <div><label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Nama Kelas <span class="text-red-500">*</span></label><input type="text" name="name" class="input-field" value="${name||''}" placeholder="Contoh: XII IPA 1" required></div>
-            <div class="flex gap-3 pt-2"><button type="button" onclick="closeModal()" class="btn-outline flex-1 !py-2.5">Batal</button><button type="submit" class="btn-brand flex-1 !py-2.5">Simpan</button></div>
+            <div class="flex gap-3 pt-2"><button type="button" onclick="closeModal()" class="btn-outline flex-1 !py-2.5">Batal</button><button type="submit" class="btn-brand flex-1 !py-2.5"><span class="btn-text"><i class="bi bi-check-circle"></i> Simpan</span><span class="btn-loading hidden"><i class="bi bi-hourglass-split animate-spin"></i> Menyimpan...</span></button></div>
         </form>`;
     document.getElementById('modalOverlay').classList.remove('hidden');
     box.classList.remove('hidden');
 }
-function closeModal(){document.getElementById('modalOverlay').classList.add('hidden');document.getElementById('modalBox').classList.add('hidden')}
-function editKelas(id, name){showModal('edit', id, name)}
+function closeModal() { document.getElementById('modalOverlay').classList.add('hidden'); document.getElementById('modalBox').classList.add('hidden'); }
+function editKelas(id, name) { showModal('edit', id, name); }
 
+// ── Kelas Detail ──
 function lihatKelas(id, name) {
-    fetch('/admin/kelas/' + id + '/students', {headers:{'Accept':'application/json'}})
-        .then(r => r.json())
-        .then(students => {
-            let rows = students.length === 0
-                ? '<tr><td class="table-cell text-center text-muted py-4" colspan="5">Tidak ada siswa di kelas ini.</td></tr>'
-                : students.map((s, i) => `<tr>
-                    <td class="table-cell">${i+1}</td>
-                    <td class="table-cell font-mono text-xs">${s.nis}</td>
-                    <td class="table-cell font-semibold">${s.name}</td>
-                    <td class="table-cell text-xs">${s.gender || '—'}</td>
-                    <td class="table-cell-aksi">
-                        <button onclick="removeStudent(${id}, ${s.id}, '${s.name.replace(/'/g, "\\'")}')" class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold bg-red-600 text-white hover:bg-red-700 transition cursor-pointer"><i class="bi bi-x-circle"></i> Keluarkan</button>
-                    </td>
-                </tr>`).join('');
+    const box = document.getElementById('kelasBox');
+    box.innerHTML = '<div class="text-center py-8"><div class="w-8 h-8 border-4 border-[#001e40] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div><p class="text-sm text-muted">Memuat data...</p></div>';
+    document.getElementById('kelasOverlay').classList.remove('hidden');
+    box.classList.remove('hidden');
 
-            document.getElementById('kelasBox').innerHTML = `
-                <div class="flex justify-between items-start mb-4">
-                    <div>
-                        <h3 class="font-bold text-lg">Kelas ${name}</h3>
-                        <p class="text-xs text-muted">${students.length} siswa</p>
-                    </div>
-                    <button onclick="closeKelasModal()" class="text-slate-400 hover:text-slate-600"><i class="bi bi-x-lg text-xl"></i></button>
-                </div>
-                <div class="mb-4 flex gap-2">
-                    <button onclick="showAddStudent(${id})" class="btn-outline !text-xs"><i class="bi bi-plus-lg"></i> Tambah Siswa</button>
-                </div>
-                <div class="table-container">
-                    <table class="w-full">
-                        <thead><tr><th class="table-header">No.</th><th class="table-header">NIS</th><th class="table-header">Nama</th><th class="table-header">JK</th><th class="table-header text-center">Aksi</th></tr></thead>
-                        <tbody>${rows}</tbody>
-                    </table>
-                </div>`;
-            document.getElementById('kelasOverlay').classList.remove('hidden');
-            document.getElementById('kelasBox').classList.remove('hidden');
-        });
+    fetch('/admin/kelas/' + id + '/students', { headers: { 'Accept': 'application/json' } })
+        .then(r => r.json())
+        .then(students => renderKelasBox(id, name, students));
 }
 
-function closeKelasModal() {
-    document.getElementById('kelasOverlay').classList.add('hidden');
-    document.getElementById('kelasBox').classList.add('hidden');
+function renderKelasBox(id, name, students) {
+    const rows = students.length === 0
+        ? '<tr><td class="table-cell text-center text-muted py-4" colspan="5">Tidak ada siswa di kelas ini.</td></tr>'
+        : students.map((s, i) => `<tr>
+            <td class="table-cell">${i + 1}</td>
+            <td class="table-cell font-mono text-xs">${s.nis}</td>
+            <td class="table-cell font-semibold">${s.name}</td>
+            <td class="table-cell text-xs">${s.gender || '—'}</td>
+            <td class="table-cell-aksi">
+                <button onclick="lihatSiswa(${s.id})" class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold border border-[#c3c6d1] text-[#43474f] hover:bg-[#edeeef] transition cursor-pointer"><i class="bi bi-eye"></i> Lihat</button>
+                <button onclick="removeStudent(${id}, ${s.id}, '${s.name.replace(/'/g, "\\'")}')" class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold bg-red-600 text-white hover:bg-red-700 transition cursor-pointer"><i class="bi bi-x-circle"></i> Keluarkan</button>
+            </td>
+        </tr>`).join('');
+
+    document.getElementById('kelasBox').innerHTML = `
+        <div class="flex justify-between items-start mb-4">
+            <div><h3 class="font-bold text-lg">Kelas ${name}</h3><p class="text-xs text-muted">${students.length} siswa</p></div>
+            <div class="flex gap-2">
+                <button onclick="showAddStudent(${id})" class="btn-outline !text-xs"><i class="bi bi-plus-lg"></i> Tambah Siswa</button>
+                <button onclick="closeKelasModal()" class="text-slate-400 hover:text-slate-600"><i class="bi bi-x-lg text-xl"></i></button>
+            </div>
+        </div>
+        <div id="searchAddBox_${id}" class="hidden mb-3 p-3 bg-slate-50 rounded-lg border border-[#c3c6d1]/30">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Cari Siswa (Nama / NIS)</label>
+            <input type="text" id="searchInput_${id}" class="input-field !py-1.5" placeholder="Ketik minimal 2 karakter..." oninput="searchSiswa(${id}, this.value)">
+            <div id="searchResults_${id}" class="mt-2 space-y-1 max-h-48 overflow-y-auto"></div>
+        </div>
+        <div class="table-container">
+            <table class="w-full">
+                <thead><tr><th class="table-header">No.</th><th class="table-header">NIS</th><th class="table-header">Nama</th><th class="table-header">JK</th><th class="table-header text-center">Aksi</th></tr></thead>
+                <tbody>${rows}</tbody>
+            </table>
+        </div>`;
+}
+
+function closeKelasModal() { document.getElementById('kelasOverlay').classList.add('hidden'); document.getElementById('kelasBox').classList.add('hidden'); }
+
+// ── Add Student Search ──
+function showAddStudent(classId) {
+    const box = document.getElementById('searchAddBox_' + classId);
+    if (!box) return;
+    box.classList.toggle('hidden');
+    if (!box.classList.contains('hidden')) {
+        const inp = document.getElementById('searchInput_' + classId);
+        if (inp) inp.focus();
+    }
+}
+
+let searchTimer;
+function searchSiswa(classId, q) {
+    clearTimeout(searchTimer);
+    const results = document.getElementById('searchResults_' + classId);
+    if (!results) return;
+    if (q.length < 2) { results.innerHTML = ''; return; }
+    results.innerHTML = '<p class="text-xs text-muted p-2">Mencari...</p>';
+    searchTimer = setTimeout(() => {
+        fetch('/admin/siswa/search?q=' + encodeURIComponent(q), { headers: { 'Accept': 'application/json' } })
+            .then(r => r.json())
+            .then(students => {
+                if (students.length === 0) { results.innerHTML = '<p class="text-xs text-muted p-2">Tidak ditemukan.</p>'; return; }
+                results.innerHTML = students.map(s => `<div class="flex items-center justify-between px-2 py-1.5 hover:bg-white rounded cursor-pointer border-b border-slate-100 last:border-0" onclick="assignStudent(${classId}, ${s.id}, '${s.name.replace(/'/g, "\\'")}')">
+                    <div><span class="text-xs font-semibold">${s.name}</span><span class="text-[10px] text-muted ml-2">NIS: ${s.nis}</span></div>
+                    <span class="text-[10px] text-blue-600 font-semibold"><i class="bi bi-plus-circle"></i> Tambah</span>
+                </div>`).join('');
+            });
+    }, 300);
+}
+
+// ── Actions ──
+function assignStudent(classId, studentId, name) {
+    if (!confirm('Tambahkan ' + name + ' ke kelas ini?')) return;
+    fetch('/admin/kelas/' + classId + '/assign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
+        body: JSON.stringify({ student_id: studentId })
+    })
+    .then(r => r.json())
+    .then(d => { showToast(d.message, d.success ? 'success' : 'error'); if (d.success) location.reload(); });
 }
 
 function removeStudent(classId, studentId, name) {
     if (!confirm('Keluarkan ' + name + ' dari kelas ini?')) return;
     fetch('/admin/kelas/' + classId + '/remove', {
         method: 'POST',
-        headers: {'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json'},
-        body: JSON.stringify({student_id: studentId})
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
+        body: JSON.stringify({ student_id: studentId })
     })
     .then(r => r.json())
-    .then(d => { if (d.success) location.reload(); else alert(d.message); });
+    .then(d => { showToast(d.message, d.success ? 'success' : 'error'); if (d.success) location.reload(); });
 }
 
-function showAddStudent(classId) {
-    const nis = prompt('Masukkan NIS siswa yang akan ditambahkan ke kelas:');
-    if (!nis) return;
-    fetch('/admin/kelas/' + classId + '/assign', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json'},
-        body: JSON.stringify({nis: nis})
-    })
-    .then(r => r.json())
-    .then(d => { if (d.success) location.reload(); else alert(d.message); });
+// ── Student Detail (JIRA-style) ──
+function lihatSiswa(id) {
+    const box = document.getElementById('detailBox');
+    box.innerHTML = '<div class="text-center py-8"><div class="w-8 h-8 border-4 border-[#001e40] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div><p class="text-sm text-muted">Memuat...</p></div>';
+    document.getElementById('detailOverlay').classList.remove('hidden');
+    box.classList.remove('hidden');
+
+    fetch('/admin/siswa/' + id + '/detail', { headers: { 'Accept': 'application/json' } })
+        .then(r => r.json())
+        .then(s => {
+            const father = s.father || {};
+            const mother = s.mother || {};
+            let html = `<div class="flex justify-between items-start mb-5"><div class="flex items-start gap-4"><div class="w-20 h-24 bg-slate-100 border-2 border-dashed border-slate-300 rounded flex items-center justify-center shrink-0"><div class="text-center"><i class="bi bi-person-fill text-3xl text-slate-300"></i><p class="text-[8px] text-slate-400 mt-0.5">3x4</p></div></div><div><h3 class="font-bold text-xl">${s.name}</h3><p class="text-sm font-mono text-muted mt-1"><strong>NIS:</strong> <strong class="text-[#001e40]">${s.nis}</strong> &middot; <strong>NISN:</strong> <strong class="text-[#001e40]">${s.nisn || '—'}</strong></p><p class="text-xs text-muted">${s.school_class?.name || '—'}</p></div></div><button onclick="closeDetail()" class="text-slate-400 hover:text-slate-600 shrink-0"><i class="bi bi-x-lg text-2xl"></i></button></div>`;
+
+            html += `<div class="grid grid-cols-3 gap-4 text-sm mb-4">
+                <div><span class="text-xs text-muted">Jenis Kelamin</span><p class="font-semibold">${s.gender || '—'}</p></div>
+                <div><span class="text-xs text-muted">Tempat Lahir</span><p class="font-semibold">${s.birth_place || '—'}</p></div>
+                <div><span class="text-xs text-muted">Tanggal Lahir</span><p class="font-semibold">${s.birth_date || '—'}</p></div>
+                <div><span class="text-xs text-muted">Agama</span><p class="font-semibold">${s.religion || '—'}</p></div>
+                <div><span class="text-xs text-muted">Anak ke</span><p class="font-semibold">${s.birth_order || '—'}</p></div>
+                <div><span class="text-xs text-muted">Status Keluarga</span><p class="font-semibold">${s.family_status || '—'}</p></div>
+                <div class="col-span-3"><span class="text-xs text-muted">Alamat</span><p class="font-semibold">${s.address || '—'}</p></div>
+            </div>`;
+
+            html += '<hr class="mb-4"><h4 class="text-sm font-bold text-purple-600 uppercase mb-3">Orang Tua</h4><div class="grid grid-cols-2 gap-4 text-sm mb-4">';
+            if (father.name) html += `<div class="p-3 bg-slate-50 rounded-xl"><span class="text-xs text-muted">Ayah</span><p class="font-semibold">${father.name || '—'}</p><p class="text-xs text-muted">${father.job || ''} &middot; ${father.phone || ''}</p></div>`;
+            if (mother.name) html += `<div class="p-3 bg-slate-50 rounded-xl"><span class="text-xs text-muted">Ibu</span><p class="font-semibold">${mother.name || '—'}</p><p class="text-xs text-muted">${mother.job || ''} &middot; ${mother.phone || ''}</p></div>`;
+            html += '</div>';
+
+            html += '<button onclick="closeDetail()" class="btn-outline w-full !py-2.5">Tutup</button>';
+            box.innerHTML = html;
+        });
 }
+
+function closeDetail() { document.getElementById('detailOverlay').classList.add('hidden'); document.getElementById('detailBox').classList.add('hidden'); }
 </script>
 @endpush
 @endsection

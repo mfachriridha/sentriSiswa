@@ -262,6 +262,30 @@ class AdminController extends Controller
         return back()->with('success', 'Kelas berhasil dihapus.');
     }
 
+    public function searchStudents(Request $request)
+    {
+        $q = $request->input('q', '');
+        if (strlen($q) < 2) {
+            return response()->json([]);
+        }
+
+        $students = Student::where('name', 'like', "%{$q}%")
+            ->orWhere('nis', 'like', "%{$q}%")
+            ->select('id', 'nis', 'nisn', 'name', 'gender', 'school_class_id', 'user_id')
+            ->orderBy('name')
+            ->limit(20)
+            ->get();
+
+        return response()->json($students);
+    }
+
+    public function studentDetail(Student $student)
+    {
+        $student->load(['schoolClass', 'father', 'mother', 'guardian']);
+
+        return response()->json($student);
+    }
+
     public function classStudents(SchoolClass $schoolClass)
     {
         $students = $schoolClass->students()->with('user')->orderBy('name')->get();
@@ -271,13 +295,24 @@ class AdminController extends Controller
 
     public function assignStudentToClass(Request $request, SchoolClass $schoolClass)
     {
-        $data = $request->validate(['nis' => 'required|string|exists:students,nis']);
+        $data = $request->validate([
+            'nis' => 'nullable|string|exists:students,nis',
+            'student_id' => 'nullable|integer|exists:students,id',
+        ]);
 
-        $student = Student::where('nis', $data['nis'])->first();
+        if (! empty($data['student_id'])) {
+            $student = Student::find($data['student_id']);
+        } else {
+            $student = Student::where('nis', $data['nis'])->first();
+        }
+
+        if (! $student) {
+            return response()->json(['success' => false, 'message' => 'Siswa tidak ditemukan.'], 404);
+        }
 
         $student->update(['school_class_id' => $schoolClass->id]);
 
-        return response()->json(['success' => true, 'message' => 'Siswa berhasil ditambahkan ke kelas.']);
+        return response()->json(['success' => true, 'message' => $student->name.' berhasil ditambahkan ke kelas '.$schoolClass->name.'.']);
     }
 
     public function removeStudentFromClass(Request $request, SchoolClass $schoolClass)
