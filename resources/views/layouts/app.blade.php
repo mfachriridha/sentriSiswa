@@ -96,7 +96,7 @@
                 @elseif($currentRole === 'siswa')
                 <a href="{{ route('siswa.pengaturan') }}" class="sidebar-link {{ request()->routeIs('siswa.pengaturan') ? 'active' : '' }}"><i class="bi bi-gear"></i> Pengaturan</a>
                 @endif
-                <a href="{{ route('landing') }}" class="sidebar-link text-[#ba1a1a] hover:bg-[#ffdad6]"><i class="bi bi-box-arrow-right"></i> Keluar</a>
+                <a href="{{ route('auth.logout.get') }}" class="sidebar-link text-[#ba1a1a] hover:bg-[#ffdad6]"><i class="bi bi-box-arrow-right"></i> Keluar</a>
             </nav>
         </aside>
 
@@ -137,11 +137,11 @@
 
     <!-- Avatar Dropdown -->
     <div id="avatar-dropdown" class="fixed z-[100] w-44 bg-white border border-[#c3c6d1]/30 rounded-lg shadow-lg py-1" style="display:none">
-        <a href="{{ route('siswa.pengaturan') }}" class="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-[#191c1d] hover:bg-[#d5e3ff] transition">
-            <i class="bi bi-gear"></i> Pengaturan
+        <a href="{{ $currentRole === 'admin' ? route('admin.dashboard') : route('siswa.pengaturan') }}" class="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-[#191c1d] hover:bg-[#d5e3ff] transition">
+            <i class="bi bi-gear"></i> {{ $currentRole === 'admin' ? 'Dashboard' : 'Pengaturan' }}
         </a>
         <hr class="border-[#c3c6d1]/30 mx-3">
-        <a href="{{ route('landing') }}" class="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-[#ba1a1a] hover:bg-[#ffdad6] transition">
+        <a href="{{ route('auth.logout.get') }}" class="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-[#ba1a1a] hover:bg-[#ffdad6] transition">
             <i class="bi bi-box-arrow-right"></i> Keluar
         </a>
     </div>

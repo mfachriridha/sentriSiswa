@@ -1,36 +1,24 @@
 <?php
 
+use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Session;
 
 Route::get('/', function () {
     return view('landing');
 })->name('landing');
 
+// Auth routes
 Route::prefix('auth')->name('auth.')->group(function () {
-    Route::view('/login', 'auth.login')->name('login');
+    Route::get('/login', [LoginController::class, 'showSiswaLogin'])->name('login');
     Route::view('/register', 'auth.register')->name('register');
-    
     Route::post('/login', function () {
-        $email = request()->input('email');
-        $password = request()->input('password');
-        
-        if ($email === 'siswa@sentrisiswa.sch.id' && $password === 'siswa123') {
-            Session::put('user_role', 'siswa');
-            Session::put('user_name', 'Ahmad Fauzi');
-            Session::put('user_email', 'siswa@sentrisiswa.sch.id');
-            return redirect()->route('siswa.dashboard');
-        }
-        
-        return redirect()->route('auth.login')->with('error', 'Email atau kata sandi salah.');
+        return app(LoginController::class)->login(request(), 'siswa');
     })->name('login.post');
-    
-    Route::get('/logout', function () {
-        Session::flush();
-        return redirect()->route('landing');
-    })->name('logout');
+    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+    Route::get('/logout', [LoginController::class, 'logout'])->name('logout.get');
 });
 
+// Siswa
 Route::prefix('siswa')->name('siswa.')->group(function () {
     Route::view('/', 'siswa.dashboard')->name('dashboard');
     Route::view('/kehadiran', 'siswa.kehadiran')->name('kehadiran');
@@ -40,23 +28,13 @@ Route::prefix('siswa')->name('siswa.')->group(function () {
     Route::view('/pengaturan', 'siswa.pengaturan')->name('pengaturan');
 });
 
+// Admin
 Route::prefix('admin')->name('admin.')->group(function () {
-    Route::view('/login', 'admin.login')->name('login');
-    
+    Route::get('/login', [LoginController::class, 'showAdminLogin'])->name('login');
     Route::post('/login', function () {
-        $email = request()->input('email');
-        $password = request()->input('password');
-        
-        if ($email === 'admin@sentrisiswa.sch.id' && $password === 'admin123') {
-            Session::put('user_role', 'admin');
-            Session::put('user_name', 'Admin Kesiswaan');
-            Session::put('user_email', 'admin@sentrisiswa.sch.id');
-            return redirect()->route('admin.dashboard');
-        }
-        
-        return redirect()->route('admin.login')->with('error', 'Email atau kata sandi salah.');
+        return app(LoginController::class)->login(request(), 'admin');
     })->name('login.post');
-    
+
     Route::view('/', 'admin.dashboard')->name('dashboard');
     Route::view('/guru', 'admin.guru')->name('guru');
     Route::view('/guru/tambah', 'admin.guru-form')->name('guru.tambah');
@@ -71,6 +49,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::view('/log', 'admin.log')->name('log');
 });
 
+// Profile
 Route::prefix('profile')->name('profile.')->group(function () {
     Route::view('/', 'profile.index')->name('index');
     Route::view('/edit', 'profile.edit')->name('edit');

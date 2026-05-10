@@ -17,9 +17,9 @@
 
         <!-- Login Form -->
         <div class="bg-white rounded-lg border border-[#c3c6d1]/30 p-6 shadow-sm">
-            @if(session('error'))
+            @if(session('error') || $errors->any())
             <div class="mb-4 p-3 bg-[#ffdad6] border border-[#ba1a1a]/30 rounded-lg text-xs font-semibold text-[#ba1a1a] flex items-center gap-2">
-                <i class="bi bi-exclamation-circle"></i> {{ session('error') }}
+                <i class="bi bi-exclamation-circle"></i> {{ session('error') ?? $errors->first('email') }}
             </div>
             @endif
             <form action="{{ route('auth.login.post') }}" method="POST">
