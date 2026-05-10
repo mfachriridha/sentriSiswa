@@ -20,8 +20,10 @@ class AdminController extends Controller
 
     public function siswa()
     {
+        $students = Student::with(['kelas', 'father', 'mother'])->latest()->get();
+
         return view('admin.siswa', [
-            'students' => Student::with('kelas')->latest()->get(),
+            'students' => $students,
             'totalSiswa' => Student::count(),
         ]);
     }
@@ -64,7 +66,7 @@ class AdminController extends Controller
             return back()->with('error', 'Tidak ada data valid di file CSV.');
         }
 
-        session()->flash('csv_rows', $rows);
+        session()->put('csv_rows', $rows);
 
         return redirect()->route('admin.siswa.preview');
     }

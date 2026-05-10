@@ -17,7 +17,7 @@ Route::prefix('auth')->name('auth.')->group(function () {
 });
 
 // Siswa
-Route::prefix('siswa')->name('siswa.')->group(function () {
+Route::prefix('siswa')->name('siswa.')->middleware('auth.session')->group(function () {
     Route::view('/', 'siswa.dashboard')->name('dashboard');
     Route::view('/kehadiran', 'siswa.kehadiran')->name('kehadiran');
     Route::view('/riwayat', 'siswa.riwayat')->name('riwayat');
@@ -27,7 +27,7 @@ Route::prefix('siswa')->name('siswa.')->group(function () {
 });
 
 // Admin
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::prefix('admin')->name('admin.')->middleware('auth.session')->group(function () {
     Route::get('/', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::get('/guru', function () { return view('admin.guru'); })->name('guru');
     Route::get('/guru/tambah', function () { return view('admin.guru-form'); })->name('guru.tambah');
