@@ -38,48 +38,57 @@
                             <i class="bi bi-download text-[#43474f] text-sm"></i>
                         </button>
                     </div>
-                    </div>
                 </div>
+
+                <div class="flex-1 bg-[#d9dadb] p-4 md:p-8 overflow-y-auto flex justify-center">
+                    <?php
+                    $pdfPath = 'storage/tata-tertib/tata_tertib.pdf';
+                    $hasPdf = file_exists(public_path($pdfPath));
+                    ?>
+                    @if($hasPdf)
+                        <div class="w-full max-w-2xl bg-white shadow-2xl min-h-[800px]">
+                            <iframe src="{{ asset($pdfPath) }}" class="w-full h-[800px] border-0"></iframe>
+                        </div>
                     @else
-                    <div id="pdfContent" class="w-full max-w-2xl bg-white shadow-2xl p-6 md:p-12 min-h-[800px]">
-                        <div class="text-center border-b-2 border-[#001e40] pb-6 mb-6">
-                            <h4 class="text-lg font-black text-[#001e40] uppercase tracking-widest">SMA Negeri 11 Kab. Tangerang</h4>
-                            <p class="text-xs font-bold text-[#0062a0] mt-1">KEPUTUSAN KEPALA SEKOLAH NOMOR: 421.3/SK/2025</p>
+                        <div class="w-full max-w-2xl bg-white shadow-2xl p-6 md:p-12 min-h-[800px]">
+                            <div class="text-center border-b-2 border-[#001e40] pb-6 mb-6">
+                                <h4 class="text-lg font-black text-[#001e40] uppercase tracking-widest">SMA Negeri 11 Kab. Tangerang</h4>
+                                <p class="text-xs font-bold text-[#0062a0] mt-1">KEPUTUSAN KEPALA SEKOLAH NOMOR: 421.3/SK/2025</p>
+                            </div>
+                            <div class="space-y-5">
+                                <div class="space-y-1.5">
+                                    <h5 class="text-sm font-bold text-[#001e40]">BAB I: KETENTUAN UMUM</h5>
+                                    <div class="h-2 w-3/4 bg-[#e1e3e4] rounded-full"></div>
+                                    <div class="h-2 w-full bg-[#e7e8e9] rounded-full"></div>
+                                    <div class="h-2 w-5/6 bg-[#e7e8e9] rounded-full"></div>
+                                </div>
+                                <div class="space-y-1.5">
+                                    <h5 class="text-sm font-bold text-[#001e40]">BAB II: KEHADIRAN DAN KETERLAMBATAN</h5>
+                                    <div class="h-2 w-1/2 bg-[#e1e3e4] rounded-full"></div>
+                                    <div class="h-2 w-full bg-[#e7e8e9] rounded-full"></div>
+                                    <div class="h-2 w-full bg-[#e7e8e9] rounded-full"></div>
+                                    <div class="h-2 w-4/5 bg-[#e7e8e9] rounded-full"></div>
+                                </div>
+                                <div class="space-y-1.5">
+                                    <h5 class="text-sm font-bold text-[#001e40]">BAB III: PENGGUNAAN SERAGAM</h5>
+                                    <div class="h-2 w-2/3 bg-[#e1e3e4] rounded-full"></div>
+                                    <div class="h-2 w-full bg-[#e7e8e9] rounded-full"></div>
+                                    <div class="h-2 w-11/12 bg-[#e7e8e9] rounded-full"></div>
+                                </div>
+                                <div class="space-y-1.5">
+                                    <h5 class="text-sm font-bold text-[#001e40]">BAB IV: SANKSI DAN PENGHARGAAN</h5>
+                                    <div class="h-2 w-3/4 bg-[#e1e3e4] rounded-full"></div>
+                                    <div class="h-2 w-full bg-[#e7e8e9] rounded-full"></div>
+                                    <div class="h-2 w-5/6 bg-[#e7e8e9] rounded-full"></div>
+                                </div>
+                            </div>
+                            <div class="mt-8 p-4 bg-[#f8f9fa] rounded-lg text-center text-sm text-[#43474f]">
+                                <i class="bi bi-info-circle mr-1"></i> Dokumen tata tertib resmi &mdash; hubungi admin untuk mengunggah PDF asli.
+                            </div>
                         </div>
-                        <div class="space-y-5">
-                            <div class="space-y-1.5">
-                                <h5 class="text-sm font-bold text-[#001e40]">BAB I: KETENTUAN UMUM</h5>
-                                <div class="h-2 w-3/4 bg-[#e1e3e4] rounded-full"></div>
-                                <div class="h-2 w-full bg-[#e7e8e9] rounded-full"></div>
-                                <div class="h-2 w-5/6 bg-[#e7e8e9] rounded-full"></div>
-                            </div>
-                            <div class="space-y-1.5">
-                                <h5 class="text-sm font-bold text-[#001e40]">BAB II: KEHADIRAN DAN KETERLAMBATAN</h5>
-                                <div class="h-2 w-1/2 bg-[#e1e3e4] rounded-full"></div>
-                                <div class="h-2 w-full bg-[#e7e8e9] rounded-full"></div>
-                                <div class="h-2 w-full bg-[#e7e8e9] rounded-full"></div>
-                                <div class="h-2 w-4/5 bg-[#e7e8e9] rounded-full"></div>
-                            </div>
-                            <div class="space-y-1.5">
-                                <h5 class="text-sm font-bold text-[#001e40]">BAB III: PENGGUNAAN SERAGAM</h5>
-                                <div class="h-2 w-2/3 bg-[#e1e3e4] rounded-full"></div>
-                                <div class="h-2 w-full bg-[#e7e8e9] rounded-full"></div>
-                                <div class="h-2 w-11/12 bg-[#e7e8e9] rounded-full"></div>
-                            </div>
-                            <div class="space-y-1.5">
-                                <h5 class="text-sm font-bold text-[#001e40]">BAB IV: SANKSI DAN PENGHARGAAN</h5>
-                                <div class="h-2 w-3/4 bg-[#e1e3e4] rounded-full"></div>
-                                <div class="h-2 w-full bg-[#e7e8e9] rounded-full"></div>
-                                <div class="h-2 w-5/6 bg-[#e7e8e9] rounded-full"></div>
-                            </div>
-                        </div>
-                        <div class="mt-8 p-4 bg-[#f8f9fa] rounded-lg text-center text-sm text-[#43474f]">
-                            <i class="bi bi-info-circle mr-1"></i> Dokumen tata tertib resmi — hubungi admin untuk mengunggah PDF asli.
-                        </div>
-                    </div>
+                    @endif
                 </div>
             </div>
-            @endif
 
             <!-- Sidebar Cards -->
             <div class="space-y-4">
