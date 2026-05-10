@@ -28,7 +28,7 @@
         <table class="w-full">
             <thead><tr><th class="table-header">No.</th><th class="table-header">Nama Kelas</th><th class="table-header">Jumlah Siswa</th><th class="table-header">Aksi</th></tr></thead>
             <tbody>
-                @forelse($kelases as $i => $k)
+                @forelse($classes as $i => $k)
                 <tr>
                     <td class="table-cell">{{ $i + 1 }}</td>
                     <td class="table-cell font-semibold">{{ $k->name }}</td>

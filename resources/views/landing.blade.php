@@ -38,9 +38,8 @@
                             <i class="bi bi-download text-[#43474f] text-sm"></i>
                         </button>
                     </div>
-                    @endif
+                    </div>
                 </div>
-            </div>
                     @else
                     <div id="pdfContent" class="w-full max-w-2xl bg-white shadow-2xl p-6 md:p-12 min-h-[800px]">
                         <div class="text-center border-b-2 border-[#001e40] pb-6 mb-6">
@@ -80,6 +79,7 @@
                     </div>
                 </div>
             </div>
+            @endif
 
             <!-- Sidebar Cards -->
             <div class="space-y-4">
