@@ -14,7 +14,7 @@ return new class extends Migration
             $table->string('nisn')->nullable();
             $table->string('name');
             $table->string('gender')->nullable();
-            $table->foreignId('kelas_id')->nullable()->constrained('kelas')->nullOnDelete();
+            $table->foreignId('school_class_id')->nullable()->constrained('school_classes')->nullOnDelete();
             $table->string('phone')->nullable();
             $table->string('parent_phone')->nullable();
             $table->string('birth_place')->nullable();

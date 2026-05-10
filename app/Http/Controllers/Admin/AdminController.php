@@ -23,24 +23,24 @@ class AdminController extends Controller
         ]);
     }
 
-    // ─── Classes (manajemen kelas) ───
-    public function kelas()
+    // ─── Classes (manajemen school_classes) ───
+    public function school_classes()
     {
-        return view('admin.kelas', [
+        return view('admin.school_classes', [
             'classes' => SchoolClass::withCount('students')->latest()->get(),
         ]);
     }
 
     public function storeClass(Request $request)
     {
-        $data = $request->validate(['name' => 'required|string|max:50|unique:kelas,name']);
+        $data = $request->validate(['name' => 'required|string|max:50|unique:school_classes,name']);
         SchoolClass::create($data);
         return back()->with('success', 'Kelas berhasil ditambahkan.');
     }
 
     public function updateClass(Request $request, SchoolClass $class)
     {
-        $data = $request->validate(['name' => 'required|string|max:50|unique:kelas,name,' . $class->id]);
+        $data = $request->validate(['name' => 'required|string|max:50|unique:school_classes,name,' . $class->id]);
         $class->update($data);
         return back()->with('success', 'Kelas berhasil diperbarui.');
     }
@@ -87,7 +87,7 @@ class AdminController extends Controller
         $student = Student::create([
             'nis' => $data['nis'], 'nisn' => $data['nisn'] ?? null,
             'name' => $data['name'], 'gender' => $data['gender'] ?? null,
-            'kelas_id' => $class?->id,
+            'school_class_id' => $class?->id,
             'birth_place' => $data['birth_place'] ?? null,
             'birth_date' => $data['birth_date'] ?? null,
             'religion' => $data['religion'] ?? null,
@@ -145,7 +145,7 @@ class AdminController extends Controller
         $student->update([
             'nis' => $data['nis'], 'nisn' => $data['nisn'] ?? null,
             'name' => $data['name'], 'gender' => $data['gender'] ?? null,
-            'kelas_id' => $class?->id ?? $student->kelas_id,
+            'school_class_id' => $class?->id ?? $student->school_class_id,
             'birth_place' => $data['birth_place'] ?? null,
             'birth_date' => $data['birth_date'] ?? null,
             'religion' => $data['religion'] ?? null,
@@ -201,7 +201,7 @@ class AdminController extends Controller
             $nama = trim($row[0] ?? ''); $jk = trim($row[1] ?? '');
             $nis = trim($row[2] ?? ''); $class = trim($row[3] ?? ''); $nisn = trim($row[4] ?? '');
             if (empty($nama) || empty($nis)) continue;
-            $rows[] = ['nama' => $nama, 'gender' => $jk, 'nis' => $nis, 'kelas' => $class, 'nisn' => $nisn];
+            $rows[] = ['nama' => $nama, 'gender' => $jk, 'nis' => $nis, 'school_classes' => $class, 'nisn' => $nisn];
         }
         fclose($handle);
         if (empty($rows)) return back()->with('error', 'Tidak ada data valid di file CSV.');
@@ -222,10 +222,10 @@ class AdminController extends Controller
         if (empty($rows)) return redirect()->route('admin.siswa')->with('error', 'Tidak ada data CSV untuk disimpan.');
         $imported = 0;
         foreach ($rows as $row) {
-            $class = !empty($row['kelas']) ? SchoolClass::firstOrCreate(['name' => $row['kelas']]) : null;
+            $class = !empty($row['school_classes']) ? SchoolClass::firstOrCreate(['name' => $row['school_classes']]) : null;
             Student::create([
                 'name' => $row['nama'], 'gender' => $row['gender'], 'nis' => $row['nis'],
-                'kelas_id' => $class?->id, 'nisn' => $row['nisn'] ?: null,
+                'school_class_id' => $class?->id, 'nisn' => $row['nisn'] ?: null,
             ]);
             $imported++;
         }
@@ -237,7 +237,7 @@ class AdminController extends Controller
     {
         return view('admin.poin-pelanggaran', [
             'violations' => Violation::orderBy('poin')->get(),
-            'students' => Student::select('id', 'name', 'nis', 'poin', 'kelas_id')->with('schoolClass')->get(),
+            'students' => Student::select('id', 'name', 'nis', 'poin', 'school_class_id')->with('schoolClass')->get(),
             'riwayat' => StudentViolation::with(['student', 'violation'])->latest()->take(20)->get(),
         ]);
     }

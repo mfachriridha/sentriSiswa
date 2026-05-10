@@ -31,7 +31,7 @@ class UserSeeder extends Seeder
                 'nisn' => '0087654321',
                 'name' => 'Ahmad Fauzi',
                 'gender' => 'Laki-laki',
-                'kelas_id' => $kelas->id,
+                'school_class_id' => $kelas->id,
                 'birth_place' => 'Tangerang',
                 'birth_date' => '2008-08-17',
                 'religion' => 'Islam',
