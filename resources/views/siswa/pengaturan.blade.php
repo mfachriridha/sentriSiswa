@@ -175,8 +175,8 @@
         <div class="card anim-up" style="animation-delay:.24s">
             <div class="flex items-center gap-2 mb-5"><div class="w-9 h-9 bg-purple-100 rounded-lg flex items-center justify-center"><i class="bi bi-people-fill text-purple-600"></i></div><h3 class="font-bold text-slate-900">Orang Tua</h3></div>
             <div class="space-y-3">
-                <div class="p-3 bg-slate-50 rounded-xl"><p class="text-[10px] font-bold text-purple-500 uppercase">Ayah</p><p class="text-sm font-bold mt-1">H. Supriyanto, S.Pd.</p><p class="text-xs text-slate-500">Pekerjaan: Guru PNS &middot; <span class="text-emerald-600"><i class="bi bi-whatsapp"></i> 081234567891</span></p></div>
-                <div class="p-3 bg-slate-50 rounded-xl"><p class="text-[10px] font-bold text-purple-500 uppercase">Ibu</p><p class="text-sm font-bold mt-1">Hj. Siti Rahmawati</p><p class="text-xs text-slate-500">Pekerjaan: IRT &middot; <span class="text-emerald-600"><i class="bi bi-whatsapp"></i> 081398765432</span></p></div>
+                <div class="p-3 bg-slate-50 rounded-xl"><p class="text-[10px] font-bold text-purple-500 uppercase">Ayah</p><p class="text-sm font-bold mt-1">H. Supriyanto, S.Pd.</p><p class="text-xs text-slate-500">Pekerjaan: Guru PNS &middot; <span class="text-[#43474f]"><i class="bi bi-telephone"></i> 081234567891</span></p></div>
+                <div class="p-3 bg-slate-50 rounded-xl"><p class="text-[10px] font-bold text-purple-500 uppercase">Ibu</p><p class="text-sm font-bold mt-1">Hj. Siti Rahmawati</p><p class="text-xs text-slate-500">Pekerjaan: IRT &middot; <span class="text-[#43474f]"><i class="bi bi-telephone"></i> 081398765432</span></p></div>
                 <div><label class="text-[10px] font-bold text-slate-400 uppercase">Alamat</label><p class="text-sm font-semibold mt-0.5">Jl. Merdeka No. 42, Kab. Tangerang</p></div>
             </div>
         </div>

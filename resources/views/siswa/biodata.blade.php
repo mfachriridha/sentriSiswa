@@ -129,7 +129,7 @@
                 <p class="text-sm font-bold text-slate-900">H. Supriyanto, S.Pd.</p>
                 <div class="flex items-center justify-between text-xs text-slate-500 mt-1">
                     <span>Pekerjaan: Guru PNS</span>
-                    <span class="text-emerald-600"><i class="bi bi-whatsapp"></i> 081234567891</span>
+                    <span class="text-[#43474f]"><i class="bi bi-telephone"></i> 081234567891</span>
                 </div>
             </div>
             <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
@@ -137,7 +137,7 @@
                 <p class="text-sm font-bold text-slate-900">Hj. Siti Rahmawati</p>
                 <div class="flex items-center justify-between text-xs text-slate-500 mt-1">
                     <span>Pekerjaan: Ibu Rumah Tangga</span>
-                    <span class="text-emerald-600"><i class="bi bi-whatsapp"></i> 081398765432</span>
+                    <span class="text-[#43474f]"><i class="bi bi-telephone"></i> 081398765432</span>
                 </div>
             </div>
             <div>
