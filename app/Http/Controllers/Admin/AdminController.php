@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Guardian;
-use App\Models\Kelas;
+use App\Models\SchoolClass;
 use App\Models\Student;
 use App\Models\StudentParent;
 use App\Models\StudentViolation;
@@ -14,62 +14,61 @@ use Illuminate\Support\Facades\Hash;
 
 class AdminController extends Controller
 {
-    // ─── Dashboard ───
     public function dashboard()
     {
         return view('admin.dashboard', [
-            'totalSiswa' => Student::count(),
-            'totalKelas' => Kelas::count(),
-            'hadirHariIni' => 0,
+            'totalStudents' => Student::count(),
+            'totalClasses' => SchoolClass::count(),
+            'presentToday' => 0,
         ]);
     }
 
-    // ─── Kelas ───
+    // ─── Classes (manajemen kelas) ───
     public function kelas()
     {
         return view('admin.kelas', [
-            'kelases' => Kelas::withCount('students')->latest()->get(),
+            'classes' => SchoolClass::withCount('students')->latest()->get(),
         ]);
     }
 
-    public function storeKelas(Request $request)
+    public function storeClass(Request $request)
     {
         $data = $request->validate(['name' => 'required|string|max:50|unique:kelas,name']);
-        Kelas::create($data);
+        SchoolClass::create($data);
         return back()->with('success', 'Kelas berhasil ditambahkan.');
     }
 
-    public function updateKelas(Request $request, Kelas $kelas)
+    public function updateClass(Request $request, SchoolClass $class)
     {
-        $data = $request->validate(['name' => 'required|string|max:50|unique:kelas,name,' . $kelas->id]);
-        $kelas->update($data);
+        $data = $request->validate(['name' => 'required|string|max:50|unique:kelas,name,' . $class->id]);
+        $class->update($data);
         return back()->with('success', 'Kelas berhasil diperbarui.');
     }
 
-    public function destroyKelas(Kelas $kelas)
+    public function destroyClass(SchoolClass $class)
     {
-        if ($kelas->students()->exists()) {
+        if ($class->students()->exists()) {
             return back()->with('error', 'Kelas tidak bisa dihapus karena masih memiliki siswa.');
         }
-        $kelas->delete();
+        $class->delete();
         return back()->with('success', 'Kelas berhasil dihapus.');
     }
 
-    // ─── Siswa ───
+    // ─── Students ───
     public function siswa()
     {
-        $students = Student::with(['kelas', 'father', 'mother'])->latest()->get();
-        return view('admin.siswa', ['students' => $students, 'totalSiswa' => $students->count()]);
+        $students = Student::with(['schoolClass', 'father', 'mother'])->latest()->get();
+        return view('admin.siswa', ['students' => $students, 'totalStudents' => $students->count()]);
     }
 
-    public function storeSiswa(Request $request)
+    public function storeStudent(Request $request)
     {
         $data = $request->validate([
             'nis' => 'required|string|max:20',
             'nisn' => 'nullable|string|max:20',
             'name' => 'required|string|max:200',
             'gender' => 'nullable|string',
-            'kelas_name' => 'nullable|string|max:50',
+            'class_name' => 'nullable|string|max:50',
             'birth_place' => 'nullable|string', 'birth_date' => 'nullable|date',
             'religion' => 'nullable|string', 'family_status' => 'nullable|string',
             'birth_order' => 'nullable|string', 'address' => 'nullable|string',
@@ -80,15 +79,15 @@ class AdminController extends Controller
             'guardian_name' => 'nullable|string', 'guardian_job' => 'nullable|string', 'guardian_phone' => 'nullable|string', 'guardian_address' => 'nullable|string',
         ]);
 
-        $kelas = null;
-        if (!empty($data['kelas_name'])) {
-            $kelas = Kelas::firstOrCreate(['name' => $data['kelas_name']]);
+        $class = null;
+        if (!empty($data['class_name'])) {
+            $class = SchoolClass::firstOrCreate(['name' => $data['class_name']]);
         }
 
         $student = Student::create([
             'nis' => $data['nis'], 'nisn' => $data['nisn'] ?? null,
             'name' => $data['name'], 'gender' => $data['gender'] ?? null,
-            'kelas_id' => $kelas?->id,
+            'kelas_id' => $class?->id,
             'birth_place' => $data['birth_place'] ?? null,
             'birth_date' => $data['birth_date'] ?? null,
             'religion' => $data['religion'] ?? null,
@@ -116,18 +115,18 @@ class AdminController extends Controller
 
     public function editSiswa(Student $student)
     {
-        $student->load(['kelas', 'father', 'mother', 'guardian']);
+        $student->load(['schoolClass', 'father', 'mother', 'guardian']);
         return view('admin.siswa-form', ['student' => $student]);
     }
 
-    public function updateSiswa(Request $request, Student $student)
+    public function updateStudent(Request $request, Student $student)
     {
         $data = $request->validate([
             'nis' => 'required|string|max:20',
             'nisn' => 'nullable|string|max:20',
             'name' => 'required|string|max:200',
             'gender' => 'nullable|string',
-            'kelas_name' => 'nullable|string|max:50',
+            'class_name' => 'nullable|string|max:50',
             'birth_place' => 'nullable|string', 'birth_date' => 'nullable|date',
             'religion' => 'nullable|string', 'family_status' => 'nullable|string',
             'birth_order' => 'nullable|string', 'address' => 'nullable|string',
@@ -138,15 +137,15 @@ class AdminController extends Controller
             'guardian_name' => 'nullable|string', 'guardian_job' => 'nullable|string', 'guardian_phone' => 'nullable|string', 'guardian_address' => 'nullable|string',
         ]);
 
-        $kelas = null;
-        if (!empty($data['kelas_name'])) {
-            $kelas = Kelas::firstOrCreate(['name' => $data['kelas_name']]);
+        $class = null;
+        if (!empty($data['class_name'])) {
+            $class = SchoolClass::firstOrCreate(['name' => $data['class_name']]);
         }
 
         $student->update([
             'nis' => $data['nis'], 'nisn' => $data['nisn'] ?? null,
             'name' => $data['name'], 'gender' => $data['gender'] ?? null,
-            'kelas_id' => $kelas?->id ?? $student->kelas_id,
+            'kelas_id' => $class?->id ?? $student->kelas_id,
             'birth_place' => $data['birth_place'] ?? null,
             'birth_date' => $data['birth_date'] ?? null,
             'religion' => $data['religion'] ?? null,
@@ -159,7 +158,6 @@ class AdminController extends Controller
             'admission_date' => $data['admission_date'] ?? null,
         ]);
 
-        // Upsert parents
         if (!empty($data['father_name'])) {
             StudentParent::updateOrCreate(
                 ['student_id' => $student->id, 'type' => 'father'],
@@ -182,13 +180,12 @@ class AdminController extends Controller
         return redirect()->route('admin.siswa')->with('success', 'Data siswa berhasil diperbarui.');
     }
 
-    public function destroySiswa(Student $student)
+    public function destroyStudent(Student $student)
     {
         $student->delete();
         return back()->with('success', 'Siswa berhasil dihapus.');
     }
 
-    // ─── CSV Import ───
     public function previewCsv(Request $request)
     {
         $request->validate(['csv_file' => 'required|file|mimes:csv,txt']);
@@ -202,9 +199,9 @@ class AdminController extends Controller
         while (($row = fgetcsv($handle, 0, $delimiter)) !== false) {
             if (count($row) < 4) continue;
             $nama = trim($row[0] ?? ''); $jk = trim($row[1] ?? '');
-            $nis = trim($row[2] ?? ''); $kelasName = trim($row[3] ?? ''); $nisn = trim($row[4] ?? '');
+            $nis = trim($row[2] ?? ''); $class = trim($row[3] ?? ''); $nisn = trim($row[4] ?? '');
             if (empty($nama) || empty($nis)) continue;
-            $rows[] = ['nama' => $nama, 'gender' => $jk, 'nis' => $nis, 'kelas' => $kelasName, 'nisn' => $nisn];
+            $rows[] = ['nama' => $nama, 'gender' => $jk, 'nis' => $nis, 'kelas' => $class, 'nisn' => $nisn];
         }
         fclose($handle);
         if (empty($rows)) return back()->with('error', 'Tidak ada data valid di file CSV.');
@@ -225,10 +222,10 @@ class AdminController extends Controller
         if (empty($rows)) return redirect()->route('admin.siswa')->with('error', 'Tidak ada data CSV untuk disimpan.');
         $imported = 0;
         foreach ($rows as $row) {
-            $kelas = !empty($row['kelas']) ? Kelas::firstOrCreate(['name' => $row['kelas']]) : null;
+            $class = !empty($row['kelas']) ? SchoolClass::firstOrCreate(['name' => $row['kelas']]) : null;
             Student::create([
                 'name' => $row['nama'], 'gender' => $row['gender'], 'nis' => $row['nis'],
-                'kelas_id' => $kelas?->id, 'nisn' => $row['nisn'] ?: null,
+                'kelas_id' => $class?->id, 'nisn' => $row['nisn'] ?: null,
             ]);
             $imported++;
         }
@@ -236,17 +233,16 @@ class AdminController extends Controller
         return redirect()->route('admin.siswa')->with('success', "{$imported} siswa berhasil diimpor.");
     }
 
-    // ─── Poin Pelanggaran ───
     public function poin()
     {
         return view('admin.poin-pelanggaran', [
             'violations' => Violation::orderBy('poin')->get(),
-            'students' => Student::select('id', 'name', 'nis', 'poin', 'kelas_id')->with('kelas')->get(),
+            'students' => Student::select('id', 'name', 'nis', 'poin', 'kelas_id')->with('schoolClass')->get(),
             'riwayat' => StudentViolation::with(['student', 'violation'])->latest()->take(20)->get(),
         ]);
     }
 
-    public function storePoin(Request $request)
+    public function storeViolation(Request $request)
     {
         $data = $request->validate([
             'student_id' => 'required|exists:students,id',
@@ -256,7 +252,6 @@ class AdminController extends Controller
 
         $student = Student::findOrFail($data['student_id']);
         $violation = Violation::findOrFail($data['violation_id']);
-
         $student->decrement('poin', $violation->poin);
 
         StudentViolation::create([
@@ -268,24 +263,16 @@ class AdminController extends Controller
         return back()->with('success', "Pelanggaran ditambahkan. Poin {$student->name}: {$student->fresh()->poin}");
     }
 
-    // ─── Tata Tertib ───
-    public function tataTertib()
-    {
-        return view('admin.tata-tertib');
-    }
+    public function tataTertib() { return view('admin.tata-tertib'); }
 
     public function uploadTataTertib(Request $request)
     {
         $request->validate(['pdf' => 'required|file|mimes:pdf|max:10240']);
-        $path = $request->file('pdf')->storeAs('tata-tertib', 'tata_tertib.pdf', 'public');
+        $request->file('pdf')->storeAs('tata-tertib', 'tata_tertib.pdf', 'public');
         return back()->with('success', 'PDF Tata Tertib berhasil diunggah.');
     }
 
-    // ─── Profile ───
-    public function profile()
-    {
-        return view('admin.profile');
-    }
+    public function profile() { return view('admin.profile'); }
 
     public function updateProfile(Request $request)
     {
@@ -295,19 +282,10 @@ class AdminController extends Controller
             'email' => 'required|email|unique:users,email,' . $user->id,
             'password' => 'nullable|string|min:6|confirmed',
         ]);
-
-        $user->update([
-            'name' => $data['name'],
-            'email' => $data['email'],
-        ]);
-
-        if (!empty($data['password'])) {
-            $user->update(['password' => Hash::make($data['password'])]);
-        }
-
+        $user->update(['name' => $data['name'], 'email' => $data['email']]);
+        if (!empty($data['password'])) $user->update(['password' => Hash::make($data['password'])]);
         session()->put('user_name', $user->name);
         session()->put('user_email', $user->email);
-
         return back()->with('success', 'Profil berhasil diperbarui.');
     }
 }

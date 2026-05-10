@@ -28,7 +28,7 @@
     @endif
 
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-        <h3 class="font-bold text-slate-900">Data Siswa <span class="text-sm font-medium text-muted">({{ $totalSiswa }})</span></h3>
+        <h3 class="font-bold text-slate-900">Data Siswa <span class="text-sm font-medium text-muted">({{ $totalStudents }})</span></h3>
         <input type="text" class="input-field !w-48 !py-1.5 !text-xs" placeholder="Cari nama / NIS...">
     </div>
     <div class="table-container">
@@ -46,13 +46,13 @@
                     <td class="table-cell font-mono"><strong>{{ $s->nis }}</strong></td>
                     <td class="table-cell font-mono">{{ $s->nisn ?? '—' }}</td>
                     <td class="table-cell font-semibold">{{ $s->name }}</td>
-                    <td class="table-cell">{{ $s->kelas?->name ?? '—' }}</td>
+                    <td class="table-cell">{{ $s->schoolClass?->name ?? '—' }}</td>
                     <td class="table-cell">{{ $s->gender }}</td>
                     <td class="table-cell">—</td>
                     <td class="table-cell">{{ $parentPhone }}</td>
                     <td class="table-cell-aksi">
                         <div class="flex items-center justify-center gap-1">
-                            <button onclick='lihatDetail({!! json_encode(array_merge($s->toArray(), ["kelas_name" => $s->kelas?->name, "father" => $father?->toArray(), "mother" => $mother?->toArray()]), JSON_HEX_APOS | JSON_HEX_QUOT) !!})' class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold border border-[#c3c6d1] text-[#43474f] hover:bg-[#edeeef] transition cursor-pointer"><i class="bi bi-eye"></i> Lihat</button>
+                            <button onclick='lihatDetail({!! json_encode(array_merge($s->toArray(), ["schoolClass_name" => $s->schoolClass?->name, "father" => $father?->toArray(), "mother" => $mother?->toArray()]), JSON_HEX_APOS | JSON_HEX_QUOT) !!})' class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold border border-[#c3c6d1] text-[#43474f] hover:bg-[#edeeef] transition cursor-pointer"><i class="bi bi-eye"></i> Lihat</button>
                             <a href="{{ route('admin.siswa.edit', $s->id) }}" class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 transition"><i class="bi bi-pencil"></i> Ubah</a>
                             <button onclick="if(confirm('Hapus {{ $s->name }}?')) this.closest('form').submit()" class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold bg-red-600 text-white hover:bg-red-700 transition cursor-pointer"><i class="bi bi-trash"></i> Hapus</button>
                             <form action="{{ route('admin.siswa.destroy', $s) }}" method="POST" class="hidden">@csrf @method('DELETE')</form>
@@ -113,7 +113,7 @@ function updateFileName(){const f=document.getElementById('csvFile').files[0];do
 function showLoad(){document.getElementById('loadOverlay').classList.remove('hidden')}
 
 function lihatDetail(s) {
-    let html=`<div class="flex justify-between items-start mb-5"><div class="flex items-start gap-4"><div class="w-20 h-24 bg-slate-100 border-2 border-dashed border-slate-300 rounded flex items-center justify-center shrink-0"><div class="text-center"><i class="bi bi-person-fill text-3xl text-slate-300"></i><p class="text-[8px] text-slate-400 mt-0.5">3x4</p></div></div><div><h3 class="font-bold text-xl">${s.name}</h3><p class="text-sm font-mono text-muted mt-1"><strong>NIS:</strong> <strong class="text-[#001e40]">${s.nis}</strong> &middot; <strong>NISN:</strong> <strong class="text-[#001e40]">${s.nisn||'—'}</strong></p><p class="text-xs text-muted">${s.kelas_name||'—'}</p></div></div><button onclick="closeDetail()" class="text-slate-400 hover:text-slate-600 shrink-0"><i class="bi bi-x-lg text-2xl"></i></button></div>`;
+    let html=`<div class="flex justify-between items-start mb-5"><div class="flex items-start gap-4"><div class="w-20 h-24 bg-slate-100 border-2 border-dashed border-slate-300 rounded flex items-center justify-center shrink-0"><div class="text-center"><i class="bi bi-person-fill text-3xl text-slate-300"></i><p class="text-[8px] text-slate-400 mt-0.5">3x4</p></div></div><div><h3 class="font-bold text-xl">${s.name}</h3><p class="text-sm font-mono text-muted mt-1"><strong>NIS:</strong> <strong class="text-[#001e40]">${s.nis}</strong> &middot; <strong>NISN:</strong> <strong class="text-[#001e40]">${s.nisn||'—'}</strong></p><p class="text-xs text-muted">${s.schoolClass_name||'—'}</p></div></div><button onclick="closeDetail()" class="text-slate-400 hover:text-slate-600 shrink-0"><i class="bi bi-x-lg text-2xl"></i></button></div>`;
 
     html+=`<div class="grid grid-cols-3 gap-4 text-sm mb-4">
         <div><span class="text-xs text-muted">Jenis Kelamin</span><p class="font-semibold">${s.gender||'—'}</p></div>

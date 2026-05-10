@@ -23,7 +23,7 @@
 @endif
 
 <div class="card anim-up">
-    <h3 class="font-bold text-slate-900 mb-4">Data Kelas <span class="text-sm font-medium text-muted">({{ $kelases->count() }})</span></h3>
+    <h3 class="font-bold text-slate-900 mb-4">Data Kelas <span class="text-sm font-medium text-muted">({{ $classes->count() }})</span></h3>
     <div class="table-container">
         <table class="w-full">
             <thead><tr><th class="table-header">No.</th><th class="table-header">Nama Kelas</th><th class="table-header">Jumlah Siswa</th><th class="table-header">Aksi</th></tr></thead>

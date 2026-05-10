@@ -34,17 +34,17 @@ Route::prefix('admin')->name('admin.')->middleware('auth.session')->group(functi
 
     // Kelas
     Route::get('/kelas', [AdminController::class, 'kelas'])->name('kelas');
-    Route::post('/kelas', [AdminController::class, 'storeKelas'])->name('kelas.store');
-    Route::put('/kelas/{kelas}', [AdminController::class, 'updateKelas'])->name('kelas.update');
-    Route::delete('/kelas/{kelas}', [AdminController::class, 'destroyKelas'])->name('kelas.destroy');
+    Route::post('/kelas', [AdminController::class, 'storeClass'])->name('kelas.store');
+    Route::put('/kelas/{schoolClass}', [AdminController::class, 'updateClass'])->name('kelas.update');
+    Route::delete('/kelas/{schoolClass}', [AdminController::class, 'destroyClass'])->name('kelas.destroy');
 
     // Siswa
     Route::get('/siswa', [AdminController::class, 'siswa'])->name('siswa');
-    Route::post('/siswa', [AdminController::class, 'storeSiswa'])->name('siswa.store');
+    Route::post('/siswa', [AdminController::class, 'storeStudent'])->name('siswa.store');
     Route::get('/siswa/tambah', fn () => view('admin.siswa-form'))->name('siswa.tambah');
     Route::get('/siswa/{student}/edit', [AdminController::class, 'editSiswa'])->name('siswa.edit');
-    Route::put('/siswa/{student}', [AdminController::class, 'updateSiswa'])->name('siswa.update');
-    Route::delete('/siswa/{student}', [AdminController::class, 'destroySiswa'])->name('siswa.destroy');
+    Route::put('/siswa/{student}', [AdminController::class, 'updateStudent'])->name('siswa.update');
+    Route::delete('/siswa/{student}', [AdminController::class, 'destroyStudent'])->name('siswa.destroy');
     // CSV
     Route::post('/siswa/import', [AdminController::class, 'previewCsv'])->name('siswa.import');
     Route::get('/siswa/preview', [AdminController::class, 'preview'])->name('siswa.preview');
@@ -52,7 +52,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth.session')->group(functi
 
     // Poin Pelanggaran
     Route::get('/poin', [AdminController::class, 'poin'])->name('poin');
-    Route::post('/poin', [AdminController::class, 'storePoin'])->name('poin.store');
+    Route::post('/poin', [AdminController::class, 'storeViolation'])->name('poin.store');
 
     // Tata Tertib
     Route::get('/tata-tertib', [AdminController::class, 'tataTertib'])->name('tata-tertib');
@@ -60,6 +60,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth.session')->group(functi
 
     // Laporan
     Route::view('/laporan', 'admin.laporan')->name('laporan');
+
+    // Integrasi
+    Route::view('/integrasi', 'admin.integrasi')->name('integrasi');
 });
 
 Route::prefix('profile')->name('profile.')->group(function () {

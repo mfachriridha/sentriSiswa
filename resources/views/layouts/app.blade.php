@@ -82,6 +82,7 @@
                     <a href="{{ route('admin.tata-tertib') }}" class="sidebar-link {{ request()->routeIs('admin.tata-tertib') ? 'active' : '' }}"><i class="bi bi-file-pdf"></i> Tata Tertib</a>
                     <a href="{{ route('admin.poin') }}" class="sidebar-link {{ request()->routeIs('admin.poin') ? 'active' : '' }}"><i class="bi bi-exclamation-triangle"></i> Poin Pelanggaran</a>
                     <a href="{{ route('admin.laporan') }}" class="sidebar-link {{ request()->routeIs('admin.laporan') ? 'active' : '' }}"><i class="bi bi-bar-chart"></i> Laporan</a>
+                    <a href="{{ route('admin.integrasi') }}" class="sidebar-link {{ request()->routeIs('admin.integrasi') ? 'active' : '' }}"><i class="bi bi-plug"></i> Integrasi</a>
                 @elseif($currentRole === 'siswa')
                     <a href="{{ route('siswa.dashboard') }}" class="sidebar-link {{ request()->routeIs('siswa.dashboard') ? 'active' : '' }}"><i class="bi bi-grid"></i> Dashboard</a>
                     <a href="{{ route('siswa.kehadiran') }}" class="sidebar-link {{ request()->routeIs('siswa.kehadiran') ? 'active' : '' }}"><i class="bi bi-camera"></i> Kehadiran</a>

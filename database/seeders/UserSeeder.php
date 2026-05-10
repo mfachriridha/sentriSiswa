@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Guardian;
-use App\Models\Kelas;
+use App\Models\SchoolClass;
 use App\Models\Student;
 use App\Models\StudentParent;
 use App\Models\User;
@@ -23,7 +23,7 @@ class UserSeeder extends Seeder
             ['name' => 'Ahmad Fauzi', 'password' => 'siswa123', 'role' => 'siswa']
         );
 
-        $kelas = Kelas::firstOrCreate(['name' => 'XII IPA 1']);
+        $kelas = SchoolClass::firstOrCreate(['name' => 'XII IPA 1']);
 
         $student = Student::firstOrCreate(
             ['nis' => 'S001'],

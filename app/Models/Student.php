@@ -15,7 +15,7 @@ class Student extends Model
         'address', 'home_phone', 'prev_school', 'admission_class', 'admission_date',
     ];
 
-    public function kelas() { return $this->belongsTo(Kelas::class); }
+    public function schoolClass() { return $this->belongsTo(SchoolClass::class); }
     public function parents() { return $this->hasMany(StudentParent::class); }
     public function father() { return $this->hasOne(StudentParent::class)->where('type', 'father'); }
     public function mother() { return $this->hasOne(StudentParent::class)->where('type', 'mother'); }

@@ -38,9 +38,10 @@
                             <i class="bi bi-download text-[#43474f] text-sm"></i>
                         </button>
                     </div>
+                    @endif
                 </div>
-
-                <div class="flex-1 bg-[#d9dadb] p-4 md:p-8 overflow-y-auto flex justify-center">
+            </div>
+                    @else
                     <div id="pdfContent" class="w-full max-w-2xl bg-white shadow-2xl p-6 md:p-12 min-h-[800px]">
                         <div class="text-center border-b-2 border-[#001e40] pb-6 mb-6">
                             <h4 class="text-lg font-black text-[#001e40] uppercase tracking-widest">SMA Negeri 11 Kab. Tangerang</h4>
