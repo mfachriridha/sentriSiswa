@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Admin\AdminController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -27,13 +28,14 @@ Route::prefix('siswa')->name('siswa.')->group(function () {
 
 // Admin
 Route::prefix('admin')->name('admin.')->group(function () {
-    Route::view('/', 'admin.dashboard')->name('dashboard');
-    Route::view('/guru', 'admin.guru')->name('guru');
-    Route::view('/guru/tambah', 'admin.guru-form')->name('guru.tambah');
-    Route::view('/guru/edit', 'admin.guru-form')->name('guru.edit');
-    Route::view('/siswa', 'admin.siswa')->name('siswa');
-    Route::view('/siswa/tambah', 'admin.siswa-form')->name('siswa.tambah');
-    Route::view('/siswa/edit', 'admin.siswa-form')->name('siswa.edit');
+    Route::get('/', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/guru', function () { return view('admin.guru'); })->name('guru');
+    Route::get('/guru/tambah', function () { return view('admin.guru-form'); })->name('guru.tambah');
+    Route::get('/guru/edit', function () { return view('admin.guru-form'); })->name('guru.edit');
+    Route::get('/siswa', [AdminController::class, 'siswa'])->name('siswa');
+    Route::post('/siswa/import', [AdminController::class, 'importCsv'])->name('siswa.import');
+    Route::get('/siswa/tambah', function () { return view('admin.siswa-form'); })->name('siswa.tambah');
+    Route::get('/siswa/edit', function () { return view('admin.siswa-form'); })->name('siswa.edit');
     Route::view('/kelas', 'admin.kelas')->name('kelas');
     Route::view('/tata-tertib', 'admin.tata-tertib')->name('tata-tertib');
     Route::view('/poin', 'admin.poin-pelanggaran')->name('poin');

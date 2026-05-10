@@ -6,10 +6,10 @@
 
 @section('content')
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-    <div class="card anim-up"><p class="text-xs font-bold text-[#43474f] uppercase tracking-wide">Total Guru</p><p class="stat-value mt-1">42</p></div>
-    <div class="card anim-up"><p class="text-xs font-bold text-[#43474f] uppercase tracking-wide">Total Siswa</p><p class="stat-value mt-1">360</p></div>
-    <div class="card anim-up"><p class="text-xs font-bold text-[#43474f] uppercase tracking-wide">Total Kelas</p><p class="stat-value mt-1">12</p></div>
-    <div class="card anim-up"><p class="text-xs font-bold text-[#43474f] uppercase tracking-wide">Hadir Hari Ini</p><p class="stat-value text-emerald-600 mt-1">342</p></div>
+    <div class="card anim-up"><p class="text-xs font-bold text-[#43474f] uppercase tracking-wide">Total Guru</p><p class="stat-value mt-1">—</p></div>
+    <div class="card anim-up"><p class="text-xs font-bold text-[#43474f] uppercase tracking-wide">Total Siswa</p><p class="stat-value mt-1">{{ $totalSiswa ?? 0 }}</p></div>
+    <div class="card anim-up"><p class="text-xs font-bold text-[#43474f] uppercase tracking-wide">Total Kelas</p><p class="stat-value mt-1">{{ $totalKelas ?? 0 }}</p></div>
+    <div class="card anim-up"><p class="text-xs font-bold text-[#43474f] uppercase tracking-wide">Hadir Hari Ini</p><p class="stat-value text-emerald-600 mt-1">—</p></div>
 </div>
 
 <!-- Chart -->
