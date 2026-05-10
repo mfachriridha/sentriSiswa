@@ -59,7 +59,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
     
     Route::view('/', 'admin.dashboard')->name('dashboard');
     Route::view('/guru', 'admin.guru')->name('guru');
+    Route::view('/guru/tambah', 'admin.guru-form')->name('guru.tambah');
+    Route::view('/guru/edit', 'admin.guru-form')->name('guru.edit');
     Route::view('/siswa', 'admin.siswa')->name('siswa');
+    Route::view('/siswa/tambah', 'admin.siswa-form')->name('siswa.tambah');
+    Route::view('/siswa/edit', 'admin.siswa-form')->name('siswa.edit');
     Route::view('/kelas', 'admin.kelas')->name('kelas');
     Route::view('/tata-tertib', 'admin.tata-tertib')->name('tata-tertib');
     Route::view('/poin', 'admin.poin-pelanggaran')->name('poin');

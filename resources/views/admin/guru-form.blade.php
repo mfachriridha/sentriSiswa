@@ -1,0 +1,80 @@
+@extends('layouts.app')
+
+@section('title', 'Form Guru - Admin')
+
+@section('page-title', 'Form Guru')
+
+@section('content')
+<?php $edit = request()->routeIs('admin.guru.edit'); ?>
+<div class="mb-6">
+    <a href="{{ route('admin.guru') }}" class="text-sm text-[#0062a0] hover:text-[#001e40] font-semibold">&larr; Kembali</a>
+</div>
+
+<div class="max-w-2xl">
+    <div class="card anim-up">
+        <h3 class="font-bold text-slate-900 mb-1">{{ $edit ? 'Edit' : 'Tambah' }} Guru</h3>
+        <p class="text-xs text-muted mb-5">Lengkapi data guru di bawah ini.</p>
+
+        <form class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">NIP <span class="text-red-500">*</span></label>
+                    <input type="text" class="input-field" value="{{ $edit ? '1234567890' : '' }}" placeholder="1234567890">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Nama Lengkap <span class="text-red-500">*</span></label>
+                    <input type="text" class="input-field" value="{{ $edit ? 'Budi Santoso, S.Pd' : '' }}" placeholder="Nama lengkap">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Jenis Kelamin</label>
+                    <select class="input-field"><option {{ $edit ? 'selected' : '' }}>Laki-laki</option><option>Perempuan</option></select>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Mata Pelajaran</label>
+                    <input type="text" class="input-field" value="{{ $edit ? 'Matematika' : '' }}" placeholder="Cth: Matematika, Fisika, BK">
+                    <p class="text-[10px] text-muted mt-1">Pisahkan dengan koma jika lebih dari satu</p>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Wali Kelas</label>
+                    <select class="input-field">
+                        <option value="">— Tidak sebagai wali kelas —</option>
+                        <option {{ $edit ? 'selected' : '' }}>XII IPA 1</option>
+                        <option>XII IPA 2</option>
+                        <option>XI IPA 1</option>
+                    </select>
+                    <p class="text-[10px] text-muted mt-1">Kosongkan jika hanya guru mapel</p>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Nomor WhatsApp</label>
+                    <input type="tel" class="input-field" value="{{ $edit ? '081234567890' : '' }}" placeholder="08xx-xxxx-xxxx">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Email</label>
+                    <input type="email" class="input-field" value="{{ $edit ? 'budi@sch.id' : '' }}" placeholder="email@domain.com">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Tempat Lahir</label>
+                    <input type="text" class="input-field" value="{{ $edit ? 'Tangerang' : '' }}" placeholder="Kota lahir">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Tanggal Lahir</label>
+                    <input type="date" class="input-field">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Pendidikan Terakhir</label>
+                    <input type="text" class="input-field" value="{{ $edit ? 'S1 Pendidikan' : '' }}" placeholder="S1 / S2">
+                </div>
+            </div>
+            <div>
+                <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5 block">Alamat</label>
+                <textarea class="input-field" rows="2" placeholder="Alamat lengkap">{{ $edit ? 'Jl. Contoh No. 1' : '' }}</textarea>
+            </div>
+
+            <div class="flex gap-3 pt-2">
+                <a href="{{ route('admin.guru') }}" class="btn-outline flex-1 !py-2.5">Batal</a>
+                <button type="button" onclick="alert('UI Only: Data tersimpan!');window.location='{{ route('admin.guru') }}'" class="btn-brand flex-1 !py-2.5">Simpan</button>
+            </div>
+        </form>
+    </div>
+</div>
+@endsection
