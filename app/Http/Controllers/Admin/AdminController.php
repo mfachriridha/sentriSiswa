@@ -82,6 +82,17 @@ class AdminController extends Controller
         return view('admin.siswa-preview', ['rows' => $rows, 'total' => count($rows)]);
     }
 
+    public function editSiswa(Student $student)
+    {
+        $student->load(['kelas', 'father', 'mother', 'guardian']);
+        $kelases = Kelas::orderBy('name')->get();
+
+        return view('admin.siswa-form', [
+            'student' => $student,
+            'kelases' => $kelases,
+        ]);
+    }
+
     public function importCsv(Request $request)
     {
         $rows = session('csv_rows', []);

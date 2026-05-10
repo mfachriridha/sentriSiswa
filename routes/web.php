@@ -37,7 +37,7 @@ Route::prefix('admin')->name('admin.')->middleware('auth.session')->group(functi
     Route::get('/siswa/preview', [AdminController::class, 'preview'])->name('siswa.preview');
     Route::post('/siswa/import/confirm', [AdminController::class, 'importCsv'])->name('siswa.import.confirm');
     Route::get('/siswa/tambah', function () { return view('admin.siswa-form'); })->name('siswa.tambah');
-    Route::get('/siswa/edit', function () { return view('admin.siswa-form'); })->name('siswa.edit');
+    Route::get('/siswa/{student}/edit', [AdminController::class, 'editSiswa'])->name('siswa.edit');
     Route::view('/kelas', 'admin.kelas')->name('kelas');
     Route::view('/tata-tertib', 'admin.tata-tertib')->name('tata-tertib');
     Route::view('/poin', 'admin.poin-pelanggaran')->name('poin');

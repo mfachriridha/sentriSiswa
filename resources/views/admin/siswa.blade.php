@@ -43,8 +43,8 @@
                 ?>
                 <tr data-id="{{ $s->id }}">
                     <td class="table-cell">{{ $i + 1 }}</td>
-                    <td class="table-cell">{{ $s->nis }}</td>
-                    <td class="table-cell">{{ $s->nisn ?? '—' }}</td>
+                    <td class="table-cell font-mono"><strong>{{ $s->nis }}</strong></td>
+                    <td class="table-cell font-mono">{{ $s->nisn ?? '—' }}</td>
                     <td class="table-cell font-semibold">{{ $s->name }}</td>
                     <td class="table-cell">{{ $s->kelas?->name ?? '—' }}</td>
                     <td class="table-cell">{{ $s->gender }}</td>
@@ -53,7 +53,7 @@
                     <td class="table-cell-aksi">
                         <div class="flex items-center justify-center gap-1">
                             <button onclick='lihatDetail({!! json_encode(array_merge($s->toArray(), ["kelas_name" => $s->kelas?->name, "father" => $father?->toArray(), "mother" => $mother?->toArray()]), JSON_HEX_APOS | JSON_HEX_QUOT) !!})' class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold border border-[#c3c6d1] text-[#43474f] hover:bg-[#edeeef] transition cursor-pointer"><i class="bi bi-eye"></i> Lihat</button>
-                            <a href="{{ route('admin.siswa.edit') }}" class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 transition"><i class="bi bi-pencil"></i> Ubah</a>
+                            <a href="{{ route('admin.siswa.edit', $s->id) }}" class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 transition"><i class="bi bi-pencil"></i> Ubah</a>
                             <button onclick="if(confirm('Hapus {{ $s->name }}?')) this.closest('tr').remove()" class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold bg-red-600 text-white hover:bg-red-700 transition cursor-pointer"><i class="bi bi-trash"></i> Hapus</button>
                         </div>
                     </td>
@@ -66,9 +66,9 @@
     </div>
 </div>
 
-<!-- Detail Modal -->
+<!-- Detail Modal (JIRA-style wide) -->
 <div id="detailOverlay" class="hidden fixed inset-0 z-50 bg-black/40" onclick="closeDetail()"></div>
-<div id="detailBox" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-white rounded-2xl shadow-xl w-full max-w-lg p-6 max-h-[85vh] overflow-y-auto"></div>
+<div id="detailBox" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-white rounded-2xl shadow-xl w-full max-w-3xl p-6 max-h-[90vh] overflow-y-auto"></div>
 
 <!-- CSV Upload Modal -->
 <div id="modalOverlay" class="hidden fixed inset-0 z-50 bg-black/40" onclick="closeModal()"></div>
@@ -112,31 +112,29 @@ function updateFileName(){const f=document.getElementById('csvFile').files[0];do
 function showLoad(){document.getElementById('loadOverlay').classList.remove('hidden')}
 
 function lihatDetail(s) {
-    let html = `<div class="flex justify-between items-start mb-4"><div><h3 class="font-bold text-lg">${s.name}</h3><p class="text-sm text-muted">${s.nis} &middot; ${s.nisn || '—'}</p></div><button onclick="closeDetail()" class="text-slate-400 hover:text-slate-600"><i class="bi bi-x-lg text-xl"></i></button></div>`;
-    html += `<div class="grid grid-cols-2 gap-3 text-sm">
-        <div><span class="text-xs text-muted">NISN</span><p class="font-semibold">${s.nisn || '—'}</p></div>
-        <div><span class="text-xs text-muted">JK</span><p class="font-semibold">${s.gender}</p></div>
-        <div><span class="text-xs text-muted">Tempat Lahir</span><p class="font-semibold">${s.birth_place || '—'}</p></div>
-        <div><span class="text-xs text-muted">Tgl Lahir</span><p class="font-semibold">${s.birth_date || '—'}</p></div>
-        <div><span class="text-xs text-muted">Agama</span><p class="font-semibold">${s.religion || '—'}</p></div>
-        <div><span class="text-xs text-muted">Status</span><p class="font-semibold">${s.family_status || '—'}</p></div>
-        <div class="col-span-2"><span class="text-xs text-muted">Alamat</span><p class="font-semibold">${s.address || '—'}</p></div>
-        <div><span class="text-xs text-muted">Kelas</span><p class="font-semibold">${s.kelas_name || '—'}</p></div>
-        <div><span class="text-xs text-muted">Anak ke</span><p class="font-semibold">${s.birth_order || '—'}</p></div>
+    let html=`<div class="flex justify-between items-start mb-5"><div class="flex items-start gap-4"><div class="w-20 h-24 bg-slate-100 border-2 border-dashed border-slate-300 rounded flex items-center justify-center shrink-0"><div class="text-center"><i class="bi bi-person-fill text-3xl text-slate-300"></i><p class="text-[8px] text-slate-400 mt-0.5">3x4</p></div></div><div><h3 class="font-bold text-xl">${s.name}</h3><p class="text-sm font-mono text-muted mt-1"><strong>NIS:</strong> <strong class="text-[#001e40]">${s.nis}</strong> &middot; <strong>NISN:</strong> <strong class="text-[#001e40]">${s.nisn||'—'}</strong></p><p class="text-xs text-muted">${s.kelas_name||'—'}</p></div></div><button onclick="closeDetail()" class="text-slate-400 hover:text-slate-600 shrink-0"><i class="bi bi-x-lg text-2xl"></i></button></div>`;
+
+    html+=`<div class="grid grid-cols-3 gap-4 text-sm mb-4">
+        <div><span class="text-xs text-muted">Jenis Kelamin</span><p class="font-semibold">${s.gender||'—'}</p></div>
+        <div><span class="text-xs text-muted">Tempat Lahir</span><p class="font-semibold">${s.birth_place||'—'}</p></div>
+        <div><span class="text-xs text-muted">Tanggal Lahir</span><p class="font-semibold">${s.birth_date||'—'}</p></div>
+        <div><span class="text-xs text-muted">Agama</span><p class="font-semibold">${s.religion||'—'}</p></div>
+        <div><span class="text-xs text-muted">Anak ke</span><p class="font-semibold">${s.birth_order||'—'}</p></div>
+        <div><span class="text-xs text-muted">Status Keluarga</span><p class="font-semibold">${s.family_status||'—'}</p></div>
+        <div class="col-span-3"><span class="text-xs text-muted">Alamat</span><p class="font-semibold">${s.address||'—'}</p></div>
     </div>`;
-    html += `<hr class="my-3"><p class="text-xs font-bold text-purple-600 uppercase mb-2">Orang Tua</p>`;
-    html += `<div class="grid grid-cols-2 gap-2 text-sm">`;
-    if (s.father) html += `<div><span class="text-xs text-muted">Ayah</span><p class="font-semibold">${s.father.name || '—'}</p><p class="text-xs text-muted">${s.father.job || ''} &middot; ${s.father.phone || ''}</p></div>`;
-    if (s.mother) html += `<div><span class="text-xs text-muted">Ibu</span><p class="font-semibold">${s.mother.name || '—'}</p><p class="text-xs text-muted">${s.mother.job || ''} &middot; ${s.mother.phone || ''}</p></div>`;
-    html += `</div><button onclick="closeDetail()" class="btn-outline w-full !py-2 mt-4">Tutup</button>`;
-    document.getElementById('detailBox').innerHTML = html;
+
+    html+=`<hr class="mb-4"><h4 class="text-sm font-bold text-purple-600 uppercase mb-3">Orang Tua</h4><div class="grid grid-cols-2 gap-4 text-sm mb-4">`;
+    if(s.father)html+=`<div class="p-3 bg-slate-50 rounded-xl"><span class="text-xs text-muted">Ayah</span><p class="font-semibold">${s.father.name||'—'}</p><p class="text-xs text-muted">${s.father.job||''} &middot; ${s.father.phone||''}</p></div>`;
+    if(s.mother)html+=`<div class="p-3 bg-slate-50 rounded-xl"><span class="text-xs text-muted">Ibu</span><p class="font-semibold">${s.mother.name||'—'}</p><p class="text-xs text-muted">${s.mother.job||''} &middot; ${s.mother.phone||''}</p></div>`;
+    html+=`</div>`;
+
+    html+=`<button onclick="closeDetail()" class="btn-outline w-full !py-2.5">Tutup</button>`;
+    document.getElementById('detailBox').innerHTML=html;
     document.getElementById('detailOverlay').classList.remove('hidden');
     document.getElementById('detailBox').classList.remove('hidden');
 }
-function closeDetail() {
-    document.getElementById('detailOverlay').classList.add('hidden');
-    document.getElementById('detailBox').classList.add('hidden');
-}
+function closeDetail(){document.getElementById('detailOverlay').classList.add('hidden');document.getElementById('detailBox').classList.add('hidden')}
 </script>
 @endpush
 @endsection
