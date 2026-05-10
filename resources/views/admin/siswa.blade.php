@@ -54,7 +54,8 @@
                         <div class="flex items-center justify-center gap-1">
                             <button onclick='lihatDetail({!! json_encode(array_merge($s->toArray(), ["kelas_name" => $s->kelas?->name, "father" => $father?->toArray(), "mother" => $mother?->toArray()]), JSON_HEX_APOS | JSON_HEX_QUOT) !!})' class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold border border-[#c3c6d1] text-[#43474f] hover:bg-[#edeeef] transition cursor-pointer"><i class="bi bi-eye"></i> Lihat</button>
                             <a href="{{ route('admin.siswa.edit', $s->id) }}" class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 transition"><i class="bi bi-pencil"></i> Ubah</a>
-                            <button onclick="if(confirm('Hapus {{ $s->name }}?')) this.closest('tr').remove()" class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold bg-red-600 text-white hover:bg-red-700 transition cursor-pointer"><i class="bi bi-trash"></i> Hapus</button>
+                            <button onclick="if(confirm('Hapus {{ $s->name }}?')) this.closest('form').submit()" class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold bg-red-600 text-white hover:bg-red-700 transition cursor-pointer"><i class="bi bi-trash"></i> Hapus</button>
+                            <form action="{{ route('admin.siswa.destroy', $s) }}" method="POST" class="hidden">@csrf @method('DELETE')</form>
                         </div>
                     </td>
                 </tr>
