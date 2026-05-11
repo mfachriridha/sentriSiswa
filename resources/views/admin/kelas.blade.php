@@ -9,7 +9,6 @@
     <button onclick="showModal('tambah')" class="btn-brand !text-xs"><i class="bi bi-plus-lg"></i> Tambah Kelas</button>
 </div>
 
-<div id="flashArea">
 @if(session('success'))
 <div class="mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-xs font-semibold text-emerald-700 flex items-center gap-2">
     <i class="bi bi-check-circle-fill"></i> {{ session('success') }}
@@ -22,10 +21,46 @@
     <button onclick="this.parentElement.remove()" class="ml-auto text-red-400 hover:text-red-600"><i class="bi bi-x"></i></button>
 </div>
 @endif
-</div>
 
 <div class="card anim-up">
-    <h3 class="font-bold text-slate-900 mb-4">Data Kelas <span class="text-sm font-medium text-muted">({{ $classes->total() }})</span></h3>
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+        <h3 class="font-bold text-slate-900">Data Kelas <span class="text-sm font-medium text-muted">({{ $classes->total() }})</span></h3>
+    </div>
+
+    <!-- Filters -->
+    <form id="filterForm" class="flex flex-wrap items-center gap-2 mb-4 pb-3 border-b border-[#c3c6d1]/20">
+        <select name="prefix" class="input-field !w-auto !py-1 !px-2 !text-xs" onchange="this.form.submit()">
+            <option value="">Semua Tingkat</option>
+            @foreach($prefixes as $p)
+            <option value="{{ $p }}" {{ request('prefix') == $p ? 'selected' : '' }}>{{ $p }}</option>
+            @endforeach
+        </select>
+
+        <select name="keyword" class="input-field !w-auto !py-1 !px-2 !text-xs" onchange="this.form.submit()">
+            <option value="">Semua Program</option>
+            @foreach($keywords as $kw)
+            <option value="{{ $kw }}" {{ request('keyword') == $kw ? 'selected' : '' }}>{{ $kw }}</option>
+            @endforeach
+        </select>
+
+        <select name="sort" class="input-field !w-auto !py-1 !px-2 !text-xs" onchange="this.form.submit()">
+            <option value="name" {{ request('sort') == 'name' || !request('sort') ? 'selected' : '' }}>Urut: Nama</option>
+            <option value="students_count" {{ request('sort') == 'students_count' ? 'selected' : '' }}>Urut: Jumlah Siswa</option>
+        </select>
+
+        @php $currentDir = request('dir', 'asc'); @endphp
+        <select name="dir" class="input-field !w-auto !py-1 !px-2 !text-xs" onchange="this.form.submit()">
+            <option value="asc" {{ $currentDir == 'asc' ? 'selected' : '' }}>A-Z / 1-9</option>
+            <option value="desc" {{ $currentDir == 'desc' ? 'selected' : '' }}>Z-A / 9-1</option>
+        </select>
+
+        <input type="hidden" name="per_page" value="{{ request('per_page', 25) }}">
+
+        @if(request()->anyFilled(['prefix', 'keyword', 'sort', 'dir']) && (request('prefix') || request('keyword') || request('sort') != 'name' || request('dir') != 'asc'))
+        <a href="{{ route('admin.kelas') }}" class="text-[10px] text-red-500 hover:text-red-700 font-semibold ml-1"><i class="bi bi-x-circle"></i> Reset</a>
+        @endif
+    </form>
+
     <div class="table-container">
         <table class="w-full">
             <thead><tr><th class="table-header">No.</th><th class="table-header">Nama Kelas</th><th class="table-header">Jumlah Siswa</th><th class="table-header">Aksi</th></tr></thead>
@@ -39,10 +74,7 @@
                         <div class="flex items-center justify-center gap-1">
                             <button onclick="lihatKelas({{ $k->id }}, '{{ $k->name }}')" class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold border border-[#c3c6d1] text-[#43474f] hover:bg-[#edeeef] transition cursor-pointer"><i class="bi bi-eye"></i> Lihat</button>
                             <button onclick='editKelas({{ $k->id }}, "{{ $k->name }}")' class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 transition cursor-pointer"><i class="bi bi-pencil"></i> Ubah</button>
-                            <form action="{{ route('admin.kelas.destroy', $k) }}" method="POST" onsubmit="return confirm('Hapus kelas {{ $k->name }}?')" class="inline">
-                                @csrf @method('DELETE')
-                                <button class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold bg-red-600 text-white hover:bg-red-700 transition cursor-pointer"><i class="bi bi-trash"></i> Hapus</button>
-                            </form>
+                            <button onclick="confirmAction('Hapus kelas {{ $k->name }}? Semua siswa akan kehilangan kelas.', () => deleteKelas({{ $k->id }}))" class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold bg-red-600 text-white hover:bg-red-700 transition cursor-pointer"><i class="bi bi-trash"></i> Hapus</button>
                         </div>
                     </td>
                 </tr>
@@ -67,11 +99,26 @@
 <div id="detailOverlay" class="hidden fixed inset-0 z-[60] bg-black/40" onclick="closeDetail()"></div>
 <div id="detailBox" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[60] bg-white rounded-2xl shadow-xl w-full max-w-3xl p-6 max-h-[90vh] overflow-y-auto anim-up"></div>
 
+<!-- Custom Confirm Modal -->
+<div id="confirmOverlay" class="hidden fixed inset-0 z-[70] bg-black/40 flex items-center justify-center">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 mx-4 anim-up">
+        <div class="text-center mb-4">
+            <i class="bi bi-exclamation-triangle-fill text-amber-500 text-3xl mb-2 block"></i>
+            <p id="confirmMessage" class="text-sm font-semibold text-slate-800"></p>
+        </div>
+        <div class="flex gap-3">
+            <button onclick="closeConfirm()" class="btn-outline flex-1 !py-2.5">Batal</button>
+            <button id="confirmOk" class="btn-brand flex-1 !py-2.5 !bg-red-600 hover:!bg-red-700">Ya, Lanjutkan</button>
+        </div>
+    </div>
+</div>
+
 <!-- Toast -->
 <div id="toast" class="hidden fixed top-4 right-4 z-[200] px-4 py-3 rounded-lg shadow-lg text-sm font-semibold text-white anim-up"></div>
 
 @push('scripts')
 <script>
+// ── Toast ──
 function showToast(msg, type) {
     const t = document.getElementById('toast');
     t.textContent = msg;
@@ -80,11 +127,37 @@ function showToast(msg, type) {
     setTimeout(() => t.classList.add('hidden'), 3000);
 }
 
+// ── Custom Confirm ──
+let confirmCallback = null;
+function confirmAction(msg, cb) {
+    document.getElementById('confirmMessage').textContent = msg;
+    confirmCallback = cb;
+    document.getElementById('confirmOverlay').classList.remove('hidden');
+}
+function closeConfirm() {
+    document.getElementById('confirmOverlay').classList.add('hidden');
+    confirmCallback = null;
+}
+document.getElementById('confirmOk').addEventListener('click', function() {
+    if (confirmCallback) confirmCallback();
+    closeConfirm();
+});
+
 function setLoading(btn, loading) {
     const t = btn.querySelector('.btn-text'), l = btn.querySelector('.btn-loading');
     if (t) t.classList.toggle('hidden', loading);
     if (l) l.classList.toggle('hidden', !loading);
     btn.disabled = loading;
+}
+
+// ── Delete Kelas ──
+function deleteKelas(id) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/admin/kelas/' + id;
+    form.innerHTML = '@csrf @method("DELETE")';
+    document.body.appendChild(form);
+    form.submit();
 }
 
 // ── CRUD Modal ──
@@ -113,7 +186,6 @@ function lihatKelas(id, name) {
     box.innerHTML = '<div class="text-center py-8"><div class="w-8 h-8 border-4 border-[#001e40] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div><p class="text-sm text-muted">Memuat data...</p></div>';
     document.getElementById('kelasOverlay').classList.remove('hidden');
     box.classList.remove('hidden');
-
     fetch('/admin/kelas/' + id + '/students', { headers: { 'Accept': 'application/json' } })
         .then(r => r.json())
         .then(students => renderKelasBox(id, name, students));
@@ -129,7 +201,7 @@ function renderKelasBox(id, name, students) {
             <td class="table-cell text-xs">${s.gender || '—'}</td>
             <td class="table-cell-aksi">
                 <button onclick="lihatSiswa(${s.id})" class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold border border-[#c3c6d1] text-[#43474f] hover:bg-[#edeeef] transition cursor-pointer"><i class="bi bi-eye"></i> Lihat</button>
-                <button onclick="removeStudent(${id}, ${s.id}, '${s.name.replace(/'/g, "\\'")}')" class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold bg-red-600 text-white hover:bg-red-700 transition cursor-pointer"><i class="bi bi-x-circle"></i> Keluarkan</button>
+                <button onclick="confirmAction('Keluarkan ${s.name.replace(/'/g, "\\'")} dari kelas ini?', () => removeStudent(${id}, ${s.id}))" class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold bg-red-600 text-white hover:bg-red-700 transition cursor-pointer"><i class="bi bi-x-circle"></i> Keluarkan</button>
             </td>
         </tr>`).join('');
 
@@ -189,18 +261,18 @@ function searchSiswa(classId, q) {
 
 // ── Actions ──
 function assignStudent(classId, studentId, name) {
-    if (!confirm('Tambahkan ' + name + ' ke kelas ini?')) return;
-    fetch('/admin/kelas/' + classId + '/assign', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
-        body: JSON.stringify({ student_id: studentId })
-    })
-    .then(r => r.json())
-    .then(d => { showToast(d.message, d.success ? 'success' : 'error'); if (d.success) location.reload(); });
+    confirmAction('Tambahkan ' + name + ' ke kelas ini? Siswa hanya bisa berada di satu kelas.', () => {
+        fetch('/admin/kelas/' + classId + '/assign', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
+            body: JSON.stringify({ student_id: studentId })
+        })
+        .then(r => r.json())
+        .then(d => { showToast(d.message, d.success ? 'success' : 'error'); if (d.success) location.reload(); });
+    });
 }
 
-function removeStudent(classId, studentId, name) {
-    if (!confirm('Keluarkan ' + name + ' dari kelas ini?')) return;
+function removeStudent(classId, studentId) {
     fetch('/admin/kelas/' + classId + '/remove', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
@@ -210,20 +282,17 @@ function removeStudent(classId, studentId, name) {
     .then(d => { showToast(d.message, d.success ? 'success' : 'error'); if (d.success) location.reload(); });
 }
 
-// ── Student Detail (JIRA-style) ──
+// ── Student Detail ──
 function lihatSiswa(id) {
     const box = document.getElementById('detailBox');
     box.innerHTML = '<div class="text-center py-8"><div class="w-8 h-8 border-4 border-[#001e40] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div><p class="text-sm text-muted">Memuat...</p></div>';
     document.getElementById('detailOverlay').classList.remove('hidden');
     box.classList.remove('hidden');
-
     fetch('/admin/siswa/' + id + '/detail', { headers: { 'Accept': 'application/json' } })
         .then(r => r.json())
         .then(s => {
-            const father = s.father || {};
-            const mother = s.mother || {};
+            const father = s.father || {}, mother = s.mother || {};
             let html = `<div class="flex justify-between items-start mb-5"><div class="flex items-start gap-4"><div class="w-20 h-24 bg-slate-100 border-2 border-dashed border-slate-300 rounded flex items-center justify-center shrink-0"><div class="text-center"><i class="bi bi-person-fill text-3xl text-slate-300"></i><p class="text-[8px] text-slate-400 mt-0.5">3x4</p></div></div><div><h3 class="font-bold text-xl">${s.name}</h3><p class="text-sm font-mono text-muted mt-1"><strong>NIS:</strong> <strong class="text-[#001e40]">${s.nis}</strong> &middot; <strong>NISN:</strong> <strong class="text-[#001e40]">${s.nisn || '—'}</strong></p><p class="text-xs text-muted">${s.school_class?.name || '—'}</p></div></div><button onclick="closeDetail()" class="text-slate-400 hover:text-slate-600 shrink-0"><i class="bi bi-x-lg text-2xl"></i></button></div>`;
-
             html += `<div class="grid grid-cols-3 gap-4 text-sm mb-4">
                 <div><span class="text-xs text-muted">Jenis Kelamin</span><p class="font-semibold">${s.gender || '—'}</p></div>
                 <div><span class="text-xs text-muted">Tempat Lahir</span><p class="font-semibold">${s.birth_place || '—'}</p></div>
@@ -231,19 +300,14 @@ function lihatSiswa(id) {
                 <div><span class="text-xs text-muted">Agama</span><p class="font-semibold">${s.religion || '—'}</p></div>
                 <div><span class="text-xs text-muted">Anak ke</span><p class="font-semibold">${s.birth_order || '—'}</p></div>
                 <div><span class="text-xs text-muted">Status Keluarga</span><p class="font-semibold">${s.family_status || '—'}</p></div>
-                <div class="col-span-3"><span class="text-xs text-muted">Alamat</span><p class="font-semibold">${s.address || '—'}</p></div>
-            </div>`;
-
+                <div class="col-span-3"><span class="text-xs text-muted">Alamat</span><p class="font-semibold">${s.address || '—'}</p></div></div>`;
             html += '<hr class="mb-4"><h4 class="text-sm font-bold text-purple-600 uppercase mb-3">Orang Tua</h4><div class="grid grid-cols-2 gap-4 text-sm mb-4">';
             if (father.name) html += `<div class="p-3 bg-slate-50 rounded-xl"><span class="text-xs text-muted">Ayah</span><p class="font-semibold">${father.name || '—'}</p><p class="text-xs text-muted">${father.job || ''} &middot; ${father.phone || ''}</p></div>`;
             if (mother.name) html += `<div class="p-3 bg-slate-50 rounded-xl"><span class="text-xs text-muted">Ibu</span><p class="font-semibold">${mother.name || '—'}</p><p class="text-xs text-muted">${mother.job || ''} &middot; ${mother.phone || ''}</p></div>`;
-            html += '</div>';
-
-            html += '<button onclick="closeDetail()" class="btn-outline w-full !py-2.5">Tutup</button>';
+            html += '</div><button onclick="closeDetail()" class="btn-outline w-full !py-2.5">Tutup</button>';
             box.innerHTML = html;
         });
 }
-
 function closeDetail() { document.getElementById('detailOverlay').classList.add('hidden'); document.getElementById('detailBox').classList.add('hidden'); }
 </script>
 @endpush

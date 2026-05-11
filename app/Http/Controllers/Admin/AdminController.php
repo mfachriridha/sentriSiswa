@@ -231,9 +231,39 @@ class AdminController extends Controller
         $perPage = $request->input('per_page', 25);
         $perPage = in_array((int) $perPage, [25, 50, 100]) ? (int) $perPage : 25;
 
-        $classes = SchoolClass::withCount('students')->latest()->paginate($perPage)->appends($request->only('per_page'));
+        $query = SchoolClass::withCount('students');
 
-        return view('admin.kelas', compact('classes'));
+        if ($prefix = $request->input('prefix')) {
+            $query->where('name', 'like', $prefix.'%');
+        }
+
+        if ($keyword = $request->input('keyword')) {
+            $query->where('name', 'like', '%'.$keyword.'%');
+        }
+
+        $sort = $request->input('sort', 'name');
+        $dir = $request->input('dir', 'asc');
+        if (in_array($sort, ['name', 'students_count']) && in_array($dir, ['asc', 'desc'])) {
+            $query->orderBy($sort, $dir);
+        } else {
+            $query->orderBy('name', 'asc');
+        }
+
+        $classes = $query->paginate($perPage)->appends($request->except('page'));
+
+        $prefixes = SchoolClass::selectRaw('SUBSTRING(name, 1, 2) as prefix')
+            ->distinct()
+            ->orderBy('prefix')
+            ->pluck('prefix')
+            ->filter(fn ($p) => preg_match('/^\d/', $p));
+
+        $keywords = SchoolClass::selectRaw("SUBSTRING_INDEX(name, ' ', -1) as kw")
+            ->distinct()
+            ->orderBy('kw')
+            ->pluck('kw')
+            ->filter(fn ($k) => ! preg_match('/^\d/', $k) && strlen($k) > 0);
+
+        return view('admin.kelas', compact('classes', 'prefixes', 'keywords'));
     }
 
     public function storeClass(Request $request)
@@ -244,20 +274,20 @@ class AdminController extends Controller
         return back()->with('success', 'Kelas berhasil ditambahkan.');
     }
 
-    public function updateClass(Request $request, SchoolClass $class)
+    public function updateClass(Request $request, SchoolClass $schoolClass)
     {
-        $data = $request->validate(['name' => 'required|string|max:50|unique:school_classes,name,'.$class->id]);
-        $class->update($data);
+        $data = $request->validate(['name' => 'required|string|max:50|unique:school_classes,name,'.$schoolClass->id]);
+        $schoolClass->update($data);
 
         return back()->with('success', 'Kelas berhasil diperbarui.');
     }
 
-    public function destroyClass(SchoolClass $class)
+    public function destroyClass(SchoolClass $schoolClass)
     {
-        if ($class->students()->exists()) {
+        if ($schoolClass->students()->exists()) {
             return back()->with('error', 'Kelas tidak bisa dihapus karena masih memiliki siswa.');
         }
-        $class->delete();
+        $schoolClass->delete();
 
         return back()->with('success', 'Kelas berhasil dihapus.');
     }
