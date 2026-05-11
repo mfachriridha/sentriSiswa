@@ -237,16 +237,18 @@ class AdminController extends Controller
             $query->where('name', 'like', $prefix.'%');
         }
 
-        $sort = $request->input('sort', 'name');
+        $sort = $request->input('sort', 'id');
         $dir = $request->input('dir', 'asc');
         $dir = in_array($dir, ['asc', 'desc']) ? $dir : 'asc';
 
         if ($sort === 'students_count') {
             $query->orderBy('students_count', $dir);
-        } else {
+        } elseif ($sort === 'name') {
             $query->orderByRaw('CAST(SUBSTRING(name, 1, 2) AS UNSIGNED) '.$dir);
             $query->orderByRaw('LENGTH(name) '.$dir);
             $query->orderBy('name', $dir);
+        } else {
+            $query->orderBy('id', $dir);
         }
 
         $classes = $query->paginate($perPage)->appends($request->except('page'));

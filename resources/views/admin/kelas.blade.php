@@ -37,7 +37,8 @@
         </select>
 
         <select name="sort" class="input-field !w-auto !py-1 !px-2 !text-xs" onchange="this.form.submit()">
-            <option value="name" {{ request('sort') == 'name' || !request('sort') ? 'selected' : '' }}>Urut: Nama</option>
+            <option value="id" {{ request('sort', 'id') == 'id' ? 'selected' : '' }}>Urut: ID</option>
+            <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>Urut: Nama</option>
             <option value="students_count" {{ request('sort') == 'students_count' ? 'selected' : '' }}>Urut: Jumlah Siswa</option>
         </select>
 
@@ -49,7 +50,7 @@
 
         <input type="hidden" name="per_page" value="{{ request('per_page', 25) }}">
 
-        @if(request()->anyFilled(['prefix', 'sort', 'dir']) && (request('prefix') || request('sort') != 'name' || request('dir') != 'asc'))
+        @if(request()->anyFilled(['prefix', 'sort', 'dir']) && (request('prefix') || request('sort') != 'id' || request('dir') != 'asc'))
         <a href="{{ route('admin.kelas') }}" class="text-[10px] text-red-500 hover:text-red-700 font-semibold ml-1"><i class="bi bi-x-circle"></i> Reset</a>
         @endif
     </form>
