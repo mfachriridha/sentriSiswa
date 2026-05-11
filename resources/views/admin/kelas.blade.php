@@ -56,12 +56,12 @@
 
     <div class="table-container">
         <table class="w-full">
-            <thead><tr><th class="table-header">No.</th><th class="table-header">Nama Kelas</th><th class="table-header">Jumlah Siswa</th><th class="table-header">Aksi</th></tr></thead>
+            <thead><tr><th class="table-header">ID</th><th class="table-header">Nama Kelas</th><th class="table-header">Jumlah Siswa</th><th class="table-header">Aksi</th></tr></thead>
             <tbody>
                 @forelse($classes as $i => $k)
                 <tr>
-                    <td class="table-cell">{{ $i + 1 }}</td>
-                    <td class="table-cell font-semibold">{{ $k->name }} <span class="text-[10px] text-muted">#{{ $k->id }}</span></td>
+                    <td class="table-cell font-mono text-xs">{{ $k->id }}</td>
+                    <td class="table-cell font-semibold">{{ $k->name }}</td>
                     <td class="table-cell">{{ $k->students_count }}</td>
                     <td class="table-cell-aksi">
                         <div class="flex items-center justify-center gap-1">
