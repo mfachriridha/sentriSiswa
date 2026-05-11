@@ -237,16 +237,16 @@ class AdminController extends Controller
             $query->where('name', 'like', $prefix.'%');
         }
 
-        if ($keyword = $request->input('keyword')) {
-            $query->where('name', 'like', '%'.$keyword.'%');
-        }
-
         $sort = $request->input('sort', 'name');
         $dir = $request->input('dir', 'asc');
-        if (in_array($sort, ['name', 'students_count']) && in_array($dir, ['asc', 'desc'])) {
-            $query->orderBy($sort, $dir);
+        $dir = in_array($dir, ['asc', 'desc']) ? $dir : 'asc';
+
+        if ($sort === 'students_count') {
+            $query->orderBy('students_count', $dir);
         } else {
-            $query->orderBy('name', 'asc');
+            $query->orderByRaw('CAST(SUBSTRING(name, 1, 2) AS UNSIGNED) '.$dir);
+            $query->orderByRaw('LENGTH(name) '.$dir);
+            $query->orderBy('name', $dir);
         }
 
         $classes = $query->paginate($perPage)->appends($request->except('page'));
@@ -257,13 +257,7 @@ class AdminController extends Controller
             ->pluck('prefix')
             ->filter(fn ($p) => preg_match('/^\d/', $p));
 
-        $keywords = SchoolClass::selectRaw("SUBSTRING_INDEX(name, ' ', -1) as kw")
-            ->distinct()
-            ->orderBy('kw')
-            ->pluck('kw')
-            ->filter(fn ($k) => ! preg_match('/^\d/', $k) && strlen($k) > 0);
-
-        return view('admin.kelas', compact('classes', 'prefixes', 'keywords'));
+        return view('admin.kelas', compact('classes', 'prefixes'));
     }
 
     public function storeClass(Request $request)

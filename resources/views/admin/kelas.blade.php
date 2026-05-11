@@ -36,13 +36,6 @@
             @endforeach
         </select>
 
-        <select name="keyword" class="input-field !w-auto !py-1 !px-2 !text-xs" onchange="this.form.submit()">
-            <option value="">Semua Program</option>
-            @foreach($keywords as $kw)
-            <option value="{{ $kw }}" {{ request('keyword') == $kw ? 'selected' : '' }}>{{ $kw }}</option>
-            @endforeach
-        </select>
-
         <select name="sort" class="input-field !w-auto !py-1 !px-2 !text-xs" onchange="this.form.submit()">
             <option value="name" {{ request('sort') == 'name' || !request('sort') ? 'selected' : '' }}>Urut: Nama</option>
             <option value="students_count" {{ request('sort') == 'students_count' ? 'selected' : '' }}>Urut: Jumlah Siswa</option>
@@ -56,7 +49,7 @@
 
         <input type="hidden" name="per_page" value="{{ request('per_page', 25) }}">
 
-        @if(request()->anyFilled(['prefix', 'keyword', 'sort', 'dir']) && (request('prefix') || request('keyword') || request('sort') != 'name' || request('dir') != 'asc'))
+        @if(request()->anyFilled(['prefix', 'sort', 'dir']) && (request('prefix') || request('sort') != 'name' || request('dir') != 'asc'))
         <a href="{{ route('admin.kelas') }}" class="text-[10px] text-red-500 hover:text-red-700 font-semibold ml-1"><i class="bi bi-x-circle"></i> Reset</a>
         @endif
     </form>
