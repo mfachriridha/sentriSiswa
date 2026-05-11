@@ -55,7 +55,7 @@
     </form>
     <div class="table-container">
         <table class="w-full">
-            <thead><tr><th class="table-header">No. (ID)</th><th class="table-header">NIS</th><th class="table-header">Nama</th><th class="table-header">Kelas</th><th class="table-header">JK</th><th class="table-header">Status</th><th class="table-header">Aksi</th></tr></thead>
+            <thead><tr><th class="table-header">No.</th><th class="table-header">NIS</th><th class="table-header">Nama</th><th class="table-header">Kelas</th><th class="table-header">JK</th><th class="table-header">Status</th><th class="table-header">Aksi</th></tr></thead>
             <tbody>
                 @forelse($students as $i => $s)
                 <?php
@@ -63,7 +63,7 @@
                 $father = $s->parents->firstWhere('type', 'father');
                 ?>
                 <tr data-id="{{ $s->id }}">
-                    <td class="table-cell text-xs font-mono">{{ $s->id }}</td>
+                    <td class="table-cell text-xs font-mono">{{ $students->firstItem() + $i }}</td>
                     <td class="table-cell font-mono"><strong>{{ $s->nis }}</strong></td>
                     <td class="table-cell font-semibold">{{ $s->name }}</td>
                     <td class="table-cell">{{ $s->schoolClass?->name ?? '—' }}</td>

@@ -64,7 +64,7 @@
             <tbody>
                 @forelse($classes as $i => $k)
                 <tr>
-                    <td class="table-cell font-mono text-xs">{{ $k->id }}</td>
+                    <td class="table-cell text-xs font-mono">{{ $classes->firstItem() + $i }}</td>
                     <td class="table-cell font-semibold">{{ $k->name }}</td>
                     <td class="table-cell">{{ $k->students_count }}</td>
                     <td class="table-cell-aksi">

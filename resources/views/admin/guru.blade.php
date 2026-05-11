@@ -57,7 +57,7 @@
         <table class="w-full">
             <thead>
                 <tr>
-                    <th class="table-header">No. (ID)</th>
+                    <th class="table-header">No.</th>
                     <th class="table-header">NIP</th>
                     <th class="table-header">Nama</th>
                     <th class="table-header">Role</th>
@@ -67,9 +67,9 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse($teachers as $teacher)
+                @forelse($teachers as $i => $teacher)
                 <tr>
-                    <td class="table-cell text-xs font-mono">{{ $teacher->id }}</td>
+                    <td class="table-cell text-xs font-mono">{{ $teachers->firstItem() + $i }}</td>
                     <td class="table-cell text-xs">{{ $teacher->nip ?? '—' }}</td>
                     <td class="table-cell font-semibold">{{ $teacher->name }}</td>
                     <td class="table-cell">
@@ -97,9 +97,10 @@
                             <button onclick="editGuru({{ $teacher->id }})" class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 transition cursor-pointer">
                                 <i class="bi bi-pencil"></i> Ubah
                             </button>
-                            <button onclick="confirmAction('Hapus guru {{ $teacher->name }}?', () => { const f = document.createElement('form'); f.method='POST'; f.action='/admin/guru/{{ $teacher->id }}'; f.innerHTML='@csrf @method('DELETE')'; document.body.appendChild(f); f.submit(); })" class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold bg-red-600 text-white hover:bg-red-700 transition cursor-pointer">
+                            <button onclick="confirmAction('Hapus guru {{ $teacher->name }}?', () => this.closest('tr').querySelector('.delForm').submit())" class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold bg-red-600 text-white hover:bg-red-700 transition cursor-pointer">
                                 <i class="bi bi-trash"></i> Hapus
                             </button>
+                            <form class="delForm hidden" action="{{ route('admin.guru.destroy', $teacher) }}" method="POST">@csrf @method('DELETE')</form>
                         </div>
                     </td>
                 </tr>
