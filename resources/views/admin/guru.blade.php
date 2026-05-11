@@ -19,10 +19,12 @@
 @endif
 
 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-    <div class="flex gap-2">
+    <div class="flex gap-2 flex-wrap">
         <button onclick="showModal()" class="btn-brand !text-xs"><i class="bi bi-plus-lg"></i> Tambah Guru</button>
         <button onclick="showCsvModal()" class="btn-outline !text-xs"><i class="bi bi-upload"></i> Upload CSV</button>
         <a href="{{ route('admin.guru.template') }}" class="btn-outline !text-xs"><i class="bi bi-download"></i> Template CSV</a>
+        <button onclick="confirmAction('Hapus SEMUA data guru? Tindakan ini tidak bisa dibatalkan!', () => document.getElementById('destroyAllGuru').submit())" class="btn-danger !text-xs !ml-auto"><i class="bi bi-trash"></i> Hapus Semua</button>
+        <form id="destroyAllGuru" action="{{ route('admin.guru.destroy-all') }}" method="POST" class="hidden">@csrf @method('DELETE')</form>
     </div>
 </div>
 
@@ -30,10 +32,32 @@
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
         <h3 class="font-bold text-slate-900">Data Guru <span class="text-sm font-medium text-muted">({{ $teachers->total() }})</span></h3>
     </div>
+
+    <form id="filterForm" class="flex flex-wrap items-center gap-2 mb-4 pb-3 border-b border-[#c3c6d1]/20">
+        <select name="sort" class="input-field !w-auto !py-1 !px-2 !text-xs" onchange="this.form.submit()">
+            <option value="id" {{ request('sort', 'id') == 'id' ? 'selected' : '' }}>Urut: No.</option>
+            <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>Urut: Nama</option>
+            <option value="created_at" {{ request('sort') == 'created_at' ? 'selected' : '' }}>Urut: Terbaru</option>
+        </select>
+
+        @php $cd = request('dir', 'asc'); @endphp
+        <select name="dir" class="input-field !w-auto !py-1 !px-2 !text-xs" onchange="this.form.submit()">
+            <option value="asc" {{ $cd == 'asc' ? 'selected' : '' }}>A-Z / 1-9</option>
+            <option value="desc" {{ $cd == 'desc' ? 'selected' : '' }}>Z-A / 9-1</option>
+        </select>
+
+        <input type="hidden" name="per_page" value="{{ request('per_page', 25) }}">
+
+        @if(request('sort') != 'id' || request('dir') != 'asc')
+        <a href="{{ route('admin.guru') }}" class="text-[10px] text-red-500 hover:text-red-700 font-semibold ml-1"><i class="bi bi-x-circle"></i> Reset</a>
+        @endif
+    </form>
+
     <div class="table-container">
         <table class="w-full">
             <thead>
                 <tr>
+                    <th class="table-header">No. (ID)</th>
                     <th class="table-header">NIP</th>
                     <th class="table-header">Nama</th>
                     <th class="table-header">Role</th>
@@ -43,8 +67,9 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse($teachers as $i => $teacher)
+                @forelse($teachers as $teacher)
                 <tr>
+                    <td class="table-cell text-xs font-mono">{{ $teacher->id }}</td>
                     <td class="table-cell text-xs">{{ $teacher->nip ?? '—' }}</td>
                     <td class="table-cell font-semibold">{{ $teacher->name }}</td>
                     <td class="table-cell">
@@ -58,9 +83,7 @@
                         @foreach($teacher->teacherClasses as $tc)
                             {{ $tc->schoolClass->name }}@if(!$loop->last), @endif
                         @endforeach
-                        @if($teacher->teacherClasses->isEmpty())
-                            —
-                        @endif
+                        @if($teacher->teacherClasses->isEmpty()) — @endif
                     </td>
                     <td class="table-cell">
                         @if($teacher->is_active)
@@ -74,17 +97,14 @@
                             <button onclick="editGuru({{ $teacher->id }})" class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 transition cursor-pointer">
                                 <i class="bi bi-pencil"></i> Ubah
                             </button>
-                            <form action="{{ route('admin.guru.destroy', $teacher) }}" method="POST" class="inline" onsubmit="return confirm('Hapus guru {{ $teacher->name }}?')">
-                                @csrf @method('DELETE')
-                                <button type="submit" class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold bg-red-600 text-white hover:bg-red-700 transition cursor-pointer">
-                                    <i class="bi bi-trash"></i> Hapus
-                                </button>
-                            </form>
+                            <button onclick="confirmAction('Hapus guru {{ $teacher->name }}?', () => { const f = document.createElement('form'); f.method='POST'; f.action='/admin/guru/{{ $teacher->id }}'; f.innerHTML='@csrf @method('DELETE')'; document.body.appendChild(f); f.submit(); })" class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold bg-red-600 text-white hover:bg-red-700 transition cursor-pointer">
+                                <i class="bi bi-trash"></i> Hapus
+                            </button>
                         </div>
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="6" class="table-cell text-center text-muted py-8">Belum ada data guru.</td></tr>
+                <tr><td colspan="7" class="table-cell text-center text-muted py-8">Belum ada data guru.</td></tr>
                 @endforelse
             </tbody>
         </table>
@@ -99,11 +119,9 @@
         <h3 id="modalTitle" class="font-bold text-lg">Tambah Guru</h3>
         <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600"><i class="bi bi-x-lg text-xl"></i></button>
     </div>
-
     <form id="guruForm" method="POST" action="{{ route('admin.guru.store') }}" class="space-y-4">
         @csrf
         <input type="hidden" name="_method" id="formMethod" value="POST">
-
         <div>
             <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Nama Lengkap</label>
             <input type="text" name="name" id="guruName" required class="input-field" placeholder="Nama lengkap dengan gelar">
@@ -120,7 +138,6 @@
                 <option value="bk">BK</option>
             </select>
         </div>
-
         <div id="waliKelasPicker">
             <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Kelas yang Dipegang</label>
             <select class="input-field" id="wkelasSelect">
@@ -131,7 +148,6 @@
             </select>
             <input type="hidden" name="class_ids[]" id="wkelasHidden">
         </div>
-
         <div id="bkPicker" class="hidden">
             <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Kelas yang Dimonitor</label>
             <div class="max-h-40 overflow-y-auto border border-[#c3c6d1] rounded-lg p-2 space-y-1">
@@ -143,7 +159,6 @@
                 @endforeach
             </div>
         </div>
-
         <div class="flex gap-3 pt-2">
             <button type="button" onclick="closeModal()" class="btn-outline flex-1 !py-2.5">Batal</button>
             <button type="submit" class="btn-brand flex-1 !py-2.5" id="modalSubmit">
@@ -157,10 +172,7 @@
 <!-- CSV Upload Modal -->
 <div id="csvOverlay" class="hidden fixed inset-0 z-50 bg-black/40" onclick="closeCsvModal()"></div>
 <div id="csvBox" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-white rounded-2xl shadow-xl w-full max-w-md p-6 anim-up">
-    <div class="flex justify-between items-center mb-4">
-        <h3 class="font-bold text-lg">Upload CSV Guru</h3>
-        <button onclick="closeCsvModal()" class="text-slate-400 hover:text-slate-600"><i class="bi bi-x-lg text-xl"></i></button>
-    </div>
+    <div class="flex justify-between items-center mb-4"><h3 class="font-bold text-lg">Upload CSV Guru</h3><button onclick="closeCsvModal()" class="text-slate-400 hover:text-slate-600"><i class="bi bi-x-lg text-xl"></i></button></div>
     <form action="{{ route('admin.guru.import') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <p class="text-xs text-slate-500 mb-4">Upload file CSV dengan kolom: <strong>Nama;NIP</strong></p>
@@ -171,18 +183,13 @@
             <input type="file" name="csv_file" accept=".csv" required class="mt-3 text-xs">
         </div>
         <div class="bg-blue-50 border border-blue-200 rounded-xl p-3 text-xs text-blue-700 mb-4">
-            <strong>Format:</strong> "Nama";"NIP"<br>
-            <strong>Contoh:</strong> "BUDI SANTOSO, S.Pd";"19920912 202221 2 018"<br>
-            NIP boleh kosong (gunakan "-")
+            <strong>Format:</strong> "Nama";"NIP"<br><strong>Contoh:</strong> "BUDI SANTOSO, S.Pd";"19920912 202221 2 018"
         </div>
-        <div class="flex gap-3 pt-2">
-            <button type="button" onclick="closeCsvModal()" class="btn-outline flex-1 !py-2.5">Batal</button>
-            <button type="submit" class="btn-brand flex-1 !py-2.5">
-                <span class="btn-text"><i class="bi bi-search"></i> Preview</span>
-            </button>
-        </div>
+        <div class="flex gap-3 pt-2"><button type="button" onclick="closeCsvModal()" class="btn-outline flex-1 !py-2.5">Batal</button><button type="submit" class="btn-brand flex-1 !py-2.5"><span class="btn-text"><i class="bi bi-search"></i> Preview</span></button></div>
     </form>
 </div>
+
+@include('components.confirm-modal')
 
 @push('scripts')
 <script>
@@ -191,18 +198,14 @@ function toggleClassPicker() {
     document.getElementById('waliKelasPicker').classList.toggle('hidden', role !== 'wali_kelas');
     document.getElementById('bkPicker').classList.toggle('hidden', role !== 'bk');
 }
-
 function setClassIds(ids) {
     if (document.getElementById('guruRole').value === 'wali_kelas') {
         document.getElementById('wkelasSelect').value = ids[0] || '';
         document.getElementById('wkelasHidden').value = ids[0] || '';
     } else {
-        document.querySelectorAll('.bkCheckbox').forEach(cb => {
-            cb.checked = ids.includes(parseInt(cb.value));
-        });
+        document.querySelectorAll('.bkCheckbox').forEach(cb => { cb.checked = ids.includes(parseInt(cb.value)); });
     }
 }
-
 function getClassIds() {
     if (document.getElementById('guruRole').value === 'wali_kelas') {
         const v = document.getElementById('wkelasSelect').value;
@@ -211,8 +214,7 @@ function getClassIds() {
     }
     return Array.from(document.querySelectorAll('.bkCheckbox:checked')).map(cb => cb.value);
 }
-
-function showModal(user = null) {
+function showModal(user) {
     document.getElementById('modalOverlay').classList.remove('hidden');
     document.getElementById('modalBox').classList.remove('hidden');
     document.getElementById('guruName').value = user ? user.name : '';
@@ -222,56 +224,27 @@ function showModal(user = null) {
     document.getElementById('formMethod').value = user ? 'PUT' : 'POST';
     const form = document.getElementById('guruForm');
     form.action = user ? '/admin/guru/' + user.id : '{{ route("admin.guru.store") }}';
-
-    if (user && user.teacher_classes && user.teacher_classes.length > 0) {
-        const ids = user.teacher_classes.map(tc => tc.school_class_id);
-        setClassIds(ids);
-    } else {
-        setClassIds([]);
-    }
-
+    if (user && user.teacher_classes) { setClassIds(user.teacher_classes.map(tc => tc.school_class_id)); }
+    else { setClassIds([]); }
     toggleClassPicker();
 }
-
-function closeModal() {
-    document.getElementById('modalOverlay').classList.add('hidden');
-    document.getElementById('modalBox').classList.add('hidden');
-}
-
-function showCsvModal() {
-    document.getElementById('csvOverlay').classList.remove('hidden');
-    document.getElementById('csvBox').classList.remove('hidden');
-}
-function closeCsvModal() {
-    document.getElementById('csvOverlay').classList.add('hidden');
-    document.getElementById('csvBox').classList.add('hidden');
-}
-
+function closeModal() { document.getElementById('modalOverlay').classList.add('hidden'); document.getElementById('modalBox').classList.add('hidden'); }
+function showCsvModal() { document.getElementById('csvOverlay').classList.remove('hidden'); document.getElementById('csvBox').classList.remove('hidden'); }
+function closeCsvModal() { document.getElementById('csvOverlay').classList.add('hidden'); document.getElementById('csvBox').classList.add('hidden'); }
 function setLoading(btn, loading) {
     const t = btn.querySelector('.btn-text'), l = btn.querySelector('.btn-loading');
     if (t) t.classList.toggle('hidden', loading);
     if (l) l.classList.toggle('hidden', !loading);
     btn.disabled = loading;
 }
-
 document.getElementById('guruForm').addEventListener('submit', function(e) {
-    const role = document.getElementById('guruRole').value;
     const classIds = getClassIds();
-    if (classIds.length === 0) {
-        e.preventDefault();
-        alert('Pilih minimal satu kelas.');
-        return;
-    }
+    if (classIds.length === 0) { e.preventDefault(); alert('Pilih minimal satu kelas.'); return; }
     setLoading(document.getElementById('modalSubmit'), true);
 });
-
-// Sync wali_kelas dropdown to hidden input
-document.getElementById('wkelasSelect').addEventListener('change', function() {
-    document.getElementById('wkelasHidden').value = this.value;
-});
-
+document.getElementById('wkelasSelect').addEventListener('change', function() { document.getElementById('wkelasHidden').value = this.value; });
 function editGuru(id) {
-    fetch('/admin/guru/' + id + '/edit?_ajax=1', { headers: {'Accept': 'application/json'} })
+    fetch('/admin/guru/' + id + '/edit?_ajax=1', { headers: {'Accept':'application/json'} })
         .then(r => r.json())
         .then(data => showModal(data.user))
         .catch(() => alert('Gagal memuat data guru.'));

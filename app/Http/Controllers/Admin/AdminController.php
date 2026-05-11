@@ -31,12 +31,21 @@ class AdminController extends Controller
         $perPage = $request->input('per_page', 25);
         $perPage = in_array((int) $perPage, [25, 50, 100]) ? (int) $perPage : 25;
 
-        $teachers = User::whereIn('role', ['wali_kelas', 'bk'])
-            ->with('teacherClasses.schoolClass')
-            ->latest()
-            ->paginate($perPage)
-            ->appends($request->only('per_page'));
+        $query = User::whereIn('role', ['wali_kelas', 'bk'])->with('teacherClasses.schoolClass');
 
+        $sort = $request->input('sort', 'id');
+        $dir = $request->input('dir', 'asc');
+        $dir = in_array($dir, ['asc', 'desc']) ? $dir : 'asc';
+
+        if ($sort === 'name') {
+            $query->orderBy('name', $dir);
+        } elseif ($sort === 'created_at') {
+            $query->orderBy('created_at', $dir);
+        } else {
+            $query->orderBy('id', $dir);
+        }
+
+        $teachers = $query->paginate($perPage)->appends($request->except('page'));
         $classes = SchoolClass::orderBy('name')->get();
 
         return view('admin.guru', compact('teachers', 'classes'));
@@ -130,6 +139,13 @@ class AdminController extends Controller
         $user->delete();
 
         return back()->with('success', 'Guru berhasil dihapus.');
+    }
+
+    public function destroyAllGuru()
+    {
+        $count = User::whereIn('role', ['wali_kelas', 'bk'])->delete();
+
+        return back()->with('success', "{$count} guru berhasil dihapus.");
     }
 
     public function previewGuruCsv(Request $request)
@@ -288,6 +304,13 @@ class AdminController extends Controller
         return back()->with('success', 'Kelas berhasil dihapus.');
     }
 
+    public function destroyAllKelas()
+    {
+        $empty = SchoolClass::whereDoesntHave('students')->delete();
+
+        return back()->with('success', "{$empty} kelas kosong berhasil dihapus.");
+    }
+
     public function searchStudents(Request $request)
     {
         $q = $request->input('q', '');
@@ -358,10 +381,21 @@ class AdminController extends Controller
         $perPage = $request->input('per_page', 25);
         $perPage = in_array((int) $perPage, [25, 50, 100]) ? (int) $perPage : 25;
 
-        $students = Student::with(['schoolClass', 'father', 'mother', 'user'])
-            ->latest()
-            ->paginate($perPage)
-            ->appends($request->only('per_page'));
+        $query = Student::with(['schoolClass', 'father', 'mother', 'user']);
+
+        $sort = $request->input('sort', 'id');
+        $dir = $request->input('dir', 'asc');
+        $dir = in_array($dir, ['asc', 'desc']) ? $dir : 'asc';
+
+        if ($sort === 'name') {
+            $query->orderBy('name', $dir);
+        } elseif ($sort === 'created_at') {
+            $query->orderBy('created_at', $dir);
+        } else {
+            $query->orderBy('id', $dir);
+        }
+
+        $students = $query->paginate($perPage)->appends($request->except('page'));
 
         return view('admin.siswa', [
             'students' => $students,
@@ -494,6 +528,13 @@ class AdminController extends Controller
         $student->delete();
 
         return back()->with('success', 'Siswa berhasil dihapus.');
+    }
+
+    public function destroyAllSiswa()
+    {
+        Student::query()->delete();
+
+        return back()->with('success', 'Semua data siswa berhasil dihapus.');
     }
 
     public function previewCsv(Request $request)

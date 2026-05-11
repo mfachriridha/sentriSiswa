@@ -5,7 +5,9 @@
 @section('page-title', 'Manajemen Kelas')
 
 @section('content')
-<div class="flex justify-end mb-6">
+<div class="flex justify-end mb-6 gap-2">
+    <button onclick="confirmAction('Hapus SEMUA kelas yang tidak memiliki siswa?', () => document.getElementById('destroyAllKelas').submit())" class="btn-danger !text-xs"><i class="bi bi-trash"></i> Hapus Kelas Kosong</button>
+    <form id="destroyAllKelas" action="{{ route('admin.kelas.destroy-all') }}" method="POST" class="hidden">@csrf @method('DELETE')</form>
     <button onclick="showModal('tambah')" class="btn-brand !text-xs"><i class="bi bi-plus-lg"></i> Tambah Kelas</button>
 </div>
 
@@ -37,9 +39,10 @@
         </select>
 
         <select name="sort" class="input-field !w-auto !py-1 !px-2 !text-xs" onchange="this.form.submit()">
-            <option value="id" {{ request('sort', 'id') == 'id' ? 'selected' : '' }}>Urut: ID</option>
+            <option value="id" {{ request('sort', 'id') == 'id' ? 'selected' : '' }}>Urut: No.</option>
             <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>Urut: Nama</option>
             <option value="students_count" {{ request('sort') == 'students_count' ? 'selected' : '' }}>Urut: Jumlah Siswa</option>
+            <option value="created_at" {{ request('sort') == 'created_at' ? 'selected' : '' }}>Urut: Terbaru</option>
         </select>
 
         @php $currentDir = request('dir', 'asc'); @endphp
@@ -57,7 +60,7 @@
 
     <div class="table-container">
         <table class="w-full">
-            <thead><tr><th class="table-header">ID</th><th class="table-header">Nama Kelas</th><th class="table-header">Jumlah Siswa</th><th class="table-header">Aksi</th></tr></thead>
+            <thead><tr><th class="table-header">No.</th><th class="table-header">Nama Kelas</th><th class="table-header">Jumlah Siswa</th><th class="table-header">Aksi</th></tr></thead>
             <tbody>
                 @forelse($classes as $i => $k)
                 <tr>
@@ -93,19 +96,7 @@
 <div id="detailOverlay" class="hidden fixed inset-0 z-[60] bg-black/40" onclick="closeDetail()"></div>
 <div id="detailBox" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[60] bg-white rounded-2xl shadow-xl w-full max-w-3xl p-6 max-h-[90vh] overflow-y-auto anim-up"></div>
 
-<!-- Custom Confirm Modal -->
-<div id="confirmOverlay" class="hidden fixed inset-0 z-[70] bg-black/40 flex items-center justify-center">
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 mx-4 anim-up">
-        <div class="text-center mb-4">
-            <i class="bi bi-exclamation-triangle-fill text-amber-500 text-3xl mb-2 block"></i>
-            <p id="confirmMessage" class="text-sm font-semibold text-slate-800"></p>
-        </div>
-        <div class="flex gap-3">
-            <button onclick="closeConfirm()" class="btn-outline flex-1 !py-2.5">Batal</button>
-            <button id="confirmOk" class="btn-brand flex-1 !py-2.5 !bg-red-600 hover:!bg-red-700">Ya, Lanjutkan</button>
-        </div>
-    </div>
-</div>
+@include('components.confirm-modal')
 
 <!-- Toast -->
 <div id="toast" class="hidden fixed top-4 right-4 z-[200] px-4 py-3 rounded-lg shadow-lg text-sm font-semibold text-white anim-up"></div>
@@ -120,22 +111,6 @@ function showToast(msg, type) {
     t.classList.remove('hidden');
     setTimeout(() => t.classList.add('hidden'), 3000);
 }
-
-// ── Custom Confirm ──
-let confirmCallback = null;
-function confirmAction(msg, cb) {
-    document.getElementById('confirmMessage').textContent = msg;
-    confirmCallback = cb;
-    document.getElementById('confirmOverlay').classList.remove('hidden');
-}
-function closeConfirm() {
-    document.getElementById('confirmOverlay').classList.add('hidden');
-    confirmCallback = null;
-}
-document.getElementById('confirmOk').addEventListener('click', function() {
-    if (confirmCallback) confirmCallback();
-    closeConfirm();
-});
 
 function setLoading(btn, loading) {
     const t = btn.querySelector('.btn-text'), l = btn.querySelector('.btn-loading');

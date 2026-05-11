@@ -6,10 +6,12 @@
 
 @section('content')
 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-    <div class="flex gap-2">
+    <div class="flex gap-2 flex-wrap">
         <a href="{{ route('admin.siswa.tambah') }}" class="btn-brand !text-xs"><i class="bi bi-plus-lg"></i> Tambah Siswa</a>
         <button onclick="showModal()" class="btn-outline !text-xs"><i class="bi bi-upload"></i> Upload CSV</button>
         <a href="{{ route('admin.siswa.template') }}" class="btn-outline !text-xs"><i class="bi bi-download"></i> Template CSV</a>
+        <button onclick="confirmAction('Hapus SEMUA data siswa? Tindakan ini tidak bisa dibatalkan!', () => document.getElementById('destroyAllSiswa').submit())" class="btn-danger !text-xs !ml-auto"><i class="bi bi-trash"></i> Hapus Semua</button>
+        <form id="destroyAllSiswa" action="{{ route('admin.siswa.destroy-all') }}" method="POST" class="hidden">@csrf @method('DELETE')</form>
     </div>
 </div>
 
@@ -31,9 +33,29 @@
         <h3 class="font-bold text-slate-900">Data Siswa <span class="text-sm font-medium text-muted">({{ $totalStudents }})</span></h3>
         <input type="text" class="input-field !w-48 !py-1.5 !text-xs" placeholder="Cari nama / NIS...">
     </div>
+
+    <form id="filterForm" class="flex flex-wrap items-center gap-2 mb-4 pb-3 border-b border-[#c3c6d1]/20">
+        <select name="sort" class="input-field !w-auto !py-1 !px-2 !text-xs" onchange="this.form.submit()">
+            <option value="id" {{ request('sort', 'id') == 'id' ? 'selected' : '' }}>Urut: No.</option>
+            <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>Urut: Nama</option>
+            <option value="created_at" {{ request('sort') == 'created_at' ? 'selected' : '' }}>Urut: Terbaru</option>
+        </select>
+
+        @php $cd = request('dir', 'asc'); @endphp
+        <select name="dir" class="input-field !w-auto !py-1 !px-2 !text-xs" onchange="this.form.submit()">
+            <option value="asc" {{ $cd == 'asc' ? 'selected' : '' }}>A-Z / 1-9</option>
+            <option value="desc" {{ $cd == 'desc' ? 'selected' : '' }}>Z-A / 9-1</option>
+        </select>
+
+        <input type="hidden" name="per_page" value="{{ request('per_page', 25) }}">
+
+        @if(request('sort') != 'id' || request('dir') != 'asc')
+        <a href="{{ route('admin.siswa') }}" class="text-[10px] text-red-500 hover:text-red-700 font-semibold ml-1"><i class="bi bi-x-circle"></i> Reset</a>
+        @endif
+    </form>
     <div class="table-container">
         <table class="w-full">
-            <thead><tr><th class="table-header">No.</th><th class="table-header">NIS</th><th class="table-header">Nama</th><th class="table-header">Kelas</th><th class="table-header">JK</th><th class="table-header">Status</th><th class="table-header">Aksi</th></tr></thead>
+            <thead><tr><th class="table-header">No. (ID)</th><th class="table-header">NIS</th><th class="table-header">Nama</th><th class="table-header">Kelas</th><th class="table-header">JK</th><th class="table-header">Status</th><th class="table-header">Aksi</th></tr></thead>
             <tbody>
                 @forelse($students as $i => $s)
                 <?php
@@ -41,7 +63,7 @@
                 $father = $s->parents->firstWhere('type', 'father');
                 ?>
                 <tr data-id="{{ $s->id }}">
-                    <td class="table-cell">{{ $students->firstItem() + $i }}</td>
+                    <td class="table-cell text-xs font-mono">{{ $s->id }}</td>
                     <td class="table-cell font-mono"><strong>{{ $s->nis }}</strong></td>
                     <td class="table-cell font-semibold">{{ $s->name }}</td>
                     <td class="table-cell">{{ $s->schoolClass?->name ?? '—' }}</td>
@@ -57,7 +79,7 @@
                         <div class="flex items-center justify-center gap-1">
                             <button onclick='lihatDetail({!! json_encode(array_merge($s->toArray(), ["schoolClass_name" => $s->schoolClass?->name, "father" => $father?->toArray(), "mother" => $mother?->toArray()]), JSON_HEX_APOS | JSON_HEX_QUOT) !!})' class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold border border-[#c3c6d1] text-[#43474f] hover:bg-[#edeeef] transition cursor-pointer"><i class="bi bi-eye"></i> Lihat</button>
                             <a href="{{ route('admin.siswa.edit', $s->id) }}" class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 transition"><i class="bi bi-pencil"></i> Ubah</a>
-                            <button onclick="if(confirm('Hapus {{ $s->name }}?')) this.closest('form').submit()" class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold bg-red-600 text-white hover:bg-red-700 transition cursor-pointer"><i class="bi bi-trash"></i> Hapus</button>
+                            <button onclick="confirmAction('Hapus {{ $s->name }}?', () => this.closest('tr').querySelector('form').submit())" class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold bg-red-600 text-white hover:bg-red-700 transition cursor-pointer"><i class="bi bi-trash"></i> Hapus</button>
                             <form action="{{ route('admin.siswa.destroy', $s) }}" method="POST" class="hidden">@csrf @method('DELETE')</form>
                         </div>
                     </td>
@@ -106,6 +128,8 @@
         <p class="text-sm font-bold text-[#001e40]">Memproses CSV...</p>
     </div>
 </div>
+
+@include('components.confirm-modal')
 
 <style>@keyframes spin{to{transform:rotate(360deg)}}.animate-spin{animation:spin .8s linear infinite}</style>
 

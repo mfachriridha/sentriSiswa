@@ -50,6 +50,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::post('/guru', [AdminController::class, 'storeGuru'])->name('guru.store');
     Route::get('/guru/{user}/edit', [AdminController::class, 'editGuru'])->name('guru.edit');
     Route::put('/guru/{user}', [AdminController::class, 'updateGuru'])->name('guru.update');
+    Route::delete('/guru', [AdminController::class, 'destroyAllGuru'])->name('guru.destroy-all');
     Route::delete('/guru/{user}', [AdminController::class, 'destroyGuru'])->name('guru.destroy');
     Route::post('/guru/import', [AdminController::class, 'previewGuruCsv'])->name('guru.import');
     Route::get('/guru/preview', [AdminController::class, 'previewGuru'])->name('guru.preview');
@@ -60,6 +61,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/kelas', [AdminController::class, 'kelas'])->name('kelas');
     Route::post('/kelas', [AdminController::class, 'storeClass'])->name('kelas.store');
     Route::put('/kelas/{schoolClass}', [AdminController::class, 'updateClass'])->name('kelas.update');
+    Route::delete('/kelas', [AdminController::class, 'destroyAllKelas'])->name('kelas.destroy-all');
     Route::delete('/kelas/{schoolClass}', [AdminController::class, 'destroyClass'])->name('kelas.destroy');
     Route::get('/kelas/{schoolClass}/students', [AdminController::class, 'classStudents'])->name('kelas.students');
     Route::post('/kelas/{schoolClass}/assign', [AdminController::class, 'assignStudentToClass'])->name('kelas.assign');
@@ -73,6 +75,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/siswa/tambah', fn () => view('admin.siswa-form'))->name('siswa.tambah');
     Route::get('/siswa/{student}/edit', [AdminController::class, 'editSiswa'])->name('siswa.edit');
     Route::put('/siswa/{student}', [AdminController::class, 'updateStudent'])->name('siswa.update');
+    Route::delete('/siswa', [AdminController::class, 'destroyAllSiswa'])->name('siswa.destroy-all');
     Route::delete('/siswa/{student}', [AdminController::class, 'destroyStudent'])->name('siswa.destroy');
     // CSV
     Route::post('/siswa/import', [AdminController::class, 'previewCsv'])->name('siswa.import');
