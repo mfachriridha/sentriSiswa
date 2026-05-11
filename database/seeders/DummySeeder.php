@@ -34,7 +34,7 @@ class DummySeeder extends Seeder
             ['email' => 'ahmad.dahlan@sentrisiswa.sch.id'],
             [
                 'name' => 'Ahmad Dahlan, S.Pd',
-                'nip' => '19850101 202012 1 001',
+                'nip' => '198501012020121001',
                 'role' => 'wali_kelas',
                 'is_active' => true,
                 'password' => Hash::make('password123'),
@@ -46,7 +46,7 @@ class DummySeeder extends Seeder
             ['email' => 'siti.aminah@sentrisiswa.sch.id'],
             [
                 'name' => 'Siti Aminah, M.Pd',
-                'nip' => '19900615 202122 2 001',
+                'nip' => '199006152021222001',
                 'role' => 'wali_kelas',
                 'is_active' => true,
                 'password' => Hash::make('password123'),
@@ -59,7 +59,7 @@ class DummySeeder extends Seeder
             ['email' => 'rudi.hartono@sentrisiswa.sch.id'],
             [
                 'name' => 'Rudi Hartono, S.Psi',
-                'nip' => '19880325 201903 1 001',
+                'nip' => '198803252019031001',
                 'role' => 'bk',
                 'is_active' => true,
                 'password' => Hash::make('password123'),
@@ -74,7 +74,7 @@ class DummySeeder extends Seeder
             ['email' => 'heru.suyana@sentrisiswa.sch.id'],
             [
                 'name' => 'Heru Suyana, S.Pd',
-                'nip' => '19661016 200012 1 001',
+                'nip' => '196610162000121001',
                 'role' => 'wali_kelas',
                 'is_active' => false,
                 'password' => Hash::make('password123'),
@@ -85,7 +85,7 @@ class DummySeeder extends Seeder
             ['email' => 'ayu.dewi@sentrisiswa.sch.id'],
             [
                 'name' => 'Ayu Dewi Lestari, S.Pd',
-                'nip' => '19921126 202521 2 077',
+                'nip' => '199211262025212077',
                 'role' => 'wali_kelas',
                 'is_active' => false,
                 'password' => Hash::make('password123'),

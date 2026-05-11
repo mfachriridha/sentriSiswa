@@ -74,7 +74,7 @@
                 <p><span class="font-semibold">BK:</span> rudi.hartono@sentrisiswa.sch.id / password123</p>
                 <p><span class="font-semibold">Siswa:</span> andi.pratama@sentrisiswa.sch.id / password123</p>
                 <hr class="border-[#0062a0]/20 my-1.5">
-                <p class="text-[10px] opacity-70">Guru belum daftar: heru.suyana@ / ayu.dewi@ (daftar via NIP)</p>
+                <p class="text-[10px] opacity-70">Guru belum daftar: heru.suyana@ / ayu.dewi@ (daftar via NIP 18 digit)</p>
                 <p class="text-[10px] opacity-70">Siswa belum daftar: NIS 3001, 3002, 3003</p>
             </div>
         </div>

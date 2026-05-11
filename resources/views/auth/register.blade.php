@@ -44,7 +44,7 @@
 
             <div id="nipField">
                 <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">NIP</label>
-                <input type="text" id="nip" class="input-field" placeholder="19920912 202221 2 018" maxlength="22" inputmode="numeric">
+                <input type="text" id="nip" class="input-field" placeholder="199209122022212018" maxlength="18" inputmode="numeric" pattern="\d*">
             </div>
 
             <div id="nisField" class="hidden">
@@ -128,8 +128,8 @@
         <div class="mt-4 p-3 bg-[#d0e4ff] border border-[#0062a0]/20 rounded-lg">
             <p class="text-[11px] font-bold text-[#00497a] uppercase tracking-wider">Data Demo Registrasi</p>
             <div class="text-xs text-[#00497a] mt-1 space-y-0.5">
-                <p><span class="font-semibold">Guru (NIP):</span> 19661016 200012 1 001 &rarr; Heru Suyana, S.Pd</p>
-                <p><span class="font-semibold">Guru (NIP):</span> 19921126 202521 2 077 &rarr; Ayu Dewi Lestari, S.Pd</p>
+                <p><span class="font-semibold">Guru (NIP):</span> 196610162000121001 &rarr; Heru Suyana, S.Pd</p>
+                <p><span class="font-semibold">Guru (NIP):</span> 199211262025212077 &rarr; Ayu Dewi Lestari, S.Pd</p>
                 <hr class="border-[#0062a0]/20 my-1.5">
                 <p><span class="font-semibold">Siswa (NIS/NISN):</span> 3001 / 0003001 &rarr; Eka Putra</p>
                 <p><span class="font-semibold">Siswa (NIS/NISN):</span> 3002 / 0003002 &rarr; Fitriani</p>

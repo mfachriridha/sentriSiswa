@@ -129,7 +129,7 @@
         </div>
         <div>
             <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">NIP</label>
-            <input type="text" name="nip" id="guruNip" class="input-field" placeholder="19920912 202221 2 018" maxlength="22" inputmode="numeric">
+            <input type="text" name="nip" id="guruNip" class="input-field" placeholder="199209122022212018" maxlength="18" inputmode="numeric" pattern="\d*">
             <p class="text-[10px] text-muted mt-1">Kosongkan jika tidak ada NIP</p>
         </div>
         <div>
@@ -184,7 +184,7 @@
             <input type="file" name="csv_file" accept=".csv" required class="mt-3 text-xs">
         </div>
         <div class="bg-blue-50 border border-blue-200 rounded-xl p-3 text-xs text-blue-700 mb-4">
-            <strong>Format:</strong> "Nama";"NIP"<br><strong>Contoh:</strong> "BUDI SANTOSO, S.Pd";"19920912 202221 2 018"
+            <strong>Format:</strong> "Nama";"NIP"<br><strong>Contoh:</strong> "BUDI SANTOSO, S.Pd";"199209122022212018"
         </div>
         <div class="flex gap-3 pt-2"><button type="button" onclick="closeCsvModal()" class="btn-outline flex-1 !py-2.5">Batal</button><button type="submit" class="btn-brand flex-1 !py-2.5"><span class="btn-text"><i class="bi bi-search"></i> Preview</span></button></div>
     </form>

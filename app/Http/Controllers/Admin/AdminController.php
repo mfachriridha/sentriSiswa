@@ -55,15 +55,15 @@ class AdminController extends Controller
     {
         $data = $request->validate([
             'name' => 'required|string|max:200',
-            'nip' => 'nullable|regex:/^[0-9\s]+$/|max:22|unique:users,nip',
+            'nip' => 'nullable|regex:/^\d+$/|max:18|unique:users,nip',
             'role' => 'required|in:wali_kelas,bk',
             'class_ids' => 'nullable|array',
             'class_ids.*' => 'exists:school_classes,id',
         ]);
 
-        $nip = $data['nip'] ? trim($data['nip']) : null;
+        $nip = $data['nip'] ? preg_replace('/\s+/', '', $data['nip']) : null;
         $email = $nip
-            ? preg_replace('/\s+/', '', $nip).'@sentrisiswa.sch.id'
+            ? $nip.'@sentrisiswa.sch.id'
             : strtolower(preg_replace('/[^a-z]/', '', $data['name'])).'@sentrisiswa.sch.id';
 
         $user = User::create([
@@ -100,7 +100,7 @@ class AdminController extends Controller
     {
         $data = $request->validate([
             'name' => 'required|string|max:200',
-            'nip' => 'nullable|regex:/^[0-9\s]+$/|max:22|unique:users,nip,'.$user->id,
+            'nip' => 'nullable|regex:/^\d+$/|max:18|unique:users,nip,'.$user->id,
             'role' => 'required|in:wali_kelas,bk',
             'class_ids' => 'nullable|array',
             'class_ids.*' => 'exists:school_classes,id',
@@ -108,7 +108,7 @@ class AdminController extends Controller
 
         $user->update([
             'name' => $data['name'],
-            'nip' => $data['nip'] ? trim($data['nip']) : null,
+            'nip' => $data['nip'] ? preg_replace('/\s+/', '', $data['nip']) : null,
             'role' => $data['role'],
         ]);
 
@@ -197,9 +197,9 @@ class AdminController extends Controller
         }
         $imported = 0;
         foreach ($rows as $row) {
-            $nip = ! empty($row['nip']) ? trim($row['nip']) : null;
+            $nip = ! empty($row['nip']) ? preg_replace('/\s+/', '', trim($row['nip'])) : null;
             $email = $nip
-                ? preg_replace('/\s+/', '', $nip).'@sentrisiswa.sch.id'
+                ? $nip.'@sentrisiswa.sch.id'
                 : strtolower(preg_replace('/[^a-z]/', '', $row['nama'])).'@sentrisiswa.sch.id';
 
             User::updateOrCreate(
@@ -222,7 +222,7 @@ class AdminController extends Controller
     public function downloadGuruTemplate()
     {
         $content = "Nama;NIP\n";
-        $content .= "BUDI SANTOSO, S.Pd;19920912 202221 2 018\n";
+        $content .= "BUDI SANTOSO, S.Pd;199209122022212018\n";
 
         return response($content, 200, [
             'Content-Type' => 'text/csv; charset=UTF-8',

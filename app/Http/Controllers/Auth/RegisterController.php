@@ -19,9 +19,9 @@ class RegisterController extends Controller
 
     public function validateNip(Request $request)
     {
-        $request->validate(['nip' => ['required', 'regex:/^[0-9\s]+$/']]);
+        $request->validate(['nip' => ['required', 'regex:/^\d+$/']]);
 
-        $nip = trim($request->input('nip'));
+        $nip = preg_replace('/\s+/', '', $request->input('nip'));
 
         $user = User::where('nip', $nip)->where('is_active', false)->first();
 
@@ -79,7 +79,7 @@ class RegisterController extends Controller
         if ($data['role'] === 'guru') {
             $request->validate(['nip' => ['required']]);
 
-            $nip = trim($request->input('nip'));
+            $nip = preg_replace('/\s+/', '', $request->input('nip'));
 
             $user = User::where('nip', $nip)->where('is_active', false)->first();
 
