@@ -124,6 +124,17 @@
             Sudah punya akun?
             <a href="{{ route('auth.login') }}" class="text-blue-600 hover:text-blue-700 font-semibold">Masuk sekarang</a>
         </p>
+
+        <div class="mt-4 p-3 bg-[#d0e4ff] border border-[#0062a0]/20 rounded-lg">
+            <p class="text-[11px] font-bold text-[#00497a] uppercase tracking-wider">Data Demo Registrasi</p>
+            <div class="text-xs text-[#00497a] mt-1 space-y-0.5">
+                <p><span class="font-semibold">Guru (NIP):</span> 19661016 200012 1 001 &rarr; Heru Suyana, S.Pd</p>
+                <p><span class="font-semibold">Guru (NIP):</span> 19921126 202521 2 077 &rarr; Ayu Dewi Lestari, S.Pd</p>
+                <hr class="border-[#0062a0]/20 my-1.5">
+                <p><span class="font-semibold">Siswa (NIS/NISN):</span> 3001 / 0003001 &rarr; Eka Putra</p>
+                <p><span class="font-semibold">Siswa (NIS/NISN):</span> 3002 / 0003002 &rarr; Fitriani</p>
+            </div>
+        </div>
     </div>
 </div>
 

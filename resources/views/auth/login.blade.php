@@ -67,9 +67,15 @@
         <!-- Info Demo -->
         <div class="mt-6 p-3 bg-[#d0e4ff] border border-[#0062a0]/20 rounded-lg">
             <p class="text-[11px] font-bold text-[#00497a] uppercase tracking-wider">Akun Demo</p>
-            <div class="text-xs text-[#00497a] mt-1 space-y-1">
+            <div class="text-xs text-[#00497a] mt-1 space-y-0.5">
                 <p><span class="font-semibold">Admin:</span> admin@sentrisiswa.sch.id / admin123</p>
-                <p><span class="font-semibold">Siswa:</span> siswa@sentrisiswa.sch.id / siswa123</p>
+                <p><span class="font-semibold">Wali Kelas 1:</span> ahmad.dahlan@sentrisiswa.sch.id / password123</p>
+                <p><span class="font-semibold">Wali Kelas 2:</span> siti.aminah@sentrisiswa.sch.id / password123</p>
+                <p><span class="font-semibold">BK:</span> rudi.hartono@sentrisiswa.sch.id / password123</p>
+                <p><span class="font-semibold">Siswa:</span> andi.pratama@sentrisiswa.sch.id / password123</p>
+                <hr class="border-[#0062a0]/20 my-1.5">
+                <p class="text-[10px] opacity-70">Guru belum daftar: heru.suyana@ / ayu.dewi@ (daftar via NIP)</p>
+                <p class="text-[10px] opacity-70">Siswa belum daftar: NIS 3001, 3002, 3003</p>
             </div>
         </div>
 
