@@ -60,8 +60,8 @@
             <tbody>
                 @forelse($classes as $i => $k)
                 <tr>
-                    <td class="table-cell">{{ $classes->firstItem() + $i }}</td>
-                    <td class="table-cell font-semibold">{{ $k->name }}</td>
+                    <td class="table-cell">{{ $i + 1 }}</td>
+                    <td class="table-cell font-semibold">{{ $k->name }} <span class="text-[10px] text-muted">#{{ $k->id }}</span></td>
                     <td class="table-cell">{{ $k->students_count }}</td>
                     <td class="table-cell-aksi">
                         <div class="flex items-center justify-center gap-1">
