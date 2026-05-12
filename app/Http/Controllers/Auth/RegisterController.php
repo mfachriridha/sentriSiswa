@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Student;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
@@ -41,13 +40,15 @@ class RegisterController extends Controller
 
     public function validateNis(Request $request)
     {
-        $data = $request->validate([
-            'nis' => ['required', 'regex:/^[0-9]+$/'],
-            'nisn' => ['required', 'regex:/^[0-9]+$/'],
+        $request->validate([
+            'nis_or_nisn' => ['required', 'regex:/^[0-9]+$/'],
         ]);
 
-        $student = Student::where('nis', $data['nis'])
-            ->where('nisn', $data['nisn'])
+        $value = $request->input('nis_or_nisn');
+
+        $student = Student::where(function ($q) use ($value) {
+            $q->where('nis', $value)->orWhere('nisn', $value);
+        })
             ->whereNull('user_id')
             ->first();
 
@@ -95,24 +96,25 @@ class RegisterController extends Controller
                 'is_active' => true,
             ]);
 
-            Auth::login($user);
-
-            return redirect()->intended(route('wali-kelas.dashboard'));
+            return redirect()->route('auth.login')
+                ->with('success', 'Akun berhasil didaftarkan. Silakan masuk.');
         }
 
-        $siswaData = $request->validate([
-            'nis' => ['required', 'regex:/^[0-9]+$/'],
-            'nisn' => ['required', 'regex:/^[0-9]+$/'],
+        $request->validate([
+            'nis_or_nisn' => ['required', 'regex:/^[0-9]+$/'],
         ]);
 
-        $student = Student::where('nis', $siswaData['nis'])
-            ->where('nisn', $siswaData['nisn'])
+        $value = $request->input('nis_or_nisn');
+
+        $student = Student::where(function ($q) use ($value) {
+            $q->where('nis', $value)->orWhere('nisn', $value);
+        })
             ->whereNull('user_id')
             ->first();
 
         if (! $student) {
             throw ValidationException::withMessages([
-                'nis' => 'NIS/NISN tidak valid atau akun sudah diaktivasi.',
+                'nis_or_nisn' => 'NIS/NISN tidak valid atau akun sudah diaktivasi.',
             ]);
         }
 
@@ -126,8 +128,7 @@ class RegisterController extends Controller
 
         $student->update(['user_id' => $user->id]);
 
-        Auth::login($user);
-
-        return redirect()->intended(route('siswa.dashboard'));
+        return redirect()->route('auth.login')
+            ->with('success', 'Akun berhasil didaftarkan. Silakan masuk.');
     }
 }

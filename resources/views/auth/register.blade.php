@@ -20,7 +20,7 @@
                 <span class="w-6 h-6 bg-blue-600 text-white rounded-full text-xs font-bold flex items-center justify-center">1</span>
                 <h3 class="font-bold text-slate-900">Validasi Data</h3>
             </div>
-            <p class="text-xs text-slate-500 mb-5">Masukkan NIP (Guru) atau NIS &amp; NISN (Siswa)</p>
+            <p class="text-xs text-slate-500 mb-5">Masukkan NIP (Guru) atau NIS / NISN (Siswa)</p>
 
             <div class="mb-4">
                 <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Pilih Role</label>
@@ -48,10 +48,8 @@
             </div>
 
             <div id="nisField" class="hidden">
-                <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">NIS</label>
-                <input type="text" id="nis" class="input-field" placeholder="Masukkan NIS" maxlength="20" inputmode="numeric">
-                <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block mt-3">NISN</label>
-                <input type="text" id="nisn" class="input-field" placeholder="Masukkan NISN" maxlength="20" inputmode="numeric">
+                <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">NIS atau NISN</label>
+                <input type="text" id="nis" class="input-field" placeholder="Masukkan NIS atau NISN" maxlength="20" inputmode="numeric">
             </div>
 
             <button id="validateBtn" class="btn-primary w-full mt-5 !py-3">
@@ -60,11 +58,12 @@
             </button>
 
             <div id="validationResult" class="hidden mt-4 p-4 bg-emerald-50 border border-emerald-200 rounded-xl">
-                <div class="flex items-center gap-3">
-                    <i class="bi bi-check-circle-fill text-emerald-500 text-xl"></i>
+                <div class="flex items-start gap-3">
+                    <i class="bi bi-check-circle-fill text-emerald-500 text-xl mt-0.5"></i>
                     <div>
                         <p class="font-bold text-emerald-800 text-sm">Data Ditemukan!</p>
-                        <p id="foundName" class="text-xs text-emerald-700"></p>
+                        <p id="foundName" class="text-xs text-emerald-700 font-semibold"></p>
+                        <p id="foundExtra" class="text-xs text-emerald-600 mt-0.5"></p>
                     </div>
                 </div>
             </div>
@@ -86,14 +85,13 @@
                 <span class="w-6 h-6 bg-blue-600 text-white rounded-full text-xs font-bold flex items-center justify-center">2</span>
                 <h3 class="font-bold text-slate-900">Lengkapi Akun</h3>
             </div>
-            <p class="text-xs text-slate-500 mb-5">Data ditemukan: <span id="displayName" class="font-bold text-blue-600"></span></p>
+            <p class="text-xs text-slate-500 mb-5">Data ditemukan: <span id="displayName" class="font-bold text-blue-600"></span><br><span id="displayExtra" class="text-[11px] text-slate-400"></span></p>
 
             <form id="registerForm" method="POST" action="{{ route('auth.register.post') }}" class="space-y-4">
                 @csrf
                 <input type="hidden" name="role" id="formRole">
                 <input type="hidden" name="nip" id="formNip">
-                <input type="hidden" name="nis" id="formNis">
-                <input type="hidden" name="nisn" id="formNisn">
+                <input type="hidden" name="nis_or_nisn" id="formNis">
 
                 <div>
                     <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Email <span class="text-red-500">*</span></label>
@@ -131,8 +129,8 @@
                 <p><span class="font-semibold">Guru (NIP):</span> 196610162000121001 &rarr; Heru Suyana, S.Pd</p>
                 <p><span class="font-semibold">Guru (NIP):</span> 199211262025212077 &rarr; Ayu Dewi Lestari, S.Pd</p>
                 <hr class="border-[#0062a0]/20 my-1.5">
-                <p><span class="font-semibold">Siswa (NIS/NISN):</span> 3001 / 0003001 &rarr; Eka Putra</p>
-                <p><span class="font-semibold">Siswa (NIS/NISN):</span> 3002 / 0003002 &rarr; Fitriani</p>
+                <p><span class="font-semibold">Siswa (NIS atau NISN):</span> 3001 &rarr; Eka Putra</p>
+                <p><span class="font-semibold">Siswa (NIS atau NISN):</span> 0003002 &rarr; Fitriani</p>
             </div>
         </div>
     </div>
@@ -188,9 +186,8 @@ document.getElementById('validateBtn').addEventListener('click', function() {
         body = { nip: nipVal };
     } else {
         const nisVal = document.getElementById('nis').value.trim();
-        const nisnVal = document.getElementById('nisn').value.trim();
         url = '{{ route("auth.register.validate-nis") }}';
-        body = { nis: nisVal, nisn: nisnVal };
+        body = { nis_or_nisn: nisVal };
     }
 
     fetch(url, {
@@ -203,6 +200,7 @@ document.getElementById('validateBtn').addEventListener('click', function() {
         setLoading(btn, false);
         if (data.valid) {
             document.getElementById('foundName').textContent = data.name;
+            document.getElementById('foundExtra').textContent = currentRole === 'siswa' ? 'NIS: ' + data.nis + '  ·  NISN: ' + data.nisn : '';
             document.getElementById('validationResult').classList.remove('hidden');
             document.getElementById('validationError').classList.add('hidden');
 
@@ -210,10 +208,8 @@ document.getElementById('validateBtn').addEventListener('click', function() {
             if (currentRole === 'guru') {
                 document.getElementById('formNip').value = data.nip;
                 document.getElementById('formNis').value = '';
-                document.getElementById('formNisn').value = '';
             } else {
                 document.getElementById('formNis').value = data.nis;
-                document.getElementById('formNisn').value = data.nisn;
                 document.getElementById('formNip').value = '';
             }
 
@@ -221,6 +217,7 @@ document.getElementById('validateBtn').addEventListener('click', function() {
                 document.getElementById('step1').classList.add('hidden');
                 document.getElementById('step2').classList.remove('hidden');
                 document.getElementById('displayName').textContent = data.name;
+                document.getElementById('displayExtra').textContent = currentRole === 'siswa' ? 'NIS: ' + data.nis + '  ·  NISN: ' + data.nisn : '';
             }, 500);
         } else {
             document.getElementById('validationResult').classList.add('hidden');
