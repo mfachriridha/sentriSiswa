@@ -15,9 +15,9 @@
         <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
         <style>
             :root {
-                --primary: #001e40;
-                --primary-hover: #002856;
-                --primary-light: #d5e3ff;
+                --primary: #1c6880;
+                --primary-hover: #155066;
+                --primary-light: #d4e8ee;
                 --secondary: #0062a0;
                 --secondary-fixed: #d0e4ff;
                 --surface: #ffffff;
@@ -87,8 +87,13 @@
         @yield('content')
     </main>
 
-    <footer class="py-6 px-8 text-center border-t border-[var(--border)]/60 bg-[var(--surface)]">
-        <p class="text-xs text-muted tracking-wider">&copy; {{ date('Y') }} <span class="font-semibold text-[var(--primary)]">Sentri Siswa</span> &mdash; SMA Negeri 11 Kab. Tangerang</p>
+    <footer class="py-8 px-6 text-center border-t border-[var(--border)]/60 bg-[var(--surface)]">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex flex-wrap justify-center gap-x-6 gap-y-2 mb-4 text-sm">
+                <a href="{{ asset('storage/tata-tertib/tata_tertib.pdf') }}" target="_blank" class="text-[var(--primary)] hover:underline font-medium">Tata Tertib Sekolah</a>
+            </div>
+            <p class="text-sm text-muted tracking-wider">&copy; {{ date('Y') }} <span class="font-semibold text-[var(--primary)]">SentriSiswa</span> &mdash; SMA Negeri 11 Kab. Tangerang</p>
+        </div>
     </footer>
 
     @stack('scripts')

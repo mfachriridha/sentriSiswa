@@ -7,52 +7,52 @@
     <div class="w-full max-w-lg">
 
         <div class="text-center mb-8">
-            <div class="w-14 h-14 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-500/20">
+            <div class="w-14 h-14 bg-gradient-to-br from-[#1c6880] to-[#155066] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-[#1c6880]/20">
                 <i class="bi bi-person-plus-fill text-white text-2xl"></i>
             </div>
             <h2 class="text-2xl font-extrabold tracking-tight text-slate-900">Daftar Akun</h2>
-            <p class="text-sm text-slate-500 mt-1">Buat akun SentriSiswa baru</p>
+            <p class="text-base text-slate-500 mt-1">Buat akun SentriSiswa baru</p>
         </div>
 
         <!-- Step 1 -->
         <div id="step1" class="card !p-6">
             <div class="flex items-center gap-2 mb-4">
-                <span class="w-6 h-6 bg-blue-600 text-white rounded-full text-xs font-bold flex items-center justify-center">1</span>
-                <h3 class="font-bold text-slate-900">Validasi Data</h3>
+                <span class="w-7 h-7 bg-[#1c6880] text-white rounded-full text-sm font-bold flex items-center justify-center">1</span>
+                <h3 class="font-bold text-lg text-slate-900">Validasi Data</h3>
             </div>
-            <p class="text-xs text-slate-500 mb-5">Masukkan NIP (Guru) atau NIS / NISN (Siswa)</p>
+            <p class="text-sm text-slate-500 mb-5">Masukkan NIP (Guru) atau NIS / NISN (Siswa)</p>
 
             <div class="mb-4">
-                <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Pilih Role</label>
+                <label class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 block">Pilih Role</label>
                 <div class="flex gap-3">
                     <label class="flex-1 cursor-pointer">
                         <input type="radio" name="role_type" value="guru" class="peer hidden" checked>
-                        <div class="border-2 border-slate-200 rounded-xl p-4 text-center peer-checked:border-blue-500 peer-checked:bg-blue-50 transition-all">
-                            <i class="bi bi-person-badge-fill text-2xl text-slate-400 peer-checked:text-blue-600 block mb-1"></i>
-                            <p class="font-semibold text-sm">Guru</p>
+                        <div class="border-2 border-slate-200 rounded-xl p-4 text-center peer-checked:border-[#1c6880] peer-checked:bg-[#d4e8ee] transition-all">
+                            <i class="bi bi-person-badge-fill text-2xl text-slate-400 peer-checked:text-[#1c6880] block mb-1"></i>
+                            <p class="font-semibold text-base">Guru</p>
                         </div>
                     </label>
                     <label class="flex-1 cursor-pointer">
                         <input type="radio" name="role_type" value="siswa" class="peer hidden">
-                        <div class="border-2 border-slate-200 rounded-xl p-4 text-center peer-checked:border-blue-500 peer-checked:bg-blue-50 transition-all">
-                            <i class="bi bi-mortarboard-fill text-2xl text-slate-400 peer-checked:text-blue-600 block mb-1"></i>
-                            <p class="font-semibold text-sm">Siswa</p>
+                        <div class="border-2 border-slate-200 rounded-xl p-4 text-center peer-checked:border-[#1c6880] peer-checked:bg-[#d4e8ee] transition-all">
+                            <i class="bi bi-mortarboard-fill text-2xl text-slate-400 peer-checked:text-[#1c6880] block mb-1"></i>
+                            <p class="font-semibold text-base">Siswa</p>
                         </div>
                     </label>
                 </div>
             </div>
 
             <div id="nipField">
-                <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">NIP</label>
+                <label class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 block">NIP</label>
                 <input type="text" id="nip" class="input-field" placeholder="199209122022212018" maxlength="18" inputmode="numeric" pattern="\d*" onkeydown="if(event.key==='Enter')document.getElementById('validateBtn').click()">
             </div>
 
             <div id="nisField" class="hidden">
-                <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">NIS atau NISN</label>
+                <label class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 block">NIS atau NISN</label>
                 <input type="text" id="nis" class="input-field" placeholder="Masukkan NIS atau NISN" maxlength="20" inputmode="numeric" onkeydown="if(event.key==='Enter')document.getElementById('validateBtn').click()">
             </div>
 
-            <button id="validateBtn" class="btn-primary w-full mt-5 !py-3">
+            <button id="validateBtn" class="btn-primary w-full mt-5 !py-3 !text-base">
                 <span class="btn-text"><i class="bi bi-search"></i> Validasi Data</span>
                 <span class="btn-loading hidden"><i class="bi bi-hourglass-split animate-spin"></i> Memvalidasi...</span>
             </button>
@@ -61,8 +61,8 @@
                 <div class="flex items-center gap-3">
                     <i class="bi bi-x-circle-fill text-red-500 text-xl"></i>
                     <div>
-                        <p class="font-bold text-red-800 text-sm">Data Tidak Ditemukan</p>
-                        <p id="errorMessage" class="text-xs text-red-600">Pastikan data yang dimasukkan benar.</p>
+                        <p class="font-bold text-red-800 text-base">Data Tidak Ditemukan</p>
+                        <p id="errorMessage" class="text-sm text-red-600">Pastikan data yang dimasukkan benar.</p>
                     </div>
                 </div>
             </div>
@@ -79,27 +79,27 @@
                 <div class="card !p-5 !bg-emerald-50 !border-emerald-200">
                     <div class="flex items-center gap-2 mb-2">
                         <i class="bi bi-check-circle-fill text-emerald-600"></i>
-                        <span class="text-sm font-bold text-emerald-800">Data tervalidasi</span>
+                        <span class="text-base font-bold text-emerald-800">Data tervalidasi</span>
                     </div>
-                    <p id="validSummary" class="text-xs text-emerald-700"></p>
+                    <p id="validSummary" class="text-sm text-emerald-700"></p>
                 </div>
 
                 <div class="card !p-5">
                     <div class="flex items-center gap-2 mb-4">
-                        <span class="w-6 h-6 bg-blue-600 text-white rounded-full text-xs font-bold flex items-center justify-center">2</span>
-                        <h3 class="font-bold text-slate-900">Buat Akun</h3>
+                        <span class="w-7 h-7 bg-[#1c6880] text-white rounded-full text-sm font-bold flex items-center justify-center">2</span>
+                        <h3 class="font-bold text-lg text-slate-900">Buat Akun</h3>
                     </div>
                     <div class="space-y-3">
                         <div>
-                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Email <span class="text-red-500">*</span></label>
+                            <label class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-1 block">Email <span class="text-red-500">*</span></label>
                             <input type="email" name="email" required class="input-field" placeholder="email@domain.com">
                         </div>
                         <div>
-                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Password <span class="text-red-500">*</span></label>
+                            <label class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-1 block">Password <span class="text-red-500">*</span></label>
                             <input type="password" name="password" required class="input-field" placeholder="Minimal 8 karakter" minlength="8">
                         </div>
                         <div>
-                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Konfirmasi Password <span class="text-red-500">*</span></label>
+                            <label class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-1 block">Konfirmasi Password <span class="text-red-500">*</span></label>
                             <input type="password" name="password_confirmation" required class="input-field" placeholder="Ulangi password" minlength="8">
                         </div>
                     </div>
@@ -107,22 +107,22 @@
 
                 <div id="kontakBlock" class="hidden card !p-5">
                     <div class="flex items-center gap-2 mb-4">
-                        <span class="w-6 h-6 bg-purple-600 text-white rounded-full text-xs font-bold flex items-center justify-center">3</span>
-                        <h3 class="font-bold text-slate-900">Kontak</h3>
+                        <span class="w-7 h-7 bg-purple-600 text-white rounded-full text-sm font-bold flex items-center justify-center">3</span>
+                        <h3 class="font-bold text-lg text-slate-900">Kontak</h3>
                     </div>
-                    <p class="text-xs text-slate-500 mb-4">Nomor HP aktif WhatsApp untuk notifikasi presensi.</p>
+                    <p class="text-sm text-slate-500 mb-4">Nomor HP aktif WhatsApp untuk notifikasi presensi.</p>
                     <div class="space-y-3">
                         <div>
-                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Nomor HP Siswa</label>
+                            <label class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-1 block">Nomor HP Siswa</label>
                             <div class="relative">
-                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 font-semibold">+62</span>
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400 font-semibold">+62</span>
                                 <input type="tel" name="student_phone" class="input-field !pl-12" placeholder="81234567890" inputmode="numeric">
                             </div>
                         </div>
                         <div>
-                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Nomor HP Orang Tua/Wali</label>
+                            <label class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-1 block">Nomor HP Orang Tua/Wali</label>
                             <div class="relative">
-                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 font-semibold">+62</span>
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400 font-semibold">+62</span>
                                 <input type="tel" name="parent_phone" class="input-field !pl-12" placeholder="81234567890" inputmode="numeric">
                             </div>
                         </div>
@@ -130,8 +130,8 @@
                 </div>
 
                 <div class="flex gap-3 pt-2">
-                    <button type="button" id="backBtn" class="btn-outline flex-1 !py-3"><i class="bi bi-arrow-left"></i> Kembali</button>
-                    <button type="submit" class="btn-primary flex-1 !py-3">
+                    <button type="button" id="backBtn" class="btn-outline flex-1 !py-3 !text-base"><i class="bi bi-arrow-left"></i> Kembali</button>
+                    <button type="submit" class="btn-primary flex-1 !py-3 !text-base">
                         <span class="btn-text"><i class="bi bi-check-circle"></i> Daftar</span>
                         <span class="btn-loading hidden"><i class="bi bi-hourglass-split animate-spin"></i> Mendaftarkan...</span>
                     </button>
@@ -139,25 +139,22 @@
             </form>
         </div>
 
-        <p class="text-center text-xs text-slate-500 mt-6">
-            Sudah punya akun? <a href="{{ route('auth.login') }}" class="text-blue-600 hover:text-blue-700 font-semibold">Masuk sekarang</a>
+        <p class="text-center text-sm text-slate-500 mt-6">
+            Sudah punya akun? <a href="{{ route('auth.login') }}" class="text-[#1c6880] hover:text-[#155066] font-semibold">Masuk sekarang</a>
         </p>
 
-        <div class="mt-4 p-3 bg-[#d0e4ff] border border-[#0062a0]/20 rounded-lg">
-            <p class="text-[11px] font-bold text-[#00497a] uppercase tracking-wider">Data Demo Registrasi</p>
-            <div class="text-xs text-[#00497a] mt-1 space-y-0.5">
+        <div class="mt-4 p-4 bg-[#d4e8ee] border border-[#1c6880]/20 rounded-lg">
+            <p class="text-xs font-bold text-[#155066] uppercase tracking-wider">Data Demo Registrasi</p>
+            <div class="text-sm text-[#155066] mt-1 space-y-0.5">
                 <p><span class="font-semibold">Guru (NIP):</span> 196610162000121001 &rarr; Heru Suyana, S.Pd</p>
                 <p><span class="font-semibold">Guru (NIP):</span> 199211262025212077 &rarr; Ayu Dewi Lestari, S.Pd</p>
-                <hr class="border-[#0062a0]/20 my-1.5">
+                <hr class="border-[#1c6880]/20 my-1.5">
                 <p><span class="font-semibold">Siswa (NIS atau NISN):</span> 3001 &rarr; Eka Putra</p>
                 <p><span class="font-semibold">Siswa (NIS atau NISN):</span> 0003002 &rarr; Fitriani</p>
             </div>
         </div>
     </div>
 </div>
-
-<!-- Toast -->
-<div id="toast" class="hidden fixed top-4 right-4 z-[200] px-4 py-3 rounded-lg shadow-lg text-sm font-semibold text-white anim-up"></div>
 
 <!-- Success Modal -->
 @if(isset($registered) && $registered)
@@ -167,8 +164,8 @@
             <i class="bi bi-check-circle-fill text-emerald-600 text-3xl"></i>
         </div>
         <h3 class="text-xl font-bold text-slate-900 mb-2">Pendaftaran Berhasil!</h3>
-        <p class="text-sm text-slate-500 mb-6">Akun Anda sudah aktif. Silakan masuk untuk melanjutkan.</p>
-        <a href="{{ route('auth.login') }}" class="btn-primary w-full !py-3"><i class="bi bi-box-arrow-in-right"></i> Kembali ke Masuk</a>
+        <p class="text-base text-slate-500 mb-6">Akun Anda sudah aktif. Silakan masuk untuk melanjutkan.</p>
+        <a href="{{ route('auth.login') }}" class="btn-primary w-full !py-3 !text-base"><i class="bi bi-box-arrow-in-right"></i> Kembali ke Masuk</a>
     </div>
 </div>
 @endif
@@ -177,7 +174,7 @@
 <div class="fixed inset-0 z-[200] flex items-center justify-center bg-black/30">
     <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl mx-4 anim-up text-center">
         <i class="bi bi-x-circle-fill text-red-500 text-4xl mb-3 block"></i>
-        <h4 class="font-bold text-slate-900 mb-2">Gagal Mendaftar</h4>
+        <h4 class="font-bold text-lg text-slate-900 mb-2">Gagal Mendaftar</h4>
         <p class="text-sm text-slate-600 mb-4">
             @foreach($errors->all() as $error)
                 {{ $error }}<br>
@@ -203,14 +200,6 @@ function setLoading(btn, loading) {
     btn.querySelector('.btn-text').classList.toggle('hidden', loading);
     btn.querySelector('.btn-loading').classList.toggle('hidden', !loading);
     btn.disabled = loading;
-}
-
-function showToast(msg, type) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.className = 'fixed top-4 right-4 z-[200] px-4 py-3 rounded-lg shadow-lg text-sm font-semibold text-white anim-up ' + (type === 'success' ? 'bg-emerald-600' : 'bg-red-600');
-    t.classList.remove('hidden');
-    setTimeout(() => t.classList.add('hidden'), 2500);
 }
 
 document.getElementById('validateBtn').addEventListener('click', function() {

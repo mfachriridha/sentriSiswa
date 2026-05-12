@@ -14,7 +14,7 @@
             <div class="w-28 h-28 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center mx-auto border-4 border-white shadow-lg">
                 <i class="bi bi-person-fill text-5xl text-blue-500"></i>
             </div>
-            <button onclick="alert('UI Only: Upload foto!')" class="absolute bottom-1 right-1/2 translate-x-8 w-9 h-9 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-blue-700 transition">
+            <button onclick="showToast('UI Only: Upload foto!', 'info')" class="absolute bottom-1 right-1/2 translate-x-8 w-9 h-9 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-blue-700 transition">
                 <i class="bi bi-camera-fill text-sm"></i>
             </button>
         </div>
@@ -137,7 +137,7 @@
         </div>
 
         <div class="flex gap-3">
-            <button type="button" onclick="alert('UI Only: Profil diperbarui!')" class="btn-brand">
+            <button type="button" onclick="showToast('UI Only: Profil diperbarui!', 'success')" class="btn-brand">
                 <i class="bi bi-check-circle"></i> Simpan Perubahan
             </button>
         </div>

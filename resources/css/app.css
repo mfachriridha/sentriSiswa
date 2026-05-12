@@ -8,9 +8,9 @@
 @theme {
     --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
     --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
-    --color-brand: #001e40;
-    --color-brand-hover: #002856;
-    --color-brand-light: #d5e3ff;
+    --color-brand: #1c6880;
+    --color-brand-hover: #155066;
+    --color-brand-light: #d4e8ee;
     --color-secondary: #0062a0;
     --color-surface: #ffffff;
     --color-surface-alt: #edeeef;
@@ -24,10 +24,9 @@
 
 @layer base {
     :root {
-        /* Aliases for guest layout compatibility */
-        --primary: #001e40;
-        --primary-hover: #002856;
-        --primary-light: #d5e3ff;
+        --primary: #1c6880;
+        --primary-hover: #155066;
+        --primary-light: #d4e8ee;
         --secondary: #0062a0;
         --secondary-fixed: #d0e4ff;
         --surface: #ffffff;
@@ -104,7 +103,7 @@
         width: 100%;
         border: 1.5px solid var(--color-border);
         border-radius: .5rem; padding: .625rem .875rem;
-        outline: none; font-size: .8125rem;
+        outline: none; font-size: .875rem;
         background: var(--color-surface);
         color: var(--color-text);
         transition: all .15s;

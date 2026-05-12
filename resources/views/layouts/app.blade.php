@@ -14,7 +14,7 @@
     @else
         <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
         <style>
-            :root{--brand:#001e40;--brand-light:#d5e3ff;--brand-dark:#003366;--secondary:#0062a0;--surface:#fff;--surface-alt:#f8fafc;--border:#c3c6d1;--text:#191c1d;--text-muted:#43474f}
+            :root{--brand:#1c6880;--brand-light:#d4e8ee;--brand-dark:#155066;--secondary:#0062a0;--surface:#fff;--surface-alt:#f8fafc;--border:#c3c6d1;--text:#191c1d;--text-muted:#43474f}
             *{box-sizing:border-box}
             body{font-family:'Inter',system-ui,sans-serif;background:#f8f9fa;color:var(--text)}
             .text-muted{color:var(--text-muted)}
@@ -26,7 +26,7 @@
             .btn-ghost:hover{background:var(--surface-alt);color:var(--text)}
             .btn-danger{background:#ba1a1a;color:#fff;border-radius:.5rem;padding:.625rem 1.25rem;font-weight:600;font-size:.8125rem;transition:all .15s}
             .card{background:var(--surface);border:1px solid var(--border);border-radius:1rem;padding:1.5rem}
-            .input-field{width:100%;border:1.5px solid var(--border);border-radius:.5rem;padding:.625rem .875rem;outline:none;font-size:.8125rem;transition:all .15s;background:var(--surface);color:var(--text)}
+            .input-field{width:100%;border:1.5px solid var(--border);border-radius:.5rem;padding:.625rem .875rem;outline:none;font-size:.875rem;transition:all .15s;background:var(--surface);color:var(--text)}
             .input-field:focus{border-color:var(--secondary);box-shadow:0 0 0 3px rgba(0,98,160,.08)}
             .table-container{overflow:auto;border:1px solid var(--border);border-radius:.75rem;background:var(--surface)}
             .table-header{padding:.75rem 1rem;background:var(--surface-alt);color:var(--text-muted);font-size:.6875rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border)}
@@ -76,11 +76,11 @@
         <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 border-r border-[#c3c6d1]/30 bg-white -translate-x-full lg:translate-x-0 lg:relative transition-transform duration-300 flex flex-col">
             <div class="p-5 border-b border-[#c3c6d1]/30">
                 <a href="{{ $dashboardRoute }}" class="flex items-center gap-2.5">
-                    <span class="w-9 h-9 bg-[#001e40] rounded-xl flex items-center justify-center text-white shadow-sm">
+                    <span class="w-9 h-9 bg-[#1c6880] rounded-xl flex items-center justify-center text-white shadow-sm">
                         <i class="bi bi-mortarboard-fill text-lg"></i>
                     </span>
                     <div>
-                        <p class="font-extrabold text-sm text-[#001e40] tracking-tight">SentriSiswa</p>
+                        <p class="font-extrabold text-sm text-[#1c6880] tracking-tight">SentriSiswa</p>
                         <p class="text-[10px] text-muted uppercase tracking-wider">SMA N 11 Kab. Tangerang</p>
                     </div>
                 </a>
@@ -132,7 +132,7 @@
                     <button id="toggle-sidebar" class="lg:hidden p-1.5 hover:bg-[#edeeef] rounded-lg shrink-0">
                         <i class="bi bi-list text-xl text-[#43474f]"></i>
                     </button>
-                    <span class="font-bold text-sm sm:text-base text-[#001e40] truncate">@yield('page-title', now()->translatedFormat('l, d F Y'))</span>
+                    <span class="font-bold text-sm sm:text-base text-[#1c6880] truncate">@yield('page-title', now()->translatedFormat('l, d F Y'))</span>
                 </div>
 
                 <div id="avatar-btn" class="flex items-center gap-2 sm:gap-3 shrink-0 cursor-pointer hover:bg-[#edeeef] rounded-lg px-2 py-1.5 transition">
@@ -140,7 +140,7 @@
                         <p class="text-xs sm:text-sm font-bold text-[#191c1d] truncate max-w-24 sm:max-w-none">{{ $userName }}</p>
                         <p class="text-[10px] sm:text-[11px] text-muted uppercase tracking-wider">{{ $roleLabel }}</p>
                     </div>
-                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#001e40] flex items-center justify-center shrink-0">
+                    <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#1c6880] flex items-center justify-center shrink-0">
                         <i class="bi bi-person-fill text-white text-sm sm:text-base"></i>
                     </div>
                 </div>
@@ -153,14 +153,14 @@
             </main>
 
             <footer class="bg-white border-t border-[#c3c6d1]/30 py-2 sm:py-3 px-3 sm:px-6 text-center text-[10px] sm:text-[11px] text-muted">
-                &copy; {{ date('Y') }} <span class="font-semibold text-[#001e40]">SentriSiswa</span> &mdash; SMA Negeri 11 Kab. Tangerang
+                &copy; {{ date('Y') }} <span class="font-semibold text-[#1c6880]">SentriSiswa</span> &mdash; SMA Negeri 11 Kab. Tangerang
             </footer>
         </div>
     </div>
 
     <!-- Avatar Dropdown -->
     <div id="avatar-dropdown" class="fixed z-[100] w-44 bg-white border border-[#c3c6d1]/30 rounded-lg shadow-lg py-1" style="display:none">
-        <a href="{{ $profileRoute }}" class="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-[#191c1d] hover:bg-[#d5e3ff] transition">
+        <a href="{{ $profileRoute }}" class="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-[#191c1d] hover:bg-[#d4e8ee] transition">
             <i class="bi bi-gear"></i> {{ $currentRole === 'admin' ? 'Profil' : 'Pengaturan' }}
         </a>
         <hr class="border-[#c3c6d1]/30 mx-3">
@@ -187,6 +187,8 @@
             dd.addEventListener('click',function(e){e.stopPropagation()});
         }
     </script>
+    @include('components.alert-toast')
+    @include('components.loading-overlay')
     @stack('scripts')
 </body>
 </html>

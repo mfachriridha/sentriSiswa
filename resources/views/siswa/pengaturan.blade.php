@@ -9,7 +9,7 @@
 
 <!-- Tab Buttons -->
 <div class="flex gap-1 p-1 bg-[#edeeef] rounded-lg w-fit mb-6">
-    <button onclick="switchTab('profil')" id="tab-profil" class="px-4 py-2 rounded-lg text-sm font-bold bg-white shadow-sm text-[#001e40] transition">Profil</button>
+    <button onclick="switchTab('profil')" id="tab-profil" class="px-4 py-2 rounded-lg text-sm font-bold bg-white shadow-sm text-[#1c6880] transition">Profil</button>
     <button onclick="switchTab('biodata')" id="tab-biodata" class="px-4 py-2 rounded-lg text-sm font-bold text-muted hover:text-[#191c1d] transition">Biodata</button>
 </div>
 
@@ -22,7 +22,7 @@
                 <div class="w-28 h-28 bg-gradient-to-br from-blue-100 to-blue-200 rounded-full flex items-center justify-center mx-auto border-4 border-white shadow-lg">
                     <i class="bi bi-person-fill text-5xl text-blue-500"></i>
                 </div>
-                <button onclick="alert('UI Only: Upload foto!')" class="absolute bottom-1 right-1/2 translate-x-8 w-9 h-9 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-blue-700 transition">
+                <button onclick="showToast('UI Only: Upload foto!', 'info')" class="absolute bottom-1 right-1/2 translate-x-8 w-9 h-9 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-blue-700 transition">
                     <i class="bi bi-camera-fill text-sm"></i>
                 </button>
             </div>
@@ -103,7 +103,7 @@
                 </form>
             </div>
 
-            <button type="button" onclick="alert('UI Only: Profil diperbarui!')" class="btn-brand">
+            <button type="button" onclick="showToast('UI Only: Profil diperbarui!', 'success')" class="btn-brand">
                 <i class="bi bi-check-circle"></i> Simpan Perubahan
             </button>
         </div>
@@ -194,12 +194,12 @@ function switchTab(tab) {
     ['profil','biodata'].forEach(t => {
         document.getElementById('panel-'+t).classList.add('hidden');
         const btn = document.getElementById('tab-'+t);
-        btn.classList.remove('bg-white','shadow-sm','text-[#001e40]');
+        btn.classList.remove('bg-white','shadow-sm','text-[#1c6880]');
         btn.classList.add('text-muted');
     });
     document.getElementById('panel-'+tab).classList.remove('hidden');
     const btn = document.getElementById('tab-'+tab);
-    btn.classList.add('bg-white','shadow-sm','text-[#001e40]');
+    btn.classList.add('bg-white','shadow-sm','text-[#1c6880]');
     btn.classList.remove('text-muted');
 }
 </script>

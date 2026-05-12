@@ -20,7 +20,7 @@
     </div>
 @else
     <div class="flex items-center gap-3 mb-6 anim-up">
-        <div class="w-10 h-10 bg-[#001e40] rounded-xl flex items-center justify-center">
+        <div class="w-10 h-10 bg-[#1c6880] rounded-xl flex items-center justify-center">
             <i class="bi bi-diagram-3 text-white"></i>
         </div>
         <div>
@@ -165,7 +165,7 @@ function confirmAttendance(id) {
     .then(r => r.json())
     .then(data => {
         if (data.success) location.reload();
-        else alert(data.message || 'Gagal.');
+        else showToast(data.message || 'Gagal.', 'error');
     });
 }
 
@@ -199,7 +199,7 @@ document.getElementById('statusForm').addEventListener('submit', function(e) {
     .then(r => r.json())
     .then(data => {
         if (data.success) location.reload();
-        else alert(data.message || 'Gagal.');
+        else showToast(data.message || 'Gagal.', 'error');
     });
 });
 </script>

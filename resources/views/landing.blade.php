@@ -1,154 +1,191 @@
 @extends('layouts.guest')
 
-@section('title', 'Portal Presensi SMA')
+@section('title', 'Portal Presensi Digital SMA Negeri 11 Kab. Tangerang')
 
 @section('content')
-<div class="p-4 md:p-8">
-    <div class="max-w-6xl mx-auto w-full">
-
-        <!-- Hero -->
-        <div class="mb-10 text-center anim-up">
-            <h2 class="text-3xl md:text-4xl font-black text-[#001e40] tracking-tight mb-3">Selamat Datang di Portal Presensi</h2>
-            <h3 class="text-xl font-bold text-[#0062a0] mb-3">SMA Negeri 11 Kab. Tangerang</h3>
-            <p class="text-[#43474f] max-w-2xl mx-auto">
-                Silakan lihat dokumen tata tertib untuk memahami hak dan kewajiban Anda sebelum melanjutkan ke dashboard.
-            </p>
-        </div>
-
-        <!-- Bento Grid: PDF Viewer + Sidebar -->
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-5 mb-10 anim-up" style="animation-delay:.08s">
-
-            <!-- Main PDF Area -->
-            <div class="lg:col-span-3 bg-white rounded-lg shadow-sm overflow-hidden flex flex-col h-[500px] md:h-[600px]">
-                <?php
-                $pdfPath = 'storage/tata-tertib/tata_tertib.pdf';
-                $hasPdf = file_exists(public_path($pdfPath));
-                ?>
-                @if($hasPdf)
-                    <iframe src="{{ asset($pdfPath) }}" class="w-full h-full border-0"></iframe>
-                @else
-                    <div class="flex-1 flex items-center justify-center p-8">
-                        <div class="text-center">
-                            <i class="bi bi-file-earmark-pdf text-6xl text-[#c3c6d1] mb-4"></i>
-                            <p class="text-[#43474f] font-semibold">Dokumen tata tertib belum diunggah.</p>
-                            <p class="text-sm text-[#717680] mt-1">Hubungi admin untuk mengunggah PDF.</p>
-                        </div>
-                    </div>
-                @endif
-            </div>
-
-            <!-- Sidebar Cards -->
-            <div class="space-y-4">
-                <div class="bg-[#001e40] text-white p-5 rounded-lg shadow-md relative overflow-hidden">
-                    <div class="relative z-10">
-                        <i class="bi bi-info-circle text-2xl mb-3 block"></i>
-                        <h4 class="font-bold text-base mb-2">Ringkasan Utama</h4>
-                        <ul class="text-xs space-y-2 opacity-90">
-                            <li class="flex gap-2"><i class="bi bi-check-circle text-[#32a3fd] shrink-0 mt-0.5"></i> Toleransi keterlambatan 15 menit.</li>
-                            <li class="flex gap-2"><i class="bi bi-check-circle text-[#32a3fd] shrink-0 mt-0.5"></i> Wajib melakukan presensi selfie.</li>
-                            <li class="flex gap-2"><i class="bi bi-check-circle text-[#32a3fd] shrink-0 mt-0.5"></i> Minimal kehadiran 85%.</li>
-                        </ul>
-                    </div>
-                    <div class="absolute -right-4 -bottom-4 w-20 h-20 bg-white/10 rounded-full blur-2xl"></div>
-                </div>
-
-                <div class="bg-white p-5 rounded-lg border border-[#c3c6d1]/30 space-y-3 shadow-sm">
-                    <h4 class="font-bold text-sm text-[#001e40]">Kontak Bantuan</h4>
-                    <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-full bg-[#d0e4ff] flex items-center justify-center">
-                            <i class="bi bi-headset text-[#00497a] text-sm"></i>
-                        </div>
-                        <div>
-                            <p class="text-[10px] text-[#43474f]">Admin Kesiswaan</p>
-                            <p class="text-xs font-bold text-[#001e40]">admin@sentrisiswa.sch.id</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-[#e6f7e6] text-[#002204] p-5 rounded-lg flex items-start gap-3 shadow-sm">
-                    <i class="bi bi-shield-check text-[#005312] text-lg"></i>
-                    <div>
-                        <p class="text-[10px] uppercase font-bold tracking-wider text-[#005312]">Status Dokumen</p>
-                        <p class="text-sm font-bold">Tervalidasi &amp; Berlaku</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Stats Grid -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10 anim-up" style="animation-delay:.16s">
-            <div class="bg-white rounded-lg p-5 border border-[#c3c6d1]/30 shadow-sm text-center">
-                <i class="bi bi-people-fill text-[#0062a0] text-xl"></i>
-                <p class="stat-value text-[#001e40] mt-2">360</p>
-                <p class="text-xs font-medium text-[#43474f]">Siswa Aktif</p>
-            </div>
-            <div class="bg-white rounded-lg p-5 border border-[#c3c6d1]/30 shadow-sm text-center">
-                <i class="bi bi-check-circle-fill text-[#15803d] text-xl"></i>
-                <p class="stat-value text-[#15803d] mt-2">92%</p>
-                <p class="text-xs font-medium text-[#43474f]">Kehadiran</p>
-            </div>
-            <div class="bg-white rounded-lg p-5 border border-[#c3c6d1]/30 shadow-sm text-center">
-                <i class="bi bi-person-badge-fill text-[#0062a0] text-xl"></i>
-                <p class="stat-value text-[#001e40] mt-2">42</p>
-                <p class="text-xs font-medium text-[#43474f]">Guru</p>
-            </div>
-            <div class="bg-white rounded-lg p-5 border border-[#c3c6d1]/30 shadow-sm text-center">
-                <i class="bi bi-diagram-3-fill text-[#0062a0] text-xl"></i>
-                <p class="stat-value text-[#001e40] mt-2">12</p>
-                <p class="text-xs font-medium text-[#43474f]">Kelas</p>
-            </div>
-        </div>
-
-        <!-- Fitur -->
-        <div class="mb-10 anim-up" style="animation-delay:.24s">
-            <p class="text-xs font-bold text-[#0062a0] uppercase tracking-widest mb-1">Fitur</p>
-            <h2 class="section-title mb-6">Rangkaian Fitur</h2>
-            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div class="bg-white rounded-lg p-5 border border-[#c3c6d1]/30 shadow-sm hover:shadow-md transition group">
-                    <div class="w-10 h-10 bg-[#e6f0ff] rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                        <i class="bi bi-geo-alt-fill text-[#0062a0]"></i>
-                    </div>
-                    <h3 class="font-bold text-sm text-[#001e40] mb-1">Geofencing Presisi</h3>
-                    <p class="text-xs text-[#43474f]">Validasi lokasi siswa hanya di dalam area sekolah.</p>
-                </div>
-                <div class="bg-white rounded-lg p-5 border border-[#c3c6d1]/30 shadow-sm hover:shadow-md transition group">
-                    <div class="w-10 h-10 bg-[#e6f7e6] rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                        <i class="bi bi-camera-fill text-[#15803d]"></i>
-                    </div>
-                    <h3 class="font-bold text-sm text-[#001e40] mb-1">Selfie Terverifikasi</h3>
-                    <p class="text-xs text-[#43474f]">Foto selfie sebagai bukti kehadiran siswa.</p>
-                </div>
-                <div class="bg-white rounded-lg p-5 border border-[#c3c6d1]/30 shadow-sm hover:shadow-md transition group">
-                    <div class="w-10 h-10 bg-[#f3e6ff] rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                        <i class="bi bi-graph-up text-[#7c3aed]"></i>
-                    </div>
-                    <h3 class="font-bold text-sm text-[#001e40] mb-1">Laporan Real-time</h3>
-                    <p class="text-xs text-[#43474f]">Rekap kehadiran otomatis dan real-time.</p>
-                </div>
-                <div class="bg-white rounded-lg p-5 border border-[#c3c6d1]/30 shadow-sm hover:shadow-md transition group">
-                    <div class="w-10 h-10 bg-[#fff3cd] rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                        <i class="bi bi-whatsapp text-[#b8860b]"></i>
-                    </div>
-                    <h3 class="font-bold text-sm text-[#001e40] mb-1">Notifikasi WhatsApp</h3>
-                    <p class="text-xs text-[#43474f]">Orang tua terima laporan kehadiran otomatis.</p>
-                </div>
-                <div class="bg-white rounded-lg p-5 border border-[#c3c6d1]/30 shadow-sm hover:shadow-md transition group">
-                    <div class="w-10 h-10 bg-[#fce4ec] rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                        <i class="bi bi-shield-check text-[#d32f2f]"></i>
-                    </div>
-                    <h3 class="font-bold text-sm text-[#001e40] mb-1">Poin Pelanggaran</h3>
-                    <p class="text-xs text-[#43474f]">Sistem poin dengan notifikasi mingguan.</p>
-                </div>
-                <div class="bg-white rounded-lg p-5 border border-[#c3c6d1]/30 shadow-sm hover:shadow-md transition group">
-                    <div class="w-10 h-10 bg-[#e0f2f1] rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                        <i class="bi bi-file-earmark-spreadsheet text-[#00796b]"></i>
-                    </div>
-                    <h3 class="font-bold text-sm text-[#001e40] mb-1">Master Data Terpusat</h3>
-                    <p class="text-xs text-[#43474f]">Kelola data guru &amp; siswa dengan mudah.</p>
-                </div>
-            </div>
-        </div>
-
+<!-- Hero Section -->
+<section class="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
+    <!-- Background Image -->
+    <div class="absolute inset-0">
+        <img src="{{ asset('images/hero-bg.jpg') }}" alt="Lapangan SMA Negeri 11" class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-gradient-to-b from-[#1c6880]/80 via-[#1c6880]/70 to-black/60"></div>
     </div>
-</div>
+
+    <!-- Content -->
+    <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 text-center text-white anim-up">
+        <div class="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm px-4 py-2 rounded-full mb-6 text-sm font-medium">
+            <i class="bi bi-geo-alt-fill"></i>
+            <span>SMA Negeri 11 Kab. Tangerang</span>
+        </div>
+
+        <h1 class="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight leading-tight mb-4">
+            Sistem Presensi<br class="hidden sm:block"> Digital
+        </h1>
+
+        <p class="text-base sm:text-lg md:text-xl text-white/90 max-w-2xl mx-auto mb-8 leading-relaxed">
+            Presensi berbasis geofencing dan selfie terverifikasi. Pantau kehadiran siswa secara real-time, otomatis, dan transparan.
+        </p>
+
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
+            <a href="{{ route('auth.login') }}" class="btn-primary !py-3.5 !px-8 !text-base min-w-[160px]">
+                <i class="bi bi-box-arrow-in-right"></i> Masuk
+            </a>
+            <a href="{{ route('auth.register') }}" class="btn-outline !py-3.5 !px-8 !text-base !border-white !text-white hover:!bg-white/20 hover:!border-white min-w-[160px]">
+                <i class="bi bi-person-plus"></i> Daftar
+            </a>
+        </div>
+    </div>
+
+    <!-- Scroll Indicator -->
+    <div class="absolute bottom-6 left-1/2 -translate-x-1/2 animate-bounce">
+        <i class="bi bi-chevron-double-down text-white/70 text-2xl"></i>
+    </div>
+</section>
+
+<!-- Stats Bar -->
+<section class="bg-[#1c6880] py-10 sm:py-12">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+            <div class="text-center text-white anim-up">
+                <div class="w-12 h-12 bg-white/15 rounded-xl flex items-center justify-center mx-auto mb-3">
+                    <i class="bi bi-people-fill text-2xl"></i>
+                </div>
+                <p class="text-3xl sm:text-4xl font-black">360+</p>
+                <p class="text-sm sm:text-base text-white/80 mt-1">Siswa Aktif</p>
+            </div>
+            <div class="text-center text-white anim-up">
+                <div class="w-12 h-12 bg-white/15 rounded-xl flex items-center justify-center mx-auto mb-3">
+                    <i class="bi bi-check-circle-fill text-2xl"></i>
+                </div>
+                <p class="text-3xl sm:text-4xl font-black">92%</p>
+                <p class="text-sm sm:text-base text-white/80 mt-1">Tingkat Kehadiran</p>
+            </div>
+            <div class="text-center text-white anim-up">
+                <div class="w-12 h-12 bg-white/15 rounded-xl flex items-center justify-center mx-auto mb-3">
+                    <i class="bi bi-person-badge-fill text-2xl"></i>
+                </div>
+                <p class="text-3xl sm:text-4xl font-black">42</p>
+                <p class="text-sm sm:text-base text-white/80 mt-1">Guru & Staff</p>
+            </div>
+            <div class="text-center text-white anim-up">
+                <div class="w-12 h-12 bg-white/15 rounded-xl flex items-center justify-center mx-auto mb-3">
+                    <i class="bi bi-diagram-3-fill text-2xl"></i>
+                </div>
+                <p class="text-3xl sm:text-4xl font-black">12</p>
+                <p class="text-sm sm:text-base text-white/80 mt-1">Kelas</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Grid -->
+<section class="py-16 sm:py-20 bg-white">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <div class="text-center mb-12 anim-up">
+            <p class="text-sm font-bold text-[#1c6880] uppercase tracking-widest mb-2">Fitur Utama</p>
+            <h2 class="text-3xl sm:text-4xl font-black text-[#191c1d] tracking-tight">Rangkaian Fitur Lengkap</h2>
+            <p class="text-base text-[#43474f] max-w-2xl mx-auto mt-3">Semua yang Anda butuhkan untuk sistem presensi modern, akurat, dan transparan.</p>
+        </div>
+
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="bg-[#f8f9fa] rounded-xl p-6 border border-[#c3c6d1]/30 hover:shadow-lg hover:-translate-y-1 transition-all group anim-up">
+                <div class="w-12 h-12 bg-[#d4e8ee] rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <i class="bi bi-geo-alt-fill text-[#1c6880] text-xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-[#191c1d] mb-2">Geofencing Presisi</h3>
+                <p class="text-sm text-[#43474f] leading-relaxed">Validasi lokasi siswa hanya di dalam area sekolah menggunakan GPS dan poligon geografis.</p>
+            </div>
+
+            <div class="bg-[#f8f9fa] rounded-xl p-6 border border-[#c3c6d1]/30 hover:shadow-lg hover:-translate-y-1 transition-all group anim-up">
+                <div class="w-12 h-12 bg-[#dcfce7] rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <i class="bi bi-camera-fill text-[#15803d] text-xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-[#191c1d] mb-2">Selfie Terverifikasi</h3>
+                <p class="text-sm text-[#43474f] leading-relaxed">Foto selfie sebagai bukti kehadiran yang diverifikasi oleh wali kelas secara otomatis.</p>
+            </div>
+
+            <div class="bg-[#f8f9fa] rounded-xl p-6 border border-[#c3c6d1]/30 hover:shadow-lg hover:-translate-y-1 transition-all group anim-up">
+                <div class="w-12 h-12 bg-[#fef3c7] rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <i class="bi bi-graph-up-arrow text-[#a16207] text-xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-[#191c1d] mb-2">Laporan Real-time</h3>
+                <p class="text-sm text-[#43474f] leading-relaxed">Rekap kehadiran otomatis yang bisa diakses kapan saja oleh guru, BK, dan orang tua.</p>
+            </div>
+
+            <div class="bg-[#f8f9fa] rounded-xl p-6 border border-[#c3c6d1]/30 hover:shadow-lg hover:-translate-y-1 transition-all group anim-up">
+                <div class="w-12 h-12 bg-[#e6f7e6] rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <i class="bi bi-whatsapp text-[#15803d] text-xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-[#191c1d] mb-2">Notifikasi WhatsApp</h3>
+                <p class="text-sm text-[#43474f] leading-relaxed">Orang tua menerima laporan kehadiran dan pelanggaran siswa secara otomatis via WhatsApp.</p>
+            </div>
+
+            <div class="bg-[#f8f9fa] rounded-xl p-6 border border-[#c3c6d1]/30 hover:shadow-lg hover:-translate-y-1 transition-all group anim-up">
+                <div class="w-12 h-12 bg-[#fee2e2] rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <i class="bi bi-shield-exclamation text-[#ba1a1a] text-xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-[#191c1d] mb-2">Poin Pelanggaran</h3>
+                <p class="text-sm text-[#43474f] leading-relaxed">Sistem poin pelanggaran dengan notifikasi mingguan ke orang tua dan wali kelas.</p>
+            </div>
+
+            <div class="bg-[#f8f9fa] rounded-xl p-6 border border-[#c3c6d1]/30 hover:shadow-lg hover:-translate-y-1 transition-all group anim-up">
+                <div class="w-12 h-12 bg-[#e0f2f1] rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <i class="bi bi-database-fill text-[#00796b] text-xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-[#191c1d] mb-2">Master Data Terpusat</h3>
+                <p class="text-sm text-[#43474f] leading-relaxed">Kelola data guru, siswa, dan kelas dengan mudah melalui import CSV atau input manual.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section class="py-16 sm:py-20 bg-[#f8f9fa]">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6">
+        <div class="text-center mb-12 anim-up">
+            <p class="text-sm font-bold text-[#1c6880] uppercase tracking-widest mb-2">Cara Kerja</p>
+            <h2 class="text-3xl sm:text-4xl font-black text-[#191c1d] tracking-tight">3 Langkah Mudah</h2>
+            <p class="text-base text-[#43474f] max-w-2xl mx-auto mt-3">Proses presensi yang simpel, cepat, dan terverifikasi otomatis.</p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8 relative">
+            <!-- Connector Line (desktop only) -->
+            <div class="hidden md:block absolute top-16 left-[20%] right-[20%] h-0.5 bg-[#c3c6d1]"></div>
+
+            <div class="relative text-center anim-up">
+                <div class="w-14 h-14 bg-[#1c6880] text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-black relative z-10">1</div>
+                <h3 class="text-lg font-bold text-[#191c1d] mb-2">Daftar Akun</h3>
+                <p class="text-sm text-[#43474f] leading-relaxed max-w-xs mx-auto">Validasi NIP untuk guru atau NIS/NISN untuk siswa. Buat akun dengan email dan password.</p>
+            </div>
+
+            <div class="relative text-center anim-up">
+                <div class="w-14 h-14 bg-[#1c6880] text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-black relative z-10">2</div>
+                <h3 class="text-lg font-bold text-[#191c1d] mb-2">Presensi Selfie</h3>
+                <p class="text-sm text-[#43474f] leading-relaxed max-w-xs mx-auto">Ambil foto selfie di area sekolah. Sistem memvalidasi lokasi dan waktu secara otomatis.</p>
+            </div>
+
+            <div class="relative text-center anim-up">
+                <div class="w-14 h-14 bg-[#1c6880] text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-black relative z-10">3</div>
+                <h3 class="text-lg font-bold text-[#191c1d] mb-2">Pantau Laporan</h3>
+                <p class="text-sm text-[#43474f] leading-relaxed max-w-xs mx-auto">Guru, BK, dan orang tua bisa memantau kehadiran dan pelanggaran secara real-time.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Final CTA -->
+<section class="py-16 sm:py-20 bg-[#1c6880]">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 text-center text-white anim-up">
+        <h2 class="text-3xl sm:text-4xl font-black tracking-tight mb-3">Siap Memulai?</h2>
+        <p class="text-base sm:text-lg text-white/85 max-w-xl mx-auto mb-8">Masuk ke dashboard Anda atau daftar akun baru untuk mulai menggunakan SentriSiswa.</p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
+            <a href="{{ route('auth.login') }}" class="bg-white text-[#1c6880] hover:bg-white/90 font-bold text-base py-3.5 px-8 rounded-lg transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 min-w-[160px] inline-flex items-center justify-center gap-2">
+                <i class="bi bi-box-arrow-in-right"></i> Masuk
+            </a>
+            <a href="{{ route('auth.register') }}" class="border-2 border-white text-white hover:bg-white/15 font-bold text-base py-3.5 px-8 rounded-lg transition-all min-w-[160px] inline-flex items-center justify-center gap-2">
+                <i class="bi bi-person-plus"></i> Daftar
+            </a>
+        </div>
+    </div>
+</section>
 @endsection

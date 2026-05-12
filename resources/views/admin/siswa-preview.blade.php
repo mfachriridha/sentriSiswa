@@ -10,18 +10,11 @@
         <p class="text-sm text-muted">{{ $total }} baris data siap diimpor</p>
     </div>
     <div class="flex gap-2">
-        <a href="{{ route('admin.siswa') }}" onclick="return confirm('Batalkan import?')" class="btn-outline !text-xs"><i class="bi bi-x-circle"></i> Batal</a>
+        <a href="{{ route('admin.siswa') }}" onclick="return confirm('Batalkan import?')" class="btn-outline !text-sm"><i class="bi bi-x-circle"></i> Batal</a>
         <form action="{{ route('admin.siswa.import.confirm') }}" method="POST" id="confirmForm">
             @csrf
-            <button type="submit" class="btn-brand !text-xs" onclick="showLoading()"><i class="bi bi-check-circle"></i> Simpan Semua</button>
+            <button type="submit" class="btn-brand !text-sm" onclick="showLoading('Mengimpor data...')"><i class="bi bi-check-circle"></i> Simpan Semua</button>
         </form>
-    </div>
-</div>
-
-<div id="loadingOverlay" class="hidden fixed inset-0 z-[200] bg-black/30 flex items-center justify-center">
-    <div class="bg-white rounded-2xl shadow-xl p-8 flex flex-col items-center gap-3">
-        <div class="w-10 h-10 border-4 border-[#001e40] border-t-transparent rounded-full animate-spin"></div>
-        <p class="text-sm font-bold text-[#001e40]">Mengimpor data...</p>
     </div>
 </div>
 
@@ -44,12 +37,4 @@
         </table>
     </div>
 </div>
-
-<script>
-function showLoading() {
-    document.getElementById('loadingOverlay').classList.remove('hidden');
-}
-</script>
-@keyframes spin { to { transform: rotate(360deg); } }
-.animate-spin { animation: spin .8s linear infinite; }
 @endsection

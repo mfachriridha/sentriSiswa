@@ -219,7 +219,7 @@ function setLoading(btn, loading) {
 function submitPresensi() {
     const btn = document.getElementById('submitBtn');
     if (!selfieFile || !locationReady) {
-        alert('Ambil foto selfie dan tunggu lokasi terdeteksi.');
+        showToast('Ambil foto selfie dan tunggu lokasi terdeteksi.', 'warning');
         return;
     }
 
@@ -246,15 +246,15 @@ function submitPresensi() {
                 document.getElementById('geoStatus').textContent = 'Valid';
                 document.getElementById('geoStatus').className = 'badge badge-green';
             }
-            alert(data.message);
-            location.reload();
+            showToast(data.message, 'success');
+            setTimeout(() => location.reload(), 1500);
         } else {
-            alert(data.message);
+            showToast(data.message, 'error');
             setLoading(btn, false);
         }
     })
     .catch(() => {
-        alert('Gagal mengirim presensi. Coba lagi.');
+        showToast('Gagal mengirim presensi. Coba lagi.', 'error');
         setLoading(btn, false);
     });
 }

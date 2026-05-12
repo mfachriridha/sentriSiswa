@@ -5,19 +5,11 @@
 @section('page-title', 'Tata Tertib')
 
 @section('content')
-@if(session('success'))
-<div class="mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-xs font-semibold text-emerald-700 flex items-center gap-2">
-    <i class="bi bi-check-circle-fill"></i> {{ session('success') }}
-    <button onclick="this.parentElement.remove()" class="ml-auto text-emerald-400 hover:text-emerald-600"><i class="bi bi-x"></i></button>
-</div>
-@endif
-
-@if($hasPdf)
 <div class="card anim-up mb-5">
     <div class="flex items-center justify-between mb-4">
         <div>
             <h3 class="font-bold text-slate-900 flex items-center gap-2"><i class="bi bi-file-earmark-pdf-fill text-red-400"></i> PDF Tata Tertib Aktif</h3>
-            <p class="text-xs text-slate-400 mt-0.5">
+            <p class="text-sm text-slate-400 mt-0.5">
                 Diunggah {{ date('d M Y, H:i', $lastModified) }} &middot; {{ number_format($fileSize / 1024, 1) }} KB
             </p>
         </div>

@@ -27,7 +27,7 @@
         @endif
 
         @for($p = $start; $p <= $end; $p++)
-            <a href="{{ $data->url($p) }}" class="px-2 py-1 text-xs font-semibold rounded transition {{ $data->currentPage() == $p ? 'bg-[#001e40] text-white' : 'hover:bg-[#edeeef]' }}">{{ $p }}</a>
+            <a href="{{ $data->url($p) }}" class="px-2 py-1 text-xs font-semibold rounded transition {{ $data->currentPage() == $p ? 'bg-[#1c6880] text-white' : 'hover:bg-[#edeeef]' }}">{{ $p }}</a>
         @endfor
 
         @if($end < $data->lastPage())

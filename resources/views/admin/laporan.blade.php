@@ -7,10 +7,10 @@
 @section('content')
 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
     <div class="flex gap-2">
-        <select class="input-field !w-auto !py-1.5 !text-xs"><option>Semua Kelas</option><option>XII IPA 1</option><option>XII IPA 2</option></select>
-        <select class="input-field !w-auto !py-1.5 !text-xs"><option>Bulan Ini</option><option>Bulan Lalu</option><option>Semester Ini</option></select>
+        <select class="input-field !w-auto !py-2 !text-sm"><option>Semua Kelas</option><option>XII IPA 1</option><option>XII IPA 2</option></select>
+        <select class="input-field !w-auto !py-2 !text-sm"><option>Bulan Ini</option><option>Bulan Lalu</option><option>Semester Ini</option></select>
     </div>
-    <button onclick="alert('UI Only: Download Excel!')" class="btn-brand !text-xs"><i class="bi bi-file-earmark-excel"></i> Download Excel</button>
+    <button onclick="showToast('Fitur download Excel akan segera tersedia.', 'info')" class="btn-brand !text-sm"><i class="bi bi-file-earmark-excel"></i> Download Excel</button>
 </div>
 
 <div class="card anim-up">
@@ -25,7 +25,7 @@
             </tbody>
         </table>
     </div>
-    <div class="mt-4 flex items-center gap-2 text-xs text-slate-400">
+    <div class="mt-4 flex items-center gap-2 text-sm text-slate-400">
         <i class="bi bi-info-circle"></i> Data semester genap 2025/2026.
     </div>
 </div>

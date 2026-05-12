@@ -8,10 +8,10 @@
 
         <!-- Logo -->
         <div class="text-center mb-8">
-            <div class="w-12 h-12 bg-[#001e40] rounded-lg flex items-center justify-center mx-auto mb-4 shadow-sm">
+            <div class="w-12 h-12 bg-[#1c6880] rounded-lg flex items-center justify-center mx-auto mb-4 shadow-sm">
                 <i class="bi bi-mortarboard-fill text-white text-xl"></i>
             </div>
-            <h2 class="text-xl font-black text-[#001e40] tracking-tight">Masuk</h2>
+            <h2 class="text-xl font-black text-[#1c6880] tracking-tight">Masuk</h2>
             <p class="text-xs text-[#43474f] mt-1">Masuk ke akun SentriSiswa Anda</p>
         </div>
 
@@ -66,7 +66,7 @@
         <!-- Daftar Link -->
         <p class="text-center text-xs text-[#43474f] mt-6">
             Belum punya akun?
-            <a href="{{ route('auth.register') }}" class="text-[#0062a0] hover:text-[#001e40] font-bold">Daftar di sini</a>
+            <a href="{{ route('auth.register') }}" class="text-[#0062a0] hover:text-[#1c6880] font-bold">Daftar di sini</a>
         </p>
 
         <!-- Info Demo -->

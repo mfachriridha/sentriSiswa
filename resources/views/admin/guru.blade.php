@@ -5,25 +5,12 @@
 @section('page-title', 'Manajemen Guru')
 
 @section('content')
-@if(session('success'))
-<div class="mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-xs font-semibold text-emerald-700 flex items-center gap-2 anim-up">
-    <i class="bi bi-check-circle-fill"></i> {{ session('success') }}
-    <button onclick="this.parentElement.remove()" class="ml-auto text-emerald-400 hover:text-emerald-600"><i class="bi bi-x"></i></button>
-</div>
-@endif
-@if(session('error'))
-<div class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-xs font-semibold text-red-700 flex items-center gap-2 anim-up">
-    <i class="bi bi-x-circle-fill"></i> {{ session('error') }}
-    <button onclick="this.parentElement.remove()" class="ml-auto text-red-400 hover:text-red-600"><i class="bi bi-x"></i></button>
-</div>
-@endif
-
 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
     <div class="flex gap-2 flex-wrap">
-        <button onclick="showModal()" class="btn-brand !text-xs"><i class="bi bi-plus-lg"></i> Tambah Guru</button>
-        <button onclick="showCsvModal()" class="btn-outline !text-xs"><i class="bi bi-upload"></i> Upload CSV</button>
-        <a href="{{ route('admin.guru.template') }}" class="btn-outline !text-xs"><i class="bi bi-download"></i> Template CSV</a>
-        <button onclick="confirmAction('Hapus SEMUA data guru? Tindakan ini tidak bisa dibatalkan!', () => document.getElementById('destroyAllGuru').submit())" class="btn-danger !text-xs !ml-auto"><i class="bi bi-trash"></i> Hapus Semua</button>
+        <button onclick="showModal()" class="btn-brand !text-sm"><i class="bi bi-plus-lg"></i> Tambah Guru</button>
+        <button onclick="showCsvModal()" class="btn-outline !text-sm"><i class="bi bi-upload"></i> Upload CSV</button>
+        <a href="{{ route('admin.guru.template') }}" class="btn-outline !text-sm"><i class="bi bi-download"></i> Template CSV</a>
+        <button onclick="confirmAction('Hapus SEMUA data guru? Tindakan ini tidak bisa dibatalkan!', () => document.getElementById('destroyAllGuru').submit())" class="btn-danger !text-sm !ml-auto"><i class="bi bi-trash"></i> Hapus Semua</button>
         <form id="destroyAllGuru" action="{{ route('admin.guru.destroy-all') }}" method="POST" class="hidden">@csrf @method('DELETE')</form>
     </div>
 </div>
@@ -34,14 +21,14 @@
     </div>
 
     <form id="filterForm" class="flex flex-wrap items-center gap-2 mb-4 pb-3 border-b border-[#c3c6d1]/20">
-        <select name="sort" class="input-field !w-auto !py-1 !px-2 !text-xs" onchange="this.form.submit()">
+        <select name="sort" class="input-field !w-auto !py-1.5 !text-sm" onchange="this.form.submit()">
             <option value="id" {{ request('sort', 'id') == 'id' ? 'selected' : '' }}>Urut: No.</option>
             <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>Urut: Nama</option>
             <option value="created_at" {{ request('sort') == 'created_at' ? 'selected' : '' }}>Urut: Terbaru</option>
         </select>
 
         @php $cd = request('dir', 'asc'); @endphp
-        <select name="dir" class="input-field !w-auto !py-1 !px-2 !text-xs" onchange="this.form.submit()">
+        <select name="dir" class="input-field !w-auto !py-1.5 !text-sm" onchange="this.form.submit()">
             <option value="asc" {{ $cd == 'asc' ? 'selected' : '' }}>A-Z / 1-9</option>
             <option value="desc" {{ $cd == 'desc' ? 'selected' : '' }}>Z-A / 9-1</option>
         </select>
@@ -49,7 +36,7 @@
         <input type="hidden" name="per_page" value="{{ request('per_page', 25) }}">
 
         @if(request('sort') != 'id' || request('dir') != 'asc')
-        <a href="{{ route('admin.guru') }}" class="text-[10px] text-red-500 hover:text-red-700 font-semibold ml-1"><i class="bi bi-x-circle"></i> Reset</a>
+        <a href="{{ route('admin.guru') }}" class="text-xs text-red-500 hover:text-red-700 font-semibold ml-1"><i class="bi bi-x-circle"></i> Reset</a>
         @endif
     </form>
 
@@ -69,8 +56,8 @@
             <tbody>
                 @forelse($teachers as $i => $teacher)
                 <tr>
-                    <td class="table-cell text-xs font-mono">{{ $teachers->firstItem() + $i }}</td>
-                    <td class="table-cell text-xs">{{ $teacher->nip ?? '—' }}</td>
+                    <td class="table-cell text-sm font-mono">{{ $teachers->firstItem() + $i }}</td>
+                    <td class="table-cell text-sm">{{ $teacher->nip ?? '—' }}</td>
                     <td class="table-cell font-semibold">{{ $teacher->name }}</td>
                     <td class="table-cell">
                         @if($teacher->role === 'wali_kelas')
@@ -79,7 +66,7 @@
                             <span class="badge badge-amber">BK</span>
                         @endif
                     </td>
-                    <td class="table-cell text-xs">
+                    <td class="table-cell text-sm">
                         @foreach($teacher->teacherClasses as $tc)
                             {{ $tc->schoolClass->name }}@if(!$loop->last), @endif
                         @endforeach
@@ -94,10 +81,10 @@
                     </td>
                     <td class="table-cell-aksi">
                         <div class="flex items-center justify-center gap-1">
-                            <button onclick="editGuru({{ $teacher->id }})" class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold bg-blue-600 text-white hover:bg-blue-700 transition cursor-pointer">
+                            <button onclick="editGuru({{ $teacher->id }})" class="inline-flex items-center gap-1 px-2 py-1.5 rounded text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 transition cursor-pointer">
                                 <i class="bi bi-pencil"></i> Ubah
                             </button>
-                            <button onclick="confirmAction('Hapus guru {{ $teacher->name }}?', () => this.closest('tr').querySelector('.delForm').submit())" class="inline-flex items-center gap-1 px-1.5 py-1 rounded text-xs font-semibold bg-red-600 text-white hover:bg-red-700 transition cursor-pointer">
+                            <button onclick="confirmAction('Hapus guru {{ $teacher->name }}?', () => this.closest('tr').querySelector('.delForm').submit())" class="inline-flex items-center gap-1 px-2 py-1.5 rounded text-sm font-semibold bg-red-600 text-white hover:bg-red-700 transition cursor-pointer">
                                 <i class="bi bi-trash"></i> Hapus
                             </button>
                             <form class="delForm hidden" action="{{ route('admin.guru.destroy', $teacher) }}" method="POST">@csrf @method('DELETE')</form>
@@ -124,23 +111,23 @@
         @csrf
         <input type="hidden" name="_method" id="formMethod" value="POST">
         <div>
-            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Nama Lengkap</label>
+            <label class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 block">Nama Lengkap</label>
             <input type="text" name="name" id="guruName" required class="input-field" placeholder="Nama lengkap dengan gelar">
         </div>
         <div>
-            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">NIP</label>
+            <label class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 block">NIP</label>
             <input type="text" name="nip" id="guruNip" class="input-field" placeholder="199209122022212018" maxlength="18" inputmode="numeric" pattern="\d*">
-            <p class="text-[10px] text-muted mt-1">Kosongkan jika tidak ada NIP</p>
+            <p class="text-xs text-muted mt-1">Kosongkan jika tidak ada NIP</p>
         </div>
         <div>
-            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Role</label>
+            <label class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 block">Role</label>
             <select name="role" id="guruRole" required class="input-field" onchange="toggleClassPicker()">
                 <option value="wali_kelas">Wali Kelas</option>
                 <option value="bk">BK</option>
             </select>
         </div>
         <div id="waliKelasPicker">
-            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Kelas yang Dipegang</label>
+            <label class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 block">Kelas yang Dipegang</label>
             <select class="input-field" id="wkelasSelect">
                 <option value="">— Pilih Kelas —</option>
                 @foreach($classes as $cls)
@@ -150,12 +137,12 @@
             <input type="hidden" name="class_ids[]" id="wkelasHidden">
         </div>
         <div id="bkPicker" class="hidden">
-            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Kelas yang Dimonitor</label>
+            <label class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 block">Kelas yang Dimonitor</label>
             <div class="max-h-40 overflow-y-auto border border-[#c3c6d1] rounded-lg p-2 space-y-1">
                 @foreach($classes as $cls)
                 <label class="flex items-center gap-2 px-2 py-1 hover:bg-slate-50 rounded cursor-pointer">
                     <input type="checkbox" name="class_ids[]" value="{{ $cls->id }}" class="bkCheckbox rounded">
-                    <span class="text-xs">{{ $cls->name }}</span>
+                    <span class="text-sm">{{ $cls->name }}</span>
                 </label>
                 @endforeach
             </div>
@@ -176,14 +163,14 @@
     <div class="flex justify-between items-center mb-4"><h3 class="font-bold text-lg">Upload CSV Guru</h3><button onclick="closeCsvModal()" class="text-slate-400 hover:text-slate-600"><i class="bi bi-x-lg text-xl"></i></button></div>
     <form action="{{ route('admin.guru.import') }}" method="POST" enctype="multipart/form-data">
         @csrf
-        <p class="text-xs text-slate-500 mb-4">Upload file CSV dengan kolom: <strong>Nama;NIP</strong></p>
+        <p class="text-sm text-slate-500 mb-4">Upload file CSV dengan kolom: <strong>Nama;NIP</strong></p>
         <div class="border-2 border-dashed border-slate-200 rounded-xl p-6 text-center mb-4">
             <i class="bi bi-cloud-upload text-3xl text-slate-300 mb-2 block"></i>
             <p class="text-sm text-slate-600">Klik untuk pilih file</p>
             <p class="text-xs text-slate-400">.csv (max 2MB)</p>
-            <input type="file" name="csv_file" accept=".csv" required class="mt-3 text-xs">
+            <input type="file" name="csv_file" accept=".csv" required class="mt-3 text-sm">
         </div>
-        <div class="bg-blue-50 border border-blue-200 rounded-xl p-3 text-xs text-blue-700 mb-4">
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-3 text-sm text-blue-700 mb-4">
             <strong>Format:</strong> "Nama";"NIP"<br><strong>Contoh:</strong> "BUDI SANTOSO, S.Pd";"199209122022212018"
         </div>
         <div class="flex gap-3 pt-2"><button type="button" onclick="closeCsvModal()" class="btn-outline flex-1 !py-2.5">Batal</button><button type="submit" class="btn-brand flex-1 !py-2.5"><span class="btn-text"><i class="bi bi-search"></i> Preview</span></button></div>
@@ -240,7 +227,7 @@ function setLoading(btn, loading) {
 }
 document.getElementById('guruForm').addEventListener('submit', function(e) {
     const classIds = getClassIds();
-    if (classIds.length === 0) { e.preventDefault(); alert('Pilih minimal satu kelas.'); return; }
+    if (classIds.length === 0) { e.preventDefault(); showToast('Pilih minimal satu kelas.', 'warning'); return; }
     setLoading(document.getElementById('modalSubmit'), true);
 });
 document.getElementById('wkelasSelect').addEventListener('change', function() { document.getElementById('wkelasHidden').value = this.value; });
@@ -248,7 +235,7 @@ function editGuru(id) {
     fetch('/admin/guru/' + id + '/edit?_ajax=1', { headers: {'Accept':'application/json'} })
         .then(r => r.json())
         .then(data => showModal(data.user))
-        .catch(() => alert('Gagal memuat data guru.'));
+        .catch(() => showToast('Gagal memuat data guru.', 'error'));
 }
 </script>
 @endpush
