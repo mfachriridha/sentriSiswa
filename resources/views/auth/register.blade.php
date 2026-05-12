@@ -80,30 +80,78 @@
         </div>
 
         <!-- Step 2: Lengkapi Akun -->
-        <div id="step2" class="card !p-6 hidden anim-up">
-            <div class="flex items-center gap-2 mb-4">
-                <span class="w-6 h-6 bg-blue-600 text-white rounded-full text-xs font-bold flex items-center justify-center">2</span>
-                <h3 class="font-bold text-slate-900">Lengkapi Akun</h3>
-            </div>
-            <p class="text-xs text-slate-500 mb-5">Data ditemukan: <span id="displayName" class="font-bold text-blue-600"></span><br><span id="displayExtra" class="text-[11px] text-slate-400"></span></p>
-
-            <form id="registerForm" method="POST" action="{{ route('auth.register.post') }}" class="space-y-4">
+        <div id="step2" class="hidden space-y-4 anim-up">
+            <form id="registerForm" method="POST" action="{{ route('auth.register.post') }}">
                 @csrf
                 <input type="hidden" name="role" id="formRole">
                 <input type="hidden" name="nip" id="formNip">
                 <input type="hidden" name="nis_or_nisn" id="formNis">
 
-                <div>
-                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Email <span class="text-red-500">*</span></label>
-                    <input type="email" name="email" id="email" required class="input-field" placeholder="email@domain.com">
+                <!-- Data Valid Box -->
+                <div id="dataValidBox" class="card !p-5 !bg-emerald-50 !border-emerald-200">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="w-6 h-6 bg-emerald-600 text-white rounded-full text-xs font-bold flex items-center justify-center"><i class="bi bi-check-lg"></i></span>
+                        <h3 class="font-bold text-emerald-800">Data Divalidasi</h3>
+                    </div>
+                    <div id="dataGuru" class="space-y-1.5">
+                        <div class="flex justify-between text-sm"><span class="text-slate-500">NIP</span><span id="dNip" class="font-mono font-bold text-slate-800"></span></div>
+                        <div class="flex justify-between text-sm"><span class="text-slate-500">Nama</span><span id="dGuruName" class="font-bold text-slate-800"></span></div>
+                    </div>
+                    <div id="dataSiswa" class="hidden space-y-1.5">
+                        <div class="flex justify-between text-sm"><span class="text-slate-500">NIS</span><span id="dNis" class="font-mono font-bold text-slate-800"></span></div>
+                        <div class="flex justify-between text-sm"><span class="text-slate-500">NISN</span><span id="dNisn" class="font-mono font-bold text-slate-800"></span></div>
+                        <div class="flex justify-between text-sm"><span class="text-slate-500">Nama</span><span id="dSiswaName" class="font-bold text-slate-800"></span></div>
+                    </div>
                 </div>
-                <div>
-                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Password <span class="text-red-500">*</span></label>
-                    <input type="password" name="password" id="password" required class="input-field" placeholder="Minimal 8 karakter" minlength="8">
+
+                <!-- Akun -->
+                <div class="card !p-5">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="w-6 h-6 bg-blue-600 text-white rounded-full text-xs font-bold flex items-center justify-center">2</span>
+                        <h3 class="font-bold text-slate-900">Buat Akun</h3>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Email <span class="text-red-500">*</span></label>
+                            <input type="email" name="email" required class="input-field" placeholder="email@domain.com">
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Password <span class="text-red-500">*</span></label>
+                            <input type="password" name="password" required class="input-field" placeholder="Minimal 8 karakter" minlength="8">
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Konfirmasi Password <span class="text-red-500">*</span></label>
+                            <input type="password" name="password_confirmation" required class="input-field" placeholder="Ulangi password" minlength="8">
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Konfirmasi Password <span class="text-red-500">*</span></label>
-                    <input type="password" name="password_confirmation" id="password_confirmation" required class="input-field" placeholder="Ulangi password" minlength="8">
+
+                <!-- Kontak (Siswa only) -->
+                <div id="kontakBlock" class="hidden card !p-5">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="w-6 h-6 bg-purple-600 text-white rounded-full text-xs font-bold flex items-center justify-center">3</span>
+                        <h3 class="font-bold text-slate-900">Kontak WhatsApp</h3>
+                    </div>
+                    <p class="text-xs text-slate-500 mb-4">Nomor WhatsApp digunakan untuk notifikasi presensi.</p>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">WhatsApp Siswa</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 font-semibold">+62</span>
+                                <input type="tel" name="student_phone" class="input-field !pl-12" placeholder="81234567890" inputmode="numeric">
+                            </div>
+                            <p class="text-[10px] text-slate-400 mt-1"><i class="bi bi-check-circle text-emerald-500 mr-1"></i>Nomor aktif WhatsApp</p>
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">WhatsApp Orang Tua/Wali</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 font-semibold">+62</span>
+                                <input type="tel" name="parent_phone" class="input-field !pl-12" placeholder="81234567890" inputmode="numeric">
+                            </div>
+                            <p class="text-[10px] text-slate-400 mt-1"><i class="bi bi-check-circle text-emerald-500 mr-1"></i>Nomor aktif WhatsApp</p>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="flex gap-3 pt-2">
@@ -136,6 +184,23 @@
     </div>
 </div>
 
+<!-- Success Modal -->
+@if(isset($registered) && $registered)
+<div id="successModal" class="fixed inset-0 z-[200] flex items-center justify-center bg-black/40">
+    <div class="bg-white rounded-2xl p-8 max-w-sm w-full shadow-2xl mx-4 anim-up text-center">
+        <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="bi bi-check-circle-fill text-emerald-600 text-3xl"></i>
+        </div>
+        <h3 class="text-xl font-bold text-slate-900 mb-2">Pendaftaran Berhasil!</h3>
+        <p class="text-sm text-slate-500 mb-6">Akun Anda sudah aktif. Silakan masuk untuk melanjutkan.</p>
+        <a href="{{ route('auth.login') }}" class="btn-primary w-full !py-3">
+            <i class="bi bi-box-arrow-in-right"></i> Kembali ke Masuk
+        </a>
+    </div>
+</div>
+@endif
+
+<!-- Error Popup -->
 @if($errors->any())
 <div id="errorPopup" class="fixed inset-0 z-[200] flex items-center justify-center bg-black/30">
     <div class="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl mx-4 anim-up">
@@ -208,17 +273,26 @@ document.getElementById('validateBtn').addEventListener('click', function() {
             if (currentRole === 'guru') {
                 document.getElementById('formNip').value = data.nip;
                 document.getElementById('formNis').value = '';
+                document.getElementById('dNip').textContent = data.nip;
+                document.getElementById('dGuruName').textContent = data.name;
+                document.getElementById('dataGuru').classList.remove('hidden');
+                document.getElementById('dataSiswa').classList.add('hidden');
+                document.getElementById('kontakBlock').classList.add('hidden');
             } else {
                 document.getElementById('formNis').value = data.nis;
                 document.getElementById('formNip').value = '';
+                document.getElementById('dNis').textContent = data.nis;
+                document.getElementById('dNisn').textContent = data.nisn;
+                document.getElementById('dSiswaName').textContent = data.name;
+                document.getElementById('dataGuru').classList.add('hidden');
+                document.getElementById('dataSiswa').classList.remove('hidden');
+                document.getElementById('kontakBlock').classList.remove('hidden');
             }
 
             setTimeout(() => {
                 document.getElementById('step1').classList.add('hidden');
                 document.getElementById('step2').classList.remove('hidden');
-                document.getElementById('displayName').textContent = data.name;
-                document.getElementById('displayExtra').textContent = currentRole === 'siswa' ? 'NIS: ' + data.nis + '  ·  NISN: ' + data.nisn : '';
-            }, 500);
+            }, 400);
         } else {
             document.getElementById('validationResult').classList.add('hidden');
             document.getElementById('errorMessage').textContent = data.message || 'Pastikan data yang dimasukkan benar.';

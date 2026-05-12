@@ -96,8 +96,7 @@ class RegisterController extends Controller
                 'is_active' => true,
             ]);
 
-            return redirect()->route('auth.login')
-                ->with('success', 'Akun berhasil didaftarkan. Silakan masuk.');
+            return view('auth.register', ['registered' => true]);
         }
 
         $request->validate([
@@ -128,7 +127,6 @@ class RegisterController extends Controller
 
         $student->update(['user_id' => $user->id]);
 
-        return redirect()->route('auth.login')
-            ->with('success', 'Akun berhasil didaftarkan. Silakan masuk.');
+        return view('auth.register', ['registered' => true]);
     }
 }
