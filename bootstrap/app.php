@@ -17,6 +17,11 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->redirectGuestsTo(fn () => route('auth.login'));
+
+        $middleware->validateCsrfTokens(except: [
+            'auth/register/validate-nip',
+            'auth/register/validate-nis',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

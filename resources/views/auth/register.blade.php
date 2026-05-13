@@ -185,6 +185,9 @@
 </div>
 @endif
 
+<!-- Toast -->
+<div id="toast" class="hidden fixed top-4 right-4 z-[200] px-4 py-3 rounded-lg shadow-lg text-sm font-semibold text-white anim-up"></div>
+
 @push('scripts')
 <script>
 const roleRadios = document.querySelectorAll('input[name="role_type"]');
@@ -196,9 +199,19 @@ roleRadios.forEach(r => r.addEventListener('change', function() {
     document.getElementById('nisField').classList.toggle('hidden', currentRole !== 'siswa');
 }));
 
+function showToast(msg, type) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'fixed top-4 right-4 z-[200] px-4 py-3 rounded-lg shadow-lg text-sm font-semibold text-white anim-up ' + (type === 'success' ? 'bg-emerald-600' : 'bg-red-600');
+    t.classList.remove('hidden');
+    setTimeout(() => t.classList.add('hidden'), 2500);
+}
+
 function setLoading(btn, loading) {
-    btn.querySelector('.btn-text').classList.toggle('hidden', loading);
-    btn.querySelector('.btn-loading').classList.toggle('hidden', !loading);
+    const t = btn.querySelector('.btn-text');
+    const l = btn.querySelector('.btn-loading');
+    if (t) t.classList.toggle('hidden', loading);
+    if (l) l.classList.toggle('hidden', !loading);
     btn.disabled = loading;
 }
 
@@ -210,10 +223,12 @@ document.getElementById('validateBtn').addEventListener('click', function() {
     let url, body;
     if (currentRole === 'guru') {
         const v = document.getElementById('nip').value.trim();
+        if (!v) { setLoading(btn, false); return; }
         url = '{{ route("auth.register.validate-nip") }}';
         body = { nip: v };
     } else {
         const v = document.getElementById('nis').value.trim();
+        if (!v) { setLoading(btn, false); return; }
         url = '{{ route("auth.register.validate-nis") }}';
         body = { nis_or_nisn: v };
     }
@@ -228,7 +243,6 @@ document.getElementById('validateBtn').addEventListener('click', function() {
         setLoading(btn, false);
         if (data.valid) {
             document.getElementById('formRole').value = currentRole;
-
             if (currentRole === 'guru') {
                 document.getElementById('formNip').value = data.nip;
                 document.getElementById('formNis').value = '';
@@ -240,9 +254,7 @@ document.getElementById('validateBtn').addEventListener('click', function() {
                 document.getElementById('validSummary').textContent = data.name + ' · NIS ' + data.nis + ' · NISN ' + data.nisn;
                 document.getElementById('kontakBlock').classList.remove('hidden');
             }
-
             showToast('Data berhasil ditemukan!', 'success');
-
             setTimeout(() => {
                 document.getElementById('step1').classList.add('hidden');
                 document.getElementById('step2').classList.remove('hidden');

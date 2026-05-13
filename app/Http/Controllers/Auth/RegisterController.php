@@ -18,9 +18,14 @@ class RegisterController extends Controller
 
     public function validateNip(Request $request)
     {
-        $request->validate(['nip' => ['required', 'regex:/^\d+$/']]);
+        $nip = preg_replace('/[^\d]/', '', (string) $request->input('nip'));
 
-        $nip = preg_replace('/\s+/', '', $request->input('nip'));
+        if ($nip === '') {
+            return response()->json([
+                'valid' => false,
+                'message' => 'NIP tidak boleh kosong.',
+            ]);
+        }
 
         $user = User::where('nip', $nip)->where('is_active', false)->first();
 
@@ -40,11 +45,14 @@ class RegisterController extends Controller
 
     public function validateNis(Request $request)
     {
-        $request->validate([
-            'nis_or_nisn' => ['required', 'regex:/^[0-9]+$/'],
-        ]);
+        $value = preg_replace('/[^\d]/', '', (string) $request->input('nis_or_nisn'));
 
-        $value = $request->input('nis_or_nisn');
+        if ($value === '') {
+            return response()->json([
+                'valid' => false,
+                'message' => 'NIS/NISN tidak boleh kosong.',
+            ]);
+        }
 
         $student = Student::where(function ($q) use ($value) {
             $q->where('nis', $value)->orWhere('nisn', $value);
@@ -78,9 +86,13 @@ class RegisterController extends Controller
         $password = Hash::make($data['password']);
 
         if ($data['role'] === 'guru') {
-            $request->validate(['nip' => ['required']]);
+            $nip = preg_replace('/[^\d]/', '', (string) $request->input('nip'));
 
-            $nip = preg_replace('/\s+/', '', $request->input('nip'));
+            if ($nip === '') {
+                throw ValidationException::withMessages([
+                    'nip' => 'NIP tidak valid.',
+                ]);
+            }
 
             $user = User::where('nip', $nip)->where('is_active', false)->first();
 
@@ -99,11 +111,13 @@ class RegisterController extends Controller
             return view('auth.register', ['registered' => true]);
         }
 
-        $request->validate([
-            'nis_or_nisn' => ['required', 'regex:/^[0-9]+$/'],
-        ]);
+        $value = preg_replace('/[^\d]/', '', (string) $request->input('nis_or_nisn'));
 
-        $value = $request->input('nis_or_nisn');
+        if ($value === '') {
+            throw ValidationException::withMessages([
+                'nis_or_nisn' => 'NIS/NISN tidak valid.',
+            ]);
+        }
 
         $student = Student::where(function ($q) use ($value) {
             $q->where('nis', $value)->orWhere('nisn', $value);
