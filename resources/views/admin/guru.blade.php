@@ -21,6 +21,8 @@
     </div>
 
     <form id="filterForm" class="flex flex-wrap items-center gap-2 mb-4 pb-3 border-b border-[#c3c6d1]/20">
+        <input type="text" name="search" class="input-field !w-40 !py-1 !px-2 !text-xs" placeholder="Cari nama / NIP / email..." value="{{ request('search') }}" onchange="this.form.submit()">
+
         <select name="sort" class="input-field !w-auto !py-1.5 !text-sm" onchange="this.form.submit()">
             <option value="id" {{ request('sort', 'id') == 'id' ? 'selected' : '' }}>Urut: No.</option>
             <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>Urut: Nama</option>
@@ -35,7 +37,7 @@
 
         <input type="hidden" name="per_page" value="{{ request('per_page', 25) }}">
 
-        @if(request('sort') != 'id' || request('dir') != 'asc')
+        @if(request('sort') != 'id' || request('dir') != 'asc' || request('search'))
         <a href="{{ route('admin.guru') }}" class="text-xs text-red-500 hover:text-red-700 font-semibold ml-1"><i class="bi bi-x-circle"></i> Reset</a>
         @endif
     </form>

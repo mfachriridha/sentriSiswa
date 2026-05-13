@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Attendance;
 use App\Models\Guardian;
 use App\Models\SchoolClass;
 use App\Models\Student;
@@ -21,7 +22,8 @@ class AdminController extends Controller
         return view('admin.dashboard', [
             'totalStudents' => Student::count(),
             'totalClasses' => SchoolClass::count(),
-            'presentToday' => 0,
+            'totalTeachers' => User::whereIn('role', ['wali_kelas', 'bk'])->count(),
+            'presentToday' => Attendance::where('date', now()->toDateString())->where('status', 'hadir')->count(),
         ]);
     }
 
@@ -32,6 +34,14 @@ class AdminController extends Controller
         $perPage = in_array((int) $perPage, [25, 50, 100]) ? (int) $perPage : 25;
 
         $query = User::whereIn('role', ['wali_kelas', 'bk'])->with('teacherClasses.schoolClass');
+
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('nip', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
 
         $sort = $request->input('sort', 'id');
         $dir = $request->input('dir', 'asc');
@@ -383,6 +393,14 @@ class AdminController extends Controller
 
         $query = Student::with(['schoolClass', 'father', 'mother', 'user']);
 
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('nis', 'like', "%{$search}%")
+                    ->orWhere('nisn', 'like', "%{$search}%");
+            });
+        }
+
         $sort = $request->input('sort', 'id');
         $dir = $request->input('dir', 'asc');
         $dir = in_array($dir, ['asc', 'desc']) ? $dir : 'asc';
@@ -632,6 +650,42 @@ class AdminController extends Controller
         ]);
 
         return back()->with('success', "Pelanggaran ditambahkan. Poin {$student->name}: {$student->fresh()->poin}");
+    }
+
+    public function storeViolationType(Request $request)
+    {
+        $data = $request->validate([
+            'name' => 'required|string|max:200',
+            'poin' => 'required|integer|min:1',
+            'category' => 'required|in:ringan,sedang,berat,amat_berat',
+        ]);
+
+        Violation::create($data);
+
+        return back()->with('success', 'Jenis pelanggaran berhasil ditambahkan.');
+    }
+
+    public function updateViolationType(Request $request, Violation $violation)
+    {
+        $data = $request->validate([
+            'name' => 'required|string|max:200',
+            'poin' => 'required|integer|min:1',
+            'category' => 'required|in:ringan,sedang,berat,amat_berat',
+        ]);
+
+        $violation->update($data);
+
+        return back()->with('success', 'Jenis pelanggaran berhasil diperbarui.');
+    }
+
+    public function destroyViolationType(Violation $violation)
+    {
+        if ($violation->studentViolations()->exists()) {
+            return back()->with('error', 'Pelanggaran tidak bisa dihapus karena sudah digunakan.');
+        }
+        $violation->delete();
+
+        return back()->with('success', 'Jenis pelanggaran berhasil dihapus.');
     }
 
     public function tataTertib()

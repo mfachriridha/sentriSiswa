@@ -86,14 +86,14 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     // Poin Pelanggaran
     Route::get('/poin', [AdminController::class, 'poin'])->name('poin');
     Route::post('/poin', [AdminController::class, 'storeViolation'])->name('poin.store');
+    Route::post('/poin/violation', [AdminController::class, 'storeViolationType'])->name('poin.violation.store');
+    Route::put('/poin/violation/{violation}', [AdminController::class, 'updateViolationType'])->name('poin.violation.update');
+    Route::delete('/poin/violation/{violation}', [AdminController::class, 'destroyViolationType'])->name('poin.violation.destroy');
 
     // Tata Tertib
     Route::get('/tata-tertib', [AdminController::class, 'tataTertib'])->name('tata-tertib');
     Route::post('/tata-tertib', [AdminController::class, 'uploadTataTertib'])->name('tata-tertib.upload');
     Route::delete('/tata-tertib', [AdminController::class, 'deleteTataTertib'])->name('tata-tertib.delete');
-
-    // Laporan
-    Route::view('/laporan', 'admin.laporan')->name('laporan');
 
     // Integrasi
     Route::view('/integrasi', 'admin.integrasi')->name('integrasi');
