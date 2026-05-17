@@ -1,8 +1,3 @@
 <x-layouts::app.sidebar :title="__('Catat Pelanggaran')">
-    <div class="p-6">
-        <flux:heading size="xl" class="mb-6">{{ __('Catat Pelanggaran') }}</flux:heading>
-        <div class="p-8 text-center text-zinc-500 border border-dashed border-zinc-300 rounded-lg">
-            Halaman ini sedang dalam pengembangan.
-        </div>
-    </div>
+    <livewire:admin.catat-pelanggaran />
 </x-layouts::app.sidebar>
