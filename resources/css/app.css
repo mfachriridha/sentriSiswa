@@ -26,6 +26,18 @@
     --color-accent: var(--color-neutral-800);
     --color-accent-content: var(--color-neutral-800);
     --color-accent-foreground: var(--color-white);
+
+    --color-brand-50: #f0f7fa;
+    --color-brand-100: #d9ecf2;
+    --color-brand-200: #b3d9e5;
+    --color-brand-300: #80c0d4;
+    --color-brand-400: #4da3bd;
+    --color-brand-500: #2d8aa3;
+    --color-brand-600: #1c6880;
+    --color-brand-700: #17556a;
+    --color-brand-800: #14485a;
+    --color-brand-900: #123d4c;
+    --color-brand-950: #0a2630;
 }
 
 @layer theme {
