@@ -24,10 +24,11 @@ Route::prefix('siswa')->name('siswa.')->middleware(['auth', 'role:siswa'])->grou
     Route::view('/', 'siswa.dashboard')->name('dashboard');
     Route::get('/kehadiran', [SiswaController::class, 'kehadiran'])->name('kehadiran');
     Route::post('/kehadiran', [SiswaController::class, 'storeAttendance'])->name('kehadiran.store');
-    Route::view('/riwayat', 'siswa.riwayat')->name('riwayat');
-    Route::view('/poin', 'siswa.poin')->name('poin');
+    Route::get('/riwayat', [SiswaController::class, 'riwayat'])->name('riwayat');
+    Route::get('/poin', [SiswaController::class, 'poin'])->name('poin');
+    Route::get('/pengaturan', [SiswaController::class, 'pengaturan'])->name('pengaturan');
+    Route::put('/pengaturan', [SiswaController::class, 'updatePengaturan'])->name('pengaturan.update');
     Route::view('/biodata', 'siswa.biodata')->name('biodata');
-    Route::view('/pengaturan', 'siswa.pengaturan')->name('pengaturan');
 });
 
 Route::prefix('wali-kelas')->name('wali-kelas.')->middleware(['auth', 'role:wali_kelas'])->group(function () {

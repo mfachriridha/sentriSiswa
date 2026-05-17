@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Attendance;
 use App\Models\Student;
+use App\Models\StudentViolation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class SiswaController extends Controller
 {
@@ -20,8 +22,7 @@ class SiswaController extends Controller
 
     public function kehadiran()
     {
-        $student = Student::where('user_id', Auth::id())->first();
-
+        $student = $this->getStudent();
         if (! $student) {
             return redirect()->route('siswa.dashboard')->with('error', 'Data siswa tidak ditemukan.');
         }
@@ -32,6 +33,75 @@ class SiswaController extends Controller
         return view('siswa.kehadiran', compact('student', 'attendance'));
     }
 
+    public function riwayat(Request $request)
+    {
+        $student = $this->getStudent();
+        if (! $student) {
+            return redirect()->route('siswa.dashboard')->with('error', 'Data siswa tidak ditemukan.');
+        }
+
+        $attendances = Attendance::where('student_id', $student->id)
+            ->latest('date')
+            ->paginate(25)
+            ->appends($request->query());
+
+        $stats = [
+            'hadir' => Attendance::where('student_id', $student->id)->where('status', 'hadir')->count(),
+            'izin' => Attendance::where('student_id', $student->id)->where('status', 'izin')->count(),
+            'sakit' => Attendance::where('student_id', $student->id)->where('status', 'sakit')->count(),
+            'alfa' => Attendance::where('student_id', $student->id)->where('status', 'alfa')->count(),
+        ];
+
+        return view('siswa.riwayat', compact('student', 'attendances', 'stats'));
+    }
+
+    public function poin()
+    {
+        $student = $this->getStudent();
+        if (! $student) {
+            return redirect()->route('siswa.dashboard')->with('error', 'Data siswa tidak ditemukan.');
+        }
+
+        $violations = StudentViolation::where('student_id', $student->id)
+            ->with('violation')
+            ->latest()
+            ->paginate(25);
+
+        return view('siswa.poin', compact('student', 'violations'));
+    }
+
+    public function pengaturan()
+    {
+        $student = Student::where('user_id', Auth::id())
+            ->with(['schoolClass', 'father', 'mother', 'guardian'])
+            ->first();
+        $user = Auth::user();
+
+        return view('siswa.pengaturan', compact('student', 'user'));
+    }
+
+    public function updatePengaturan(Request $request)
+    {
+        $user = Auth::user();
+        $data = $request->validate([
+            'name' => 'required|string|max:200',
+            'email' => 'required|email|unique:users,email,'.$user->id,
+            'password' => 'nullable|string|min:8|confirmed',
+        ]);
+
+        $user->update(['name' => $data['name'], 'email' => $data['email']]);
+        if (! empty($data['password'])) {
+            $user->update(['password' => Hash::make($data['password'])]);
+        }
+
+        return back()->with('success', 'Profil berhasil diperbarui.');
+    }
+
+    protected function getStudent(): ?Student
+    {
+        return Student::where('user_id', Auth::id())->first();
+    }
+
     public function storeAttendance(Request $request)
     {
         $request->validate([
@@ -40,7 +110,7 @@ class SiswaController extends Controller
             'selfie' => 'required|image|mimes:jpeg,png,jpg|max:5120',
         ]);
 
-        $student = Student::where('user_id', Auth::id())->first();
+        $student = $this->getStudent();
 
         if (! $student) {
             return response()->json(['success' => false, 'message' => 'Data siswa tidak ditemukan.'], 404);
