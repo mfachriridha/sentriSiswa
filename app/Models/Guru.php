@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Guru extends Model
 {
+    protected $table = 'guru';
+
     protected $fillable = ['user_id', 'nip', 'nama', 'no_hp'];
 
     public function user(): BelongsTo

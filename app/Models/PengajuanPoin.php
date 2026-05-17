@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PengajuanPoin extends Model
 {
+    protected $table = 'pengajuan_poin';
+
     protected $fillable = [
         'user_id', 'guru_id', 'jumlah_poin', 'keterangan',
         'status', 'diproses_oleh', 'catatan_admin',

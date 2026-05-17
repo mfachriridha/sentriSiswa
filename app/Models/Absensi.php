@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Absensi extends Model
 {
+    protected $table = 'absensi';
+
     protected $fillable = [
         'user_id', 'kelas_id', 'tanggal', 'jam_absen',
         'foto_selfie', 'latitude', 'longitude', 'status', 'keterangan',

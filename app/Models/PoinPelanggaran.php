@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PoinPelanggaran extends Model
 {
+    protected $table = 'poin_pelanggaran';
+
     protected $fillable = ['kategori', 'jenis_pelanggaran', 'poin'];
 
     public function pelanggaranSiswa(): HasMany

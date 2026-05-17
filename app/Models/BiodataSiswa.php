@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class BiodataSiswa extends Model
 {
+    protected $table = 'biodata_siswa';
+
     protected $fillable = [
         'siswa_id', 'foto', 'tempat_lahir', 'tanggal_lahir',
         'agama', 'status_keluarga', 'anak_ke', 'alamat',

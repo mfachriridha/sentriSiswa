@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class OrangTuaSiswa extends Model
 {
+    protected $table = 'orang_tua_siswa';
+
     protected $fillable = [
         'siswa_id', 'nama_ayah', 'nama_ibu', 'alamat_ortu',
         'no_telp_ortu', 'pekerjaan_ayah', 'pekerjaan_ibu',

@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Siswa extends Model
 {
+    protected $table = 'siswa';
+
     protected $fillable = [
         'user_id', 'kelas_id', 'nis', 'nisn', 'nama',
         'jenis_kelamin', 'no_hp', 'poin',

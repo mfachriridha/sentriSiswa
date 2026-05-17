@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'nama' => env('SEKOLAH_NAMA', 'SMA Negeri 1 ...'),
+    'nama' => env('SEKOLAH_NAMA', 'SMAN 11 KABUPATEN TANGERANG'),
 
     'geofence' => [
         'type' => 'polygon',
