@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\BKController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\WaliKelasController;
 use Illuminate\Support\Facades\Route;
@@ -33,12 +34,14 @@ Route::prefix('siswa')->name('siswa.')->middleware(['auth', 'role:siswa'])->grou
 
 Route::prefix('wali-kelas')->name('wali-kelas.')->middleware(['auth', 'role:wali_kelas'])->group(function () {
     Route::get('/', [WaliKelasController::class, 'dashboard'])->name('dashboard');
+    Route::get('/laporan', [WaliKelasController::class, 'laporan'])->name('laporan');
     Route::post('/confirm/{attendance}', [WaliKelasController::class, 'confirm'])->name('confirm');
     Route::post('/update-status/{attendance}', [WaliKelasController::class, 'updateStatus'])->name('update-status');
 });
 
 Route::prefix('bk')->name('bk.')->middleware(['auth', 'role:bk'])->group(function () {
-    Route::view('/', 'bk.dashboard')->name('dashboard');
+    Route::get('/', [BKController::class, 'dashboard'])->name('dashboard');
+    Route::get('/laporan', [BKController::class, 'laporan'])->name('laporan');
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
@@ -98,6 +101,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 
     // Integrasi
     Route::view('/integrasi', 'admin.integrasi')->name('integrasi');
+
+    // Pengaturan
+    Route::get('/pengaturan', [AdminController::class, 'settings'])->name('settings');
+    Route::put('/pengaturan', [AdminController::class, 'updateSettings'])->name('settings.update');
 });
 
 Route::prefix('profile')->name('profile.')->group(function () {

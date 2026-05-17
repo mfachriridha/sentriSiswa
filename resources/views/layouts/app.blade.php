@@ -97,14 +97,13 @@
                     <a href="{{ route('admin.tata-tertib') }}" class="sidebar-link {{ request()->routeIs('admin.tata-tertib') ? 'active' : '' }}"><i class="bi bi-file-pdf"></i> Tata Tertib</a>
                     <a href="{{ route('admin.poin') }}" class="sidebar-link {{ request()->routeIs('admin.poin') ? 'active' : '' }}"><i class="bi bi-exclamation-triangle"></i> Poin Pelanggaran</a>
                     <a href="{{ route('admin.integrasi') }}" class="sidebar-link {{ request()->routeIs('admin.integrasi') ? 'active' : '' }}"><i class="bi bi-plug"></i> Integrasi</a>
+                    <a href="{{ route('admin.settings') }}" class="sidebar-link {{ request()->routeIs('admin.settings') ? 'active' : '' }}"><i class="bi bi-gear"></i> Pengaturan</a>
                 @elseif($currentRole === 'wali_kelas')
                     <a href="{{ route('wali-kelas.dashboard') }}" class="sidebar-link {{ request()->routeIs('wali-kelas.dashboard') ? 'active' : '' }}"><i class="bi bi-grid"></i> Dashboard</a>
-                    <a href="#" class="sidebar-link opacity-50"><i class="bi bi-camera"></i> Verifikasi Selfie</a>
-                    <a href="#" class="sidebar-link opacity-50"><i class="bi bi-bar-chart"></i> Rekap Kehadiran</a>
+                    <a href="{{ route('wali-kelas.laporan') }}" class="sidebar-link {{ request()->routeIs('wali-kelas.laporan') ? 'active' : '' }}"><i class="bi bi-bar-chart"></i> Laporan</a>
                 @elseif($currentRole === 'bk')
                     <a href="{{ route('bk.dashboard') }}" class="sidebar-link {{ request()->routeIs('bk.dashboard') ? 'active' : '' }}"><i class="bi bi-grid"></i> Dashboard</a>
-                    <a href="#" class="sidebar-link opacity-50"><i class="bi bi-eye"></i> Monitoring Kelas</a>
-                    <a href="#" class="sidebar-link opacity-50"><i class="bi bi-bar-chart"></i> Rekap Kehadiran</a>
+                    <a href="{{ route('bk.laporan') }}" class="sidebar-link {{ request()->routeIs('bk.laporan') ? 'active' : '' }}"><i class="bi bi-bar-chart"></i> Laporan</a>
                 @elseif($currentRole === 'siswa')
                     <a href="{{ route('siswa.dashboard') }}" class="sidebar-link {{ request()->routeIs('siswa.dashboard') ? 'active' : '' }}"><i class="bi bi-grid"></i> Dashboard</a>
                     <a href="{{ route('siswa.kehadiran') }}" class="sidebar-link {{ request()->routeIs('siswa.kehadiran') ? 'active' : '' }}"><i class="bi bi-camera"></i> Kehadiran</a>

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Attendance;
 use App\Models\Guardian;
 use App\Models\SchoolClass;
+use App\Models\Setting;
 use App\Models\Student;
 use App\Models\StudentParent;
 use App\Models\StudentViolation;
@@ -737,5 +738,29 @@ class AdminController extends Controller
         session()->put('user_email', $user->email);
 
         return back()->with('success', 'Profil berhasil diperbarui.');
+    }
+
+    public function settings()
+    {
+        return view('admin.settings', [
+            'jamMasuk' => Setting::get('jam_masuk', '07:00'),
+            'jamPulang' => Setting::get('jam_pulang', '15:00'),
+            'batasTelat' => Setting::get('batas_telat', '15'),
+        ]);
+    }
+
+    public function updateSettings(Request $request)
+    {
+        $data = $request->validate([
+            'jam_masuk' => 'required|date_format:H:i',
+            'jam_pulang' => 'required|date_format:H:i',
+            'batas_telat' => 'required|integer|min:1|max:120',
+        ]);
+
+        Setting::set('jam_masuk', $data['jam_masuk']);
+        Setting::set('jam_pulang', $data['jam_pulang']);
+        Setting::set('batas_telat', $data['batas_telat']);
+
+        return back()->with('success', 'Pengaturan berhasil disimpan.');
     }
 }
