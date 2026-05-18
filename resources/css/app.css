@@ -96,7 +96,7 @@ select:focus[data-flux-control] {
 }
 
 [data-flux-sidebar-group] > div:first-child {
-    @apply !text-zinc-600 !font-semibold;
+    @apply !text-zinc-500 !font-semibold !uppercase !text-xs !tracking-wider;
 }
 
 [data-flux-sidebar-brand] [data-content] {

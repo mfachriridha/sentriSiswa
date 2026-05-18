@@ -1,7 +1,10 @@
 <div class="p-6" x-data="{ showFoto: false, fotoUrl: '' }">
-    <flux:heading size="xl" class="mb-6">{{ __('Laporan Absensi') }}</flux:heading>
+    <div class="mb-6">
+        <flux:heading size="xl" class="text-zinc-900">{{ __('Laporan Absensi') }}</flux:heading>
+        <flux:subheading class="text-zinc-600">{{ __('Lihat dan filter data absensi siswa') }}</flux:subheading>
+    </div>
 
-    <flux:card class="mb-6">
+    <div class="bg-white rounded-xl border border-zinc-200 shadow-sm p-5 mb-6">
         <div class="flex flex-wrap items-end gap-4">
             <flux:field class="flex-1 min-w-[150px]">
                 <flux:label>{{ __('Kelas') }}</flux:label>
@@ -30,75 +33,82 @@
                 </flux:select>
             </flux:field>
 
-            <flux:button wire:click="resetFilters" variant="ghost" size="sm">
-                {{ __('Reset Filter') }}
+            <flux:button wire:click="resetFilters" variant="ghost" size="sm" icon="arrow-path">
+                {{ __('Reset') }}
             </flux:button>
         </div>
-    </flux:card>
+    </div>
 
-    <flux:card class="overflow-hidden">
+    <div class="bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead>
-                    <tr class="border-b-2 border-zinc-300">
-                        <th class="text-left p-3 font-semibold text-zinc-700">{{ __('Nama') }}</th>
-                        <th class="text-left p-3 font-semibold text-zinc-700">{{ __('Kelas') }}</th>
-                        <th class="text-left p-3 font-semibold text-zinc-700">{{ __('Tanggal') }}</th>
-                        <th class="text-left p-3 font-semibold text-zinc-700">{{ __('Jam') }}</th>
-                        <th class="text-left p-3 font-semibold text-zinc-700">{{ __('Status') }}</th>
-                        <th class="text-left p-3 font-semibold text-zinc-700">{{ __('Foto') }}</th>
-                        <th class="text-left p-3 font-semibold text-zinc-700">{{ __('Keterangan') }}</th>
+                    <tr class="bg-zinc-50 border-b border-zinc-200">
+                        <th class="text-left p-4 font-semibold text-zinc-700">{{ __('Nama') }}</th>
+                        <th class="text-left p-4 font-semibold text-zinc-700">{{ __('Kelas') }}</th>
+                        <th class="text-left p-4 font-semibold text-zinc-700">{{ __('Tanggal') }}</th>
+                        <th class="text-left p-4 font-semibold text-zinc-700">{{ __('Jam') }}</th>
+                        <th class="text-left p-4 font-semibold text-zinc-700">{{ __('Status') }}</th>
+                        <th class="text-left p-4 font-semibold text-zinc-700">{{ __('Foto') }}</th>
+                        <th class="text-left p-4 font-semibold text-zinc-700">{{ __('Keterangan') }}</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-zinc-300">
+                <tbody class="divide-y divide-zinc-200">
                     @forelse($absensi as $a)
                         <tr wire:key="absensi-{{ $a->id }}">
-                            <td class="p-3">{{ $a->user?->siswa?->nama ?? $a->user?->name ?? '-' }}</td>
-                            <td class="p-3">{{ $a->kelas?->nama ?? '-' }}</td>
-                            <td class="p-3">{{ $a->tanggal }}</td>
-                            <td class="p-3">{{ $a->jam_absen }}</td>
-                            <td class="p-3">
+                            <td class="p-4 font-medium text-zinc-900">{{ $a->user?->siswa?->nama ?? $a->user?->name ?? '-' }}</td>
+                            <td class="p-4 text-zinc-600">{{ $a->kelas?->nama ?? '-' }}</td>
+                            <td class="p-4 text-zinc-600">{{ $a->tanggal }}</td>
+                            <td class="p-4 text-zinc-600">{{ $a->jam_absen }}</td>
+                            <td class="p-4">
                                 <flux:badge
                                     :color="$a->status === 'hadir' ? 'green' : ($a->status === 'terlambat' ? 'amber' : ($a->status === 'izin' ? 'blue' : ($a->status === 'sakit' ? 'purple' : 'red')))"
                                     size="sm">
                                     {{ ucfirst($a->status) }}
                                 </flux:badge>
                             </td>
-                            <td class="p-3">
+                            <td class="p-4">
                                 @if($a->foto_selfie)
                                     <button @click="fotoUrl = '{{ asset('storage/' . $a->foto_selfie) }}'; showFoto = true"
-                                        class="text-brand-600 hover:text-brand-700 underline text-xs">
+                                        class="text-brand-600 hover:text-brand-700 underline text-sm font-medium">
                                         {{ __('Lihat') }}
                                     </button>
                                 @else
-                                    <span class="text-zinc-400 text-xs">-</span>
+                                    <span class="text-zinc-400 text-sm">-</span>
                                 @endif
                             </td>
-                            <td class="p-3 max-w-xs truncate" title="{{ $a->keterangan }}">{{ $a->keterangan ?? '-' }}</td>
+                            <td class="p-4 max-w-xs truncate text-zinc-600" title="{{ $a->keterangan }}">{{ $a->keterangan ?? '-' }}</td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="p-6 text-center text-zinc-500">{{ __('Tidak ada data absensi.') }}</td>
+                            <td colspan="7" class="p-12 text-center">
+                                <flux:icon.calendar-days class="size-12 text-zinc-300 mx-auto mb-3" />
+                                <flux:heading size="base" class="text-zinc-500 mb-1">{{ __('Tidak ada data absensi') }}</flux:heading>
+                                <flux:text class="text-zinc-400">{{ __('Data absensi akan muncul setelah siswa melakukan absensi') }}</flux:text>
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
 
-        <div class="p-3 border-t border-zinc-200">
+        <div class="p-4 border-t border-zinc-200 bg-zinc-50">
             {{ $absensi->links() }}
         </div>
-    </flux:card>
+    </div>
 
     {{-- Foto Modal --}}
     <div x-show="showFoto" x-transition
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
         @click.self="showFoto = false">
         <div class="bg-white rounded-xl max-w-lg mx-4 overflow-hidden shadow-2xl">
-            <div class="flex justify-end p-2">
+            <div class="flex justify-between items-center p-4 border-b border-zinc-200">
+                <flux:heading size="base">{{ __('Foto Selfie') }}</flux:heading>
                 <flux:button icon="x-mark" variant="ghost" size="sm" @click="showFoto = false" />
             </div>
-            <img :src="fotoUrl" class="max-w-full max-h-[70vh] object-contain mx-auto" />
+            <div class="p-4">
+                <img :src="fotoUrl" class="max-w-full max-h-[70vh] object-contain mx-auto rounded-lg" />
+            </div>
         </div>
     </div>
 </div>

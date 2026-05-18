@@ -1,6 +1,9 @@
 <div class="p-6">
     <div class="flex items-center justify-between mb-6">
-        <flux:heading size="xl">{{ __('Poin Pelanggaran') }}</flux:heading>
+        <div>
+            <flux:heading size="xl" class="text-zinc-900">{{ __('Poin Pelanggaran') }}</flux:heading>
+            <flux:subheading class="text-zinc-600">{{ __('Kelola kategori dan jenis pelanggaran') }}</flux:subheading>
+        </div>
         <flux:button variant="primary" wire:click="openCreate" icon="plus">
             {{ __('Tambah') }}
         </flux:button>
@@ -8,32 +11,32 @@
 
     @foreach($categories as $cat)
         @php $items = $grouped->get($cat, collect()); @endphp
-        <flux:card class="mb-4 overflow-hidden" wire:key="cat-{{ $cat }}">
+        <div class="bg-white rounded-xl border border-zinc-200 shadow-sm mb-4 overflow-hidden" wire:key="cat-{{ $cat }}">
             <button wire:click="toggleCategory('{{ $cat }}')"
                 class="w-full flex items-center justify-between p-4 hover:bg-zinc-50 transition">
-                <div class="flex items-center gap-2">
-                    <flux:icon.chevron-right class="size-4 transition-transform {{ in_array($cat, $expandedCategories) ? 'rotate-90' : '' }}" />
-                    <flux:heading size="base">
+                <div class="flex items-center gap-3">
+                    <flux:icon.chevron-right class="size-4 text-zinc-400 transition-transform {{ in_array($cat, $expandedCategories) ? 'rotate-90' : '' }}" />
+                    <flux:heading size="base" class="text-zinc-900">
                         {{ $cat }}
-                        <span class="text-zinc-400 text-sm ml-2">({{ $items->count() }})</span>
                     </flux:heading>
+                    <flux:badge color="zinc" size="sm">{{ $items->count() }}</flux:badge>
                 </div>
             </button>
 
             @if(in_array($cat, $expandedCategories))
-                <div class="border-t-2 border-zinc-300">
+                <div class="border-t border-zinc-200">
                     @if($items->count())
                         <table class="w-full text-sm">
-                            <tbody class="divide-y divide-zinc-300">
+                            <tbody class="divide-y divide-zinc-200">
                                 @foreach($items as $item)
-                                    <tr class="hover:bg-zinc-50" wire:key="poin-{{ $item->id }}">
-                                        <td class="p-3">{{ $item->jenis_pelanggaran }}</td>
-                                        <td class="p-3 text-center">
-                                            <flux:badge color="red" size="sm">{{ $item->poin }}</flux:badge>
+                                    <tr class="hover:bg-zinc-50 transition" wire:key="poin-{{ $item->id }}">
+                                        <td class="p-4 text-zinc-700">{{ $item->jenis_pelanggaran }}</td>
+                                        <td class="p-4 text-center">
+                                            <flux:badge color="red" size="sm">{{ $item->poin }} {{ __('poin') }}</flux:badge>
                                         </td>
-                                        <td class="p-3 text-right">
+                                        <td class="p-4 text-right">
                                             <div class="flex justify-end gap-1">
-                                                <flux:button size="xs" wire:click="openEdit({{ $item->id }})" icon="pencil-square" />
+                                                <flux:button size="xs" wire:click="openEdit({{ $item->id }})" icon="pencil-square" variant="ghost" />
                                                 <flux:button size="xs" variant="danger" wire:click="delete({{ $item->id }})"
                                                     wire:confirm="{{ __('Yakin hapus?') }}" icon="trash" />
                                             </div>
@@ -43,13 +46,14 @@
                             </tbody>
                         </table>
                     @else
-                        <div class="p-4 text-center text-zinc-500 text-sm">
-                            {{ __('Belum ada data di kategori ini.') }}
+                        <div class="p-8 text-center">
+                            <flux:icon.exclamation-triangle class="size-8 text-zinc-300 mx-auto mb-2" />
+                            <flux:text class="text-zinc-500">{{ __('Belum ada data di kategori ini.') }}</flux:text>
                         </div>
                     @endif
                 </div>
             @endif
-        </flux:card>
+        </div>
     @endforeach
 
     <flux:modal wire:model="showModal" class="max-w-md">

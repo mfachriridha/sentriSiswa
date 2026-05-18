@@ -1,44 +1,47 @@
 <div class="p-6">
     <div class="flex items-center justify-between mb-6">
-        <flux:heading size="xl">{{ __('Manajemen Siswa') }}</flux:heading>
+        <div>
+            <flux:heading size="xl" class="text-zinc-900">{{ __('Manajemen Siswa') }}</flux:heading>
+            <flux:subheading class="text-zinc-600">{{ __('Kelola data siswa dan biodata') }}</flux:subheading>
+        </div>
         <flux:button variant="primary" wire:click="openCreate" icon="plus">
             {{ __('Tambah Siswa') }}
         </flux:button>
     </div>
 
-    <flux:card class="overflow-hidden">
+    <div class="bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead>
-                    <tr class="border-b-2 border-zinc-300">
-                        <th class="text-left p-3 font-semibold text-zinc-700">{{ __('Nama') }}</th>
-                        <th class="text-left p-3 font-semibold text-zinc-700">{{ __('NIS') }}</th>
-                        <th class="text-left p-3 font-semibold text-zinc-700">{{ __('Kelas') }}</th>
-                        <th class="text-left p-3 font-semibold text-zinc-700">{{ __('Poin') }}</th>
-                        <th class="text-left p-3 font-semibold text-zinc-700">{{ __('Status') }}</th>
-                        <th class="text-right p-3 font-semibold text-zinc-700">{{ __('Aksi') }}</th>
+                    <tr class="bg-zinc-50 border-b border-zinc-200">
+                        <th class="text-left p-4 font-semibold text-zinc-700">{{ __('Nama') }}</th>
+                        <th class="text-left p-4 font-semibold text-zinc-700">{{ __('NIS') }}</th>
+                        <th class="text-left p-4 font-semibold text-zinc-700">{{ __('Kelas') }}</th>
+                        <th class="text-left p-4 font-semibold text-zinc-700">{{ __('Poin') }}</th>
+                        <th class="text-left p-4 font-semibold text-zinc-700">{{ __('Status') }}</th>
+                        <th class="text-right p-4 font-semibold text-zinc-700">{{ __('Aksi') }}</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-zinc-300">
+                <tbody class="divide-y divide-zinc-200">
                     @forelse($semuaSiswa as $siswa)
-                        <tr class="hover:bg-zinc-50 cursor-pointer"
+                        <tr class="hover:bg-zinc-50 cursor-pointer transition"
                             wire:key="siswa-{{ $siswa->id }}" wire:click="openDetail({{ $siswa->id }})">
-                            <td class="p-3">{{ $siswa->nama }}</td>
-                            <td class="p-3">{{ $siswa->nis }}</td>
-                            <td class="p-3">{{ $siswa->kelas?->nama ?? '-' }}</td>
-                            <td class="p-3">
+                            <td class="p-4 font-medium text-zinc-900">{{ $siswa->nama }}</td>
+                            <td class="p-4 text-zinc-600">{{ $siswa->nis }}</td>
+                            <td class="p-4 text-zinc-600">{{ $siswa->kelas?->nama ?? '-' }}</td>
+                            <td class="p-4">
                                 <flux:badge :color="$siswa->poin >= 0 ? 'green' : 'red'" size="sm">
                                     {{ $siswa->poin }}
                                 </flux:badge>
                             </td>
-                            <td class="p-3">
+                            <td class="p-4">
                                 <flux:badge :color="$siswa->status_aktif === 'Aktif' ? 'green' : 'zinc'" size="sm">
                                     {{ $siswa->status_aktif }}
                                 </flux:badge>
                             </td>
-                            <td class="p-3 text-right">
+                            <td class="p-4 text-right">
                                 <div class="flex justify-end gap-1" wire:click.stop>
-                                    <flux:button size="xs" wire:click="openEdit({{ $siswa->id }})" icon="pencil-square" />
+                                    <flux:button size="xs" wire:click="openEdit({{ $siswa->id }})" icon="pencil-square" variant="ghost" />
                                     <flux:button size="xs" variant="danger" wire:click="delete({{ $siswa->id }})"
                                         wire:confirm="{{ __('Yakin hapus siswa ini?') }}" icon="trash" />
                                 </div>
@@ -46,13 +49,17 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="p-6 text-center text-zinc-500">{{ __('Belum ada data siswa.') }}</td>
+                            <td colspan="6" class="p-12 text-center">
+                                <flux:icon.user-group class="size-12 text-zinc-300 mx-auto mb-3" />
+                                <flux:heading size="base" class="text-zinc-500 mb-1">{{ __('Belum ada data siswa') }}</flux:heading>
+                                <flux:text class="text-zinc-400">{{ __('Klik tombol "Tambah Siswa" untuk memulai') }}</flux:text>
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
-    </flux:card>
+    </div>
 
     {{-- Tambah/Edit Modal --}}
     <flux:modal wire:model="showModal" class="max-w-md">
@@ -115,17 +122,17 @@
         <div class="space-y-4">
             <flux:heading size="lg">{{ __('Detail Siswa') }}</flux:heading>
 
-            <div class="flex border-b-2 border-zinc-300">
+            <div class="flex border-b border-zinc-200">
                 <button wire:click="setDetailTab('dasar')"
-                    class="px-4 py-2 text-sm font-medium border-b-2 transition {{ $detailTab === 'dasar' ? 'border-brand-600 text-brand-600' : 'border-transparent text-zinc-500 hover:text-zinc-700' }}">
+                    class="px-4 py-2.5 text-sm font-medium border-b-2 transition {{ $detailTab === 'dasar' ? 'border-brand-600 text-brand-600' : 'border-transparent text-zinc-500 hover:text-zinc-700' }}">
                     {{ __('Data Dasar') }}
                 </button>
                 <button wire:click="setDetailTab('biodata')"
-                    class="px-4 py-2 text-sm font-medium border-b-2 transition {{ $detailTab === 'biodata' ? 'border-brand-600 text-brand-600' : 'border-transparent text-zinc-500 hover:text-zinc-700' }}">
+                    class="px-4 py-2.5 text-sm font-medium border-b-2 transition {{ $detailTab === 'biodata' ? 'border-brand-600 text-brand-600' : 'border-transparent text-zinc-500 hover:text-zinc-700' }}">
                     {{ __('Biodata') }}
                 </button>
                 <button wire:click="setDetailTab('orangtua')"
-                    class="px-4 py-2 text-sm font-medium border-b-2 transition {{ $detailTab === 'orangtua' ? 'border-brand-600 text-brand-600' : 'border-transparent text-zinc-500 hover:text-zinc-700' }}">
+                    class="px-4 py-2.5 text-sm font-medium border-b-2 transition {{ $detailTab === 'orangtua' ? 'border-brand-600 text-brand-600' : 'border-transparent text-zinc-500 hover:text-zinc-700' }}">
                     {{ __('Orang Tua') }}
                 </button>
             </div>
@@ -134,14 +141,14 @@
                 @php $s = \App\Models\Siswa::with('kelas', 'user')->find($detailSiswaId); @endphp
                 @if($s)
                     <div class="grid grid-cols-2 gap-4">
-                        <div><flux:text class="text-zinc-600 font-medium">{{ __('Nama') }}</flux:text><flux:text>{{ $s->nama }}</flux:text></div>
-                        <div><flux:text class="text-zinc-600 font-medium">{{ __('NIS') }}</flux:text><flux:text>{{ $s->nis }}</flux:text></div>
-                        <div><flux:text class="text-zinc-600 font-medium">{{ __('NISN') }}</flux:text><flux:text>{{ $s->nisn ?? '-' }}</flux:text></div>
-                        <div><flux:text class="text-zinc-600 font-medium">{{ __('Kelas') }}</flux:text><flux:text>{{ $s->kelas?->nama ?? '-' }}</flux:text></div>
-                        <div><flux:text class="text-zinc-600 font-medium">{{ __('Jenis Kelamin') }}</flux:text><flux:text>{{ $s->jenis_kelamin }}</flux:text></div>
-                        <div><flux:text class="text-zinc-600 font-medium">{{ __('No HP') }}</flux:text><flux:text>{{ $s->no_hp ?? '-' }}</flux:text></div>
-                        <div><flux:text class="text-zinc-600 font-medium">{{ __('Poin') }}</flux:text><flux:text>{{ $s->poin }}</flux:text></div>
-                        <div><flux:text class="text-zinc-600 font-medium">{{ __('Status Akun') }}</flux:text>
+                        <div><flux:text class="text-zinc-600 font-medium text-sm">{{ __('Nama') }}</flux:text><flux:text class="text-zinc-900">{{ $s->nama }}</flux:text></div>
+                        <div><flux:text class="text-zinc-600 font-medium text-sm">{{ __('NIS') }}</flux:text><flux:text class="text-zinc-900">{{ $s->nis }}</flux:text></div>
+                        <div><flux:text class="text-zinc-600 font-medium text-sm">{{ __('NISN') }}</flux:text><flux:text class="text-zinc-900">{{ $s->nisn ?? '-' }}</flux:text></div>
+                        <div><flux:text class="text-zinc-600 font-medium text-sm">{{ __('Kelas') }}</flux:text><flux:text class="text-zinc-900">{{ $s->kelas?->nama ?? '-' }}</flux:text></div>
+                        <div><flux:text class="text-zinc-600 font-medium text-sm">{{ __('Jenis Kelamin') }}</flux:text><flux:text class="text-zinc-900">{{ $s->jenis_kelamin }}</flux:text></div>
+                        <div><flux:text class="text-zinc-600 font-medium text-sm">{{ __('No HP') }}</flux:text><flux:text class="text-zinc-900">{{ $s->no_hp ?? '-' }}</flux:text></div>
+                        <div><flux:text class="text-zinc-600 font-medium text-sm">{{ __('Poin') }}</flux:text><flux:text class="text-zinc-900">{{ $s->poin }}</flux:text></div>
+                        <div><flux:text class="text-zinc-600 font-medium text-sm">{{ __('Status Akun') }}</flux:text>
                             <flux:badge :color="$s->user_id ? 'green' : 'zinc'" size="sm">
                                 {{ $s->user_id ? 'Aktif' : 'Belum Aktif' }}
                             </flux:badge>
@@ -200,7 +207,7 @@
 
             @elseif($detailTab === 'orangtua')
                 <form wire:submit="saveOrangTua" class="space-y-4">
-                    <flux:heading size="base" class="text-zinc-500">{{ __('Data Ayah') }}</flux:heading>
+                    <flux:heading size="base" class="text-zinc-700">{{ __('Data Ayah') }}</flux:heading>
                     <div class="grid grid-cols-2 gap-4">
                         <flux:field>
                             <flux:label>{{ __('Nama Ayah') }}</flux:label>
@@ -211,7 +218,7 @@
                             <flux:input wire:model="pekerjaan_ayah" />
                         </flux:field>
                     </div>
-                    <flux:heading size="base" class="text-zinc-500">{{ __('Data Ibu') }}</flux:heading>
+                    <flux:heading size="base" class="text-zinc-700">{{ __('Data Ibu') }}</flux:heading>
                     <div class="grid grid-cols-2 gap-4">
                         <flux:field>
                             <flux:label>{{ __('Nama Ibu') }}</flux:label>
@@ -231,7 +238,7 @@
                         <flux:input wire:model="no_telp_ortu" />
                     </flux:field>
                     <flux:separator />
-                    <flux:heading size="base" class="text-zinc-500">{{ __('Data Wali') }}</flux:heading>
+                    <flux:heading size="base" class="text-zinc-700">{{ __('Data Wali') }}</flux:heading>
                     <div class="grid grid-cols-2 gap-4">
                         <flux:field>
                             <flux:label>{{ __('Nama Wali') }}</flux:label>

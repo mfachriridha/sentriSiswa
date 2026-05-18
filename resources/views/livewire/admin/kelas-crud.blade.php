@@ -1,31 +1,34 @@
 <div class="p-6">
     <div class="flex items-center justify-between mb-6">
-        <flux:heading size="xl">{{ __('Manajemen Kelas') }}</flux:heading>
+        <div>
+            <flux:heading size="xl" class="text-zinc-900">{{ __('Manajemen Kelas') }}</flux:heading>
+            <flux:subheading class="text-zinc-600">{{ __('Kelola data kelas sekolah') }}</flux:subheading>
+        </div>
         <flux:button variant="primary" wire:click="openCreate" icon="plus">
             {{ __('Tambah Kelas') }}
         </flux:button>
     </div>
 
-    <flux:card class="overflow-hidden">
+    <div class="bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead>
-                    <tr class="border-b-2 border-zinc-300">
-                        <th class="text-left p-3 font-semibold text-zinc-700">{{ __('Nama Kelas') }}</th>
-                        <th class="text-left p-3 font-semibold text-zinc-700">{{ __('Tingkat') }}</th>
-                        <th class="text-left p-3 font-semibold text-zinc-700">{{ __('Jurusan') }}</th>
-                        <th class="text-right p-3 font-semibold text-zinc-700">{{ __('Aksi') }}</th>
+                    <tr class="bg-zinc-50 border-b border-zinc-200">
+                        <th class="text-left p-4 font-semibold text-zinc-700">{{ __('Nama Kelas') }}</th>
+                        <th class="text-left p-4 font-semibold text-zinc-700">{{ __('Tingkat') }}</th>
+                        <th class="text-left p-4 font-semibold text-zinc-700">{{ __('Jurusan') }}</th>
+                        <th class="text-right p-4 font-semibold text-zinc-700">{{ __('Aksi') }}</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-zinc-300">
+                <tbody class="divide-y divide-zinc-200">
                     @forelse($semuaKelas as $kelas)
-                        <tr class="hover:bg-zinc-50" wire:key="kelas-{{ $kelas->id }}">
-                            <td class="p-3">{{ $kelas->nama }}</td>
-                            <td class="p-3">{{ $kelas->tingkat }}</td>
-                            <td class="p-3">{{ $kelas->jurusan }}</td>
-                            <td class="p-3 text-right">
+                        <tr class="hover:bg-zinc-50 transition" wire:key="kelas-{{ $kelas->id }}">
+                            <td class="p-4 font-medium text-zinc-900">{{ $kelas->nama }}</td>
+                            <td class="p-4 text-zinc-600">{{ $kelas->tingkat }}</td>
+                            <td class="p-4 text-zinc-600">{{ $kelas->jurusan }}</td>
+                            <td class="p-4 text-right">
                                 <div class="flex justify-end gap-1">
-                                    <flux:button size="xs" wire:click="openEdit({{ $kelas->id }})" icon="pencil-square" />
+                                    <flux:button size="xs" wire:click="openEdit({{ $kelas->id }})" icon="pencil-square" variant="ghost" />
                                     <flux:button size="xs" variant="danger" wire:click="delete({{ $kelas->id }})"
                                         wire:confirm="{{ __('Yakin hapus kelas ini?') }}" icon="trash" />
                                 </div>
@@ -33,13 +36,17 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="p-6 text-center text-zinc-500">{{ __('Belum ada data kelas.') }}</td>
+                            <td colspan="4" class="p-12 text-center">
+                                <flux:icon.academic-cap class="size-12 text-zinc-300 mx-auto mb-3" />
+                                <flux:heading size="base" class="text-zinc-500 mb-1">{{ __('Belum ada data kelas') }}</flux:heading>
+                                <flux:text class="text-zinc-400">{{ __('Klik tombol "Tambah Kelas" untuk memulai') }}</flux:text>
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
-    </flux:card>
+    </div>
 
     <flux:modal wire:model="showModal" class="max-w-md">
         <div class="space-y-4">

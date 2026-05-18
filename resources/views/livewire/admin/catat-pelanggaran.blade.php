@@ -1,9 +1,12 @@
 <div class="p-6" x-data="{ searchOpen: false }" @click.away="searchOpen = false">
-    <flux:heading size="xl" class="mb-6">{{ __('Catat Pelanggaran') }}</flux:heading>
+    <div class="mb-6">
+        <flux:heading size="xl" class="text-zinc-900">{{ __('Catat Pelanggaran') }}</flux:heading>
+        <flux:subheading class="text-zinc-600">{{ __('Catat pelanggaran siswa dan lihat riwayat terbaru') }}</flux:subheading>
+    </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <flux:card class="space-y-4">
-            <flux:heading size="base">{{ __('Form Pelanggaran') }}</flux:heading>
+        <div class="bg-white rounded-xl border border-zinc-200 shadow-sm p-6 space-y-4">
+            <flux:heading size="base" class="text-zinc-900">{{ __('Form Pelanggaran') }}</flux:heading>
 
             <div class="relative">
                 <flux:field>
@@ -18,9 +21,9 @@
                         @foreach($hasilPencarian as $s)
                             <button wire:click="selectSiswa({{ $s['id'] }})"
                                 @click="searchOpen = false"
-                                class="w-full text-left px-3 py-2 text-sm hover:bg-zinc-100 flex items-center justify-between">
-                                <span>{{ $s['nama'] }}</span>
-                                <span class="text-zinc-400 text-xs">{{ $s['nis'] }} - {{ $s['kelas'] }}</span>
+                                class="w-full text-left px-4 py-2.5 text-sm hover:bg-zinc-50 flex items-center justify-between transition">
+                                <span class="font-medium text-zinc-900">{{ $s['nama'] }}</span>
+                                <span class="text-zinc-500 text-xs">{{ $s['nis'] }} - {{ $s['kelas'] }}</span>
                             </button>
                         @endforeach
                     </div>
@@ -44,42 +47,45 @@
                 <flux:error name="keterangan" />
             </flux:field>
 
-            <flux:button variant="primary" wire:click="simpan" class="w-full">
+            <flux:button variant="primary" wire:click="simpan" class="w-full" icon="check">
                 {{ __('Simpan Pelanggaran') }}
             </flux:button>
-        </flux:card>
+        </div>
 
-        <flux:card class="space-y-4">
-            <flux:heading size="base">{{ __('Pelanggaran Terbaru') }}</flux:heading>
+        <div class="bg-white rounded-xl border border-zinc-200 shadow-sm p-6 space-y-4">
+            <flux:heading size="base" class="text-zinc-900">{{ __('Pelanggaran Terbaru') }}</flux:heading>
 
             <div class="overflow-auto max-h-96">
                 <table class="w-full text-sm">
                     <thead>
-                        <tr class="border-b-2 border-zinc-300 sticky top-0 bg-white">
-                            <th class="text-left p-2 font-semibold text-zinc-700">{{ __('Siswa') }}</th>
-                            <th class="text-left p-2 font-semibold text-zinc-700">{{ __('Jenis') }}</th>
-                            <th class="text-left p-2 font-semibold text-zinc-700">{{ __('Poin') }}</th>
-                            <th class="text-left p-2 font-semibold text-zinc-700">{{ __('Tanggal') }}</th>
+                        <tr class="bg-zinc-50 border-b border-zinc-200 sticky top-0">
+                            <th class="text-left p-3 font-semibold text-zinc-700">{{ __('Siswa') }}</th>
+                            <th class="text-left p-3 font-semibold text-zinc-700">{{ __('Jenis') }}</th>
+                            <th class="text-left p-3 font-semibold text-zinc-700">{{ __('Poin') }}</th>
+                            <th class="text-left p-3 font-semibold text-zinc-700">{{ __('Tanggal') }}</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-zinc-300">
+                    <tbody class="divide-y divide-zinc-200">
                         @forelse($recent as $r)
                             <tr wire:key="rec-{{ $r->id }}">
-                                <td class="p-2">{{ $r->user?->siswa?->nama ?? $r->user?->name ?? '-' }}</td>
-                                <td class="p-2">{{ $r->poinPelanggaran?->jenis_pelanggaran ?? '-' }}</td>
-                                <td class="p-2">
+                                <td class="p-3 font-medium text-zinc-900">{{ $r->user?->siswa?->nama ?? $r->user?->name ?? '-' }}</td>
+                                <td class="p-3 text-zinc-600">{{ $r->poinPelanggaran?->jenis_pelanggaran ?? '-' }}</td>
+                                <td class="p-3">
                                     <flux:badge color="red" size="sm">{{ $r->poinPelanggaran?->poin ?? 0 }}</flux:badge>
                                 </td>
-                                <td class="p-2">{{ $r->created_at->format('d/m/Y H:i') }}</td>
+                                <td class="p-3 text-zinc-500 text-xs">{{ $r->created_at->format('d/m/Y H:i') }}</td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="p-4 text-center text-zinc-500">{{ __('Belum ada pelanggaran.') }}</td>
+                                <td colspan="4" class="p-8 text-center">
+                                    <flux:icon.exclamation-circle class="size-8 text-zinc-300 mx-auto mb-2" />
+                                    <flux:text class="text-zinc-500">{{ __('Belum ada pelanggaran.') }}</flux:text>
+                                </td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
-        </flux:card>
+        </div>
     </div>
 </div>
