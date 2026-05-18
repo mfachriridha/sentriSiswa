@@ -80,13 +80,33 @@ select:focus[data-flux-control] {
 }
 
 [data-flux-sidebar-item][data-current] {
-    @apply bg-brand-50 text-brand-700 font-medium;
+    @apply bg-brand-50 text-brand-700 font-semibold;
 }
 
 [data-flux-sidebar-item][data-current]:hover {
     @apply bg-brand-100;
 }
 
+[data-flux-sidebar-item] {
+    @apply !text-zinc-700 !font-medium;
+}
+
+[data-flux-sidebar-item]:hover {
+    @apply !text-zinc-900;
+}
+
 [data-flux-sidebar-group] > div:first-child {
-    @apply text-zinc-600;
+    @apply !text-zinc-600 !font-semibold;
+}
+
+[data-flux-sidebar-brand] [data-content] {
+    @apply !text-zinc-800 !font-semibold;
+}
+
+[data-flux-sidebar-profile] {
+    @apply !text-zinc-700;
+}
+
+[data-flux-sidebar-profile] span {
+    @apply !text-zinc-700 !font-medium;
 }
