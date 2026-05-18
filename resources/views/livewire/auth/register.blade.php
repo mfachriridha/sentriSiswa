@@ -1,6 +1,6 @@
 <div class="w-full max-w-md mx-auto">
     <div class="mb-6 text-center">
-        <flux:heading size="xl" class="mb-2">{{ __('Daftar Akun') }}</flux:heading>
+        <flux:heading size="xl" class="mb-2">{{ __('Daftar ke Sentri Siswa') }}</flux:heading>
         <flux:subheading>{{ __('Masukkan NIP atau NIS untuk mendaftar') }}</flux:subheading>
     </div>
 

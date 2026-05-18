@@ -132,6 +132,8 @@
                     <flux:menu.item :href="route('guru.profile')" icon="cog" wire:navigate>{{ __('Profile') }}</flux:menu.item>
                     @elseif($role === 'siswa')
                     <flux:menu.item :href="route('siswa.profile')" icon="cog" wire:navigate>{{ __('Profile') }}</flux:menu.item>
+                    @else
+                    <flux:menu.item :href="route('profile.edit')" icon="cog" wire:navigate>{{ __('Settings') }}</flux:menu.item>
                     @endif
                 </flux:menu.radio.group>
                 <flux:menu.separator />

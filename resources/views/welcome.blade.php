@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Portal Absensi - {{ config('sekolah.nama', 'SMA Negeri 1 ...') }}</title>
+        <title>Sentri Siswa - {{ config('sekolah.nama', 'SMAN 11 KABUPATEN TANGERANG') }}</title>
     <link rel="icon" href="/favicon.ico" sizes="any">
     @fonts
     @vite(['resources/css/app.css'])
@@ -30,7 +30,7 @@
                     <svg class="w-8 h-8 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                     </svg>
-                    {{ config('sekolah.nama', 'Portal Absensi') }}
+                    {{ config('app.name', 'Sentri Siswa') }}
                 </a>
                 <nav class="hidden md:flex items-center gap-1 text-sm">
                     <a href="#fitur" class="px-4 py-2 text-zinc-600 hover:text-brand-700 rounded-lg transition">Fitur</a>
@@ -39,6 +39,12 @@
                 </nav>
                 <div class="flex items-center gap-3">
                     @auth
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="px-5 py-2 text-sm text-zinc-500 hover:text-red-600 rounded-lg transition no-underline cursor-pointer border-0 bg-transparent">
+                                {{ __('Keluar') }}
+                            </button>
+                        </form>
                         <a href="{{ route('dashboard') }}" class="px-5 py-2 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 transition no-underline">
                             Dashboard
                         </a>
