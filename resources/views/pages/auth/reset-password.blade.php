@@ -44,11 +44,9 @@
                 viewable
             />
 
-            <div class="flex items-center justify-end">
-                <flux:button type="submit" variant="primary" class="w-full" data-test="reset-password-button">
-                    {{ __('Reset password') }}
-                </flux:button>
-            </div>
+            <flux:button type="submit" variant="primary" class="w-full" data-test="reset-password-button">
+                {{ __('Reset password') }}
+            </flux:button>
         </form>
     </div>
 </x-layouts::auth>

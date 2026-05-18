@@ -8,10 +8,10 @@
                 {{ __('Unduh template CSV yang sesuai, isi data, lalu upload melalui form di samping.') }}
             </flux:text>
             <div class="flex gap-2">
-                <flux:button icon="arrow-down-tray" wire:click="downloadTemplate('guru')">
+                <flux:button variant="outline" icon="arrow-down-tray" wire:click="downloadTemplate('guru')">
                     {{ __('Template Guru') }}
                 </flux:button>
-                <flux:button icon="arrow-down-tray" wire:click="downloadTemplate('siswa')">
+                <flux:button variant="outline" icon="arrow-down-tray" wire:click="downloadTemplate('siswa')">
                     {{ __('Template Siswa') }}
                 </flux:button>
             </div>

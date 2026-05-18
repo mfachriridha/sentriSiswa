@@ -32,7 +32,7 @@
                     viewable
                 />
                 @if (Route::has('password.request'))
-                    <div class="mt-1 text-right">
+                    <div class="mt-1 text-end">
                         <a href="{{ route('password.request') }}" class="text-xs text-brand-600 hover:text-brand-700 dark:text-brand-400" wire:navigate>
                             {{ __('Lupa password?') }}
                         </a>
@@ -42,7 +42,7 @@
 
             <flux:checkbox name="remember" :label="__('Ingat saya')" :checked="old('remember')" />
 
-            <flux:button type="submit" class="w-full !bg-brand-600 hover:!bg-brand-700 !text-white" data-test="login-button">
+            <flux:button type="submit" variant="primary" class="w-full" data-test="login-button">
                 {{ __('Masuk') }}
             </flux:button>
         </form>

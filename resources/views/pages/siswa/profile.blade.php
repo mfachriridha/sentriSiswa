@@ -1,8 +1,11 @@
 <x-layouts::app.sidebar :title="__('Profile Siswa')">
     <div class="p-6">
-        <flux:heading size="xl" class="mb-6">{{ __('Profile Siswa') }}</flux:heading>
-        <div class="p-8 text-center text-zinc-500 border border-dashed border-zinc-300 rounded-lg">
-            Halaman ini sedang dalam pengembangan.
+        <flux:heading size="xl" class="mb-2">{{ __('Profile Siswa') }}</flux:heading>
+        <flux:subheading class="mb-6">{{ __('Lihat dan kelola data diri Anda') }}</flux:subheading>
+        <div class="p-8 text-center text-brand-500 border-2 border-dashed border-brand-300 rounded-xl bg-brand-50/50">
+            <flux:icon.user-circle class="size-8 mx-auto mb-3 text-brand-400" />
+            <flux:heading size="base" class="text-brand-700 mb-1">{{ __('Halaman Dalam Pengembangan') }}</flux:heading>
+            <flux:text class="text-brand-500">{{ __('Fitur ini akan segera tersedia.') }}</flux:text>
         </div>
     </div>
 </x-layouts::app.sidebar>

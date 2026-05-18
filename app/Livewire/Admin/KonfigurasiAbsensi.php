@@ -42,6 +42,7 @@ class KonfigurasiAbsensi extends Component
         );
 
         $this->dispatch('saved');
+        $this->js('Flux.toast.success({ message: "Konfigurasi berhasil disimpan." })');
     }
 
     public function render()

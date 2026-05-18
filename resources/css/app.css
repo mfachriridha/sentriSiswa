@@ -23,8 +23,8 @@
     --color-zinc-900: #171717;
     --color-zinc-950: #0a0a0a;
 
-    --color-accent: var(--color-neutral-800);
-    --color-accent-content: var(--color-neutral-800);
+    --color-accent: var(--color-brand-600);
+    --color-accent-content: var(--color-brand-600);
     --color-accent-foreground: var(--color-white);
 
     --color-brand-50: #f0f7fa;
@@ -42,8 +42,8 @@
 
 @layer theme {
     .dark {
-        --color-accent: var(--color-white);
-        --color-accent-content: var(--color-white);
+        --color-accent: var(--color-brand-400);
+        --color-accent-content: var(--color-brand-400);
         --color-accent-foreground: var(--color-neutral-800);
     }
 }
@@ -61,6 +61,24 @@
 
 [data-flux-field]:not(ui-radio, ui-checkbox) {
     @apply grid gap-2;
+}
+
+[data-flux-label] {
+    @apply !mb-0 !leading-tight;
+}
+
+input:focus[data-flux-control],
+textarea:focus[data-flux-control],
+select:focus[data-flux-control] {
+    @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
+}
+
+[data-flux-sidebar-item][data-current] {
+    @apply bg-brand-50 text-brand-700 font-medium;
+}
+
+[data-flux-sidebar-item][data-current]:hover {
+    @apply bg-brand-100;
 }
 
 [data-flux-label] {

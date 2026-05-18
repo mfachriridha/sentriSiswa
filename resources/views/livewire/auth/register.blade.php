@@ -24,15 +24,10 @@
 
         @if($role === 'guru')
             <div class="flex flex-col gap-4">
-                <flux:input
-                    wire:model="nip"
-                    label="{{ __('NIP') }}"
-                    placeholder="12312312 123412 1 123"
-                    autofocus
-                />
-                @error('nip')
-                    <p class="text-sm text-red-500">{{ $message }}</p>
-                @enderror
+                <flux:field>
+                    <flux:input wire:model="nip" label="{{ __('NIP') }}" placeholder="12312312 123412 1 123" autofocus />
+                    <flux:error name="nip" />
+                </flux:field>
 
                 <flux:button wire:click="cekIdentitas" variant="primary" class="w-full">
                     {{ __('Cek NIP') }}
@@ -40,15 +35,10 @@
             </div>
         @else
             <div class="flex flex-col gap-4">
-                <flux:input
-                    wire:model="nis"
-                    label="{{ __('NIS') }}"
-                    placeholder="123456789"
-                    autofocus
-                />
-                @error('nis')
-                    <p class="text-sm text-red-500">{{ $message }}</p>
-                @enderror
+                <flux:field>
+                    <flux:input wire:model="nis" label="{{ __('NIS') }}" placeholder="123456789" autofocus />
+                    <flux:error name="nis" />
+                </flux:field>
 
                 <flux:button wire:click="cekIdentitas" variant="primary" class="w-full">
                     {{ __('Cek NIS') }}
@@ -66,53 +56,26 @@
         </div>
 
         <form wire:submit="register" class="flex flex-col gap-4">
-            <flux:input
-                wire:model="email"
-                label="{{ __('Email') }}"
-                type="email"
-                required
-                autocomplete="email"
-                placeholder="email@example.com"
-                autofocus
-            />
-            @error('email')
-                <p class="text-sm text-red-500">{{ $message }}</p>
-            @enderror
+            <flux:field>
+                <flux:input wire:model="email" label="{{ __('Email') }}" type="email" required autocomplete="email" placeholder="email@example.com" autofocus />
+                <flux:error name="email" />
+            </flux:field>
 
-            <flux:input
-                wire:model="password"
-                label="{{ __('Password') }}"
-                type="password"
-                required
-                autocomplete="new-password"
-                placeholder="{{ __('Password') }}"
-                viewable
-            />
+            <flux:field>
+                <flux:input wire:model="password" label="{{ __('Password') }}" type="password" required autocomplete="new-password" placeholder="{{ __('Password') }}" viewable />
+                <flux:error name="password" />
+            </flux:field>
 
-            <flux:input
-                wire:model="password_confirmation"
-                label="{{ __('Ulangi Password') }}"
-                type="password"
-                required
-                autocomplete="new-password"
-                placeholder="{{ __('Ulangi Password') }}"
-                viewable
-            />
-            @error('password')
-                <p class="text-sm text-red-500">{{ $message }}</p>
-            @enderror
+            <flux:field>
+                <flux:input wire:model="password_confirmation" label="{{ __('Ulangi Password') }}" type="password" required autocomplete="new-password" placeholder="{{ __('Ulangi Password') }}" viewable />
+                <flux:error name="password_confirmation" />
+            </flux:field>
 
             @if($role === 'guru')
-                <flux:input
-                    wire:model="no_hp"
-                    label="{{ __('Nomor HP (aktif WhatsApp)') }}"
-                    type="tel"
-                    required
-                    placeholder="08123456789"
-                />
-                @error('no_hp')
-                    <p class="text-sm text-red-500">{{ $message }}</p>
-                @enderror
+                <flux:field>
+                    <flux:input wire:model="no_hp" label="{{ __('Nomor HP (aktif WhatsApp)') }}" type="tel" required placeholder="08123456789" />
+                    <flux:error name="no_hp" />
+                </flux:field>
             @endif
 
             <flux:button type="submit" variant="primary" class="w-full mt-2">
