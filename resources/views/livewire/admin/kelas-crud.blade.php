@@ -10,16 +10,16 @@
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead>
-                    <tr class="border-b border-zinc-200 dark:border-zinc-700">
+                    <tr class="border-b border-zinc-200">
                         <th class="text-left p-3 font-medium text-zinc-500">{{ __('Nama Kelas') }}</th>
                         <th class="text-left p-3 font-medium text-zinc-500">{{ __('Tingkat') }}</th>
                         <th class="text-left p-3 font-medium text-zinc-500">{{ __('Jurusan') }}</th>
                         <th class="text-right p-3 font-medium text-zinc-500">{{ __('Aksi') }}</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-zinc-200 dark:divide-zinc-700">
+                <tbody class="divide-y divide-zinc-200">
                     @forelse($semuaKelas as $kelas)
-                        <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800" wire:key="kelas-{{ $kelas->id }}">
+                        <tr class="hover:bg-zinc-50" wire:key="kelas-{{ $kelas->id }}">
                             <td class="p-3">{{ $kelas->nama }}</td>
                             <td class="p-3">{{ $kelas->tingkat }}</td>
                             <td class="p-3">{{ $kelas->jurusan }}</td>

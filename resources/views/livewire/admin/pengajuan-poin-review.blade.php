@@ -14,7 +14,7 @@
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead>
-                    <tr class="border-b border-zinc-200 dark:border-zinc-700">
+                    <tr class="border-b border-zinc-200">
                         <th class="text-left p-3 font-medium text-zinc-500">{{ __('Siswa') }}</th>
                         <th class="text-left p-3 font-medium text-zinc-500">{{ __('Pengaju') }}</th>
                         <th class="text-left p-3 font-medium text-zinc-500">{{ __('Poin') }}</th>
@@ -24,7 +24,7 @@
                         <th class="text-right p-3 font-medium text-zinc-500">{{ __('Aksi') }}</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-zinc-200 dark:divide-zinc-700">
+                <tbody class="divide-y divide-zinc-200">
                     @forelse($daftarPengajuan as $p)
                         <tr wire:key="pengajuan-{{ $p->id }}">
                             <td class="p-3">{{ $p->user?->siswa?->nama ?? $p->user?->name ?? '-' }}</td>
@@ -32,7 +32,7 @@
                             <td class="p-3">
                                 <flux:badge color="green" size="sm">+{{ $p->jumlah_poin }}</flux:badge>
                             </td>
-                            <td class="p-3 max-w-xs truncate">{{ $p->keterangan ?? '-' }}</td>
+                            <td class="p-3 max-w-xs truncate" title="{{ $p->keterangan }}">{{ $p->keterangan ?? '-' }}</td>
                             <td class="p-3">
                                 <flux:badge
                                     :color="$p->status === 'disetujui' ? 'green' : ($p->status === 'ditolak' ? 'red' : 'amber')"
@@ -40,7 +40,7 @@
                                     {{ ucfirst($p->status) }}
                                 </flux:badge>
                             </td>
-                            <td class="p-3 max-w-xs truncate">{{ $p->catatan_admin ?? '-' }}</td>
+                            <td class="p-3 max-w-xs truncate" title="{{ $p->catatan_admin }}">{{ $p->catatan_admin ?? '-' }}</td>
                             <td class="p-3 text-right">
                                 @if($p->status === 'pending')
                                     <div class="flex justify-end gap-1">

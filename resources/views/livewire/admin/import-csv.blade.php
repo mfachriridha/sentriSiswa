@@ -54,7 +54,7 @@
                     @if(!empty($result['errors']))
                         <div class="max-h-48 overflow-y-auto space-y-1 mt-2">
                             @foreach($result['errors'] as $error)
-                                <div class="text-xs text-red-600 bg-red-50 dark:bg-red-950 dark:text-red-400 p-2 rounded">
+                                <div class="text-xs text-red-600 bg-red-50 p-2 rounded">
                                     {{ $error }}
                                 </div>
                             @endforeach

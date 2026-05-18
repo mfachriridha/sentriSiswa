@@ -129,9 +129,9 @@
                 <flux:menu.separator />
                 <flux:menu.radio.group>
                     @if($role === 'guru')
-                    <flux:menu.item :href="route('guru.profile')" icon="cog" wire:navigate>{{ __('Profile') }}</flux:menu.item>
+                    <flux:menu.item :href="route('guru.profile')" icon="user-circle" wire:navigate>{{ __('Profile') }}</flux:menu.item>
                     @elseif($role === 'siswa')
-                    <flux:menu.item :href="route('siswa.profile')" icon="cog" wire:navigate>{{ __('Profile') }}</flux:menu.item>
+                    <flux:menu.item :href="route('siswa.profile')" icon="user-circle" wire:navigate>{{ __('Profile') }}</flux:menu.item>
                     @endif
                 </flux:menu.radio.group>
                 <flux:menu.separator />

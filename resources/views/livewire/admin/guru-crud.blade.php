@@ -10,7 +10,7 @@
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead>
-                    <tr class="border-b border-zinc-200 dark:border-zinc-700">
+                    <tr class="border-b border-zinc-200">
                         <th class="text-left p-3 font-medium text-zinc-500">{{ __('Nama') }}</th>
                         <th class="text-left p-3 font-medium text-zinc-500">{{ __('NIP') }}</th>
                         <th class="text-left p-3 font-medium text-zinc-500">{{ __('No HP') }}</th>
@@ -20,9 +20,9 @@
                         <th class="text-right p-3 font-medium text-zinc-500">{{ __('Aksi') }}</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-zinc-200 dark:divide-zinc-700">
+                <tbody class="divide-y divide-zinc-200">
                     @forelse($semuaGuru as $guru)
-                        <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer"
+                        <tr class="hover:bg-zinc-50 cursor-pointer"
                             wire:key="guru-{{ $guru->id }}" wire:click="openDetail({{ $guru->id }})">
                             <td class="p-3">{{ $guru->nama }}</td>
                             <td class="p-3">{{ $guru->nip }}</td>
@@ -84,7 +84,7 @@
                 <flux:heading size="lg">{{ __('Detail Guru') }}: {{ $g->nama }}</flux:heading>
             @endif
 
-            <div class="flex border-b border-zinc-200 dark:border-zinc-700">
+            <div class="flex border-b border-zinc-200">
                 <button wire:click="setDetailTab('data')"
                     class="px-4 py-2 text-sm font-medium border-b-2 transition {{ $detailTab === 'data' ? 'border-brand-600 text-brand-600' : 'border-transparent text-zinc-500 hover:text-zinc-700' }}">
                     {{ __('Data Guru') }}

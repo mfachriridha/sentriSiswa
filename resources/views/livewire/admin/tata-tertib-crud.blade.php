@@ -10,17 +10,17 @@
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead>
-                    <tr class="border-b border-zinc-200 dark:border-zinc-700">
+                    <tr class="border-b border-zinc-200">
                         <th class="text-left p-3 font-medium text-zinc-500">{{ __('Judul') }}</th>
                         <th class="text-left p-3 font-medium text-zinc-500">{{ __('Tanggal Upload') }}</th>
                         <th class="text-right p-3 font-medium text-zinc-500">{{ __('Aksi') }}</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-zinc-200 dark:divide-zinc-700">
+                <tbody class="divide-y divide-zinc-200">
                     @forelse($daftarTataTertib as $tt)
                         <tr wire:key="tt-{{ $tt->id }}">
                             <td class="p-3">{{ $tt->judul }}</td>
-                            <td class="p-3">{{ $tt->created_at->format('d M Y H:i') }}</td>
+                            <td class="p-3">{{ $tt->created_at->format('d M Y') }}</td>
                             <td class="p-3 text-right">
                                 <div class="flex justify-end gap-1">
                                     <a href="{{ asset('storage/' . $tt->file_pdf) }}" target="_blank">

@@ -13,12 +13,12 @@
                 </flux:field>
 
                 @if(!empty($hasilPencarian))
-                    <div class="absolute z-10 w-full mt-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-lg max-h-48 overflow-y-auto"
+                    <div class="absolute z-10 w-full mt-1 bg-white border border-zinc-200 rounded-lg shadow-lg max-h-48 overflow-y-auto"
                         x-show="searchOpen">
                         @foreach($hasilPencarian as $s)
                             <button wire:click="selectSiswa({{ $s['id'] }})"
                                 @click="searchOpen = false"
-                                class="w-full text-left px-3 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-between">
+                                class="w-full text-left px-3 py-2 text-sm hover:bg-zinc-100 flex items-center justify-between">
                                 <span>{{ $s['nama'] }}</span>
                                 <span class="text-zinc-400 text-xs">{{ $s['nis'] }} - {{ $s['kelas'] }}</span>
                             </button>
@@ -52,17 +52,17 @@
         <flux:card class="space-y-4">
             <flux:heading size="base">{{ __('Pelanggaran Terbaru') }}</flux:heading>
 
-            <div class="overflow-x-auto max-h-96 overflow-y-auto">
-                <table class="w-full text-xs">
+            <div class="overflow-auto max-h-96">
+                <table class="w-full text-sm">
                     <thead>
-                        <tr class="border-b border-zinc-200 dark:border-zinc-700 sticky top-0 bg-white dark:bg-zinc-900">
+                        <tr class="border-b border-zinc-200 sticky top-0 bg-white">
                             <th class="text-left p-2 font-medium text-zinc-500">{{ __('Siswa') }}</th>
                             <th class="text-left p-2 font-medium text-zinc-500">{{ __('Jenis') }}</th>
                             <th class="text-left p-2 font-medium text-zinc-500">{{ __('Poin') }}</th>
                             <th class="text-left p-2 font-medium text-zinc-500">{{ __('Tanggal') }}</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-zinc-200 dark:divide-zinc-700">
+                    <tbody class="divide-y divide-zinc-200">
                         @forelse($recent as $r)
                             <tr wire:key="rec-{{ $r->id }}">
                                 <td class="p-2">{{ $r->user?->siswa?->nama ?? $r->user?->name ?? '-' }}</td>

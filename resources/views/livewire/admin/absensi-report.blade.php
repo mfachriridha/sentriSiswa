@@ -40,7 +40,7 @@
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead>
-                    <tr class="border-b border-zinc-200 dark:border-zinc-700">
+                    <tr class="border-b border-zinc-200">
                         <th class="text-left p-3 font-medium text-zinc-500">{{ __('Nama') }}</th>
                         <th class="text-left p-3 font-medium text-zinc-500">{{ __('Kelas') }}</th>
                         <th class="text-left p-3 font-medium text-zinc-500">{{ __('Tanggal') }}</th>
@@ -50,7 +50,7 @@
                         <th class="text-left p-3 font-medium text-zinc-500">{{ __('Keterangan') }}</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-zinc-200 dark:divide-zinc-700">
+                <tbody class="divide-y divide-zinc-200">
                     @forelse($absensi as $a)
                         <tr wire:key="absensi-{{ $a->id }}">
                             <td class="p-3">{{ $a->user?->siswa?->nama ?? $a->user?->name ?? '-' }}</td>
@@ -74,7 +74,7 @@
                                     <span class="text-zinc-400 text-xs">-</span>
                                 @endif
                             </td>
-                            <td class="p-3 max-w-xs truncate">{{ $a->keterangan ?? '-' }}</td>
+                            <td class="p-3 max-w-xs truncate" title="{{ $a->keterangan }}">{{ $a->keterangan ?? '-' }}</td>
                         </tr>
                     @empty
                         <tr>
@@ -85,7 +85,7 @@
             </table>
         </div>
 
-        <div class="p-3 border-t border-zinc-200 dark:border-zinc-700">
+        <div class="p-3 border-t border-zinc-200">
             {{ $absensi->links() }}
         </div>
     </flux:card>
@@ -94,7 +94,7 @@
     <div x-show="showFoto" x-transition
         class="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
         @click.self="showFoto = false">
-        <div class="bg-white dark:bg-zinc-900 rounded-xl max-w-lg mx-4 overflow-hidden shadow-2xl">
+        <div class="bg-white rounded-xl max-w-lg mx-4 overflow-hidden shadow-2xl">
             <div class="flex justify-end p-2">
                 <flux:button icon="x-mark" variant="ghost" size="sm" @click="showFoto = false" />
             </div>

@@ -10,7 +10,7 @@
         @php $items = $grouped->get($cat, collect()); @endphp
         <flux:card class="mb-4 overflow-hidden" wire:key="cat-{{ $cat }}">
             <button wire:click="toggleCategory('{{ $cat }}')"
-                class="w-full flex items-center justify-between p-4 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition">
+                class="w-full flex items-center justify-between p-4 hover:bg-zinc-50 transition">
                 <div class="flex items-center gap-2">
                     <flux:icon.chevron-right class="size-4 transition-transform {{ in_array($cat, $expandedCategories) ? 'rotate-90' : '' }}" />
                     <flux:heading size="base">
@@ -21,12 +21,12 @@
             </button>
 
             @if(in_array($cat, $expandedCategories))
-                <div class="border-t border-zinc-200 dark:border-zinc-700">
+                <div class="border-t border-zinc-200">
                     @if($items->count())
                         <table class="w-full text-sm">
-                            <tbody class="divide-y divide-zinc-200 dark:divide-zinc-700">
+                            <tbody class="divide-y divide-zinc-200">
                                 @foreach($items as $item)
-                                    <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-800" wire:key="poin-{{ $item->id }}">
+                                    <tr class="hover:bg-zinc-50" wire:key="poin-{{ $item->id }}">
                                         <td class="p-3">{{ $item->jenis_pelanggaran }}</td>
                                         <td class="p-3 text-center">
                                             <flux:badge color="red" size="sm">{{ $item->poin }}</flux:badge>
