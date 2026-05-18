@@ -16,16 +16,6 @@ Route::middleware(['auth'])->group(function () {
             default => '/',
         });
     })->name('dashboard');
-
-    Route::get('/profile', function () {
-        $role = auth()->user()->role;
-
-        return redirect(match ($role) {
-            UserRole::Guru->value => route('guru.profile'),
-            UserRole::Siswa->value => route('siswa.profile'),
-            default => route('home'),
-        });
-    })->name('profile.edit');
 });
 
 require __DIR__.'/admin.php';

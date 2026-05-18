@@ -5,6 +5,15 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
+beforeEach(function () {
+    $this->admin = User::factory()->create([
+        'email' => 'admin@sekolah.sch.id',
+        'password' => 'admin123',
+        'role' => 'admin',
+        'name' => 'Admin',
+    ]);
+});
+
 test('landing page returns 200 with branding', function () {
     $this->get('/')->assertOk()->assertSee('Sentri Siswa');
 });
@@ -23,15 +32,8 @@ test('register page returns 200 with branding', function () {
 });
 
 test('admin can login and redirect to dashboard', function () {
-    $admin = User::factory()->create([
-        'email' => 'admin@sekolah.sch.id',
-        'password' => 'admin123',
-        'role' => 'admin',
-        'name' => 'Admin',
-    ]);
-
     $response = $this->post('/login', [
-        'email' => 'admin@sekolah.sch.id',
+        'email' => $this->admin->email,
         'password' => 'admin123',
     ]);
 
@@ -40,14 +42,7 @@ test('admin can login and redirect to dashboard', function () {
 });
 
 test('admin dashboard loads without error', function () {
-    $admin = User::factory()->create([
-        'email' => 'admin@sekolah.sch.id',
-        'password' => 'admin123',
-        'role' => 'admin',
-        'name' => 'Admin',
-    ]);
-
-    $this->actingAs($admin)
+    $this->actingAs($this->admin)
         ->get('/admin/dashboard')
         ->assertOk()
         ->assertDontSee('Internal Server Error')
@@ -55,14 +50,7 @@ test('admin dashboard loads without error', function () {
 });
 
 test('all admin routes load without error', function (string $route) {
-    $admin = User::factory()->create([
-        'email' => 'admin@sekolah.sch.id',
-        'password' => 'admin123',
-        'role' => 'admin',
-        'name' => 'Admin',
-    ]);
-
-    $this->actingAs($admin)
+    $this->actingAs($this->admin)
         ->get($route)
         ->assertOk()
         ->assertDontSee('Internal Server Error')
@@ -79,19 +67,6 @@ test('all admin routes load without error', function (string $route) {
     '/admin/absensi',
     '/admin/konfigurasi',
 ]);
-
-test('profile.edit route redirects for admin', function () {
-    $admin = User::factory()->create([
-        'email' => 'admin@sekolah.sch.id',
-        'password' => 'admin123',
-        'role' => 'admin',
-        'name' => 'Admin',
-    ]);
-
-    $this->actingAs($admin)
-        ->get('/profile')
-        ->assertRedirect(route('home'));
-});
 
 test('guest cannot access admin routes', function () {
     $this->get('/admin/dashboard')
