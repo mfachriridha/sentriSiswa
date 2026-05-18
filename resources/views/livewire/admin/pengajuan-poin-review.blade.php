@@ -14,17 +14,17 @@
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead>
-                    <tr class="border-b border-zinc-200">
-                        <th class="text-left p-3 font-medium text-zinc-500">{{ __('Siswa') }}</th>
-                        <th class="text-left p-3 font-medium text-zinc-500">{{ __('Pengaju') }}</th>
-                        <th class="text-left p-3 font-medium text-zinc-500">{{ __('Poin') }}</th>
-                        <th class="text-left p-3 font-medium text-zinc-500">{{ __('Keterangan') }}</th>
-                        <th class="text-left p-3 font-medium text-zinc-500">{{ __('Status') }}</th>
-                        <th class="text-left p-3 font-medium text-zinc-500">{{ __('Catatan Admin') }}</th>
-                        <th class="text-right p-3 font-medium text-zinc-500">{{ __('Aksi') }}</th>
+                    <tr class="border-b-2 border-zinc-300">
+                        <th class="text-left p-3 font-semibold text-zinc-700">{{ __('Siswa') }}</th>
+                        <th class="text-left p-3 font-semibold text-zinc-700">{{ __('Pengaju') }}</th>
+                        <th class="text-left p-3 font-semibold text-zinc-700">{{ __('Poin') }}</th>
+                        <th class="text-left p-3 font-semibold text-zinc-700">{{ __('Keterangan') }}</th>
+                        <th class="text-left p-3 font-semibold text-zinc-700">{{ __('Status') }}</th>
+                        <th class="text-left p-3 font-semibold text-zinc-700">{{ __('Catatan Admin') }}</th>
+                        <th class="text-right p-3 font-semibold text-zinc-700">{{ __('Aksi') }}</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-zinc-200">
+                <tbody class="divide-y divide-zinc-300">
                     @forelse($daftarPengajuan as $p)
                         <tr wire:key="pengajuan-{{ $p->id }}">
                             <td class="p-3">{{ $p->user?->siswa?->nama ?? $p->user?->name ?? '-' }}</td>

@@ -13,7 +13,7 @@
                 </flux:field>
 
                 @if(!empty($hasilPencarian))
-                    <div class="absolute z-10 w-full mt-1 bg-white border border-zinc-200 rounded-lg shadow-lg max-h-48 overflow-y-auto"
+                    <div class="absolute z-10 w-full mt-1 bg-white border-2 border-zinc-300 rounded-lg shadow-lg max-h-48 overflow-y-auto"
                         x-show="searchOpen">
                         @foreach($hasilPencarian as $s)
                             <button wire:click="selectSiswa({{ $s['id'] }})"
@@ -55,14 +55,14 @@
             <div class="overflow-auto max-h-96">
                 <table class="w-full text-sm">
                     <thead>
-                        <tr class="border-b border-zinc-200 sticky top-0 bg-white">
-                            <th class="text-left p-2 font-medium text-zinc-500">{{ __('Siswa') }}</th>
-                            <th class="text-left p-2 font-medium text-zinc-500">{{ __('Jenis') }}</th>
-                            <th class="text-left p-2 font-medium text-zinc-500">{{ __('Poin') }}</th>
-                            <th class="text-left p-2 font-medium text-zinc-500">{{ __('Tanggal') }}</th>
+                        <tr class="border-b-2 border-zinc-300 sticky top-0 bg-white">
+                            <th class="text-left p-2 font-semibold text-zinc-700">{{ __('Siswa') }}</th>
+                            <th class="text-left p-2 font-semibold text-zinc-700">{{ __('Jenis') }}</th>
+                            <th class="text-left p-2 font-semibold text-zinc-700">{{ __('Poin') }}</th>
+                            <th class="text-left p-2 font-semibold text-zinc-700">{{ __('Tanggal') }}</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-zinc-200">
+                    <tbody class="divide-y divide-zinc-300">
                         @forelse($recent as $r)
                             <tr wire:key="rec-{{ $r->id }}">
                                 <td class="p-2">{{ $r->user?->siswa?->nama ?? $r->user?->name ?? '-' }}</td>

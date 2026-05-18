@@ -10,14 +10,14 @@
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead>
-                    <tr class="border-b border-zinc-200">
-                        <th class="text-left p-3 font-medium text-zinc-500">{{ __('Nama Kelas') }}</th>
-                        <th class="text-left p-3 font-medium text-zinc-500">{{ __('Tingkat') }}</th>
-                        <th class="text-left p-3 font-medium text-zinc-500">{{ __('Jurusan') }}</th>
-                        <th class="text-right p-3 font-medium text-zinc-500">{{ __('Aksi') }}</th>
+                    <tr class="border-b-2 border-zinc-300">
+                        <th class="text-left p-3 font-semibold text-zinc-700">{{ __('Nama Kelas') }}</th>
+                        <th class="text-left p-3 font-semibold text-zinc-700">{{ __('Tingkat') }}</th>
+                        <th class="text-left p-3 font-semibold text-zinc-700">{{ __('Jurusan') }}</th>
+                        <th class="text-right p-3 font-semibold text-zinc-700">{{ __('Aksi') }}</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-zinc-200">
+                <tbody class="divide-y divide-zinc-300">
                     @forelse($semuaKelas as $kelas)
                         <tr class="hover:bg-zinc-50" wire:key="kelas-{{ $kelas->id }}">
                             <td class="p-3">{{ $kelas->nama }}</td>

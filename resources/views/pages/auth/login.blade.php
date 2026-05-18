@@ -1,8 +1,8 @@
 <x-layouts::auth :title="__('Masuk')">
     <div class="flex flex-col gap-6">
         <div class="text-center">
-            <h2 class="text-lg font-semibold text-zinc-800">{{ __('Masuk ke Sentri Siswa') }}</h2>
-            <p class="mt-1 text-sm text-zinc-500">{{ __('Masukkan email dan password Anda') }}</p>
+            <h2 class="text-xl font-bold text-zinc-900">{{ __('Masuk ke Sentri Siswa') }}</h2>
+            <p class="mt-2 text-sm text-zinc-600">{{ __('Masukkan email dan password Anda') }}</p>
         </div>
 
         <x-auth-session-status class="text-center" :status="session('status')" />
@@ -33,7 +33,7 @@
                 />
                 @if (Route::has('password.request'))
                     <div class="mt-1 text-end">
-                        <a href="{{ route('password.request') }}" class="text-xs text-brand-600 hover:text-brand-700">
+                        <a href="{{ route('password.request') }}" class="text-sm font-medium text-brand-600 hover:text-brand-700">
                             {{ __('Lupa password?') }}
                         </a>
                     </div>
@@ -48,9 +48,9 @@
         </form>
 
         @if (Route::has('register'))
-            <div class="text-center text-sm text-zinc-500">
+            <div class="text-center text-sm text-zinc-600">
                 <span>{{ __('Belum punya akun?') }}</span>
-                <a href="{{ route('register') }}" class="font-medium text-brand-600 hover:text-brand-700" wire:navigate>
+                <a href="{{ route('register') }}" class="font-semibold text-brand-600 hover:text-brand-700" wire:navigate>
                     {{ __('Daftar') }}
                 </a>
             </div>

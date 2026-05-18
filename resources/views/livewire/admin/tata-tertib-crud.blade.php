@@ -10,13 +10,13 @@
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead>
-                    <tr class="border-b border-zinc-200">
-                        <th class="text-left p-3 font-medium text-zinc-500">{{ __('Judul') }}</th>
-                        <th class="text-left p-3 font-medium text-zinc-500">{{ __('Tanggal Upload') }}</th>
-                        <th class="text-right p-3 font-medium text-zinc-500">{{ __('Aksi') }}</th>
+                    <tr class="border-b-2 border-zinc-300">
+                        <th class="text-left p-3 font-semibold text-zinc-700">{{ __('Judul') }}</th>
+                        <th class="text-left p-3 font-semibold text-zinc-700">{{ __('Tanggal Upload') }}</th>
+                        <th class="text-right p-3 font-semibold text-zinc-700">{{ __('Aksi') }}</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-zinc-200">
+                <tbody class="divide-y divide-zinc-300">
                     @forelse($daftarTataTertib as $tt)
                         <tr wire:key="tt-{{ $tt->id }}">
                             <td class="p-3">{{ $tt->judul }}</td>

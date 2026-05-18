@@ -40,17 +40,17 @@
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead>
-                    <tr class="border-b border-zinc-200">
-                        <th class="text-left p-3 font-medium text-zinc-500">{{ __('Nama') }}</th>
-                        <th class="text-left p-3 font-medium text-zinc-500">{{ __('Kelas') }}</th>
-                        <th class="text-left p-3 font-medium text-zinc-500">{{ __('Tanggal') }}</th>
-                        <th class="text-left p-3 font-medium text-zinc-500">{{ __('Jam') }}</th>
-                        <th class="text-left p-3 font-medium text-zinc-500">{{ __('Status') }}</th>
-                        <th class="text-left p-3 font-medium text-zinc-500">{{ __('Foto') }}</th>
-                        <th class="text-left p-3 font-medium text-zinc-500">{{ __('Keterangan') }}</th>
+                    <tr class="border-b-2 border-zinc-300">
+                        <th class="text-left p-3 font-semibold text-zinc-700">{{ __('Nama') }}</th>
+                        <th class="text-left p-3 font-semibold text-zinc-700">{{ __('Kelas') }}</th>
+                        <th class="text-left p-3 font-semibold text-zinc-700">{{ __('Tanggal') }}</th>
+                        <th class="text-left p-3 font-semibold text-zinc-700">{{ __('Jam') }}</th>
+                        <th class="text-left p-3 font-semibold text-zinc-700">{{ __('Status') }}</th>
+                        <th class="text-left p-3 font-semibold text-zinc-700">{{ __('Foto') }}</th>
+                        <th class="text-left p-3 font-semibold text-zinc-700">{{ __('Keterangan') }}</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-zinc-200">
+                <tbody class="divide-y divide-zinc-300">
                     @forelse($absensi as $a)
                         <tr wire:key="absensi-{{ $a->id }}">
                             <td class="p-3">{{ $a->user?->siswa?->nama ?? $a->user?->name ?? '-' }}</td>

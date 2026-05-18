@@ -1,7 +1,7 @@
 <div class="w-full max-w-md mx-auto">
     <div class="mb-6 text-center">
-        <flux:heading size="xl" class="mb-2">{{ __('Daftar ke Sentri Siswa') }}</flux:heading>
-        <flux:subheading>{{ __('Masukkan NIP atau NIS untuk mendaftar') }}</flux:subheading>
+        <flux:heading size="xl" class="mb-2 text-zinc-900">{{ __('Daftar ke Sentri Siswa') }}</flux:heading>
+        <flux:subheading class="text-zinc-600">{{ __('Masukkan NIP atau NIS untuk mendaftar') }}</flux:subheading>
     </div>
 
     @if(!$validated)
@@ -9,13 +9,13 @@
             <div class="flex rounded-lg bg-zinc-100 p-1 gap-1">
                 <button
                     wire:click="setRole('siswa')"
-                    class="flex-1 py-2.5 px-4 rounded-md text-sm font-semibold transition {{ $role === 'siswa' ? 'bg-white shadow-sm text-brand-700' : 'text-zinc-500 hover:text-zinc-700' }}"
+                    class="flex-1 py-2.5 px-4 rounded-md text-sm font-semibold transition {{ $role === 'siswa' ? 'bg-white shadow text-brand-700' : 'text-zinc-500 hover:text-zinc-700' }}"
                 >
                     {{ __('Siswa') }}
                 </button>
                 <button
                     wire:click="setRole('guru')"
-                    class="flex-1 py-2.5 px-4 rounded-md text-sm font-semibold transition {{ $role === 'guru' ? 'bg-white shadow-sm text-brand-700' : 'text-zinc-500 hover:text-zinc-700' }}"
+                    class="flex-1 py-2.5 px-4 rounded-md text-sm font-semibold transition {{ $role === 'guru' ? 'bg-white shadow text-brand-700' : 'text-zinc-500 hover:text-zinc-700' }}"
                 >
                     {{ __('Guru') }}
                 </button>
@@ -47,12 +47,12 @@
         @endif
 
     @else
-        <div class="mb-6 p-4 rounded-lg bg-brand-50 border border-brand-200">
+        <div class="mb-6 p-4 rounded-lg bg-brand-50 border-2 border-brand-300">
             <div class="flex items-center gap-2 mb-1">
                 <flux:icon.check-circle class="size-5 text-brand-600" />
-                <span class="text-sm text-brand-700 font-medium">{{ __('Selamat datang,') }}</span>
+                <span class="text-sm font-medium text-brand-700">{{ __('Selamat datang,') }}</span>
             </div>
-            <p class="text-lg font-semibold text-brand-800">{{ $nama }}</p>
+            <p class="text-lg font-bold text-brand-800">{{ $nama }}</p>
         </div>
 
         <form wire:submit="register" class="flex flex-col gap-4">
@@ -84,15 +84,15 @@
         </form>
 
         <div class="mt-4 text-center">
-            <button wire:click="setRole('{{ $role }}')" class="text-sm text-brand-600 hover:text-brand-700 underline font-medium">
+            <button wire:click="setRole('{{ $role }}')" class="text-sm font-semibold text-brand-600 hover:text-brand-700 underline">
                 {{ __('← Ganti NIP/NIS') }}
             </button>
         </div>
     @endif
 
-    <div class="mt-6 text-center text-sm text-zinc-500">
+    <div class="mt-6 text-center text-sm text-zinc-600">
         {{ __('Sudah punya akun?') }}
-        <a href="{{ route('login') }}" class="text-brand-600 hover:text-brand-700 font-medium">
+        <a href="{{ route('login') }}" class="font-semibold text-brand-600 hover:text-brand-700">
             {{ __('Masuk') }}
         </a>
     </div>

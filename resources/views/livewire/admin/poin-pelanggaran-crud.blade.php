@@ -21,10 +21,10 @@
             </button>
 
             @if(in_array($cat, $expandedCategories))
-                <div class="border-t border-zinc-200">
+                <div class="border-t-2 border-zinc-300">
                     @if($items->count())
                         <table class="w-full text-sm">
-                            <tbody class="divide-y divide-zinc-200">
+                            <tbody class="divide-y divide-zinc-300">
                                 @foreach($items as $item)
                                     <tr class="hover:bg-zinc-50" wire:key="poin-{{ $item->id }}">
                                         <td class="p-3">{{ $item->jenis_pelanggaran }}</td>
