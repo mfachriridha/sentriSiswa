@@ -1,7 +1,7 @@
 <div class="p-6">
     <div class="mb-6">
         <flux:heading size="xl" class="text-zinc-900 text-2xl">{{ __('Import Data') }}</flux:heading>
-        <flux:subheading class="text-zinc-600 text-base">{{ __('Upload data guru dan siswa melalui file CSV') }}</flux:subheading>
+        <flux:subheading class="text-zinc-700 text-base">{{ __('Upload data guru dan siswa melalui file CSV') }}</flux:subheading>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -23,7 +23,7 @@
                     {{ __('Template Siswa') }}
                 </flux:button>
             </div>
-            <div class="mt-2 p-4 bg-zinc-50 rounded-lg text-base text-zinc-600 space-y-2">
+            <div class="mt-2 p-4 bg-zinc-50 rounded-lg text-base text-zinc-700 space-y-2">
                 <p><strong class="text-zinc-800">{{ __('Format Guru:') }}</strong> Nama;nip</p>
                 <p><strong class="text-zinc-800">{{ __('Format Siswa:') }}</strong> Nama;Jenis Kelamin;Kelas;NIS;NISN</p>
             </div>

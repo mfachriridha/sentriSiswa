@@ -2,7 +2,7 @@
     <div class="flex items-center justify-between mb-6">
         <div>
             <flux:heading size="xl" class="text-zinc-900 text-2xl">{{ __('Manajemen Kelas') }}</flux:heading>
-            <flux:subheading class="text-zinc-600 text-base">{{ __('Kelola data kelas sekolah') }}</flux:subheading>
+            <flux:subheading class="text-zinc-700 text-base">{{ __('Kelola data kelas sekolah') }}</flux:subheading>
         </div>
         <flux:button variant="primary" wire:click="openCreate" icon="plus" class="text-base px-5 py-2.5">
             {{ __('Tambah Kelas') }}
@@ -14,18 +14,18 @@
             <table class="w-full text-base">
                 <thead>
                     <tr class="bg-zinc-50 border-b border-zinc-200">
-                        <th class="text-left p-4 font-semibold text-zinc-700 text-base">{{ __('Nama Kelas') }}</th>
-                        <th class="text-left p-4 font-semibold text-zinc-700 text-base">{{ __('Tingkat') }}</th>
-                        <th class="text-left p-4 font-semibold text-zinc-700 text-base">{{ __('Jurusan') }}</th>
-                        <th class="text-right p-4 font-semibold text-zinc-700 text-base">{{ __('Aksi') }}</th>
+                        <th class="text-left p-4 font-semibold text-zinc-800 text-base">{{ __('Nama Kelas') }}</th>
+                        <th class="text-left p-4 font-semibold text-zinc-800 text-base">{{ __('Tingkat') }}</th>
+                        <th class="text-left p-4 font-semibold text-zinc-800 text-base">{{ __('Jurusan') }}</th>
+                        <th class="text-right p-4 font-semibold text-zinc-800 text-base">{{ __('Aksi') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-zinc-200">
                     @forelse($semuaKelas as $kelas)
                         <tr class="hover:bg-zinc-50 transition" wire:key="kelas-{{ $kelas->id }}">
                             <td class="p-4 font-medium text-zinc-900 text-base">{{ $kelas->nama }}</td>
-                            <td class="p-4 text-zinc-600 text-base">{{ $kelas->tingkat }}</td>
-                            <td class="p-4 text-zinc-600 text-base">{{ $kelas->jurusan }}</td>
+                            <td class="p-4 text-zinc-700 text-base">{{ $kelas->tingkat }}</td>
+                            <td class="p-4 text-zinc-700 text-base">{{ $kelas->jurusan }}</td>
                             <td class="p-4 text-right">
                                 <div class="flex justify-end gap-2">
                                     <flux:button size="sm" wire:click="openEdit({{ $kelas->id }})" icon="pencil-square" variant="ghost" />
@@ -38,8 +38,8 @@
                         <tr>
                             <td colspan="4" class="p-12 text-center">
                                 <flux:icon.academic-cap class="size-12 text-zinc-300 mx-auto mb-3" />
-                                <flux:heading size="base" class="text-zinc-500 mb-2 text-base">{{ __('Belum ada data kelas') }}</flux:heading>
-                                <flux:text class="text-zinc-400 text-base">{{ __('Klik tombol "Tambah Kelas" untuk memulai') }}</flux:text>
+                                <flux:heading size="base" class="text-zinc-600 mb-2 text-base">{{ __('Belum ada data kelas') }}</flux:heading>
+                                <flux:text class="text-zinc-500 text-base">{{ __('Klik tombol "Tambah Kelas" untuk memulai') }}</flux:text>
                             </td>
                         </tr>
                     @endforelse

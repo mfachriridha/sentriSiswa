@@ -1,7 +1,7 @@
 <div class="p-6" x-data="{ showFoto: false, fotoUrl: '' }">
     <div class="mb-6">
         <flux:heading size="xl" class="text-zinc-900 text-2xl">{{ __('Laporan Absensi') }}</flux:heading>
-        <flux:subheading class="text-zinc-600 text-base">{{ __('Lihat dan filter data absensi siswa') }}</flux:subheading>
+        <flux:subheading class="text-zinc-700 text-base">{{ __('Lihat dan filter data absensi siswa') }}</flux:subheading>
     </div>
 
     <div class="bg-white rounded-xl border border-zinc-200 shadow-sm p-5 mb-6">
@@ -44,22 +44,22 @@
             <table class="w-full text-base">
                 <thead>
                     <tr class="bg-zinc-50 border-b border-zinc-200">
-                        <th class="text-left p-4 font-semibold text-zinc-700 text-base">{{ __('Nama') }}</th>
-                        <th class="text-left p-4 font-semibold text-zinc-700 text-base">{{ __('Kelas') }}</th>
-                        <th class="text-left p-4 font-semibold text-zinc-700 text-base">{{ __('Tanggal') }}</th>
-                        <th class="text-left p-4 font-semibold text-zinc-700 text-base">{{ __('Jam') }}</th>
-                        <th class="text-left p-4 font-semibold text-zinc-700 text-base">{{ __('Status') }}</th>
-                        <th class="text-left p-4 font-semibold text-zinc-700 text-base">{{ __('Foto') }}</th>
-                        <th class="text-left p-4 font-semibold text-zinc-700 text-base">{{ __('Keterangan') }}</th>
+                        <th class="text-left p-4 font-semibold text-zinc-800 text-base">{{ __('Nama') }}</th>
+                        <th class="text-left p-4 font-semibold text-zinc-800 text-base">{{ __('Kelas') }}</th>
+                        <th class="text-left p-4 font-semibold text-zinc-800 text-base">{{ __('Tanggal') }}</th>
+                        <th class="text-left p-4 font-semibold text-zinc-800 text-base">{{ __('Jam') }}</th>
+                        <th class="text-left p-4 font-semibold text-zinc-800 text-base">{{ __('Status') }}</th>
+                        <th class="text-left p-4 font-semibold text-zinc-800 text-base">{{ __('Foto') }}</th>
+                        <th class="text-left p-4 font-semibold text-zinc-800 text-base">{{ __('Keterangan') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-zinc-200">
                     @forelse($absensi as $a)
                         <tr wire:key="absensi-{{ $a->id }}">
                             <td class="p-4 font-medium text-zinc-900 text-base">{{ $a->user?->siswa?->nama ?? $a->user?->name ?? '-' }}</td>
-                            <td class="p-4 text-zinc-600 text-base">{{ $a->kelas?->nama ?? '-' }}</td>
-                            <td class="p-4 text-zinc-600 text-base">{{ $a->tanggal }}</td>
-                            <td class="p-4 text-zinc-600 text-base">{{ $a->jam_absen }}</td>
+                            <td class="p-4 text-zinc-700 text-base">{{ $a->kelas?->nama ?? '-' }}</td>
+                            <td class="p-4 text-zinc-700 text-base">{{ $a->tanggal }}</td>
+                            <td class="p-4 text-zinc-700 text-base">{{ $a->jam_absen }}</td>
                             <td class="p-4">
                                 <flux:badge
                                     :color="$a->status === 'hadir' ? 'green' : ($a->status === 'terlambat' ? 'amber' : ($a->status === 'izin' ? 'blue' : ($a->status === 'sakit' ? 'purple' : 'red')))"
@@ -77,14 +77,14 @@
                                     <span class="text-zinc-400 text-base">-</span>
                                 @endif
                             </td>
-                            <td class="p-4 max-w-xs truncate text-zinc-600 text-base" title="{{ $a->keterangan }}">{{ $a->keterangan ?? '-' }}</td>
+                            <td class="p-4 max-w-xs truncate text-zinc-700 text-base" title="{{ $a->keterangan }}">{{ $a->keterangan ?? '-' }}</td>
                         </tr>
                     @empty
                         <tr>
                             <td colspan="7" class="p-12 text-center">
                                 <flux:icon.calendar-days class="size-12 text-zinc-300 mx-auto mb-3" />
-                                <flux:heading size="base" class="text-zinc-500 mb-2 text-base">{{ __('Tidak ada data absensi') }}</flux:heading>
-                                <flux:text class="text-zinc-400 text-base">{{ __('Data absensi akan muncul setelah siswa melakukan absensi') }}</flux:text>
+                                <flux:heading size="base" class="text-zinc-600 mb-2 text-base">{{ __('Tidak ada data absensi') }}</flux:heading>
+                                <flux:text class="text-zinc-500 text-base">{{ __('Data absensi akan muncul setelah siswa melakukan absensi') }}</flux:text>
                             </td>
                         </tr>
                     @endforelse

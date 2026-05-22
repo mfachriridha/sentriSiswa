@@ -2,7 +2,7 @@
     <div class="flex items-center justify-between mb-6">
         <div>
             <flux:heading size="xl" class="text-zinc-900 text-2xl">{{ __('Poin Pelanggaran') }}</flux:heading>
-            <flux:subheading class="text-zinc-600 text-base">{{ __('Kelola kategori dan jenis pelanggaran') }}</flux:subheading>
+            <flux:subheading class="text-zinc-700 text-base">{{ __('Kelola kategori dan jenis pelanggaran') }}</flux:subheading>
         </div>
         <flux:button variant="primary" wire:click="openCreate" icon="plus" class="text-base px-5 py-2.5">
             {{ __('Tambah') }}
@@ -19,7 +19,7 @@
                     <flux:heading size="base" class="text-zinc-900 text-lg">
                         {{ $cat }}
                     </flux:heading>
-                    <flux:badge color="zinc" >{{ $items->count() }}</flux:badge>
+                    <flux:badge color="neutral" >{{ $items->count() }}</flux:badge>
                 </div>
             </button>
 
@@ -30,7 +30,7 @@
                             <tbody class="divide-y divide-zinc-200">
                                 @foreach($items as $item)
                                     <tr class="hover:bg-zinc-50 transition" wire:key="poin-{{ $item->id }}">
-                                        <td class="p-4 text-zinc-700 text-base">{{ $item->jenis_pelanggaran }}</td>
+                                        <td class="p-4 text-zinc-800 text-base">{{ $item->jenis_pelanggaran }}</td>
                                         <td class="p-4 text-center">
                                             <flux:badge color="red" >{{ $item->poin }} {{ __('poin') }}</flux:badge>
                                         </td>
@@ -48,7 +48,7 @@
                     @else
                         <div class="p-8 text-center">
                             <flux:icon.exclamation-triangle class="size-8 text-zinc-300 mx-auto mb-2" />
-                            <flux:text class="text-zinc-500 text-base">{{ __('Belum ada data di kategori ini.') }}</flux:text>
+                            <flux:text class="text-zinc-600 text-base">{{ __('Belum ada data di kategori ini.') }}</flux:text>
                         </div>
                     @endif
                 </div>

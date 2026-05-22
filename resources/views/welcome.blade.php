@@ -32,7 +32,7 @@
                     </svg>
                     {{ config('app.name', 'Sentri Siswa') }}
                 </a>
-                <nav class="hidden md:flex items-center gap-1 text-sm">
+                <nav class="hidden md:flex items-center gap-1 text-base">
                     <a href="#fitur" class="px-4 py-2 text-zinc-600 hover:text-brand-700 rounded-lg transition">Fitur</a>
                     <a href="#cara-kerja" class="px-4 py-2 text-zinc-600 hover:text-brand-700 rounded-lg transition">Cara Kerja</a>
                     <a href="#kontak" class="px-4 py-2 text-zinc-600 hover:text-brand-700 rounded-lg transition">Kontak</a>
@@ -41,18 +41,18 @@
                     @auth
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
-                            <button type="submit" class="px-5 py-2 text-sm text-zinc-500 hover:text-red-600 rounded-lg transition no-underline cursor-pointer border-0 bg-transparent">
+                            <button type="submit" class="px-5 py-2 text-base text-zinc-500 hover:text-red-600 rounded-lg transition no-underline cursor-pointer border-0 bg-transparent">
                                 {{ __('Keluar') }}
                             </button>
                         </form>
-                        <a href="{{ route('dashboard') }}" class="px-5 py-2 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 transition no-underline">
+                        <a href="{{ route('dashboard') }}" class="px-5 py-2 bg-brand-600 text-white rounded-lg text-base font-medium hover:bg-brand-700 transition no-underline">
                             Dashboard
                         </a>
                     @else
-                        <a href="{{ route('login') }}" class="px-5 py-2 text-brand-700 border border-brand-300 rounded-lg text-sm font-medium hover:bg-brand-50 transition no-underline">
+                        <a href="{{ route('login') }}" class="px-5 py-2 text-brand-700 border border-brand-300 rounded-lg text-base font-medium hover:bg-brand-50 transition no-underline">
                             Masuk
                         </a>
-                        <a href="{{ route('register') }}" class="px-5 py-2 bg-brand-600 text-white rounded-lg text-sm font-medium hover:bg-brand-700 transition no-underline">
+                        <a href="{{ route('register') }}" class="px-5 py-2 bg-brand-600 text-white rounded-lg text-base font-medium hover:bg-brand-700 transition no-underline">
                             Daftar
                         </a>
                     @endauth
@@ -164,22 +164,22 @@
                 <div class="text-center relative">
                     <div class="w-14 h-14 bg-brand-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">1</div>
                     <h4 class="font-semibold mb-2">Buka Aplikasi</h4>
-                    <p class="text-sm text-zinc-500">Siswa membuka portal absensi melalui smartphone.</p>
+                    <p class="text-base text-zinc-600">Siswa membuka portal absensi melalui smartphone.</p>
                 </div>
                 <div class="text-center relative">
                     <div class="w-14 h-14 bg-brand-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">2</div>
                     <h4 class="font-semibold mb-2">Izinkan Lokasi</h4>
-                    <p class="text-sm text-zinc-500">Izinkan akses lokasi untuk verifikasi area sekolah.</p>
+                    <p class="text-base text-zinc-600">Izinkan akses lokasi untuk verifikasi area sekolah.</p>
                 </div>
                 <div class="text-center relative">
                     <div class="w-14 h-14 bg-brand-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">3</div>
                     <h4 class="font-semibold mb-2">Ambil Selfie</h4>
-                    <p class="text-sm text-zinc-500">Ambil foto selfie sebagai bukti kehadiran.</p>
+                    <p class="text-base text-zinc-600">Ambil foto selfie sebagai bukti kehadiran.</p>
                 </div>
                 <div class="text-center relative">
                     <div class="w-14 h-14 bg-brand-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">4</div>
                     <h4 class="font-semibold mb-2">Absen Tercatat</h4>
-                    <p class="text-sm text-zinc-500">Absensi tersimpan & notifikasi terkirim ke wali kelas.</p>
+                    <p class="text-base text-zinc-600">Absensi tersimpan & notifikasi terkirim ke wali kelas.</p>
                 </div>
             </div>
         </div>
@@ -229,11 +229,11 @@
             <div class="grid md:grid-cols-3 gap-8">
                 <div>
                     <h4 class="font-bold text-lg mb-4">{{ config('sekolah.nama', 'SMA Negeri 1 ...') }}</h4>
-                    <p class="text-brand-300 text-sm">Portal absensi modern untuk monitoring kehadiran siswa secara real-time.</p>
+                    <p class="text-brand-200 text-base">Portal absensi modern untuk monitoring kehadiran siswa secara real-time.</p>
                 </div>
                 <div>
                     <h4 class="font-bold text-lg mb-4">Tautan</h4>
-                    <ul class="space-y-2 text-sm text-brand-300">
+                    <ul class="space-y-2 text-base text-brand-200">
                         <li><a href="{{ route('login') }}" class="hover:text-white transition">Masuk</a></li>
                         <li><a href="{{ route('register') }}" class="hover:text-white transition">Daftar</a></li>
                         <li><a href="#fitur" class="hover:text-white transition">Fitur</a></li>
@@ -242,13 +242,13 @@
                 </div>
                 <div>
                     <h4 class="font-bold text-lg mb-4">Kontak</h4>
-                    <ul class="space-y-2 text-sm text-brand-300">
+                    <ul class="space-y-2 text-base text-brand-200">
                         <li>Email: sekolah@sch.id</li>
                         <li>Telp: (021) 12345678</li>
                     </ul>
                 </div>
             </div>
-            <div class="border-t border-brand-700 mt-8 pt-8 text-center text-sm text-brand-400">
+            <div class="border-t border-brand-700 mt-8 pt-8 text-center text-base text-brand-300">
                 &copy; {{ date('Y') }} {{ config('sekolah.nama', 'Portal Absensi') }}. All rights reserved.
             </div>
         </div>

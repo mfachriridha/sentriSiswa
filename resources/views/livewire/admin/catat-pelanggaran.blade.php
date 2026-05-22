@@ -1,7 +1,7 @@
 <div class="p-6" x-data="{ searchOpen: false }" @click.away="searchOpen = false">
     <div class="mb-6">
         <flux:heading size="xl" class="text-zinc-900 text-2xl">{{ __('Catat Pelanggaran') }}</flux:heading>
-        <flux:subheading class="text-zinc-600 text-base">{{ __('Catat pelanggaran siswa dan lihat riwayat terbaru') }}</flux:subheading>
+        <flux:subheading class="text-zinc-700 text-base">{{ __('Catat pelanggaran siswa dan lihat riwayat terbaru') }}</flux:subheading>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -23,7 +23,7 @@
                                 @click="searchOpen = false"
                                 class="w-full text-left px-5 py-3 text-base hover:bg-zinc-50 flex items-center justify-between transition">
                                 <span class="font-medium text-zinc-900 text-base">{{ $s['nama'] }}</span>
-                                <span class="text-zinc-500 text-sm">{{ $s['nis'] }} - {{ $s['kelas'] }}</span>
+                                <span class="text-zinc-600 text-base">{{ $s['nis'] }} - {{ $s['kelas'] }}</span>
                             </button>
                         @endforeach
                     </div>
@@ -59,27 +59,27 @@
                 <table class="w-full text-base">
                     <thead>
                         <tr class="bg-zinc-50 border-b border-zinc-200 sticky top-0">
-                            <th class="text-left p-4 font-semibold text-zinc-700 text-base">{{ __('Siswa') }}</th>
-                            <th class="text-left p-4 font-semibold text-zinc-700 text-base">{{ __('Jenis') }}</th>
-                            <th class="text-left p-4 font-semibold text-zinc-700 text-base">{{ __('Poin') }}</th>
-                            <th class="text-left p-4 font-semibold text-zinc-700 text-base">{{ __('Tanggal') }}</th>
+                            <th class="text-left p-4 font-semibold text-zinc-800 text-base">{{ __('Siswa') }}</th>
+                            <th class="text-left p-4 font-semibold text-zinc-800 text-base">{{ __('Jenis') }}</th>
+                            <th class="text-left p-4 font-semibold text-zinc-800 text-base">{{ __('Poin') }}</th>
+                            <th class="text-left p-4 font-semibold text-zinc-800 text-base">{{ __('Tanggal') }}</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-zinc-200">
                         @forelse($recent as $r)
                             <tr wire:key="rec-{{ $r->id }}">
                                 <td class="p-4 font-medium text-zinc-900 text-base">{{ $r->user?->siswa?->nama ?? $r->user?->name ?? '-' }}</td>
-                                <td class="p-4 text-zinc-600 text-base">{{ $r->poinPelanggaran?->jenis_pelanggaran ?? '-' }}</td>
+                                <td class="p-4 text-zinc-700 text-base">{{ $r->poinPelanggaran?->jenis_pelanggaran ?? '-' }}</td>
                                 <td class="p-4">
                                     <flux:badge color="red" >{{ $r->poinPelanggaran?->poin ?? 0 }}</flux:badge>
                                 </td>
-                                <td class="p-4 text-zinc-500 text-sm">{{ $r->created_at->format('d/m/Y H:i') }}</td>
+                                <td class="p-4 text-zinc-600 text-base">{{ $r->created_at->format('d/m/Y H:i') }}</td>
                             </tr>
                         @empty
                             <tr>
                                 <td colspan="4" class="p-8 text-center">
                                     <flux:icon.exclamation-circle class="size-8 text-zinc-300 mx-auto mb-2" />
-                                    <flux:text class="text-zinc-500 text-base">{{ __('Belum ada pelanggaran.') }}</flux:text>
+                                    <flux:text class="text-zinc-600 text-base">{{ __('Belum ada pelanggaran.') }}</flux:text>
                                 </td>
                             </tr>
                         @endforelse

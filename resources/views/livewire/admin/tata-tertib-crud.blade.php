@@ -2,7 +2,7 @@
     <div class="flex items-center justify-between mb-6">
         <div>
             <flux:heading size="xl" class="text-zinc-900 text-2xl">{{ __('Tata Tertib') }}</flux:heading>
-            <flux:subheading class="text-zinc-600 text-base">{{ __('Kelola dokumen tata tertib sekolah') }}</flux:subheading>
+            <flux:subheading class="text-zinc-700 text-base">{{ __('Kelola dokumen tata tertib sekolah') }}</flux:subheading>
         </div>
         <flux:button variant="primary" wire:click="openUpload" icon="arrow-up-tray" class="text-base px-5 py-2.5">
             {{ __('Upload PDF') }}
@@ -14,16 +14,16 @@
             <table class="w-full text-base">
                 <thead>
                     <tr class="bg-zinc-50 border-b border-zinc-200">
-                        <th class="text-left p-4 font-semibold text-zinc-700 text-base">{{ __('Judul') }}</th>
-                        <th class="text-left p-4 font-semibold text-zinc-700 text-base">{{ __('Tanggal Upload') }}</th>
-                        <th class="text-right p-4 font-semibold text-zinc-700 text-base">{{ __('Aksi') }}</th>
+                        <th class="text-left p-4 font-semibold text-zinc-800 text-base">{{ __('Judul') }}</th>
+                        <th class="text-left p-4 font-semibold text-zinc-800 text-base">{{ __('Tanggal Upload') }}</th>
+                        <th class="text-right p-4 font-semibold text-zinc-800 text-base">{{ __('Aksi') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-zinc-200">
                     @forelse($daftarTataTertib as $tt)
                         <tr wire:key="tt-{{ $tt->id }}">
                             <td class="p-4 font-medium text-zinc-900 text-base">{{ $tt->judul }}</td>
-                            <td class="p-4 text-zinc-600 text-base">{{ $tt->created_at->format('d M Y') }}</td>
+                            <td class="p-4 text-zinc-700 text-base">{{ $tt->created_at->format('d M Y') }}</td>
                             <td class="p-4 text-right">
                                 <div class="flex justify-end gap-2">
                                     <a href="{{ asset('storage/' . $tt->file_pdf) }}" target="_blank">
@@ -38,8 +38,8 @@
                         <tr>
                             <td colspan="3" class="p-12 text-center">
                                 <flux:icon.document-text class="size-12 text-zinc-300 mx-auto mb-3" />
-                                <flux:heading size="base" class="text-zinc-500 mb-2 text-base">{{ __('Belum ada file tata tertib') }}</flux:heading>
-                                <flux:text class="text-zinc-400 text-base">{{ __('Klik tombol "Upload PDF" untuk menambahkan') }}</flux:text>
+                                <flux:heading size="base" class="text-zinc-600 mb-2 text-base">{{ __('Belum ada file tata tertib') }}</flux:heading>
+                                <flux:text class="text-zinc-500 text-base">{{ __('Klik tombol "Upload PDF" untuk menambahkan') }}</flux:text>
                             </td>
                         </tr>
                     @endforelse

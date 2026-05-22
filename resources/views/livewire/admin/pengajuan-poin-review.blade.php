@@ -1,7 +1,7 @@
 <div class="p-6">
     <div class="mb-6">
         <flux:heading size="xl" class="text-zinc-900 text-2xl">{{ __('Pengajuan Poin') }}</flux:heading>
-        <flux:subheading class="text-zinc-600 text-base">{{ __('Review pengajuan poin dari guru') }}</flux:subheading>
+        <flux:subheading class="text-zinc-700 text-base">{{ __('Review pengajuan poin dari guru') }}</flux:subheading>
     </div>
 
     <div class="flex gap-3 mb-5">
@@ -18,24 +18,24 @@
             <table class="w-full text-base">
                 <thead>
                     <tr class="bg-zinc-50 border-b border-zinc-200">
-                        <th class="text-left p-4 font-semibold text-zinc-700 text-base">{{ __('Siswa') }}</th>
-                        <th class="text-left p-4 font-semibold text-zinc-700 text-base">{{ __('Pengaju') }}</th>
-                        <th class="text-left p-4 font-semibold text-zinc-700 text-base">{{ __('Poin') }}</th>
-                        <th class="text-left p-4 font-semibold text-zinc-700 text-base">{{ __('Keterangan') }}</th>
-                        <th class="text-left p-4 font-semibold text-zinc-700 text-base">{{ __('Status') }}</th>
-                        <th class="text-left p-4 font-semibold text-zinc-700 text-base">{{ __('Catatan Admin') }}</th>
-                        <th class="text-right p-4 font-semibold text-zinc-700 text-base">{{ __('Aksi') }}</th>
+                        <th class="text-left p-4 font-semibold text-zinc-800 text-base">{{ __('Siswa') }}</th>
+                        <th class="text-left p-4 font-semibold text-zinc-800 text-base">{{ __('Pengaju') }}</th>
+                        <th class="text-left p-4 font-semibold text-zinc-800 text-base">{{ __('Poin') }}</th>
+                        <th class="text-left p-4 font-semibold text-zinc-800 text-base">{{ __('Keterangan') }}</th>
+                        <th class="text-left p-4 font-semibold text-zinc-800 text-base">{{ __('Status') }}</th>
+                        <th class="text-left p-4 font-semibold text-zinc-800 text-base">{{ __('Catatan Admin') }}</th>
+                        <th class="text-right p-4 font-semibold text-zinc-800 text-base">{{ __('Aksi') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-zinc-200">
                     @forelse($daftarPengajuan as $p)
                         <tr wire:key="pengajuan-{{ $p->id }}">
                             <td class="p-4 font-medium text-zinc-900 text-base">{{ $p->user?->siswa?->nama ?? $p->user?->name ?? '-' }}</td>
-                            <td class="p-4 text-zinc-600 text-base">{{ $p->guru?->nama ?? '-' }}</td>
+                            <td class="p-4 text-zinc-700 text-base">{{ $p->guru?->nama ?? '-' }}</td>
                             <td class="p-4">
                                 <flux:badge color="green" >+{{ $p->jumlah_poin }}</flux:badge>
                             </td>
-                            <td class="p-4 max-w-xs truncate text-zinc-600 text-base" title="{{ $p->keterangan }}">{{ $p->keterangan ?? '-' }}</td>
+                            <td class="p-4 max-w-xs truncate text-zinc-700 text-base" title="{{ $p->keterangan }}">{{ $p->keterangan ?? '-' }}</td>
                             <td class="p-4">
                                 <flux:badge
                                     :color="$p->status === 'disetujui' ? 'green' : ($p->status === 'ditolak' ? 'red' : 'amber')"
@@ -43,7 +43,7 @@
                                     {{ ucfirst($p->status) }}
                                 </flux:badge>
                             </td>
-                            <td class="p-4 max-w-xs truncate text-zinc-600 text-base" title="{{ $p->catatan_admin }}">{{ $p->catatan_admin ?? '-' }}</td>
+                            <td class="p-4 max-w-xs truncate text-zinc-700 text-base" title="{{ $p->catatan_admin }}">{{ $p->catatan_admin ?? '-' }}</td>
                             <td class="p-4 text-right">
                                 @if($p->status === 'pending')
                                     <div class="flex justify-end gap-2">
@@ -62,8 +62,8 @@
                         <tr>
                             <td colspan="7" class="p-12 text-center">
                                 <flux:icon.clipboard-document-check class="size-12 text-zinc-300 mx-auto mb-3" />
-                                <flux:heading size="base" class="text-zinc-500 mb-2 text-base">{{ __('Tidak ada pengajuan poin') }}</flux:heading>
-                                <flux:text class="text-zinc-400 text-base">{{ __('Pengajuan dari guru akan muncul di sini') }}</flux:text>
+                                <flux:heading size="base" class="text-zinc-600 mb-2 text-base">{{ __('Tidak ada pengajuan poin') }}</flux:heading>
+                                <flux:text class="text-zinc-500 text-base">{{ __('Pengajuan dari guru akan muncul di sini') }}</flux:text>
                             </td>
                         </tr>
                     @endforelse

@@ -1,7 +1,7 @@
 <div class="p-6">
     <div class="mb-6">
         <flux:heading size="xl" class="text-zinc-900 text-2xl">{{ __('Konfigurasi Absensi') }}</flux:heading>
-        <flux:subheading class="text-zinc-600 text-base">{{ __('Atur waktu absensi dan batas keterlambatan') }}</flux:subheading>
+        <flux:subheading class="text-zinc-700 text-base">{{ __('Atur waktu absensi dan batas keterlambatan') }}</flux:subheading>
     </div>
 
     <div class="bg-white rounded-xl border border-zinc-200 shadow-sm p-6 max-w-lg space-y-5">

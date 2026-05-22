@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
+    @php
+        $flux->appearance = 'light';
+    @endphp
     @include('partials.head')
 </head>
 <body class="min-h-screen bg-white">

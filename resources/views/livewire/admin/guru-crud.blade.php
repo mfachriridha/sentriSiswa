@@ -2,7 +2,7 @@
     <div class="flex items-center justify-between mb-6">
         <div>
             <flux:heading size="xl" class="text-zinc-900 text-2xl">{{ __('Manajemen Guru') }}</flux:heading>
-            <flux:subheading class="text-zinc-600 text-base">{{ __('Kelola data guru, wali kelas, dan BK') }}</flux:subheading>
+            <flux:subheading class="text-zinc-700 text-base">{{ __('Kelola data guru, wali kelas, dan BK') }}</flux:subheading>
         </div>
         <flux:button variant="primary" wire:click="openCreate" icon="plus" class="text-base px-5 py-2.5">
             {{ __('Tambah Guru') }}
@@ -14,13 +14,13 @@
             <table class="w-full text-base">
                 <thead>
                     <tr class="bg-zinc-50 border-b border-zinc-200">
-                        <th class="text-left p-4 font-semibold text-zinc-700 text-base">{{ __('Nama') }}</th>
-                        <th class="text-left p-4 font-semibold text-zinc-700 text-base">{{ __('NIP') }}</th>
-                        <th class="text-left p-4 font-semibold text-zinc-700 text-base">{{ __('No HP') }}</th>
-                        <th class="text-left p-4 font-semibold text-zinc-700 text-base">{{ __('Status') }}</th>
-                        <th class="text-left p-4 font-semibold text-zinc-700 text-base">{{ __('Wali Kelas') }}</th>
-                        <th class="text-left p-4 font-semibold text-zinc-700 text-base">{{ __('BK') }}</th>
-                        <th class="text-right p-4 font-semibold text-zinc-700 text-base">{{ __('Aksi') }}</th>
+                        <th class="text-left p-4 font-semibold text-zinc-800 text-base">{{ __('Nama') }}</th>
+                        <th class="text-left p-4 font-semibold text-zinc-800 text-base">{{ __('NIP') }}</th>
+                        <th class="text-left p-4 font-semibold text-zinc-800 text-base">{{ __('No HP') }}</th>
+                        <th class="text-left p-4 font-semibold text-zinc-800 text-base">{{ __('Status') }}</th>
+                        <th class="text-left p-4 font-semibold text-zinc-800 text-base">{{ __('Wali Kelas') }}</th>
+                        <th class="text-left p-4 font-semibold text-zinc-800 text-base">{{ __('BK') }}</th>
+                        <th class="text-right p-4 font-semibold text-zinc-800 text-base">{{ __('Aksi') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-zinc-200">
@@ -28,15 +28,15 @@
                         <tr class="hover:bg-zinc-50 cursor-pointer transition"
                             wire:key="guru-{{ $guru->id }}" wire:click="openDetail({{ $guru->id }})">
                             <td class="p-4 font-medium text-zinc-900 text-base">{{ $guru->nama }}</td>
-                            <td class="p-4 text-zinc-600 text-base">{{ $guru->nip }}</td>
-                            <td class="p-4 text-zinc-600 text-base">{{ $guru->no_hp ?? '-' }}</td>
+                            <td class="p-4 text-zinc-700 text-base">{{ $guru->nip }}</td>
+                            <td class="p-4 text-zinc-700 text-base">{{ $guru->no_hp ?? '-' }}</td>
                             <td class="p-4">
                                 <flux:badge :color="$guru->status_aktif === 'Aktif' ? 'green' : 'zinc'" >
                                     {{ $guru->status_aktif }}
                                 </flux:badge>
                             </td>
-                            <td class="p-4 text-zinc-600 text-base">{{ $guru->wali_kelas_nama }}</td>
-                            <td class="p-4 text-zinc-600 text-base">{{ $guru->bk_tingkat_list }}</td>
+                            <td class="p-4 text-zinc-700 text-base">{{ $guru->wali_kelas_nama }}</td>
+                            <td class="p-4 text-zinc-700 text-base">{{ $guru->bk_tingkat_list }}</td>
                             <td class="p-4 text-right">
                                 <div class="flex justify-end gap-2" wire:click.stop>
                                     <flux:button size="sm" wire:click="openEdit({{ $guru->id }})" icon="pencil-square" variant="ghost" />
@@ -49,8 +49,8 @@
                         <tr>
                             <td colspan="7" class="p-12 text-center">
                                 <flux:icon.briefcase class="size-12 text-zinc-300 mx-auto mb-3" />
-                                <flux:heading size="base" class="text-zinc-500 mb-2 text-base">{{ __('Belum ada data guru') }}</flux:heading>
-                                <flux:text class="text-zinc-400 text-base">{{ __('Klik tombol "Tambah Guru" untuk memulai') }}</flux:text>
+                                <flux:heading size="base" class="text-zinc-600 mb-2 text-base">{{ __('Belum ada data guru') }}</flux:heading>
+                                <flux:text class="text-zinc-500 text-base">{{ __('Klik tombol "Tambah Guru" untuk memulai') }}</flux:text>
                             </td>
                         </tr>
                     @endforelse
@@ -93,25 +93,25 @@
 
             <div class="flex border-b border-zinc-200">
                 <button wire:click="setDetailTab('data')"
-                    class="px-5 py-3 text-base font-medium border-b-2 transition {{ $detailTab === 'data' ? 'border-brand-600 text-brand-600' : 'border-transparent text-zinc-500 hover:text-zinc-700' }}">
+                    class="px-5 py-3 text-base font-medium border-b-2 transition {{ $detailTab === 'data' ? 'border-brand-600 text-brand-600' : 'border-transparent text-zinc-600 hover:text-zinc-800' }}">
                     {{ __('Data Guru') }}
                 </button>
                 <button wire:click="setDetailTab('walikelas')"
-                    class="px-5 py-3 text-base font-medium border-b-2 transition {{ $detailTab === 'walikelas' ? 'border-brand-600 text-brand-600' : 'border-transparent text-zinc-500 hover:text-zinc-700' }}">
+                    class="px-5 py-3 text-base font-medium border-b-2 transition {{ $detailTab === 'walikelas' ? 'border-brand-600 text-brand-600' : 'border-transparent text-zinc-600 hover:text-zinc-800' }}">
                     {{ __('Wali Kelas') }}
                 </button>
                 <button wire:click="setDetailTab('bk')"
-                    class="px-5 py-3 text-base font-medium border-b-2 transition {{ $detailTab === 'bk' ? 'border-brand-600 text-brand-600' : 'border-transparent text-zinc-500 hover:text-zinc-700' }}">
+                    class="px-5 py-3 text-base font-medium border-b-2 transition {{ $detailTab === 'bk' ? 'border-brand-600 text-brand-600' : 'border-transparent text-zinc-600 hover:text-zinc-800' }}">
                     {{ __('BK') }}
                 </button>
             </div>
 
             @if($detailTab === 'data' && $g)
                 <div class="grid grid-cols-2 gap-5">
-                    <div><flux:text class="text-zinc-600 font-medium text-base">{{ __('Nama') }}</flux:text><flux:text class="text-zinc-900 text-base">{{ $g->nama }}</flux:text></div>
-                    <div><flux:text class="text-zinc-600 font-medium text-base">{{ __('NIP') }}</flux:text><flux:text class="text-zinc-900 text-base">{{ $g->nip }}</flux:text></div>
-                    <div><flux:text class="text-zinc-600 font-medium text-base">{{ __('No HP') }}</flux:text><flux:text class="text-zinc-900 text-base">{{ $g->no_hp ?? '-' }}</flux:text></div>
-                    <div><flux:text class="text-zinc-600 font-medium text-base">{{ __('Status Akun') }}</flux:text>
+                    <div><flux:text class="text-zinc-700 font-medium text-base">{{ __('Nama') }}</flux:text><flux:text class="text-zinc-900 text-base">{{ $g->nama }}</flux:text></div>
+                    <div><flux:text class="text-zinc-700 font-medium text-base">{{ __('NIP') }}</flux:text><flux:text class="text-zinc-900 text-base">{{ $g->nip }}</flux:text></div>
+                    <div><flux:text class="text-zinc-700 font-medium text-base">{{ __('No HP') }}</flux:text><flux:text class="text-zinc-900 text-base">{{ $g->no_hp ?? '-' }}</flux:text></div>
+                    <div><flux:text class="text-zinc-700 font-medium text-base">{{ __('Status Akun') }}</flux:text>
                         <flux:badge :color="$g->user_id ? 'green' : 'zinc'" >
                             {{ $g->user_id ? 'Aktif' : 'Belum Aktif' }}
                         </flux:badge>
@@ -144,7 +144,7 @@
 
             @elseif($detailTab === 'bk')
                 <form wire:submit="saveBk" class="space-y-5">
-                    <flux:text class="text-zinc-700 text-base">{{ __('Pilih tingkat yang dibimbing:') }}</flux:text>
+                    <flux:text class="text-zinc-800 text-base">{{ __('Pilih tingkat yang dibimbing:') }}</flux:text>
                     <div class="space-y-3">
                         @foreach([10, 11, 12] as $t)
                             <label class="flex items-center gap-3 cursor-pointer">
