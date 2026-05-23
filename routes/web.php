@@ -21,5 +21,5 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::resource('teachers', TeacherController::class);
     Route::get('/students', [StudentController::class, 'index'])->name('students');
-    Route::get('/classes', [ClassController::class, 'index'])->name('classes');
+    Route::resource('classes', ClassController::class);
 });

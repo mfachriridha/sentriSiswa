@@ -14,6 +14,7 @@
         </div>
     </div>
 
+    <x-confirm-modal />
     @include('partials.scripts')
 </body>
 </html>

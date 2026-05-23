@@ -60,4 +60,9 @@ class User extends Authenticatable
     {
         return $this->role === 'student';
     }
+
+    public function homeroomClass(): HasOne
+    {
+        return $this->hasOne(SchoolClass::class, 'homeroom_teacher_id');
+    }
 }
