@@ -19,7 +19,7 @@ Route::middleware('auth')->group(function () {
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/teachers', [TeacherController::class, 'index'])->name('teachers');
+    Route::resource('teachers', TeacherController::class);
     Route::get('/students', [StudentController::class, 'index'])->name('students');
     Route::get('/classes', [ClassController::class, 'index'])->name('classes');
 });

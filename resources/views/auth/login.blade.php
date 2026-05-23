@@ -7,10 +7,9 @@
     <div class="w-full max-w-md">
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
             <div class="mb-8 text-center">
-                <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-primary text-white text-xl font-bold">
-                    SS
-                </div>
-                <h2 class="text-2xl font-bold text-gray-900">Sentri Siswa</h2>
+                <img src="{{ asset('storage/assets/logo/logo-website.png') }}" alt="Sentri Siswa"
+                     class="mx-auto h-24 w-auto rounded-xl border-4 border-white shadow-lg">
+                <h2 class="mt-6 text-2xl font-bold text-gray-900">Sentri Siswa</h2>
                 <p class="mt-2 text-sm text-gray-500">Sistem Pengawasan Absensi</p>
             </div>
 

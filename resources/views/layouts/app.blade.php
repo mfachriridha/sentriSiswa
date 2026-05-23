@@ -6,7 +6,7 @@
         <div class="flex min-h-screen flex-1 flex-col ml-64">
             @include('partials.header')
 
-            <main class="flex-1 p-6">
+            <main class="flex-1 p-8">
                 @yield('content')
             </main>
 
