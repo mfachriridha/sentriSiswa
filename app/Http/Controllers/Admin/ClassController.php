@@ -76,4 +76,11 @@ class ClassController extends Controller
 
         return redirect()->route('admin.classes.index')->with('success', 'Kelas berhasil dihapus.');
     }
+
+    public function deleteAll(): RedirectResponse
+    {
+        SchoolClass::query()->delete();
+
+        return redirect()->route('admin.classes.index')->with('success', 'Semua kelas berhasil dihapus.');
+    }
 }

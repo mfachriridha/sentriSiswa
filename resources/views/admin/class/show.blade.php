@@ -23,23 +23,30 @@
 </div>
 
 <div class="rounded-xl border border-gray-200 bg-white p-8">
-    <div class="mb-8 flex items-center gap-5">
-        <div class="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary">
-            {{ strtoupper(substr($class->name, 0, 1)) }}
-        </div>
-        <div>
-            <h1 class="text-2xl font-bold text-gray-900">{{ $class->name }}</h1>
-            <p class="mt-1 text-base text-gray-500">Tingkat {{ $class->grade }}</p>
-        </div>
+    <div class="mb-8">
+        <h1 class="text-2xl font-bold text-gray-900">{{ $class->name }}</h1>
+        <p class="mt-1 text-base text-gray-500">
+            @if ($class->grade === '10')
+                <span class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">Tingkat 10</span>
+            @elseif ($class->grade === '11')
+                <span class="inline-flex items-center rounded-full bg-green-50 px-3 py-1 text-sm font-medium text-green-700">Tingkat 11</span>
+            @else
+                <span class="inline-flex items-center rounded-full bg-purple-50 px-3 py-1 text-sm font-medium text-purple-700">Tingkat 12</span>
+            @endif
+        </p>
     </div>
 
     <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">Tingkat</p>
             <p class="mt-1.5">
-                <span class="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
-                    Tingkat {{ $class->grade }}
-                </span>
+                @if ($class->grade === '10')
+                    <span class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">Tingkat 10</span>
+                @elseif ($class->grade === '11')
+                    <span class="inline-flex items-center rounded-full bg-green-50 px-3 py-1 text-sm font-medium text-green-700">Tingkat 11</span>
+                @else
+                    <span class="inline-flex items-center rounded-full bg-purple-50 px-3 py-1 text-sm font-medium text-purple-700">Tingkat 12</span>
+                @endif
             </p>
         </div>
 

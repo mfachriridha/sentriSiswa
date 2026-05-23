@@ -26,6 +26,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/teachers/import', [TeacherImportController::class, 'store'])->name('teachers.import.store');
     Route::delete('/teachers/delete-all', [TeacherController::class, 'deleteAll'])->name('teachers.delete-all');
     Route::resource('teachers', TeacherController::class);
-    Route::get('/students', [StudentController::class, 'index'])->name('students');
+    Route::delete('/students/delete-all', [StudentController::class, 'deleteAll'])->name('students.delete-all');
+    Route::resource('students', StudentController::class);
+    Route::delete('/classes/delete-all', [ClassController::class, 'deleteAll'])->name('classes.delete-all');
     Route::resource('classes', ClassController::class);
 });

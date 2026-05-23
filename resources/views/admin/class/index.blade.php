@@ -8,14 +8,33 @@
         <h1 class="text-3xl font-bold text-gray-900">Kelas</h1>
         <p class="mt-2 text-base text-gray-500">Kelola data kelas</p>
     </div>
-    <a href="{{ route('admin.classes.create') }}"
-       class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-base font-semibold text-white shadow-sm
-              hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors">
-        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-        </svg>
-        Tambah Kelas
-    </a>
+    <div class="flex items-center gap-3">
+        <button type="button"
+                onclick="window.dispatchEvent(new CustomEvent('open-confirm-modal', {
+                    detail: {
+                        title: 'Hapus Semua Kelas',
+                        message: 'Anda akan menghapus semua data kelas. Tindakan ini akan menghapus semua kelas beserta relasi wali kelasnya.',
+                        secondMessage: 'PERINGATAN: Tindakan ini tidak dapat diurungkan! Semua data kelas akan hilang permanen.',
+                        formId: 'delete-all-classes-form'
+                    }
+                }))"
+                class="inline-flex items-center gap-2 rounded-lg border border-red-200 px-5 py-3 text-base font-medium text-red-600 shadow-sm
+                       hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-300 transition-colors cursor-pointer">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+            </svg>
+            Hapus Semua
+        </button>
+        <a href="{{ route('admin.classes.create') }}"
+           class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-base font-semibold text-white shadow-sm
+                  hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Tambah Kelas
+        </a>
+    </div>
 </div>
 
 <x-alert type="success" :message="session('success')" />
@@ -35,9 +54,13 @@
                 <tr class="hover:bg-gray-50">
                     <td class="px-6 py-5 font-medium text-gray-900">{{ $class->name }}</td>
                     <td class="px-6 py-5">
-                        <span class="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
-                            Tingkat {{ $class->grade }}
-                        </span>
+                        @if ($class->grade === '10')
+                            <span class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">Tingkat 10</span>
+                        @elseif ($class->grade === '11')
+                            <span class="inline-flex items-center rounded-full bg-green-50 px-3 py-1 text-sm font-medium text-green-700">Tingkat 11</span>
+                        @else
+                            <span class="inline-flex items-center rounded-full bg-purple-50 px-3 py-1 text-sm font-medium text-purple-700">Tingkat 12</span>
+                        @endif
                     </td>
                     <td class="px-6 py-5 text-gray-700">{{ $class->homeroomTeacher?->name ?? '-' }}</td>
                     <td class="px-6 py-5">
@@ -91,3 +114,8 @@
     </table>
 </div>
 @endsection
+
+<form id="delete-all-classes-form" method="POST" action="{{ route('admin.classes.delete-all') }}" class="hidden">
+    @csrf
+    @method('DELETE')
+</form>
