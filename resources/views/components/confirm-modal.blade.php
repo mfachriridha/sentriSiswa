@@ -1,7 +1,7 @@
 <div
-    x-data="{ open: false, title: '', message: '', formId: '' }"
+    x-data="{ open: false, title: '', message: '', formId: '', loading: false }"
     x-on:open-confirm-modal.window="
-        open = true;
+        open = true; loading = false;
         title = $event.detail.title;
         message = $event.detail.message;
         formId = $event.detail.formId;
@@ -31,8 +31,15 @@
                         class="rounded-lg border border-gray-300 px-5 py-2.5 text-base font-medium text-gray-700 hover:bg-gray-50 transition-colors">
                     Batal
                 </button>
-                <button @click="document.getElementById(formId).submit()"
-                        class="rounded-lg bg-red-600 px-5 py-2.5 text-base font-semibold text-white hover:bg-red-700 transition-colors">
+                <button @click="loading = true; document.getElementById(formId).submit()"
+                        class="inline-flex items-center gap-2 rounded-lg bg-red-600 px-5 py-2.5 text-base font-semibold text-white hover:bg-red-700 transition-colors disabled:opacity-60"
+                        :disabled="loading">
+                    <span x-show="loading">
+                        <svg class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                        </svg>
+                    </span>
                     Hapus
                 </button>
             </div>

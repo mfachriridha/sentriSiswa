@@ -8,17 +8,42 @@
         <h1 class="text-3xl font-bold text-gray-900">Guru</h1>
         <p class="mt-1 text-base text-gray-500">Kelola data guru</p>
     </div>
-    <a href="{{ route('admin.teachers.create') }}"
-       class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-base font-semibold text-white shadow-sm
-              hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors">
-        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-        </svg>
-        Tambah Guru
-    </a>
+    <div class="flex items-center gap-3">
+        <a href="{{ route('admin.teachers.import') }}"
+           class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-5 py-3 text-base font-medium text-gray-700 shadow-sm
+                  hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            Import Excel
+        </a>
+        <a href="{{ route('admin.teachers.create') }}"
+           class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-base font-semibold text-white shadow-sm
+                  hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Tambah Guru
+        </a>
+    </div>
 </div>
 
 <x-alert type="success" :message="session('success')" />
+
+@if (session('import_result'))
+    <div class="mb-6 rounded-lg border border-green-200 bg-green-50 px-5 py-4 text-base text-green-700">
+        <p class="font-semibold">Import berhasil!</p>
+        <ul class="mt-2 list-disc pl-5 space-y-1">
+            <li>{{ session('import_result.teachers_created') }} guru baru dibuat</li>
+            <li>{{ session('import_result.teachers_existing') }} guru sudah ada</li>
+            <li>{{ session('import_result.classes_created') }} kelas dibuat</li>
+            @if (session('import_result.errors'))
+                <li>{{ session('import_result.errors') }} baris dilewati (nama kosong)</li>
+            @endif
+        </ul>
+    </div>
+@endif
 
 <div class="overflow-hidden rounded-xl border border-gray-200 bg-white">
     <table class="min-w-full text-left text-base">
