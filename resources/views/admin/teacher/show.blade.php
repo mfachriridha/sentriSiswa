@@ -69,6 +69,23 @@
             <p class="text-sm font-medium text-gray-500">Telepon</p>
             <p class="mt-1.5 text-base text-gray-900">{{ $teacher->teacherProfile?->phone ?? '-' }}</p>
         </div>
+
+        <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
+            <p class="text-sm font-medium text-gray-500">Kelas yang Diampu</p>
+            <p class="mt-1.5 text-base">
+                @if ($teacher->homeroomClass)
+                    <a href="{{ route('admin.classes.show', $teacher->homeroomClass) }}" class="text-primary hover:underline">
+                        {{ $teacher->homeroomClass->name }}
+                    </a>
+                @elseif ($teacher->teacherProfile?->grade)
+                    <span class="inline-flex items-center gap-1 rounded-full bg-teal-50 px-3 py-1 text-sm font-medium text-teal-700">
+                        Tingkat {{ $teacher->teacherProfile->grade }}
+                    </span>
+                @else
+                    <span class="text-gray-400">-</span>
+                @endif
+            </p>
+        </div>
     </div>
 </div>
 @endsection

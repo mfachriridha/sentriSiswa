@@ -20,6 +20,7 @@ class StoreTeacherRequest extends FormRequest
             'nip' => ['nullable', 'string', 'max:30', 'unique:teacher_profiles,nip'],
             'phone' => ['nullable', 'string', 'max:20'],
             'teacher_type' => ['required', 'in:homeroom,counselor'],
+            'grade' => ['nullable', 'required_if:teacher_type,counselor', 'in:10,11,12'],
         ];
     }
 }

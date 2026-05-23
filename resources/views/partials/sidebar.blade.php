@@ -1,4 +1,4 @@
-<aside class="fixed inset-y-0 left-0 z-10 flex w-64 flex-col bg-white border-r border-gray-200">
+<aside class="fixed inset-y-0 left-0 z-10 flex w-64 shrink-0 flex-col bg-white border-r border-gray-200">
     <div class="flex items-center gap-3 px-6 py-5 border-b border-gray-200">
         <img src="{{ asset('storage/assets/logo/logo-website.png') }}" alt="Sentri Siswa" class="h-8 w-auto rounded-lg border border-gray-200">
         <span class="text-lg font-semibold text-gray-900">Sentri Siswa</span>
@@ -14,16 +14,14 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1"/>
                     </svg>
-                    Beranda
+                    Dashboard
                 </a>
             </li>
-        </ul>
 
-        <div class="mt-6 mb-2 px-3">
-            <span class="text-xs font-semibold uppercase tracking-wider text-gray-400">Manajemen Data</span>
-        </div>
+            <li class="pt-5 pb-2">
+                <span class="px-3 text-xs font-semibold uppercase tracking-wider text-gray-400">Manajemen Data</span>
+            </li>
 
-        <ul class="space-y-1">
             <li>
                 <a href="{{ route('admin.teachers.index') }}"
                    class="flex items-center gap-3 rounded-lg px-4 py-3 text-base font-medium transition-colors

@@ -55,18 +55,35 @@
                 @enderror
             </div>
 
-            <div>
-                <label for="teacher_type" class="block text-base font-medium text-gray-700">Tipe</label>
-                <select id="teacher_type" name="teacher_type" required
-                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm
-                               focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
-                    <option value="">Pilih tipe</option>
-                    <option value="homeroom" {{ old('teacher_type', $teacher->teacherProfile?->teacher_type) === 'homeroom' ? 'selected' : '' }}>Wali Kelas</option>
-                    <option value="counselor" {{ old('teacher_type', $teacher->teacherProfile?->teacher_type) === 'counselor' ? 'selected' : '' }}>BK</option>
-                </select>
-                @error('teacher_type')
-                    <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
-                @enderror
+            <div x-data="{ type: '{{ old('teacher_type', $teacher->teacherProfile?->teacher_type) }}' }">
+                <div>
+                    <label for="teacher_type" class="block text-base font-medium text-gray-700">Tipe</label>
+                    <select id="teacher_type" name="teacher_type" required x-model="type"
+                            class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm
+                                   focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
+                        <option value="">Pilih tipe</option>
+                        <option value="homeroom">Wali Kelas</option>
+                        <option value="counselor">BK</option>
+                    </select>
+                    @error('teacher_type')
+                        <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div x-show="type === 'counselor'" x-cloak class="mt-6">
+                    <label for="grade" class="block text-base font-medium text-gray-700">Tingkatan</label>
+                    <select id="grade" name="grade"
+                            class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm
+                                   focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
+                        <option value="">Pilih tingkatan</option>
+                        <option value="10" {{ old('grade', $teacher->teacherProfile?->grade) === '10' ? 'selected' : '' }}>10</option>
+                        <option value="11" {{ old('grade', $teacher->teacherProfile?->grade) === '11' ? 'selected' : '' }}>11</option>
+                        <option value="12" {{ old('grade', $teacher->teacherProfile?->grade) === '12' ? 'selected' : '' }}>12</option>
+                    </select>
+                    @error('grade')
+                        <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
 
             <div>

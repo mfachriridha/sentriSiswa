@@ -16,7 +16,7 @@ class TeacherController extends Controller
     public function index(): View
     {
         $teachers = User::where('role', 'teacher')
-            ->with('teacherProfile')
+            ->with(['teacherProfile', 'homeroomClass'])
             ->latest()
             ->get();
 
@@ -42,6 +42,7 @@ class TeacherController extends Controller
                 'nip' => $request->nip,
                 'phone' => $request->phone,
                 'teacher_type' => $request->teacher_type,
+                'grade' => $request->teacher_type === 'counselor' ? $request->grade : null,
             ]);
         });
 
@@ -50,7 +51,7 @@ class TeacherController extends Controller
 
     public function show(User $teacher): View
     {
-        $teacher->load('teacherProfile');
+        $teacher->load(['teacherProfile', 'homeroomClass']);
 
         return view('admin.teacher.show', compact('teacher'));
     }
@@ -80,6 +81,7 @@ class TeacherController extends Controller
                     'nip' => $request->nip,
                     'phone' => $request->phone,
                     'teacher_type' => $request->teacher_type,
+                    'grade' => $request->teacher_type === 'counselor' ? $request->grade : null,
                 ],
             );
         });
@@ -92,5 +94,12 @@ class TeacherController extends Controller
         $teacher->delete();
 
         return redirect()->route('admin.teachers.index')->with('success', 'Guru berhasil dihapus.');
+    }
+
+    public function deleteAll(): RedirectResponse
+    {
+        User::where('role', 'teacher')->delete();
+
+        return redirect()->route('admin.teachers.index')->with('success', 'Semua guru berhasil dihapus.');
     }
 }

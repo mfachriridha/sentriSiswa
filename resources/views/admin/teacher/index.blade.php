@@ -18,6 +18,23 @@
             </svg>
             Import Excel
         </a>
+        <button type="button"
+                onclick="window.dispatchEvent(new CustomEvent('open-confirm-modal', {
+                    detail: {
+                        title: 'Hapus Semua Guru',
+                        message: 'Anda akan menghapus semua data guru. Tindakan ini akan menghapus semua guru beserta data profilnya.',
+                        secondMessage: 'PERINGATAN: Tindakan ini tidak dapat diurungkan! Semua data guru akan hilang permanen.',
+                        formId: 'delete-all-form'
+                    }
+                }))"
+                class="inline-flex items-center gap-2 rounded-lg border border-red-200 px-5 py-3 text-base font-medium text-red-600 shadow-sm
+                       hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-300 transition-colors cursor-pointer">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+            </svg>
+            Hapus Semua
+        </button>
         <a href="{{ route('admin.teachers.create') }}"
            class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-base font-semibold text-white shadow-sm
                   hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors">
@@ -53,6 +70,7 @@
                 <th class="px-6 py-5 font-semibold text-gray-600">Nama</th>
                 <th class="px-6 py-5 font-semibold text-gray-600">Email</th>
                 <th class="px-6 py-5 font-semibold text-gray-600">Tipe</th>
+                <th class="px-6 py-5 font-semibold text-gray-600">Kelas</th>
                 <th class="px-6 py-5 font-semibold text-gray-600">Telepon</th>
                 <th class="px-6 py-5 font-semibold text-gray-600">Aksi</th>
             </tr>
@@ -74,6 +92,19 @@
                             </span>
                         @else
                             <span class="text-gray-400">-</span>
+                        @endif
+                    </td>
+                    <td class="px-6 py-5 text-gray-700">
+                        @if ($teacher->homeroomClass)
+                            <a href="{{ route('admin.classes.show', $teacher->homeroomClass) }}" class="text-primary hover:underline">
+                                {{ $teacher->homeroomClass->name }}
+                            </a>
+                        @elseif ($teacher->teacherProfile?->grade)
+                            <span class="inline-flex items-center gap-1 rounded-full bg-teal-50 px-2.5 py-0.5 text-xs font-medium text-teal-700">
+                                BK {{ $teacher->teacherProfile->grade }}
+                            </span>
+                        @else
+                            -
                         @endif
                     </td>
                     <td class="px-6 py-5 text-gray-700">{{ $teacher->teacherProfile?->phone ?? '-' }}</td>
@@ -121,10 +152,15 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6" class="px-6 py-16 text-center text-base text-gray-500">Belum ada data guru.</td>
+                    <td colspan="7" class="px-6 py-16 text-center text-base text-gray-500">Belum ada data guru.</td>
                 </tr>
             @endforelse
         </tbody>
     </table>
 </div>
 @endsection
+
+<form id="delete-all-form" method="POST" action="{{ route('admin.teachers.delete-all') }}" class="hidden">
+    @csrf
+    @method('DELETE')
+</form>

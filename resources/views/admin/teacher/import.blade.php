@@ -25,7 +25,7 @@
         <p class="mt-2 text-base text-gray-500">Upload file Excel berisi data guru</p>
     </div>
 
-    <form method="POST" action="{{ route('admin.teachers.import.preview') }}" enctype="multipart/form-data" class="space-y-6"
+    <form method="POST" action="{{ route('admin.teachers.import.upload') }}" enctype="multipart/form-data" class="space-y-6"
           x-data="{ loading: false }" @submit="loading = true">
         @csrf
 

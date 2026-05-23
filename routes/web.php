@@ -21,8 +21,10 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/teachers/import', [TeacherImportController::class, 'create'])->name('teachers.import');
-    Route::post('/teachers/import/preview', [TeacherImportController::class, 'preview'])->name('teachers.import.preview');
+    Route::post('/teachers/import/upload', [TeacherImportController::class, 'upload'])->name('teachers.import.upload');
+    Route::get('/teachers/import/preview', [TeacherImportController::class, 'preview'])->name('teachers.import.preview');
     Route::post('/teachers/import', [TeacherImportController::class, 'store'])->name('teachers.import.store');
+    Route::delete('/teachers/delete-all', [TeacherController::class, 'deleteAll'])->name('teachers.delete-all');
     Route::resource('teachers', TeacherController::class);
     Route::get('/students', [StudentController::class, 'index'])->name('students');
     Route::resource('classes', ClassController::class);
