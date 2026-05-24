@@ -11,7 +11,7 @@ use Illuminate\View\View;
 
 class LoginController extends Controller
 {
-    public function create(): View
+    public function create(): View|RedirectResponse
     {
         if (Auth::check()) {
             return $this->redirectByRole(Auth::user());

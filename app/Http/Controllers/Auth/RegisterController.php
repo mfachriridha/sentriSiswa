@@ -48,13 +48,29 @@ class RegisterController extends Controller
             }
         }
 
+        $name = $profile->user?->name ?? '';
+
         session([
             'register_role' => $role,
             'register_user_id' => $profile->user_id,
             'register_identity' => $identity,
+            'register_name' => $name,
         ]);
 
-        return view('auth.register-step2', compact('role', 'identity'));
+        return view('auth.register-step2', compact('role', 'identity', 'name'));
+    }
+
+    public function showForm(): RedirectResponse|View
+    {
+        $role = session('register_role');
+        $identity = session('register_identity');
+        $name = session('register_name');
+
+        if (! $role || ! $identity) {
+            return redirect()->route('register');
+        }
+
+        return view('auth.register-step2', compact('role', 'identity', 'name'));
     }
 
     public function store(RegisterRequest $request): RedirectResponse
@@ -84,7 +100,7 @@ class RegisterController extends Controller
             ]);
         }
 
-        session()->forget(['register_role', 'register_user_id', 'register_identity']);
+        session()->forget(['register_role', 'register_user_id', 'register_identity', 'register_name']);
 
         Auth::login($user);
 

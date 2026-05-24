@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\TeacherImportController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Guru\DashboardController as GuruDashboardController;
 use App\Http\Controllers\Siswa\DashboardController as SiswaDashboardController;
+use App\Http\Controllers\Siswa\ProfilController as SiswaProfilController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
@@ -25,7 +26,14 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AdminLoginController::class, 'destroy'])->name('logout');
-    Route::get('/', fn () => redirect()->route('login'));
+    Route::get('/', function () {
+        return match (auth()->user()->role) {
+            'admin' => redirect()->route('admin.dashboard'),
+            'teacher' => redirect()->route('guru.dashboard'),
+            'student' => redirect()->route('siswa.dashboard'),
+            default => redirect()->route('login'),
+        };
+    });
 });
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -62,4 +70,9 @@ Route::middleware(['auth', 'registered', 'guru'])->prefix('guru')->name('guru.')
 
 Route::middleware(['auth', 'registered', 'siswa'])->prefix('siswa')->name('siswa.')->group(function () {
     Route::get('/dashboard', [SiswaDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/profil', [SiswaProfilController::class, 'show'])->name('profil');
+    Route::get('/profil/edit', [SiswaProfilController::class, 'edit'])->name('profil.edit');
+    Route::put('/profil', [SiswaProfilController::class, 'update'])->name('profil.update');
+    Route::post('/profil/photo', [SiswaProfilController::class, 'uploadPhoto'])->name('profil.photo');
+    Route::delete('/profil/photo', [SiswaProfilController::class, 'deletePhoto'])->name('profil.photo.delete');
 });

@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Database\Factories\StudentProfileFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -28,5 +27,19 @@ class StudentProfile extends Model
     public function biodata(): HasOne
     {
         return $this->hasOne(StudentBiodata::class);
+    }
+
+    public function violations()
+    {
+        return $this->hasMany(StudentViolation::class);
+    }
+
+    public function getPointsAttribute(): int
+    {
+        $deductions = $this->violations()
+            ->join('violation_types', 'student_violations.violation_type_id', '=', 'violation_types.id')
+            ->sum('violation_types.point_deduction');
+
+        return max(0, 100 - $deductions);
     }
 }

@@ -110,6 +110,7 @@
                 <th class="px-6 py-5"><x-sort-link label="NIS" column="nis" :sort="$sort" :direction="$direction" /></th>
                 <th class="px-6 py-5"><x-sort-link label="Nama" column="name" :sort="$sort" :direction="$direction" /></th>
                 <th class="px-6 py-5"><x-sort-link label="Kelas" column="class_name" :sort="$sort" :direction="$direction" /></th>
+                <th class="px-6 py-5 text-gray-600 font-semibold">Status</th>
                 <th class="px-6 py-5 text-gray-600 font-semibold">Aksi</th>
             </tr>
         </thead>
@@ -126,6 +127,13 @@
                             </a>
                         @else
                             -
+                        @endif
+                    </td>
+                    <td class="px-6 py-5">
+                        @if ($student->isRegistered())
+                            <span class="inline-flex items-center gap-1 rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-700">Terdaftar</span>
+                        @else
+                            <span class="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-500">Belum</span>
                         @endif
                     </td>
                     <td class="px-6 py-5">

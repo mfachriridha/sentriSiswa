@@ -17,6 +17,9 @@
                         Verifikasi NISN/NIS <span class="font-semibold">{{ $identity }}</span> berhasil
                     @endif
                 </p>
+                @if($name)
+                    <p class="mt-1 text-base font-semibold text-gray-900">{{ $name }}</p>
+                @endif
             </div>
 
             @if ($errors->any())
