@@ -14,7 +14,81 @@
 </div>
 
 <div class="rounded-xl border border-gray-200 bg-white p-8">
-    <h1 class="text-2xl font-bold text-gray-900">Riwayat Absensi</h1>
-    <p class="mt-1 text-base text-gray-500">Catatan kehadiran Anda</p>
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">Riwayat Absensi</h1>
+            <p class="mt-1 text-base text-gray-500">Catatan kehadiran bulan {{ $monthLabel }}</p>
+        </div>
+
+        <form method="GET" action="{{ route('siswa.absensi.riwayat') }}" class="flex items-center gap-3">
+            <label for="month" class="text-sm font-medium text-gray-600">Bulan</label>
+            <input id="month"
+                   type="month"
+                   name="month"
+                   value="{{ $selectedMonth }}"
+                   class="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20">
+            <button type="submit"
+                    class="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-dark">
+                Filter
+            </button>
+        </form>
+    </div>
+
+    <div class="mt-8 overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead>
+                <tr class="text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                    <th class="px-4 py-3">Tanggal</th>
+                    <th class="px-4 py-3">Status</th>
+                    <th class="px-4 py-3">Jam Absen</th>
+                    <th class="px-4 py-3">Selfie</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                @forelse($attendances as $attendance)
+                    @php
+                        $statusConfig = [
+                            'hadir' => ['bg-green-50 text-green-700', 'Hadir'],
+                            'terlambat' => ['bg-amber-50 text-amber-700', 'Terlambat'],
+                            'izin' => ['bg-blue-50 text-blue-700', 'Izin'],
+                            'sakit' => ['bg-purple-50 text-purple-700', 'Sakit'],
+                            'alpha' => ['bg-red-50 text-red-700', 'Alpha'],
+                        ];
+                        [$badgeClass, $statusLabel] = $statusConfig[$attendance->status] ?? ['bg-gray-50 text-gray-700', $attendance->status];
+                    @endphp
+                    <tr>
+                        <td class="whitespace-nowrap px-4 py-4 text-sm font-medium text-gray-900">
+                            {{ $attendance->date->translatedFormat('d F Y') }}
+                        </td>
+                        <td class="whitespace-nowrap px-4 py-4">
+                            <span class="inline-flex rounded-full {{ $badgeClass }} px-3 py-1 text-sm font-semibold">
+                                {{ $statusLabel }}
+                            </span>
+                        </td>
+                        <td class="whitespace-nowrap px-4 py-4 text-sm text-gray-600">
+                            {{ $attendance->check_in_time?->format('H:i') ?? '-' }}
+                        </td>
+                        <td class="whitespace-nowrap px-4 py-4">
+                            @if($attendance->selfie_path)
+                                <a href="{{ asset('storage/'.$attendance->selfie_path) }}" target="_blank" class="inline-block">
+                                    <img src="{{ asset('storage/'.$attendance->selfie_path) }}"
+                                         alt="Selfie absensi {{ $attendance->date->translatedFormat('d F Y') }}"
+                                         class="h-14 w-14 rounded-lg border border-gray-200 object-cover">
+                                </a>
+                            @else
+                                <span class="text-sm text-gray-400">-</span>
+                            @endif
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="4" class="px-4 py-10 text-center text-base text-gray-500">
+                            Belum ada catatan absensi pada bulan ini.
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
 </div>
 @endsection

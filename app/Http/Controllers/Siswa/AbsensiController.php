@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Siswa;
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
@@ -52,7 +54,7 @@ class AbsensiController extends Controller
         ));
     }
 
-    public function store(): RedirectResponse
+    public function store(Request $request): RedirectResponse
     {
         $student = Auth::user();
         $profile = $student->studentProfile;
@@ -77,19 +79,45 @@ class AbsensiController extends Controller
             return redirect()->route('siswa.absensi')->with('error', 'Waktu absen sudah lewat atau belum dimulai.');
         }
 
+        $request->validate([
+            'selfie' => ['required', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+        ]);
+
         $status = ($currentTime > $lateTime) ? 'terlambat' : 'hadir';
+        $selfiePath = $request->file('selfie')->store('attendance-selfies/'.$profile->id, 'public');
 
         $profile->attendances()->create([
             'date' => $today,
             'status' => $status,
             'check_in_time' => $currentTime,
+            'selfie_path' => $selfiePath,
         ]);
 
         return redirect()->route('siswa.absensi')->with('success', $status === 'terlambat' ? 'Absen tercatat: Terlambat.' : 'Absen berhasil: Hadir.');
     }
 
-    public function riwayat(): View
+    public function riwayat(Request $request): View
     {
-        return view('siswa.absensi.riwayat');
+        $student = Auth::user();
+        $profile = $student->studentProfile;
+        $selectedMonth = $request->query('month', now()->format('Y-m'));
+
+        if (! is_string($selectedMonth) || ! preg_match('/^\d{4}-(0[1-9]|1[0-2])$/', $selectedMonth)) {
+            $selectedMonth = now()->format('Y-m');
+        }
+
+        $month = Carbon::createFromFormat('Y-m', $selectedMonth)->startOfMonth();
+
+        $attendances = $profile?->attendances()
+            ->whereBetween('date', [
+                $month->toDateString(),
+                $month->copy()->endOfMonth()->toDateString(),
+            ])
+            ->latest('date')
+            ->get() ?? collect();
+
+        $monthLabel = $month->translatedFormat('F Y');
+
+        return view('siswa.absensi.riwayat', compact('attendances', 'monthLabel', 'selectedMonth'));
     }
 }

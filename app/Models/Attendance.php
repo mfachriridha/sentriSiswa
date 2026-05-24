@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['student_profile_id', 'date', 'status', 'check_in_time'])]
+#[Fillable(['student_profile_id', 'date', 'status', 'check_in_time', 'selfie_path'])]
 class Attendance extends Model
 {
     protected function casts(): array
