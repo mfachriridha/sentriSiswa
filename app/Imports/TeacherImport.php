@@ -194,7 +194,8 @@ class TeacherImport implements ToCollection, WithChunkReading, WithHeadingRow
         $className = trim((string) ($row['kelas'] ?? ''));
 
         $typeRaw = trim((string) ($row['tipe'] ?? ''));
-        $teacherType = in_array(strtolower($typeRaw), ['bk', 'guru bk']) ? 'counselor' : 'homeroom';
+        $teacherType = in_array(strtolower($typeRaw), ['bk', 'guru bk']) ? 'counselor'
+            : (in_array(strtolower($typeRaw), ['kesiswaan', 'student_affairs']) ? 'student_affairs' : 'homeroom');
 
         $grade = null;
         if ($teacherType === 'counselor' && ! empty($typeRaw)) {

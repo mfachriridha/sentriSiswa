@@ -59,6 +59,8 @@
                     <span class="inline-flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">Wali Kelas</span>
                 @elseif ($teacher->teacherProfile?->teacher_type === 'counselor')
                     <span class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-3 py-1 text-sm font-medium text-amber-700">BK</span>
+                @elseif ($teacher->teacherProfile?->teacher_type === 'student_affairs')
+                    <span class="inline-flex items-center gap-1 rounded-full bg-green-50 px-3 py-1 text-sm font-medium text-green-700">Kesiswaan</span>
                 @else
                     <span class="text-base text-gray-400">-</span>
                 @endif

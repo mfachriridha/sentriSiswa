@@ -55,7 +55,7 @@
     :search="$search"
     placeholder="Cari nama atau NIP..."
     :filters="[
-        ['name' => 'teacher_type', 'label' => 'Tipe', 'value' => $filterType, 'options' => ['' => 'Semua Tipe', 'homeroom' => 'Wali Kelas', 'counselor' => 'BK']],
+        ['name' => 'teacher_type', 'label' => 'Tipe', 'value' => $filterType, 'options' => ['' => 'Semua Tipe', 'homeroom' => 'Wali Kelas', 'counselor' => 'BK', 'student_affairs' => 'Kesiswaan']],
         ['name' => 'grade', 'label' => 'Tingkat', 'value' => $filterGrade, 'options' => ['' => 'Semua Tingkat', '10' => '10', '11' => '11', '12' => '12']],
     ]"
     :sort="$sort"
@@ -107,6 +107,10 @@
                         @elseif ($teacher->teacherProfile?->teacher_type === 'counselor')
                             <span class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">
                                 BK
+                            </span>
+                        @elseif ($teacher->teacherProfile?->teacher_type === 'student_affairs')
+                            <span class="inline-flex items-center gap-1 rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-700">
+                                Kesiswaan
                             </span>
                         @else
                             <span class="text-gray-400">-</span>

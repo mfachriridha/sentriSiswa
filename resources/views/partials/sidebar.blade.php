@@ -56,5 +56,35 @@
                 </a>
             </li>
         </ul>
+
+        <ul class="mt-2 space-y-1">
+            <li class="pt-5 pb-2">
+                <span class="px-3 text-xs font-semibold uppercase tracking-wider text-gray-400">Konfigurasi</span>
+            </li>
+
+            <li>
+                <a href="{{ route('admin.settings.attendance-time.index') }}"
+                   class="flex items-center gap-3 rounded-lg px-4 py-3 text-base font-medium transition-colors
+                          {{ request()->routeIs('admin.settings.attendance-time.*') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
+                    <svg class="h-6 w-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Waktu Absen
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ route('admin.settings.whatsapp.index') }}"
+                   class="flex items-center gap-3 rounded-lg px-4 py-3 text-base font-medium transition-colors
+                          {{ request()->routeIs('admin.settings.whatsapp.*') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
+                    <svg class="h-6 w-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                    </svg>
+                    WhatsApp API
+                </a>
+            </li>
+        </ul>
     </nav>
 </aside>

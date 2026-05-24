@@ -56,6 +56,11 @@ class User extends Authenticatable
         return $this->isTeacher() && $this->teacherProfile?->teacher_type === 'counselor';
     }
 
+    public function isStudentAffairs(): bool
+    {
+        return $this->isTeacher() && $this->teacherProfile?->teacher_type === 'student_affairs';
+    }
+
     public function isStudent(): bool
     {
         return $this->role === 'student';

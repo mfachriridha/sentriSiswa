@@ -64,6 +64,7 @@
                         <option value="">Pilih tipe</option>
                         <option value="homeroom">Wali Kelas</option>
                         <option value="counselor">BK</option>
+                        <option value="student_affairs">Kesiswaan</option>
                     </select>
                     @error('teacher_type')
                         <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
