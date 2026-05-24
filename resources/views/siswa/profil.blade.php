@@ -68,6 +68,10 @@
             <p class="mt-1.5 text-base text-gray-900">{{ $student->studentProfile?->nis ?? '-' }}</p>
         </div>
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
+            <p class="text-sm font-medium text-gray-500">Email</p>
+            <p class="mt-1.5 text-base text-gray-900">{{ $student->email ?? '-' }}</p>
+        </div>
+        <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">Telepon</p>
             <p class="mt-1.5 text-base text-gray-900">{{ $student->studentProfile?->phone ?? '-' }}</p>
         </div>

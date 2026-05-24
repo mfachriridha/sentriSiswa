@@ -31,6 +31,10 @@ class ProfilController extends Controller
     {
         $student = Auth::user();
 
+        $student->update([
+            'email' => $request->email,
+        ]);
+
         $student->studentProfile->update([
             'phone' => $request->phone,
             'address' => $request->address,
