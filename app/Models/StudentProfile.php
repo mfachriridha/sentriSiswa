@@ -29,17 +29,24 @@ class StudentProfile extends Model
         return $this->hasOne(StudentBiodata::class);
     }
 
-    public function violations()
-    {
-        return $this->hasMany(StudentViolation::class);
-    }
+    // TODO: Uncomment when violation_types & student_violations tables are created
+    // public function violations()
+    // {
+    //     return $this->hasMany(StudentViolation::class);
+    // }
+
+    // TODO: Uncomment when violation_types & student_violations tables are created
+    // public function getPointsAttribute(): int
+    // {
+    //     $deductions = $this->violations()
+    //         ->join('violation_types', 'student_violations.violation_type_id', '=', 'violation_types.id')
+    //         ->sum('violation_types.point_deduction');
+    //
+    //     return max(0, 100 - $deductions);
+    // }
 
     public function getPointsAttribute(): int
     {
-        $deductions = $this->violations()
-            ->join('violation_types', 'student_violations.violation_type_id', '=', 'violation_types.id')
-            ->sum('violation_types.point_deduction');
-
-        return max(0, 100 - $deductions);
+        return 100;
     }
 }
