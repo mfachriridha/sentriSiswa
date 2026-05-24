@@ -8,17 +8,49 @@ use App\Http\Requests\Class\UpdateClassRequest;
 use App\Models\SchoolClass;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class ClassController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $classes = SchoolClass::with('homeroomTeacher')
-            ->latest()
-            ->get();
+        $search = $request->get('search', '');
+        $filterGrade = $request->get('grade', '');
+        $sort = $request->get('sort', 'name');
+        $direction = $request->get('direction', 'asc');
+        $allowed = ['name', 'grade', 'created_at'];
+        $sort = in_array($sort, $allowed) ? $sort : 'name';
+        $direction = in_array($direction, ['asc', 'desc']) ? $direction : 'asc';
 
-        return view('admin.class.index', compact('classes'));
+        $classes = SchoolClass::with('homeroomTeacher');
+
+        if ($search) {
+            $classes->where('name', 'like', "%{$search}%");
+        }
+
+        if ($filterGrade) {
+            $classes->where('grade', $filterGrade);
+        }
+
+        if ($sort === 'name') {
+            $classes = $classes->orderBy('grade', $direction)
+                ->orderByRaw("CAST(SUBSTRING_INDEX(name, '. ', -1) AS UNSIGNED) {$direction}")
+                ->orderBy('name', $direction);
+        } elseif ($sort === 'grade') {
+            $classes = $classes->orderBy('grade', $direction)->orderBy('name', 'asc');
+        } else {
+            $classes = $classes->orderBy($sort, $direction);
+        }
+
+        $classes = $classes->paginate(25)->appends([
+            'search' => $search,
+            'grade' => $filterGrade,
+            'sort' => $sort,
+            'direction' => $direction,
+        ]);
+
+        return view('admin.class.index', compact('classes', 'sort', 'direction', 'search', 'filterGrade'));
     }
 
     public function create(): View

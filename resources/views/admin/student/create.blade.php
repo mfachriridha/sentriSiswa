@@ -22,7 +22,7 @@
 
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
-                <label for="name" class="block text-base font-medium text-gray-700">Nama</label>
+                <label for="name" class="block text-base font-medium text-gray-700">Nama <span class="text-red-500">*</span></label>
                 <input id="name" type="text" name="name" value="{{ old('name') }}" required
                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm
                               placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
@@ -32,7 +32,7 @@
             </div>
 
             <div>
-                <label for="email" class="block text-base font-medium text-gray-700">Email</label>
+                <label for="email" class="block text-base font-medium text-gray-700">Email <span class="text-sm font-normal text-gray-400">(opsional)</span></label>
                 <input id="email" type="email" name="email" value="{{ old('email') }}"
                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm
                               placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
@@ -42,8 +42,8 @@
             </div>
 
             <div>
-                <label for="nisn" class="block text-base font-medium text-gray-700">NISN</label>
-                <input id="nisn" type="text" name="nisn" value="{{ old('nisn') }}"
+                <label for="nisn" class="block text-base font-medium text-gray-700">NISN <span class="text-red-500">*</span></label>
+                <input id="nisn" type="text" name="nisn" value="{{ old('nisn') }}" required
                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm
                               placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                 @error('nisn')
@@ -52,8 +52,8 @@
             </div>
 
             <div>
-                <label for="nis" class="block text-base font-medium text-gray-700">NIS</label>
-                <input id="nis" type="text" name="nis" value="{{ old('nis') }}"
+                <label for="nis" class="block text-base font-medium text-gray-700">NIS <span class="text-red-500">*</span></label>
+                <input id="nis" type="text" name="nis" value="{{ old('nis') }}" required
                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm
                               placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                 @error('nis')
@@ -99,15 +99,14 @@
             </div>
 
             <div>
-                <label for="password" class="block text-base font-medium text-gray-700">Kata Sandi</label>
-                <input id="password" type="password" name="password" required
+                <label for="password" class="block text-base font-medium text-gray-700">Kata Sandi <span class="text-sm font-normal text-gray-400">(opsional)</span></label>
+                <input id="password" type="password" name="password"
                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm
                               placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                 @error('password')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
-        </div>
 
         <div class="flex items-center gap-4 pt-2">
             <button type="submit" :disabled="loading"

@@ -23,7 +23,7 @@
 
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
-                <label for="grade" class="block text-base font-medium text-gray-700">Tingkat</label>
+                <label for="grade" class="block text-base font-medium text-gray-700">Tingkat <span class="text-red-500">*</span></label>
                 <select id="grade" name="grade" required
                         class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm
                                focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
@@ -38,7 +38,7 @@
             </div>
 
             <div>
-                <label for="identifier" class="block text-base font-medium text-gray-700">Nama Kelas</label>
+                <label for="identifier" class="block text-base font-medium text-gray-700">Nama Kelas <span class="text-red-500">*</span></label>
                 <input id="identifier" type="text" name="identifier" value="{{ old('identifier', $identifier) }}" required
                        placeholder="contoh: 1, IPA 1, SAINS 1"
                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm

@@ -18,8 +18,10 @@
                         formId: 'delete-all-classes-form'
                     }
                 }))"
+                @disabled($classes->isEmpty())
                 class="inline-flex items-center gap-2 rounded-lg border border-red-200 px-5 py-3 text-base font-medium text-red-600 shadow-sm
-                       hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-300 transition-colors cursor-pointer">
+                       hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-300 transition-colors cursor-pointer
+                       disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent">
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
@@ -39,14 +41,26 @@
 
 <x-alert type="success" :message="session('success')" />
 
+<x-search-filter-form
+    :action="route('admin.classes.index')"
+    :search="$search"
+    placeholder="Cari nama kelas..."
+    :filters="[
+        ['name' => 'grade', 'label' => 'Tingkat', 'value' => $filterGrade, 'options' => ['' => 'Semua Tingkat', '10' => '10', '11' => '11', '12' => '12']],
+    ]"
+    :sort="$sort"
+    :direction="$direction"
+/>
+
 <div class="overflow-hidden rounded-xl border border-gray-200 bg-white">
-    <table class="min-w-full text-left text-base">
+    <div class="overflow-x-auto">
+        <table class="min-w-full text-left text-base">
         <thead class="border-b border-gray-200 bg-gray-50">
             <tr>
-                <th class="px-6 py-5 font-semibold text-gray-600">Nama</th>
-                <th class="px-6 py-5 font-semibold text-gray-600">Tingkat</th>
-                <th class="px-6 py-5 font-semibold text-gray-600">Wali Kelas</th>
-                <th class="px-6 py-5 font-semibold text-gray-600">Aksi</th>
+                <th class="px-6 py-5"><x-sort-link label="Nama" column="name" :sort="$sort" :direction="$direction" /></th>
+                <th class="px-6 py-5"><x-sort-link label="Tingkat" column="grade" :sort="$sort" :direction="$direction" /></th>
+                <th class="px-6 py-5 text-gray-600 font-semibold">Wali Kelas</th>
+                <th class="px-6 py-5 text-gray-600 font-semibold">Aksi</th>
             </tr>
         </thead>
         <tbody class="divide-y divide-gray-100">
@@ -107,15 +121,24 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="4" class="px-6 py-16 text-center text-base text-gray-500">Belum ada data kelas.</td>
+                    <td colspan="4" class="px-6 py-16 text-center text-base text-gray-500">
+                    {{ $search || $filterGrade ? 'Tidak ada kelas yang sesuai dengan pencarian.' : 'Belum ada data kelas.' }}
+                </td>
                 </tr>
             @endforelse
         </tbody>
-    </table>
+        </table>
+    </div>
+
+    @if ($classes->hasPages())
+        <div class="border-t border-gray-200 px-6 py-4">
+            <x-pagination :paginator="$classes" />
+        </div>
+    @endif
 </div>
-@endsection
 
 <form id="delete-all-classes-form" method="POST" action="{{ route('admin.classes.delete-all') }}" class="hidden">
     @csrf
     @method('DELETE')
 </form>
+@endsection

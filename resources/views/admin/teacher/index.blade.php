@@ -16,7 +16,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
             </svg>
-            Import Excel
+            Impor Excel
         </a>
         <button type="button"
                 onclick="window.dispatchEvent(new CustomEvent('open-confirm-modal', {
@@ -27,8 +27,10 @@
                         formId: 'delete-all-form'
                     }
                 }))"
+                @disabled($teachers->isEmpty())
                 class="inline-flex items-center gap-2 rounded-lg border border-red-200 px-5 py-3 text-base font-medium text-red-600 shadow-sm
-                       hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-300 transition-colors cursor-pointer">
+                       hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-300 transition-colors cursor-pointer
+                       disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent">
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
@@ -48,31 +50,47 @@
 
 <x-alert type="success" :message="session('success')" />
 
+<x-search-filter-form
+    :action="route('admin.teachers.index')"
+    :search="$search"
+    placeholder="Cari nama atau NIP..."
+    :filters="[
+        ['name' => 'teacher_type', 'label' => 'Tipe', 'value' => $filterType, 'options' => ['' => 'Semua Tipe', 'homeroom' => 'Wali Kelas', 'counselor' => 'BK']],
+        ['name' => 'grade', 'label' => 'Tingkat', 'value' => $filterGrade, 'options' => ['' => 'Semua Tingkat', '10' => '10', '11' => '11', '12' => '12']],
+    ]"
+    :sort="$sort"
+    :direction="$direction"
+/>
+
 @if (session('import_result'))
     <div class="mb-6 rounded-lg border border-green-200 bg-green-50 px-5 py-4 text-base text-green-700">
-        <p class="font-semibold">Import berhasil!</p>
+        <p class="font-semibold">Impor berhasil!</p>
         <ul class="mt-2 list-disc pl-5 space-y-1">
             <li>{{ session('import_result.teachers_created') }} guru baru dibuat</li>
             <li>{{ session('import_result.teachers_existing') }} guru sudah ada</li>
             <li>{{ session('import_result.classes_created') }} kelas dibuat</li>
+            @if (session('import_result.duration'))
+                <li>Selesai dalam {{ session('import_result.duration') }} detik</li>
+            @endif
             @if (session('import_result.errors'))
-                <li>{{ session('import_result.errors') }} baris dilewati (nama kosong)</li>
+                <li>{{ session('import_result.errors') }} baris dilewati</li>
             @endif
         </ul>
     </div>
 @endif
 
 <div class="overflow-hidden rounded-xl border border-gray-200 bg-white">
-    <table class="min-w-full text-left text-base">
+    <div class="overflow-x-auto">
+        <table class="min-w-full text-left text-base">
         <thead class="border-b border-gray-200 bg-gray-50">
             <tr>
-                <th class="px-6 py-5 font-semibold text-gray-600">NIP</th>
-                <th class="px-6 py-5 font-semibold text-gray-600">Nama</th>
-                <th class="px-6 py-5 font-semibold text-gray-600">Email</th>
-                <th class="px-6 py-5 font-semibold text-gray-600">Tipe</th>
-                <th class="px-6 py-5 font-semibold text-gray-600">Kelas</th>
-                <th class="px-6 py-5 font-semibold text-gray-600">Telepon</th>
-                <th class="px-6 py-5 font-semibold text-gray-600">Aksi</th>
+                <th class="px-6 py-5"><x-sort-link label="NIP" column="nip" :sort="$sort" :direction="$direction" /></th>
+                <th class="px-6 py-5"><x-sort-link label="Nama" column="name" :sort="$sort" :direction="$direction" /></th>
+                <th class="px-6 py-5"><x-sort-link label="Email" column="email" :sort="$sort" :direction="$direction" /></th>
+                <th class="px-6 py-5"><x-sort-link label="Tipe" column="teacher_type" :sort="$sort" :direction="$direction" /></th>
+                <th class="px-6 py-5"><x-sort-link label="Kelas" column="class_name" :sort="$sort" :direction="$direction" /></th>
+                <th class="px-6 py-5"><x-sort-link label="Telepon" column="phone" :sort="$sort" :direction="$direction" /></th>
+                <th class="px-6 py-5 text-gray-600 font-semibold">Aksi</th>
             </tr>
         </thead>
         <tbody class="divide-y divide-gray-100">
@@ -152,15 +170,24 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7" class="px-6 py-16 text-center text-base text-gray-500">Belum ada data guru.</td>
+                    <td colspan="7" class="px-6 py-16 text-center text-base text-gray-500">
+                    {{ $search || $filterType || $filterGrade ? 'Tidak ada guru yang sesuai dengan pencarian.' : 'Belum ada data guru.' }}
+                </td>
                 </tr>
             @endforelse
         </tbody>
-    </table>
+        </table>
+    </div>
+
+    @if ($teachers->hasPages())
+        <div class="border-t border-gray-200 px-6 py-4">
+            <x-pagination :paginator="$teachers" />
+        </div>
+    @endif
 </div>
-@endsection
 
 <form id="delete-all-form" method="POST" action="{{ route('admin.teachers.delete-all') }}" class="hidden">
     @csrf
     @method('DELETE')
 </form>
+@endsection

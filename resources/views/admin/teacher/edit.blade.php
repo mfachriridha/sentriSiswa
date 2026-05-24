@@ -23,7 +23,7 @@
 
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
-                <label for="name" class="block text-base font-medium text-gray-700">Nama</label>
+                <label for="name" class="block text-base font-medium text-gray-700">Nama <span class="text-red-500">*</span></label>
                 <input id="name" type="text" name="name" value="{{ old('name', $teacher->name) }}" required
                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm
                               placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20
@@ -34,7 +34,7 @@
             </div>
 
             <div>
-                <label for="email" class="block text-base font-medium text-gray-700">Email</label>
+                <label for="email" class="block text-base font-medium text-gray-700">Email <span class="text-sm font-normal text-gray-400">(opsional)</span></label>
                 <input id="email" type="email" name="email" value="{{ old('email', $teacher->email) }}" required
                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm
                               placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20
@@ -57,7 +57,7 @@
 
             <div x-data="{ type: '{{ old('teacher_type', $teacher->teacherProfile?->teacher_type) }}' }">
                 <div>
-                    <label for="teacher_type" class="block text-base font-medium text-gray-700">Tipe</label>
+                    <label for="teacher_type" class="block text-base font-medium text-gray-700">Tipe <span class="text-red-500">*</span></label>
                     <select id="teacher_type" name="teacher_type" required x-model="type"
                             class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm
                                    focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">

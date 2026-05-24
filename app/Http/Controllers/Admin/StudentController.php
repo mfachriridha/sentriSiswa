@@ -6,22 +6,68 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Student\StoreStudentRequest;
 use App\Http\Requests\Student\UpdateStudentRequest;
 use App\Models\SchoolClass;
+use App\Models\StudentProfile;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 
 class StudentController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $students = User::where('role', 'student')
-            ->with('studentProfile.class')
-            ->latest()
-            ->get();
+        $search = $request->get('search', '');
+        $filterGrade = $request->get('grade', '');
+        $sort = $request->get('sort', 'created_at');
+        $direction = $request->get('direction', 'desc');
+        $allowed = ['name', 'email', 'created_at', 'nisn', 'nis', 'class_name'];
+        $sort = in_array($sort, $allowed) ? $sort : 'created_at';
+        $direction = in_array($direction, ['asc', 'desc']) ? $direction : 'desc';
 
-        return view('admin.student.index', compact('students'));
+        $students = User::where('role', 'student')
+            ->with('studentProfile.class');
+
+        if ($search) {
+            $students->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhereHas('studentProfile', fn ($q) => $q
+                        ->where('nisn', 'like', "%{$search}%")
+                        ->orWhere('nis', 'like', "%{$search}%"));
+            });
+        }
+
+        if ($filterGrade) {
+            $students->whereHas('studentProfile.class', fn ($q) => $q->where('grade', $filterGrade));
+        }
+
+        if ($sort === 'class_name') {
+            $students = $students->orderBy(
+                SchoolClass::select('name')
+                    ->whereColumn('id', 'student_profiles.class_id')
+                    ->limit(1),
+                $direction,
+            );
+        } elseif (in_array($sort, ['nisn', 'nis'])) {
+            $students = $students->orderBy(
+                StudentProfile::select($sort)
+                    ->whereColumn('student_profiles.user_id', 'users.id')
+                    ->limit(1),
+                $direction,
+            );
+        } else {
+            $students = $students->orderBy($sort, $direction);
+        }
+
+        $students = $students->paginate(25)->appends([
+            'search' => $search,
+            'grade' => $filterGrade,
+            'sort' => $sort,
+            'direction' => $direction,
+        ]);
+
+        return view('admin.student.index', compact('students', 'sort', 'direction', 'search', 'filterGrade'));
     }
 
     public function create(): View
@@ -34,12 +80,17 @@ class StudentController extends Controller
     public function store(StoreStudentRequest $request): RedirectResponse
     {
         DB::transaction(function () use ($request) {
-            $user = User::create([
+            $data = [
                 'name' => $request->name,
                 'email' => $request->email,
-                'password' => Hash::make($request->password),
                 'role' => 'student',
-            ]);
+            ];
+
+            if ($request->filled('password')) {
+                $data['password'] = Hash::make($request->password);
+            }
+
+            $user = User::create($data);
 
             $user->studentProfile()->create([
                 'nisn' => $request->nisn,
@@ -104,6 +155,7 @@ class StudentController extends Controller
 
     public function deleteAll(): RedirectResponse
     {
+        StudentProfile::whereHas('user', fn ($q) => $q->where('role', 'student'))->delete();
         User::where('role', 'student')->delete();
 
         return redirect()->route('admin.students.index')->with('success', 'Semua siswa berhasil dihapus.');

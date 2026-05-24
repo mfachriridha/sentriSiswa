@@ -22,22 +22,20 @@
 
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
-                <label for="name" class="block text-base font-medium text-gray-700">Nama</label>
+                <label for="name" class="block text-base font-medium text-gray-700">Nama <span class="text-red-500">*</span></label>
                 <input id="name" type="text" name="name" value="{{ old('name') }}" required
                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm
-                              placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20
-                              transition-colors">
+                              placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                 @error('name')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
 
             <div>
-                <label for="email" class="block text-base font-medium text-gray-700">Email</label>
-                <input id="email" type="email" name="email" value="{{ old('email') }}" required
+                <label for="email" class="block text-base font-medium text-gray-700">Email <span class="text-sm font-normal text-gray-400">(opsional)</span></label>
+                <input id="email" type="email" name="email" value="{{ old('email') }}"
                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm
-                              placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20
-                              transition-colors">
+                              placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                 @error('email')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror
@@ -47,8 +45,7 @@
                 <label for="nip" class="block text-base font-medium text-gray-700">NIP</label>
                 <input id="nip" type="text" name="nip" value="{{ old('nip') }}"
                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm
-                              placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20
-                              transition-colors">
+                              placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                 @error('nip')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror
@@ -56,7 +53,7 @@
 
             <div x-data="{ type: '{{ old('teacher_type') }}' }">
                 <div>
-                    <label for="teacher_type" class="block text-base font-medium text-gray-700">Tipe</label>
+                    <label for="teacher_type" class="block text-base font-medium text-gray-700">Tipe <span class="text-red-500">*</span></label>
                     <select id="teacher_type" name="teacher_type" required x-model="type"
                             class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm
                                    focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
@@ -70,7 +67,7 @@
                 </div>
 
                 <div x-show="type === 'counselor'" x-cloak class="mt-6">
-                    <label for="grade" class="block text-base font-medium text-gray-700">Tingkatan</label>
+                    <label for="grade" class="block text-base font-medium text-gray-700">Tingkatan <span class="text-red-500">*</span></label>
                     <select id="grade" name="grade"
                             class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm
                                    focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
@@ -89,19 +86,17 @@
                 <label for="phone" class="block text-base font-medium text-gray-700">Telepon</label>
                 <input id="phone" type="text" name="phone" value="{{ old('phone') }}"
                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm
-                              placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20
-                              transition-colors">
+                              placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                 @error('phone')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
 
             <div>
-                <label for="password" class="block text-base font-medium text-gray-700">Kata Sandi</label>
-                <input id="password" type="password" name="password" required
+                <label for="password" class="block text-base font-medium text-gray-700">Kata Sandi <span class="text-sm font-normal text-gray-400">(opsional)</span></label>
+                <input id="password" type="password" name="password"
                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm
-                              placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20
-                              transition-colors">
+                              placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                 @error('password')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror

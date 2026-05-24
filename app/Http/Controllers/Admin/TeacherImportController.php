@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\TeacherTemplateExport;
 use App\Http\Controllers\Controller;
 use App\Imports\TeacherImport;
 use Illuminate\Http\RedirectResponse;
@@ -9,10 +10,16 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class TeacherImportController extends Controller
 {
     protected int $perPage = 25;
+
+    public function template(): BinaryFileResponse
+    {
+        return Excel::download(new TeacherTemplateExport, 'template-impor-guru.xlsx');
+    }
 
     public function create(): View
     {
@@ -44,11 +51,38 @@ class TeacherImportController extends Controller
         $rows = Excel::toArray(new TeacherImport, $fullPath);
         $allRows = $rows[0] ?? [];
 
+        $isOldFormat = ! empty($allRows) && isset($allRows[0]['walas']);
+
+        $normalized = array_map(function ($row) use ($isOldFormat) {
+            if ($isOldFormat) {
+                $name = trim((string) ($row['walas'] ?? ''));
+                $nipRaw = isset($row['nip']) && $row['nip'] !== '-' ? trim((string) $row['nip']) : null;
+                $nip = $nipRaw ? str_replace(' ', '', $nipRaw) : null;
+                $className = trim((string) ($row['kelas'] ?? ''));
+                $type = 'Wali Kelas';
+            } else {
+                $name = trim((string) ($row['nama'] ?? ''));
+                $nipRaw = isset($row['nip']) && $row['nip'] !== '-' ? trim((string) $row['nip']) : null;
+                $nip = $nipRaw ? str_replace(' ', '', $nipRaw) : null;
+                $className = trim((string) ($row['kelas'] ?? ''));
+                $typeRaw = trim((string) ($row['tipe'] ?? ''));
+                $type = in_array(strtolower($typeRaw), ['bk', 'guru bk']) ? 'BK' : 'Wali Kelas';
+            }
+
+            return [
+                'nama' => $name,
+                'nip' => $nip ?? ($nipRaw ?? ''),
+                'tipe' => $type,
+                'kelas' => $className,
+            ];
+        }, $allRows);
+
         $page = (int) $request->get('page', 1);
-        $collection = collect($allRows);
+        $total = count($normalized);
+        $offset = ($page - 1) * $this->perPage;
         $paginated = new LengthAwarePaginator(
-            $collection->forPage($page, $this->perPage)->values(),
-            $collection->count(),
+            array_slice($normalized, $offset, $this->perPage),
+            $total,
             $this->perPage,
             $page,
             ['path' => route('admin.teachers.import.preview')],
@@ -56,7 +90,7 @@ class TeacherImportController extends Controller
 
         return view('admin.teacher.import-preview', [
             'previewRows' => $paginated,
-            'totalRows' => $collection->count(),
+            'totalRows' => $total,
             'filePath' => $path,
         ]);
     }
@@ -67,9 +101,13 @@ class TeacherImportController extends Controller
             'file_path' => ['required', 'string'],
         ]);
 
+        set_time_limit(0);
+
         $import = new TeacherImport;
+        $start = microtime(true);
         $path = storage_path('app/private/'.$request->file_path);
         Excel::import($import, $path);
+        $duration = round(microtime(true) - $start, 1);
 
         session()->forget('import_file_path');
 
@@ -80,6 +118,7 @@ class TeacherImportController extends Controller
                 'teachers_existing' => $import->teachersExisting,
                 'classes_created' => $import->classesCreated,
                 'errors' => $import->errors,
+                'duration' => $duration,
             ]);
     }
 }

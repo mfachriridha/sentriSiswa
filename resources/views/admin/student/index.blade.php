@@ -9,6 +9,15 @@
         <p class="mt-2 text-base text-gray-500">Kelola data siswa</p>
     </div>
     <div class="flex items-center gap-3">
+        <a href="{{ route('admin.students.import') }}"
+           class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-5 py-3 text-base font-medium text-gray-700 shadow-sm
+                  hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            Impor Excel
+        </a>
         <button type="button"
                 onclick="window.dispatchEvent(new CustomEvent('open-confirm-modal', {
                     detail: {
@@ -18,8 +27,10 @@
                         formId: 'delete-all-students-form'
                     }
                 }))"
+                @disabled($students->isEmpty())
                 class="inline-flex items-center gap-2 rounded-lg border border-red-200 px-5 py-3 text-base font-medium text-red-600 shadow-sm
-                       hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-300 transition-colors cursor-pointer">
+                       hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-300 transition-colors cursor-pointer
+                       disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent">
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
@@ -39,15 +50,67 @@
 
 <x-alert type="success" :message="session('success')" />
 
+<x-search-filter-form
+    :action="route('admin.students.index')"
+    :search="$search"
+    placeholder="Cari nama, NISN, atau NIS..."
+    :filters="[
+        ['name' => 'grade', 'label' => 'Tingkat', 'value' => $filterGrade, 'options' => ['' => 'Semua Tingkat', '10' => '10', '11' => '11', '12' => '12']],
+    ]"
+    :sort="$sort"
+    :direction="$direction"
+/>
+
+@if (session('import_result'))
+    <div class="mb-6 rounded-lg border border-green-200 bg-green-50 px-5 py-4 text-base">
+        <p class="font-semibold text-green-800">Impor berhasil!</p>
+        <ul class="mt-2 list-disc pl-5 space-y-1 text-green-700">
+            <li>{{ session('import_result.students_created') }} siswa baru dibuat</li>
+            @if (session('import_result.students_existing'))
+                <li class="text-amber-700">{{ session('import_result.students_existing') }} siswa sudah ada</li>
+            @endif
+            @if (session('import_result.duration'))
+                <li>Selesai dalam {{ session('import_result.duration') }} detik</li>
+            @endif
+        </ul>
+        @if (!empty(session('import_result.error_details')))
+            <div class="mt-3">
+                <p class="font-medium text-red-800">Detail baris yang dilewati/diabaikan:</p>
+                <div class="mt-2 max-h-48 overflow-y-auto rounded border border-red-200 bg-red-50 p-3">
+                    <table class="w-full text-left text-sm">
+                        <thead>
+                            <tr class="text-red-700">
+                                <th class="py-1 pr-4">Baris</th>
+                                <th class="py-1 pr-4">Nama</th>
+                                <th class="py-1">Alasan</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-red-600">
+                            @foreach (session('import_result.error_details') as $detail)
+                                <tr>
+                                    <td class="py-1 pr-4">{{ $detail['row'] }}</td>
+                                    <td class="py-1 pr-4">{{ $detail['name'] }}</td>
+                                    <td class="py-1">{{ $detail['reason'] }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        @endif
+    </div>
+@endif
+
 <div class="overflow-hidden rounded-xl border border-gray-200 bg-white">
-    <table class="min-w-full text-left text-base">
+    <div class="overflow-x-auto">
+        <table class="min-w-full text-left text-base">
         <thead class="border-b border-gray-200 bg-gray-50">
             <tr>
-                <th class="px-6 py-5 font-semibold text-gray-600">NISN</th>
-                <th class="px-6 py-5 font-semibold text-gray-600">NIS</th>
-                <th class="px-6 py-5 font-semibold text-gray-600">Nama</th>
-                <th class="px-6 py-5 font-semibold text-gray-600">Kelas</th>
-                <th class="px-6 py-5 font-semibold text-gray-600">Aksi</th>
+                <th class="px-6 py-5"><x-sort-link label="NISN" column="nisn" :sort="$sort" :direction="$direction" /></th>
+                <th class="px-6 py-5"><x-sort-link label="NIS" column="nis" :sort="$sort" :direction="$direction" /></th>
+                <th class="px-6 py-5"><x-sort-link label="Nama" column="name" :sort="$sort" :direction="$direction" /></th>
+                <th class="px-6 py-5"><x-sort-link label="Kelas" column="class_name" :sort="$sort" :direction="$direction" /></th>
+                <th class="px-6 py-5 text-gray-600 font-semibold">Aksi</th>
             </tr>
         </thead>
         <tbody class="divide-y divide-gray-100">
@@ -109,11 +172,20 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5" class="px-6 py-16 text-center text-base text-gray-500">Belum ada data siswa.</td>
+                    <td colspan="5" class="px-6 py-16 text-center text-base text-gray-500">
+                    {{ $search || $filterGrade ? 'Tidak ada siswa yang sesuai dengan pencarian.' : 'Belum ada data siswa.' }}
+                </td>
                 </tr>
             @endforelse
         </tbody>
-    </table>
+        </table>
+    </div>
+
+    @if ($students->hasPages())
+        <div class="border-t border-gray-200 px-6 py-4">
+            <x-pagination :paginator="$students" />
+        </div>
+    @endif
 </div>
 
 <form id="delete-all-students-form" method="POST" action="{{ route('admin.students.delete-all') }}" class="hidden">

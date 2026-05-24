@@ -7,8 +7,9 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
-#[Fillable(['nisn', 'nis', 'class_id', 'phone', 'address'])]
+#[Fillable(['nisn', 'nis', 'class_id', 'phone', 'address', 'photo'])]
 class StudentProfile extends Model
 {
     /** @use HasFactory<StudentProfileFactory> */
@@ -22,5 +23,10 @@ class StudentProfile extends Model
     public function class(): BelongsTo
     {
         return $this->belongsTo(SchoolClass::class, 'class_id');
+    }
+
+    public function biodata(): HasOne
+    {
+        return $this->hasOne(StudentBiodata::class);
     }
 }

@@ -1,6 +1,6 @@
 <aside class="fixed inset-y-0 left-0 z-10 flex w-64 shrink-0 flex-col bg-white border-r border-gray-200">
     <div class="flex items-center gap-3 px-6 py-5 border-b border-gray-200">
-        <img src="{{ asset('storage/assets/logo/logo-website.png') }}" alt="Sentri Siswa" class="h-8 w-auto rounded-lg border border-gray-200">
+        <img src="{{ asset('storage/assets/logo/logo-sidebar.png') }}" alt="Sentri Siswa" class="h-8 w-auto rounded-lg border border-gray-200">
         <span class="text-lg font-semibold text-gray-900">Sentri Siswa</span>
     </div>
 

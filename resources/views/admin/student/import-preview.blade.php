@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'Pratinjau Impor Guru')
+@section('title', 'Pratinjau Impor Siswa')
 
 @section('content')
 <div class="mb-6">
-    <a href="{{ route('admin.teachers.import') }}"
+    <a href="{{ route('admin.students.import') }}"
        class="inline-flex items-center gap-2 text-base text-gray-500 hover:text-gray-700 transition-colors">
         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
@@ -24,8 +24,8 @@
                     <tr>
                         <th class="px-6 py-4 font-semibold text-gray-600 w-16">#</th>
                         <th class="px-6 py-4 font-semibold text-gray-600">Nama</th>
-                        <th class="px-6 py-4 font-semibold text-gray-600">NIP</th>
-                        <th class="px-6 py-4 font-semibold text-gray-600">Tipe</th>
+                        <th class="px-6 py-4 font-semibold text-gray-600">NIS</th>
+                        <th class="px-6 py-4 font-semibold text-gray-600">NISN</th>
                         <th class="px-6 py-4 font-semibold text-gray-600">Kelas</th>
                         <th class="px-6 py-4 font-semibold text-gray-600">Status</th>
                     </tr>
@@ -35,22 +35,16 @@
                         <tr>
                             <td class="px-6 py-4 text-gray-500">{{ ($previewRows->currentPage() - 1) * 25 + $index + 1 }}</td>
                             <td class="px-6 py-4 font-medium text-gray-900">{{ $row['nama'] ?? '-' }}</td>
-                            <td class="px-6 py-4 text-gray-700">{{ $row['nip'] ?? '-' }}</td>
-                            <td class="px-6 py-4 text-gray-700">{{ $row['tipe'] ?? '-' }}</td>
+                            <td class="px-6 py-4 text-gray-700">{{ $row['nis'] ?? '-' }}</td>
+                            <td class="px-6 py-4 text-gray-700">{{ $row['nisn'] ?? '-' }}</td>
                             <td class="px-6 py-4 text-gray-700">{{ $row['kelas'] ?? '-' }}</td>
                             <td class="px-6 py-4">
                                 @if (empty(trim($row['nama'] ?? '')))
-                                    <span class="inline-flex items-center gap-1 rounded-full bg-red-50 px-3 py-1 text-sm font-medium text-red-700">
-                                        ✗ Nama kosong
-                                    </span>
-                                @elseif (empty(trim($row['nip'] ?? '')) || ($row['nip'] ?? '') === '-')
-                                    <span class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-3 py-1 text-sm font-medium text-amber-700">
-                                        ⚠ NIP kosong
-                                    </span>
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-red-50 px-3 py-1 text-sm font-medium text-red-700">✗ Nama kosong</span>
+                                @elseif (empty(trim($row['kelas'] ?? '')))
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-3 py-1 text-sm font-medium text-amber-700">⚠ Kelas kosong</span>
                                 @else
-                                    <span class="inline-flex items-center gap-1 rounded-full bg-green-50 px-3 py-1 text-sm font-medium text-green-700">
-                                        ✓ Valid
-                                    </span>
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-green-50 px-3 py-1 text-sm font-medium text-green-700">✓ Valid</span>
                                 @endif
                             </td>
                         </tr>
@@ -68,7 +62,7 @@
 
     <div class="mt-8 flex items-center justify-between border-t border-gray-200 pt-6">
         <p class="text-base text-gray-500">Total {{ $totalRows }} baris akan diproses</p>
-        <form method="POST" action="{{ route('admin.teachers.import.store') }}" x-data="{ loading: false }" @submit="loading = true">
+        <form method="POST" action="{{ route('admin.students.import.store') }}" x-data="{ loading: false }" @submit="loading = true">
             @csrf
             <input type="hidden" name="file_path" value="{{ $filePath }}">
             <button type="submit" :disabled="loading"
