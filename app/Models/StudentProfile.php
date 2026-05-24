@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 #[Fillable(['nisn', 'nis', 'class_id', 'phone', 'address', 'photo'])]
@@ -27,6 +28,11 @@ class StudentProfile extends Model
     public function biodata(): HasOne
     {
         return $this->hasOne(StudentBiodata::class);
+    }
+
+    public function attendances(): HasMany
+    {
+        return $this->hasMany(Attendance::class);
     }
 
     // TODO: Uncomment when violation_types & student_violations tables are created

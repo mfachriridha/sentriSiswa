@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\TeacherController;
 use App\Http\Controllers\Admin\TeacherImportController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Guru\DashboardController as GuruDashboardController;
+use App\Http\Controllers\Siswa\AbsensiController as SiswaAbsensiController;
 use App\Http\Controllers\Siswa\DashboardController as SiswaDashboardController;
 use App\Http\Controllers\Siswa\ProfilController as SiswaProfilController;
 use Illuminate\Support\Facades\Route;
@@ -70,6 +71,9 @@ Route::middleware(['auth', 'registered', 'guru'])->prefix('guru')->name('guru.')
 
 Route::middleware(['auth', 'registered', 'siswa'])->prefix('siswa')->name('siswa.')->group(function () {
     Route::get('/dashboard', [SiswaDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/absensi', [SiswaAbsensiController::class, 'index'])->name('absensi');
+    Route::post('/absensi', [SiswaAbsensiController::class, 'store'])->name('absensi.store');
+    Route::get('/absensi/riwayat', [SiswaAbsensiController::class, 'riwayat'])->name('absensi.riwayat');
     Route::get('/profil', [SiswaProfilController::class, 'show'])->name('profil');
     Route::get('/profil/edit', [SiswaProfilController::class, 'edit'])->name('profil.edit');
     Route::put('/profil', [SiswaProfilController::class, 'update'])->name('profil.update');
