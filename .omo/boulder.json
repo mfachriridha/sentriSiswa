@@ -1,0 +1,177 @@
+{
+  "schema_version": 2,
+  "active_work_id": "fix-admin-create-user-password-754aa05f",
+  "works": {
+    "fix-admin-create-user-password-754aa05f": {
+      "work_id": "fix-admin-create-user-password-754aa05f",
+      "active_plan": "C:\\wamp64\\www\\sentrisiswav2\\.omo\\plans\\fix-admin-create-user-password.md",
+      "plan_name": "fix-admin-create-user-password",
+      "status": "active",
+      "started_at": "2026-05-24T11:35:27.915Z",
+      "updated_at": "2026-05-24T13:21:58.164Z",
+      "session_ids": [
+        "ses_1a7e43fd8ffeEJ6iMujvJp6SMg"
+      ],
+      "session_origins": {
+        "ses_1a7e43fd8ffeEJ6iMujvJp6SMg": "direct"
+      },
+      "agent": "atlas",
+      "task_sessions": {
+        "todo:1": {
+          "task_key": "todo:1",
+          "task_label": "1",
+          "task_title": "Fix admin student/teacher create password fallback",
+          "session_id": "ses_1a62a2d8affeB6H5JQLTaD3ntX",
+          "agent": "Sisyphus-Junior",
+          "category": "quick",
+          "updated_at": "2026-05-24T11:57:43.591Z",
+          "started_at": "2026-05-24T11:56:35.072Z",
+          "status": "completed",
+          "ended_at": "2026-05-24T11:57:43.589Z",
+          "elapsed_ms": 68517
+        },
+        "todo:2": {
+          "task_key": "todo:2",
+          "task_label": "2",
+          "task_title": "Add Pest regression tests for admin-created users",
+          "session_id": "ses_1a6259d63ffeBGAhGfyRvrgbkZ",
+          "agent": "Sisyphus-Junior",
+          "category": "quick",
+          "updated_at": "2026-05-24T12:14:23.312Z",
+          "started_at": "2026-05-24T12:09:42.689Z",
+          "status": "completed",
+          "ended_at": "2026-05-24T12:14:23.312Z",
+          "elapsed_ms": 280623
+        },
+        "final-wave:f1": {
+          "task_key": "final-wave:f1",
+          "task_label": "F1",
+          "task_title": "Plan Compliance Audit — re-run after corrective fixes for `fix-admin-create-user-password`.",
+          "session_id": "ses_1a5e64672ffexR3PEhQSzBTkhz",
+          "agent": "oracle",
+          "category": "",
+          "started_at": "2026-05-24T12:21:38.761Z",
+          "status": "running",
+          "updated_at": "2026-05-24T13:14:26.737Z"
+        },
+        "final-wave:f3": {
+          "task_key": "final-wave:f3",
+          "task_label": "F3",
+          "task_title": "Real Manual QA for `fix-admin-create-user-password`.",
+          "session_id": "ses_1a5e61f11ffeFQ2FvP4BV6FZ34",
+          "agent": "Sisyphus-Junior",
+          "category": "unspecified-high",
+          "updated_at": "2026-05-24T13:12:43.346Z",
+          "started_at": "2026-05-24T13:12:43.346Z",
+          "status": "running"
+        },
+        "final-wave:f4": {
+          "task_key": "final-wave:f4",
+          "task_label": "F4",
+          "task_title": "Scope Fidelity Check for `fix-admin-create-user-password`.",
+          "session_id": "ses_1a5e612bcffeCLEb4M0y7wlnr3",
+          "agent": "Sisyphus-Junior",
+          "category": "deep",
+          "updated_at": "2026-05-24T13:13:00.744Z",
+          "started_at": "2026-05-24T13:13:00.744Z",
+          "status": "running"
+        },
+        "final-wave:f2": {
+          "task_key": "final-wave:f2",
+          "task_label": "F2",
+          "task_title": "Code Quality Review for `fix-admin-create-user-password`.",
+          "session_id": "ses_1a5e634e7ffeKFJLdKDehgOzSj",
+          "agent": "Sisyphus-Junior",
+          "category": "unspecified-high",
+          "updated_at": "2026-05-24T13:21:58.165Z",
+          "started_at": "2026-05-24T13:21:58.165Z",
+          "status": "running"
+        }
+      }
+    }
+  },
+  "active_plan": "C:\\wamp64\\www\\sentrisiswav2\\.omo\\plans\\fix-admin-create-user-password.md",
+  "started_at": "2026-05-24T11:35:27.915Z",
+  "status": "active",
+  "updated_at": "2026-05-24T13:21:58.164Z",
+  "session_ids": [
+    "ses_1a7e43fd8ffeEJ6iMujvJp6SMg"
+  ],
+  "session_origins": {
+    "ses_1a7e43fd8ffeEJ6iMujvJp6SMg": "direct"
+  },
+  "plan_name": "fix-admin-create-user-password",
+  "task_sessions": {
+    "todo:1": {
+      "task_key": "todo:1",
+      "task_label": "1",
+      "task_title": "Fix admin student/teacher create password fallback",
+      "session_id": "ses_1a62a2d8affeB6H5JQLTaD3ntX",
+      "agent": "Sisyphus-Junior",
+      "category": "quick",
+      "updated_at": "2026-05-24T11:57:43.591Z",
+      "started_at": "2026-05-24T11:56:35.072Z",
+      "status": "completed",
+      "ended_at": "2026-05-24T11:57:43.589Z",
+      "elapsed_ms": 68517
+    },
+    "todo:2": {
+      "task_key": "todo:2",
+      "task_label": "2",
+      "task_title": "Add Pest regression tests for admin-created users",
+      "session_id": "ses_1a6259d63ffeBGAhGfyRvrgbkZ",
+      "agent": "Sisyphus-Junior",
+      "category": "quick",
+      "updated_at": "2026-05-24T12:14:23.312Z",
+      "started_at": "2026-05-24T12:09:42.689Z",
+      "status": "completed",
+      "ended_at": "2026-05-24T12:14:23.312Z",
+      "elapsed_ms": 280623
+    },
+    "final-wave:f1": {
+      "task_key": "final-wave:f1",
+      "task_label": "F1",
+      "task_title": "Plan Compliance Audit — re-run after corrective fixes for `fix-admin-create-user-password`.",
+      "session_id": "ses_1a5e64672ffexR3PEhQSzBTkhz",
+      "agent": "oracle",
+      "category": "",
+      "started_at": "2026-05-24T12:21:38.761Z",
+      "status": "running",
+      "updated_at": "2026-05-24T13:14:26.737Z"
+    },
+    "final-wave:f3": {
+      "task_key": "final-wave:f3",
+      "task_label": "F3",
+      "task_title": "Real Manual QA for `fix-admin-create-user-password`.",
+      "session_id": "ses_1a5e61f11ffeFQ2FvP4BV6FZ34",
+      "agent": "Sisyphus-Junior",
+      "category": "unspecified-high",
+      "updated_at": "2026-05-24T13:12:43.346Z",
+      "started_at": "2026-05-24T13:12:43.346Z",
+      "status": "running"
+    },
+    "final-wave:f4": {
+      "task_key": "final-wave:f4",
+      "task_label": "F4",
+      "task_title": "Scope Fidelity Check for `fix-admin-create-user-password`.",
+      "session_id": "ses_1a5e612bcffeCLEb4M0y7wlnr3",
+      "agent": "Sisyphus-Junior",
+      "category": "deep",
+      "updated_at": "2026-05-24T13:13:00.744Z",
+      "started_at": "2026-05-24T13:13:00.744Z",
+      "status": "running"
+    },
+    "final-wave:f2": {
+      "task_key": "final-wave:f2",
+      "task_label": "F2",
+      "task_title": "Code Quality Review for `fix-admin-create-user-password`.",
+      "session_id": "ses_1a5e634e7ffeKFJLdKDehgOzSj",
+      "agent": "Sisyphus-Junior",
+      "category": "unspecified-high",
+      "updated_at": "2026-05-24T13:21:58.165Z",
+      "started_at": "2026-05-24T13:21:58.165Z",
+      "status": "running"
+    }
+  },
+  "agent": "atlas"
+}

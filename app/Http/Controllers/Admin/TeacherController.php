@@ -89,11 +89,9 @@ class TeacherController extends Controller
                 'name' => $request->name,
                 'email' => $request->email,
                 'role' => 'teacher',
+                'status' => 'unregistered',
+                'password' => Hash::make($request->filled('password') ? $request->password : 'password'),
             ];
-
-            if ($request->filled('password')) {
-                $data['password'] = Hash::make($request->password);
-            }
 
             $user = User::create($data);
 

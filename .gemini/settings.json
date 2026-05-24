@@ -1,0 +1,25 @@
+{
+    "tools": {
+        "sandboxAllowedPaths": [
+            "true"
+        ],
+        "sandboxNetworkAccess": true
+    },
+    "ui": {
+        "footer": {
+            "hideSandboxStatus": false
+        }
+    },
+    "security": {
+        "toolSandboxing": true
+    },
+    "mcpServers": {
+        "laravel-boost": {
+            "command": "php",
+            "args": [
+                "artisan",
+                "boost:mcp"
+            ]
+        }
+    }
+}
