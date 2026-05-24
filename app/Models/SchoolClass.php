@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['name', 'grade', 'homeroom_teacher_id', 'student_count'])]
+#[Fillable(['name', 'grade', 'homeroom_teacher_id'])]
 class SchoolClass extends Model
 {
     protected $table = 'classes';

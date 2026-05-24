@@ -75,7 +75,8 @@ class ClassController extends Controller
 
     public function show(SchoolClass $class): View
     {
-        $class->load('homeroomTeacher');
+        $class->load(['homeroomTeacher']);
+        $class->loadCount('students');
 
         return view('admin.class.show', compact('class'));
     }
