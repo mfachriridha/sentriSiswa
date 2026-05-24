@@ -44,5 +44,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::delete('/classes/delete-all', [ClassController::class, 'deleteAll'])->name('classes.delete-all');
     Route::resource('classes', ClassController::class);
     Route::get('/settings/attendance-time', [SettingController::class, 'attendanceTime'])->name('settings.attendance-time.index');
+    Route::put('/settings/attendance-time', [SettingController::class, 'attendanceTimeUpdate'])->name('settings.attendance-time.update');
     Route::get('/settings/whatsapp', [SettingController::class, 'whatsapp'])->name('settings.whatsapp.index');
+    Route::put('/settings/whatsapp', [SettingController::class, 'whatsappUpdate'])->name('settings.whatsapp.update');
 });
