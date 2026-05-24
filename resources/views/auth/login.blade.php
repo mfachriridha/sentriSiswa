@@ -23,6 +23,12 @@
                 </div>
             @endif
 
+            @if (session('error'))
+                <div class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
+                    <p class="text-sm text-red-600">{{ session('error') }}</p>
+                </div>
+            @endif
+
             <form method="POST" action="{{ route('login') }}" class="space-y-5">
                 @csrf
 
@@ -42,12 +48,6 @@
                                   transition-colors">
                 </div>
 
-                <div class="flex items-center">
-                    <input id="remember" type="checkbox" name="remember"
-                           class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary">
-                    <label for="remember" class="ml-2 text-sm text-gray-600">Ingatkan saya</label>
-                </div>
-
                 <button type="submit"
                         class="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm
                                hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50
@@ -55,6 +55,10 @@
                     Masuk
                 </button>
             </form>
+
+            <p class="mt-6 text-center text-sm text-gray-500">
+                Belum terdaftar? <a href="{{ route('register') }}" class="font-medium text-primary hover:underline">Daftar di sini</a>
+            </p>
         </div>
     </div>
 </div>

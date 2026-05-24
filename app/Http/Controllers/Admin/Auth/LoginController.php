@@ -13,12 +13,16 @@ class LoginController extends Controller
 {
     public function create(): View
     {
+        if (Auth::check()) {
+            return $this->redirectByRole(Auth::user());
+        }
+
         return view('auth.login');
     }
 
     public function store(LoginRequest $request): RedirectResponse
     {
-        if (! Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
+        if (! Auth::attempt($request->only('email', 'password'))) {
             return back()->withErrors([
                 'email' => 'Email atau kata sandi tidak sesuai.',
             ])->onlyInput('email');
@@ -26,15 +30,9 @@ class LoginController extends Controller
 
         $request->session()->regenerate();
 
-        if (Auth::user()->role !== 'admin') {
-            Auth::logout();
+        $user = Auth::user();
 
-            return redirect()->route('login')->withErrors([
-                'email' => 'Anda tidak memiliki akses admin.',
-            ]);
-        }
-
-        return redirect()->intended(route('admin.dashboard'));
+        return $this->redirectByRole($user);
     }
 
     public function destroy(Request $request): RedirectResponse
@@ -45,5 +43,15 @@ class LoginController extends Controller
         $request->session()->regenerateToken();
 
         return redirect()->route('login');
+    }
+
+    private function redirectByRole($user): RedirectResponse
+    {
+        return match ($user->role) {
+            'admin' => redirect()->intended(route('admin.dashboard')),
+            'teacher' => redirect()->intended(route('guru.dashboard')),
+            'student' => redirect()->intended(route('siswa.dashboard')),
+            default => redirect()->route('login'),
+        };
     }
 }

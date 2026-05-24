@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Admin\Auth\LoginController;
+use App\Http\Controllers\Admin\Auth\LoginController as AdminLoginController;
 use App\Http\Controllers\Admin\ClassController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\SettingController;
@@ -9,16 +9,23 @@ use App\Http\Controllers\Admin\StudentController;
 use App\Http\Controllers\Admin\StudentImportController;
 use App\Http\Controllers\Admin\TeacherController;
 use App\Http\Controllers\Admin\TeacherImportController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Guru\DashboardController as GuruDashboardController;
+use App\Http\Controllers\Siswa\DashboardController as SiswaDashboardController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
-    Route::get('/login', [LoginController::class, 'create'])->name('login');
-    Route::post('/login', [LoginController::class, 'store']);
+    Route::get('/login', [AdminLoginController::class, 'create'])->name('login');
+    Route::post('/login', [AdminLoginController::class, 'store']);
+    Route::get('/daftar', [RegisterController::class, 'create'])->name('register');
+    Route::post('/daftar/verifikasi', [RegisterController::class, 'verify'])->name('register.verify');
+    Route::get('/daftar/lengkapi', [RegisterController::class, 'showForm'])->name('register.step2');
+    Route::post('/daftar/lengkapi', [RegisterController::class, 'store'])->name('register.store');
 });
 
 Route::middleware('auth')->group(function () {
-    Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
-    Route::get('/', fn () => redirect()->route('admin.dashboard'));
+    Route::post('/logout', [AdminLoginController::class, 'destroy'])->name('logout');
+    Route::get('/', fn () => redirect()->route('login'));
 });
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -47,4 +54,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::put('/settings/attendance-time', [SettingController::class, 'attendanceTimeUpdate'])->name('settings.attendance-time.update');
     Route::get('/settings/whatsapp', [SettingController::class, 'whatsapp'])->name('settings.whatsapp.index');
     Route::put('/settings/whatsapp', [SettingController::class, 'whatsappUpdate'])->name('settings.whatsapp.update');
+});
+
+Route::middleware(['auth', 'registered', 'guru'])->prefix('guru')->name('guru.')->group(function () {
+    Route::get('/dashboard', [GuruDashboardController::class, 'index'])->name('dashboard');
+});
+
+Route::middleware(['auth', 'registered', 'siswa'])->prefix('siswa')->name('siswa.')->group(function () {
+    Route::get('/dashboard', [SiswaDashboardController::class, 'index'])->name('dashboard');
 });

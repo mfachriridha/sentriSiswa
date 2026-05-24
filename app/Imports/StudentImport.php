@@ -71,6 +71,7 @@ class StudentImport implements ToCollection, WithChunkReading, WithHeadingRow
             $newUsers[] = [
                 'name' => $name,
                 'role' => 'student',
+                'status' => 'unregistered',
                 'password' => $this->defaultPassword,
                 'email' => null,
                 'created_at' => now(),

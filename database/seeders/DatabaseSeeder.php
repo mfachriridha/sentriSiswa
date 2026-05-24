@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
         User::factory()->admin()->create([
             'name' => 'Admin',
             'email' => 'admin@sentrisiswa.test',
+            'status' => 'registered',
         ]);
     }
 }

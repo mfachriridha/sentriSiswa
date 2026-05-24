@@ -21,7 +21,7 @@
                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm
                               placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors"
                        placeholder="Masukkan API key dari Fonnte">
-                <p class="mt-1.5 text-sm text-gray-500">Dapatkan API key dari <a href="https://dashboard.fonnte.com" target="_blank" class="text-primary hover:underline">dashboard.fonnte.com</a>.</p>
+                <p class="mt-1.5 text-sm text-gray-500">Dapatkan API key dari <a href="https://fonnte.com" target="_blank" class="text-primary hover:underline">fonnte.com</a>.</p>
                 @error('fonnte_api_key')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror

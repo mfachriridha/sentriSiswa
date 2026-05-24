@@ -68,6 +68,7 @@ class TeacherImport implements ToCollection, WithChunkReading, WithHeadingRow
             $newUsers[] = [
                 'name' => $parsed['name'],
                 'role' => 'teacher',
+                'status' => 'unregistered',
                 'password' => $this->defaultPassword,
                 'email' => null,
                 'created_at' => now(),

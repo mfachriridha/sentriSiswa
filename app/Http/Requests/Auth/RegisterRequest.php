@@ -1,0 +1,43 @@
+<?php
+
+namespace App\Http\Requests\Auth;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class RegisterRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        $rules = [
+            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:8', 'regex:/[a-z]/i', 'regex:/[0-9]/', 'confirmed'],
+        ];
+
+        if (session('register_role') === 'teacher') {
+            $rules['phone'] = ['required', 'string', 'min:10', 'max:20', 'regex:/^[0-9+\-\s()]*$/'];
+        }
+
+        return $rules;
+    }
+
+    public function messages(): array
+    {
+        return [
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'email.unique' => 'Email sudah terdaftar.',
+            'password.required' => 'Kata sandi wajib diisi.',
+            'password.min' => 'Kata sandi minimal 8 karakter.',
+            'password.regex' => 'Kata sandi harus mengandung huruf dan angka.',
+            'password.confirmed' => 'Konfirmasi kata sandi tidak cocok.',
+            'phone.required' => 'Nomor HP wajib diisi.',
+            'phone.min' => 'Nomor HP minimal 10 digit.',
+            'phone.regex' => 'Format nomor HP tidak valid.',
+        ];
+    }
+}
