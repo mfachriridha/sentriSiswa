@@ -4,43 +4,163 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Services\KmlParser;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class SettingController extends Controller
 {
     public function attendanceTime(): View
     {
+        $startTime = Setting::get('attendance_start_time', '06:30');
+        $endTime = Setting::get('attendance_end_time', '07:00');
+        $lateToleranceMinutes = Setting::get('attendance_late_tolerance_minutes');
+
+        if (! is_numeric($lateToleranceMinutes)) {
+            $lateToleranceMinutes = max(0, $this->minutesFromTime($endTime) - $this->minutesFromTime(Setting::get('attendance_late_time', '07:00')));
+        }
+
         return view('admin.settings.attendance-time', [
-            'startTime' => Setting::get('attendance_start_time', '06:30'),
-            'endTime' => Setting::get('attendance_end_time', '07:00'),
-            'lateTime' => Setting::get('attendance_late_time', '07:00'),
+            'startTime' => $startTime,
+            'endTime' => $endTime,
+            'lateToleranceMinutes' => (int) $lateToleranceMinutes,
         ]);
     }
 
     public function attendanceTimeUpdate(Request $request): RedirectResponse
     {
+        $hours = array_map(fn (int $hour): string => sprintf('%02d', $hour), range(0, 23));
+        $minutes = array_map(fn (int $minute): string => sprintf('%02d', $minute), range(0, 59));
+        $lateToleranceOptions = array_map('strval', [0, 5, 10, 15, 20, 30, 45, 60, 90, 120]);
+
         $validated = $request->validate([
-            'attendance_start_time' => ['required', 'date_format:H:i'],
-            'attendance_end_time' => ['required', 'date_format:H:i', 'after:attendance_start_time'],
-            'attendance_late_time' => ['required', 'date_format:H:i', 'after_or_equal:attendance_start_time'],
+            'attendance_start_hour' => ['required', Rule::in($hours)],
+            'attendance_start_minute' => ['required', Rule::in($minutes)],
+            'attendance_end_hour' => ['required', Rule::in($hours)],
+            'attendance_end_minute' => ['required', Rule::in($minutes)],
+            'attendance_late_tolerance_minutes' => ['required', Rule::in($lateToleranceOptions)],
         ], [
-            'attendance_start_time.required' => 'Jam mulai absen wajib diisi.',
-            'attendance_start_time.date_format' => 'Format jam tidak valid.',
-            'attendance_end_time.required' => 'Jam selesai absen wajib diisi.',
-            'attendance_end_time.date_format' => 'Format jam tidak valid.',
-            'attendance_end_time.after' => 'Jam selesai harus setelah jam mulai.',
-            'attendance_late_time.required' => 'Batas terlambat wajib diisi.',
-            'attendance_late_time.date_format' => 'Format jam tidak valid.',
-            'attendance_late_time.after_or_equal' => 'Batas terlambat harus setelah jam mulai.',
+            '*.required' => 'Jam dan menit wajib diisi.',
+            '*.in' => 'Pilihan jam atau menit tidak valid.',
         ]);
 
-        Setting::set('attendance_start_time', $validated['attendance_start_time']);
-        Setting::set('attendance_end_time', $validated['attendance_end_time']);
-        Setting::set('attendance_late_time', $validated['attendance_late_time']);
+        $startTime = $this->formatAttendanceTime($validated['attendance_start_hour'], $validated['attendance_start_minute']);
+        $endTime = $this->formatAttendanceTime($validated['attendance_end_hour'], $validated['attendance_end_minute']);
+        $lateToleranceMinutes = (int) $validated['attendance_late_tolerance_minutes'];
+        $attendanceDurationMinutes = $this->minutesFromTime($endTime) - $this->minutesFromTime($startTime);
+
+        if ($endTime <= $startTime) {
+            return back()->withErrors([
+                'attendance_end_hour' => 'Jam selesai harus setelah jam mulai.',
+            ])->withInput();
+        }
+
+        if ($lateToleranceMinutes > $attendanceDurationMinutes) {
+            return back()->withErrors([
+                'attendance_late_tolerance_minutes' => 'Toleransi terlambat tidak boleh lebih besar dari durasi absen.',
+            ])->withInput();
+        }
+
+        Setting::set('attendance_start_time', $startTime);
+        Setting::set('attendance_end_time', $endTime);
+        Setting::set('attendance_late_tolerance_minutes', (string) $lateToleranceMinutes);
+        Setting::set('attendance_late_time', $this->formatMinutesAsTime($this->minutesFromTime($endTime) - $lateToleranceMinutes));
 
         return redirect()->route('admin.settings.attendance-time.index')->with('success', 'Konfigurasi waktu absen berhasil disimpan.');
+    }
+
+    private function formatAttendanceTime(int|string $hour, int|string $minute): string
+    {
+        return sprintf('%02d:%02d', (int) $hour, (int) $minute);
+    }
+
+    private function minutesFromTime(string $time): int
+    {
+        [$hour, $minute] = array_map('intval', explode(':', $time));
+
+        return ($hour * 60) + $minute;
+    }
+
+    private function formatMinutesAsTime(int $minutes): string
+    {
+        $minutes %= 1440;
+
+        return sprintf('%02d:%02d', intdiv($minutes, 60), $minutes % 60);
+    }
+
+    public function attendanceLocation(): View
+    {
+        $geofenceData = Setting::get('attendance_geofence_data');
+        $toleranceMeters = Setting::get('attendance_tolerance_meters', '0');
+
+        if (is_string($geofenceData) && $geofenceData !== '') {
+            $decoded = json_decode($geofenceData, true);
+            if (is_array($decoded) && isset($decoded['coordinates'])) {
+                $geofenceData = $decoded;
+            } else {
+                $geofenceData = null;
+            }
+        } else {
+            $geofenceData = null;
+        }
+
+        return view('admin.settings.attendance-location', [
+            'geofenceData' => $geofenceData,
+            'toleranceMeters' => (int) $toleranceMeters,
+        ]);
+    }
+
+    public function attendanceLocationUpdate(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'kml_file' => ['required', 'file', 'mimetypes:text/xml,application/xml,application/vnd.google-earth.kml+xml', 'max:5120'],
+        ], [
+            'kml_file.required' => 'File KML wajib diunggah.',
+            'kml_file.file' => 'File tidak valid.',
+            'kml_file.mimetypes' => 'File harus berformat KML.',
+            'kml_file.max' => 'File maksimal 5 MB.',
+        ]);
+
+        $parser = new KmlParser;
+        $result = $parser->parseFile($request->file('kml_file')->getPathname());
+
+        if (isset($result['error'])) {
+            return back()->withErrors(['kml_file' => $result['error']])->withInput();
+        }
+
+        Setting::set('attendance_geofence_data', json_encode($result));
+
+        if (! Setting::get('attendance_tolerance_meters')) {
+            Setting::set('attendance_tolerance_meters', '0');
+        }
+
+        return redirect()->route('admin.settings.attendance-location.index')->with('success', 'Area absensi berhasil diimpor.');
+    }
+
+    public function attendanceLocationTolerance(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'tolerance_meters' => ['required', 'integer', 'min:0', 'max:500'],
+        ], [
+            'tolerance_meters.required' => 'Toleransi wajib diisi.',
+            'tolerance_meters.integer' => 'Toleransi harus berupa angka.',
+            'tolerance_meters.min' => 'Toleransi minimal 0 meter.',
+            'tolerance_meters.max' => 'Toleransi maksimal 500 meter.',
+        ]);
+
+        Setting::set('attendance_tolerance_meters', (string) $validated['tolerance_meters']);
+
+        return redirect()->route('admin.settings.attendance-location.index')->with('success', 'Toleransi jarak berhasil disimpan.');
+    }
+
+    public function attendanceLocationDelete(): RedirectResponse
+    {
+        Setting::set('attendance_geofence_data', '');
+        Setting::set('attendance_tolerance_meters', '0');
+
+        return redirect()->route('admin.settings.attendance-location.index')->with('success', 'Lokasi absen berhasil dihapus.');
     }
 
     public function whatsapp(): View

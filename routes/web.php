@@ -61,6 +61,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('classes', ClassController::class);
     Route::get('/settings/attendance-time', [SettingController::class, 'attendanceTime'])->name('settings.attendance-time.index');
     Route::put('/settings/attendance-time', [SettingController::class, 'attendanceTimeUpdate'])->name('settings.attendance-time.update');
+    Route::get('/settings/attendance-location', [SettingController::class, 'attendanceLocation'])->name('settings.attendance-location.index');
+    Route::put('/settings/attendance-location', [SettingController::class, 'attendanceLocationUpdate'])->name('settings.attendance-location.update');
+    Route::put('/settings/attendance-location/tolerance', [SettingController::class, 'attendanceLocationTolerance'])->name('settings.attendance-location.tolerance');
+    Route::delete('/settings/attendance-location', [SettingController::class, 'attendanceLocationDelete'])->name('settings.attendance-location.destroy');
     Route::get('/settings/whatsapp', [SettingController::class, 'whatsapp'])->name('settings.whatsapp.index');
     Route::put('/settings/whatsapp', [SettingController::class, 'whatsappUpdate'])->name('settings.whatsapp.update');
 });
@@ -72,6 +76,7 @@ Route::middleware(['auth', 'registered', 'guru'])->prefix('guru')->name('guru.')
 Route::middleware(['auth', 'registered', 'siswa'])->prefix('siswa')->name('siswa.')->group(function () {
     Route::get('/dashboard', [SiswaDashboardController::class, 'index'])->name('dashboard');
     Route::get('/absensi', [SiswaAbsensiController::class, 'index'])->name('absensi');
+    Route::post('/absensi/cek-lokasi', [SiswaAbsensiController::class, 'checkLocation'])->name('absensi.check-location');
     Route::post('/absensi', [SiswaAbsensiController::class, 'store'])->name('absensi.store');
     Route::get('/absensi/riwayat', [SiswaAbsensiController::class, 'riwayat'])->name('absensi.riwayat');
     Route::get('/profil', [SiswaProfilController::class, 'show'])->name('profil');

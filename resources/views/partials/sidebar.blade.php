@@ -75,6 +75,20 @@
                     </li>
 
                     <li>
+                        <a href="{{ route('admin.settings.attendance-location.index') }}"
+                           class="flex items-center gap-3 rounded-lg px-4 py-3 text-base font-medium transition-colors
+                                  {{ request()->routeIs('admin.settings.attendance-location.*') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
+                            <svg class="h-6 w-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                            Lokasi Absen
+                        </a>
+                    </li>
+
+                    <li>
                         <a href="{{ route('admin.settings.whatsapp.index') }}"
                            class="flex items-center gap-3 rounded-lg px-4 py-3 text-base font-medium transition-colors
                                   {{ request()->routeIs('admin.settings.whatsapp.*') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">

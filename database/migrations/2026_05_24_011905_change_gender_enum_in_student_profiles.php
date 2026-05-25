@@ -7,11 +7,19 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (DB::getDriverName() !== 'mysql') {
+            return;
+        }
+
         DB::statement("ALTER TABLE student_profiles MODIFY COLUMN gender ENUM('L', 'P') NULL");
     }
 
     public function down(): void
     {
+        if (DB::getDriverName() !== 'mysql') {
+            return;
+        }
+
         DB::statement("ALTER TABLE student_profiles MODIFY COLUMN gender ENUM('Laki-laki', 'Perempuan') NULL");
     }
 };
