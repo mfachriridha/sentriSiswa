@@ -11,91 +11,157 @@
 <x-alert type="success" :message="session('success')" />
 <x-alert type="error" :message="session('error')" />
 
-<div class="rounded-xl border border-gray-200 bg-white p-8">
-    <div class="mb-6 flex items-center justify-between gap-4">
-        <h2 class="text-lg font-semibold text-gray-900">Absen Hari Ini</h2>
+<div class="rounded-xl border border-gray-200 bg-white p-6 sm:p-8">
+    <div class="mb-6 flex items-start justify-between gap-4">
+        <div>
+            <h2 class="text-lg font-semibold text-gray-900">Absen Hari Ini</h2>
+            <div class="mt-8 space-y-1">
+                <p class="text-base font-medium text-gray-700">{{ now()->locale('id')->translatedFormat('l, d F Y') }}</p>
+                <p class="text-sm text-gray-400">Jam absen: {{ $startTime }} - {{ $endTime }}</p>
+                <p class="text-sm text-gray-400">Waktu aplikasi sekarang: {{ $currentTimeLabel }}</p>
+            </div>
+        </div>
+
         <a href="{{ route('siswa.absensi.riwayat') }}"
            class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
             Riwayat
         </a>
     </div>
 
-    <div class="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-start">
-        <div>
-            <p class="text-base text-gray-600">{{ now()->translatedFormat('l, d F Y') }}</p>
-            <p class="mt-1 text-sm text-gray-400">Jam absen: {{ $startTime }} — {{ $endTime }}</p>
-            <p class="mt-1 text-sm text-gray-400">Waktu aplikasi sekarang: {{ $currentTimeLabel }}</p>
-        </div>
-
-        @if($todayAttendance)
-            <div class="space-y-4 lg:text-right">
-                @php
-                    $statusConfig = [
-                        'hadir' => ['bg-green-50 text-green-700', 'Hadir'],
-                        'terlambat' => ['bg-amber-50 text-amber-700', 'Terlambat'],
-                        'izin' => ['bg-blue-50 text-blue-700', 'Izin'],
-                        'sakit' => ['bg-purple-50 text-purple-700', 'Sakit'],
-                        'alpha' => ['bg-red-50 text-red-700', 'Alpha'],
-                    ];
-                    [$badgeClass, $statusLabel] = $statusConfig[$todayAttendance->status] ?? ['bg-gray-50 text-gray-700', $todayAttendance->status];
-                @endphp
-                <span class="inline-flex items-center rounded-full {{ $badgeClass }} px-4 py-2 text-base font-semibold">
-                    {{ $statusLabel }}
-                </span>
-                @if($todayAttendance->check_in_time)
-                    <p class="text-sm text-gray-500">Absen pukul {{ $todayAttendance->check_in_time->format('H:i') }}</p>
-                @endif
-                @if($todayAttendance->distance_meters !== null)
-                    <p class="text-sm text-gray-500">
-                        @if($todayAttendance->distance_meters == 0)
-                            Lokasi di dalam area absensi
-                        @else
-                            Lokasi {{ number_format($todayAttendance->distance_meters, 0) }} m dari area
-                        @endif
-                    </p>
-                @endif
+    @if($todayAttendance)
+        <div class="grid gap-6 lg:grid-cols-[280px_1fr]">
+            <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
                 @if($todayAttendance->selfie_path)
                     <img src="{{ asset('storage/'.$todayAttendance->selfie_path) }}"
                          alt="Selfie absensi"
-                         class="h-32 w-32 rounded-lg border border-gray-200 object-cover lg:ml-auto">
+                         class="aspect-[3/4] w-full rounded-lg border border-gray-200 object-cover">
+                @else
+                    <div class="flex aspect-[3/4] w-full items-center justify-center rounded-lg border border-dashed border-gray-300 bg-white p-4 text-center text-sm text-gray-400">
+                        Selfie belum tersedia
+                    </div>
                 @endif
             </div>
-        @elseif($canCheckIn)
-            <form method="POST"
-                  action="{{ route('siswa.absensi.store') }}"
-                  enctype="multipart/form-data"
-                  class="space-y-5 lg:col-span-2"
-                  x-data="attendanceForm({ geofenceActive: @js($geofenceActive), maxPhotoKb: 300 })"
-                  @submit="validateBeforeSubmit($event)">
-                @csrf
-                <input x-ref="selfieInput" type="file" name="selfie" accept="image/jpeg,image/webp" class="hidden">
-                <input type="hidden" name="latitude" x-model="latitude">
-                <input type="hidden" name="longitude" x-model="longitude">
-                <input type="hidden" name="accuracy" x-model="accuracy">
 
-                @if($geofenceActive)
-                    <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
-                        <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                            <div>
-                                <h3 class="text-sm font-semibold text-gray-900">Lokasi GPS</h3>
-                                <p class="mt-1 text-sm text-gray-500">Aktifkan lokasi sebelum absen. Jika akurasi masih rendah, tekan refresh.</p>
-                            </div>
+            <div class="rounded-xl border border-gray-200 bg-gray-50 p-5">
+                @php
+                    $statusConfig = [
+                        'hadir' => ['bg-green-50 text-green-700 border-green-200', 'Hadir'],
+                        'terlambat' => ['bg-amber-50 text-amber-700 border-amber-200', 'Terlambat'],
+                        'izin' => ['bg-blue-50 text-blue-700 border-blue-200', 'Izin'],
+                        'sakit' => ['bg-purple-50 text-purple-700 border-purple-200', 'Sakit'],
+                        'alpha' => ['bg-red-50 text-red-700 border-red-200', 'Alpha'],
+                    ];
+                    [$badgeClass, $statusLabel] = $statusConfig[$todayAttendance->status] ?? ['bg-gray-50 text-gray-700 border-gray-200', $todayAttendance->status];
+                @endphp
 
-                            <div class="flex flex-wrap gap-3">
-                                <button type="button"
-                                        @click="getGpsLocation()"
-                                        :disabled="gpsLoading"
-                                        class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60">
-                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"/>
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                    </svg>
-                                    <span x-text="gpsReady ? 'Refresh Lokasi' : 'Aktifkan Lokasi'"></span>
-                                </button>
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <h3 class="text-sm font-semibold text-gray-900">Status Absensi</h3>
+                    <span class="inline-flex items-center rounded-full border {{ $badgeClass }} px-4 py-2 text-sm font-semibold">
+                        {{ $statusLabel }}
+                    </span>
+                </div>
+
+                <div class="mt-4 space-y-2 text-sm text-gray-500">
+                    @if($todayAttendance->check_in_time)
+                        <p>Absen pukul {{ $todayAttendance->check_in_time->format('H:i') }}</p>
+                    @endif
+                    @if($todayAttendance->distance_meters !== null)
+                        <p>
+                            @if($todayAttendance->distance_meters == 0)
+                                Lokasi di dalam area absensi
+                            @else
+                                Lokasi {{ number_format($todayAttendance->distance_meters, 0) }} m dari area
+                            @endif
+                        </p>
+                    @endif
+                </div>
+            </div>
+        </div>
+    @elseif($canCheckIn)
+        <form method="POST"
+              action="{{ route('siswa.absensi.store') }}"
+              enctype="multipart/form-data"
+              x-data="attendanceForm({ geofenceActive: @js($geofenceActive), maxPhotoKb: 300 })"
+              @submit="validateBeforeSubmit($event)">
+            @csrf
+            <input x-ref="selfieInput" type="file" name="selfie" accept="image/jpeg,image/webp" class="hidden">
+            <input type="hidden" name="latitude" x-model="latitude">
+            <input type="hidden" name="longitude" x-model="longitude">
+            <input type="hidden" name="accuracy" x-model="accuracy">
+
+            <div class="grid gap-6 lg:grid-cols-[320px_1fr]">
+                <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                    <div class="flex items-start justify-between gap-3">
+                        <div>
+                            <h3 class="text-sm font-semibold text-gray-900">Selfie Absensi</h3>
+                            <p class="mt-1 text-sm text-gray-500">Selfie wajib untuk absen hari ini.</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 overflow-hidden rounded-lg border border-gray-200 bg-white">
+                        <div class="relative aspect-[3/4] w-full bg-gray-100">
+                            <img x-show="previewUrl"
+                                 :src="previewUrl"
+                                 alt="Preview selfie"
+                                 class="h-full w-full object-cover">
+                            <div x-show="!previewUrl" class="flex h-full w-full items-center justify-center p-6 text-center text-sm text-gray-400">
+                                Belum ada selfie
                             </div>
                         </div>
+                    </div>
 
-                        <div class="mt-4 rounded-lg border border-gray-200 bg-white p-3">
+                    <div class="mt-4 space-y-3">
+                        <button type="button"
+                                @click="openSelfieModal()"
+                                :disabled="!canOpenSelfieModal"
+                                class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:cursor-not-allowed disabled:bg-gray-300">
+                            Absen Sekarang
+                        </button>
+
+                        <p class="text-sm" :class="canOpenSelfieModal ? 'text-green-700' : 'text-amber-700'" x-text="openDisabledMessage"></p>
+                        <p x-show="compressedSizeKb" class="text-sm text-gray-500">
+                            Ukuran foto: <span x-text="compressedSizeKb"></span> KB
+                        </p>
+                        <p x-show="error" x-text="error" class="text-sm text-red-600"></p>
+                        @error('selfie')
+                            <p class="text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                        @error('latitude')
+                            <p class="text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                        @error('longitude')
+                            <p class="text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="rounded-xl border border-gray-200 bg-gray-50 p-5">
+                    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                        <div>
+                            <h3 class="text-sm font-semibold text-gray-900">Lokasi GPS</h3>
+                            @if($geofenceActive)
+                                <p class="mt-1 text-sm text-gray-500">Aktifkan lokasi sebelum absen. Jika akurasi masih rendah, tekan refresh.</p>
+                            @else
+                                <p class="mt-1 text-sm text-gray-500">Area absensi belum dikonfigurasi, sehingga GPS tidak diwajibkan.</p>
+                            @endif
+                        </div>
+
+                        @if($geofenceActive)
+                            <button type="button"
+                                    @click="getGpsLocation()"
+                                    :disabled="gpsLoading"
+                                    class="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                                <span x-text="gpsReady ? 'Refresh Lokasi' : 'Aktifkan Lokasi'"></span>
+                            </button>
+                        @endif
+                    </div>
+
+                    <div class="mt-4 rounded-lg border border-gray-200 bg-white p-4">
+                        @if($geofenceActive)
                             <p x-show="gpsLoading" class="text-sm text-gray-600">Mengambil lokasi...</p>
                             <p x-show="gpsError" x-text="gpsError" class="text-sm text-red-600"></p>
                             <template x-if="gpsReady">
@@ -109,7 +175,7 @@
                                         </p>
                                         <p x-show="accuracy > 500" class="text-xs text-amber-600">Akurasi masih rendah. Coba tekan Refresh Lokasi sebelum absen.</p>
                                     </div>
-                                    <div x-show="locationStatus" class="mt-2 rounded-lg border px-3 py-2 text-sm font-medium"
+                                    <div x-show="locationStatus" class="mt-3 rounded-lg border px-3 py-2 text-sm font-medium"
                                          :class="{
                                              'border-green-200 bg-green-50 text-green-700': locationStatus === 'inside',
                                              'border-amber-200 bg-amber-50 text-amber-700': locationStatus === 'tolerance',
@@ -123,84 +189,112 @@
                                 </div>
                             </template>
                             <p x-show="!gpsLoading && !gpsError && !gpsReady" class="text-sm text-gray-400">Lokasi belum diambil.</p>
-                        </div>
-                    </div>
-                @endif
-
-                <div class="grid gap-4 sm:grid-cols-[220px_1fr]">
-                    <div class="relative aspect-[3/4] overflow-hidden rounded-lg border border-gray-200 bg-gray-100">
-                        <video x-ref="video"
-                               x-show="cameraReady && !previewUrl"
-                               class="h-full w-full object-cover"
-                               playsinline
-                               muted></video>
-                        <img x-show="previewUrl"
-                             :src="previewUrl"
-                             alt="Preview selfie"
-                             class="h-full w-full object-cover">
-                        <div x-show="!cameraReady && !previewUrl" class="flex h-full items-center justify-center p-4 text-center text-sm text-gray-500">
-                            Kamera belum aktif
-                        </div>
-                    </div>
-
-                    <div class="flex flex-col justify-between gap-4">
-                        <div>
-                            <p class="text-sm font-medium text-gray-700">Selfie wajib untuk absen.</p>
-                            <p x-show="compressedSizeKb" class="mt-2 text-sm text-gray-500">
-                                Ukuran foto: <span x-text="compressedSizeKb"></span> KB
-                            </p>
-                            <p x-show="error" x-text="error" class="mt-3 text-sm text-red-600"></p>
-                            @error('selfie')
-                                <p class="mt-3 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                            @error('latitude')
-                                <p class="mt-3 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                            @error('longitude')
-                                <p class="mt-3 text-sm text-red-600">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div class="flex flex-wrap gap-3">
-                            <button type="button"
-                                    x-show="!cameraReady"
-                                    @click="startCamera()"
-                                    class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
-                                Nyalakan Kamera
-                            </button>
-                            <button type="button"
-                                    x-show="cameraReady"
-                                    @click="captureSelfie()"
-                                    :disabled="compressing"
-                                    class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60">
-                                <span x-text="compressing ? 'Memproses...' : 'Ambil Selfie'"></span>
-                            </button>
-                            <button type="button"
-                                    x-show="previewUrl"
-                                    @click="resetSelfie()"
-                                    class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
-                                Ulangi
-                            </button>
-                            <button type="submit"
-                                    :disabled="!canSubmit"
-                                    class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:cursor-not-allowed disabled:bg-gray-300">
-                                Absen Sekarang
-                            </button>
-                        </div>
+                        @else
+                            <div class="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-medium text-blue-700">
+                                Lokasi GPS tidak aktif untuk sesi absensi ini.
+                            </div>
+                        @endif
                     </div>
                 </div>
-                <canvas x-ref="canvas" class="hidden"></canvas>
-            </form>
-        @else
-            <p class="text-base text-gray-400">
-                @if(now()->format('H:i') < $startTime)
-                    Belum waktunya absen. Waktu aplikasi sekarang {{ $currentTimeLabel }}, absen dimulai pukul {{ $startTime }}.
-                @else
-                    Waktu absen sudah berakhir. Waktu aplikasi sekarang {{ $currentTimeLabel }}, batas absen pukul {{ $endTime }}.
-                @endif
-            </p>
-        @endif
-    </div>
+            </div>
+
+            <div x-cloak
+                 x-show="modalOpen"
+                 x-transition.opacity
+                 class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 p-4"
+                 @keydown.escape.window="cancelSelfieModal()">
+                <div class="w-full max-w-3xl rounded-2xl bg-white shadow-xl" @click.outside="cancelSelfieModal()">
+                    <div class="flex items-start justify-between gap-4 border-b border-gray-200 px-6 py-4">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">Ambil Selfie Absensi</h3>
+                            <p class="mt-1 text-sm text-gray-500">Pastikan wajah terlihat jelas sebelum menekan Absen Sekarang.</p>
+                        </div>
+                        <button type="button"
+                                @click="cancelSelfieModal()"
+                                class="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600">
+                            <span class="sr-only">Tutup</span>
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="grid gap-6 px-6 py-5 md:grid-cols-[260px_1fr]">
+                        <div class="relative aspect-[3/4] overflow-hidden rounded-xl border border-gray-200 bg-gray-100">
+                            <video x-ref="video"
+                                   x-show="cameraReady && !previewUrl"
+                                   class="h-full w-full object-cover"
+                                   playsinline
+                                   muted></video>
+                            <img x-show="previewUrl"
+                                 :src="previewUrl"
+                                 alt="Preview selfie"
+                                 class="h-full w-full object-cover">
+                            <div x-show="!cameraReady && !previewUrl" class="flex h-full items-center justify-center p-4 text-center text-sm text-gray-500">
+                                Kamera belum aktif
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col justify-between gap-5">
+                            <div class="space-y-3">
+                                <p class="text-sm font-medium text-gray-700">Ambil selfie dari kamera perangkat ini.</p>
+                                <p class="text-sm text-gray-500">Foto akan dikompresi otomatis maksimal 300 KB.</p>
+                                <p x-show="compressedSizeKb" class="text-sm text-gray-500">
+                                    Ukuran foto: <span x-text="compressedSizeKb"></span> KB
+                                </p>
+                                <p x-show="error" x-text="error" class="text-sm text-red-600"></p>
+                            </div>
+
+                            <div class="flex flex-wrap gap-3">
+                                <button type="button"
+                                        x-show="!cameraReady && !previewUrl"
+                                        @click="startCamera()"
+                                        class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
+                                    Nyalakan Kamera
+                                </button>
+                                <button type="button"
+                                        x-show="cameraReady"
+                                        @click="captureSelfie()"
+                                        :disabled="compressing"
+                                        class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60">
+                                    <span x-text="compressing ? 'Memproses...' : 'Ambil Selfie'"></span>
+                                </button>
+                                <button type="button"
+                                        x-show="previewUrl"
+                                        @click="resetSelfie()"
+                                        class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
+                                    Ulangi
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col-reverse gap-3 border-t border-gray-200 px-6 py-4 sm:flex-row sm:justify-end">
+                        <button type="button"
+                                @click="cancelSelfieModal()"
+                                class="inline-flex items-center justify-center rounded-lg border border-gray-300 px-5 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
+                            Batal
+                        </button>
+                        <button type="submit"
+                                :disabled="!canSubmit"
+                                class="inline-flex items-center justify-center rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:cursor-not-allowed disabled:bg-gray-300">
+                            Absen Sekarang
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <canvas x-ref="canvas" class="hidden"></canvas>
+        </form>
+    @else
+        <p class="text-base text-gray-400">
+            @if(now()->format('H:i') < $startTime)
+                Belum waktunya absen. Waktu aplikasi sekarang {{ $currentTimeLabel }}, absen dimulai pukul {{ $startTime }}.
+            @else
+                Waktu absen sudah berakhir. Waktu aplikasi sekarang {{ $currentTimeLabel }}, batas absen pukul {{ $endTime }}.
+            @endif
+        </p>
+    @endif
 </div>
 
 @push('scripts')
@@ -208,6 +302,7 @@
     function attendanceForm(config) {
         return {
             cameraReady: false,
+            modalOpen: false,
             error: '',
             previewUrl: '',
             selfieReady: false,
@@ -228,19 +323,62 @@
             locationChecking: false,
 
             get canSubmit() {
-                if (!this.selfieReady || this.compressing) {
+                return this.selfieReady && !this.compressing;
+            },
+
+            get canOpenSelfieModal() {
+                if (!this.geofenceActive) {
+                    return true;
+                }
+
+                if (!this.gpsReady || this.gpsLoading || this.locationChecking) {
                     return false;
                 }
 
-                if (this.geofenceActive && !this.gpsReady) {
-                    return false;
+                return ['inside', 'tolerance'].includes(this.locationStatus);
+            },
+
+            get openDisabledMessage() {
+                if (!this.geofenceActive) {
+                    return 'Lokasi GPS tidak diwajibkan. Silakan lanjut absen.';
                 }
 
-                if (this.geofenceActive && this.locationStatus === 'outside') {
-                    return false;
+                if (this.gpsLoading) {
+                    return 'Mengambil lokasi GPS...';
                 }
 
-                return true;
+                if (this.locationChecking) {
+                    return 'Memeriksa lokasi Anda...';
+                }
+
+                if (!this.gpsReady) {
+                    return 'Aktifkan lokasi GPS terlebih dahulu.';
+                }
+
+                if (this.locationStatus === 'outside') {
+                    return 'Lokasi Anda di luar area absensi.';
+                }
+
+                if (['inside', 'tolerance'].includes(this.locationStatus)) {
+                    return 'Lokasi valid, silakan lanjut absen.';
+                }
+
+                return 'Tekan Refresh Lokasi untuk memeriksa lokasi.';
+            },
+
+            openSelfieModal() {
+                if (!this.canOpenSelfieModal) {
+                    return;
+                }
+
+                this.error = '';
+                this.modalOpen = true;
+            },
+
+            cancelSelfieModal() {
+                this.modalOpen = false;
+                this.stopCamera();
+                this.resetSelfieData();
             },
 
             getGpsLocation() {
@@ -420,6 +558,11 @@
             },
 
             resetSelfie() {
+                this.resetSelfieData();
+                this.startCamera();
+            },
+
+            resetSelfieData() {
                 if (this.previewUrl) {
                     URL.revokeObjectURL(this.previewUrl);
                 }
@@ -428,7 +571,6 @@
                 this.selfieReady = false;
                 this.compressedSizeKb = null;
                 this.$refs.selfieInput.value = '';
-                this.startCamera();
             },
 
             stopCamera() {
@@ -441,18 +583,6 @@
 
             validateBeforeSubmit(event) {
                 this.error = '';
-
-                if (this.geofenceActive && !this.gpsReady) {
-                    event.preventDefault();
-                    this.error = 'Aktifkan lokasi GPS terlebih dahulu.';
-                    return;
-                }
-
-                if (this.geofenceActive && this.locationStatus === 'outside') {
-                    event.preventDefault();
-                    this.error = 'Lokasi Anda di luar area absensi.';
-                    return;
-                }
 
                 if (!this.selfieReady) {
                     event.preventDefault();
