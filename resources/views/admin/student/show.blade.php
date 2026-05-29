@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="mb-6 flex items-center justify-between">
-    <a href="{{ route('admin.students.index') }}"
+    <a href="{{ route('admin.siswa.index') }}"
        class="inline-flex items-center gap-2 text-base text-gray-500 hover:text-gray-700 transition-colors">
         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
@@ -12,7 +12,7 @@
         Kembali
     </a>
     <div class="flex items-center gap-3">
-        <a href="{{ route('admin.students.biodata.edit', $student) }}"
+        <a href="{{ route('admin.siswa.biodata.edit', $student) }}"
            class="inline-flex items-center gap-2 rounded-lg border border-primary/30 px-5 py-3 text-base font-medium text-primary
                   hover:bg-primary/5 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors">
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -21,7 +21,7 @@
             </svg>
             Biodata
         </a>
-        <a href="{{ route('admin.students.edit', $student) }}"
+        <a href="{{ route('admin.siswa.edit', $student) }}"
            class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-base font-semibold text-white shadow-sm
                   hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors">
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -47,7 +47,7 @@
             <h1 class="text-2xl font-bold text-gray-900">{{ $student->name }}</h1>
             <p class="mt-1 text-base text-gray-500">
                 @if ($student->studentProfile?->class)
-                    <a href="{{ route('admin.classes.show', $student->studentProfile->class) }}" class="text-primary hover:underline">
+                    <a href="{{ route('admin.kelas.show', $student->studentProfile->class) }}" class="text-primary hover:underline">
                         {{ $student->studentProfile->class->name }}
                     </a>
                 @else
@@ -77,7 +77,7 @@
             <p class="text-sm font-medium text-gray-500">Kelas</p>
             <p class="mt-1.5 text-base">
                 @if ($student->studentProfile?->class)
-                    <a href="{{ route('admin.classes.show', $student->studentProfile->class) }}" class="text-primary hover:underline">
+                    <a href="{{ route('admin.kelas.show', $student->studentProfile->class) }}" class="text-primary hover:underline">
                         {{ $student->studentProfile->class->name }}
                     </a>
                 @else
@@ -216,7 +216,7 @@
         @endif
     @else
         <p class="text-base text-gray-500">Belum ada data biodata.</p>
-        <a href="{{ route('admin.students.biodata.edit', $student) }}"
+        <a href="{{ route('admin.siswa.biodata.edit', $student) }}"
            class="mt-4 inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-base font-semibold text-white shadow-sm
                   hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors">
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

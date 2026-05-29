@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="mb-6">
-    <a href="{{ route('admin.teachers.index') }}"
+    <a href="{{ route('admin.guru.index') }}"
        class="inline-flex items-center gap-2 text-base text-gray-500 hover:text-gray-700 transition-colors">
         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
@@ -16,7 +16,7 @@
 <div class="rounded-xl border border-gray-200 bg-white p-8">
     <h1 class="mb-8 text-2xl font-bold text-gray-900">Edit Guru</h1>
 
-    <form method="POST" action="{{ route('admin.teachers.update', $teacher) }}" class="space-y-6"
+    <form method="POST" action="{{ route('admin.guru.update', $teacher) }}" class="space-y-6"
           x-data="{ loading: false }" @submit="loading = true">
         @csrf
         @method('PUT')
@@ -123,7 +123,7 @@
                 </span>
                 Perbarui
             </button>
-            <a href="{{ route('admin.teachers.index') }}"
+            <a href="{{ route('admin.guru.index') }}"
                class="rounded-lg border border-gray-300 px-6 py-3 text-base font-medium text-gray-700
                       hover:bg-gray-50 transition-colors">
                 Batal

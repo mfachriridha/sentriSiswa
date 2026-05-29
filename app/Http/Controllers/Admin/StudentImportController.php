@@ -36,7 +36,7 @@ class StudentImportController extends Controller
 
         session(['import_student_file_path' => $file->store('imports')]);
 
-        return redirect()->route('admin.students.import.preview');
+        return redirect()->route('admin.siswa.impor.pratinjau');
     }
 
     public function preview(Request $request): View
@@ -44,7 +44,7 @@ class StudentImportController extends Controller
         $path = session('import_student_file_path');
 
         if (! $path) {
-            return redirect()->route('admin.students.import');
+            return redirect()->route('admin.siswa.impor');
         }
 
         $fullPath = storage_path('app/private/'.$path);
@@ -59,7 +59,7 @@ class StudentImportController extends Controller
             $total,
             $this->perPage,
             $page,
-            ['path' => route('admin.students.import.preview')],
+            ['path' => route('admin.siswa.impor.pratinjau')],
         );
 
         return view('admin.student.import-preview', [
@@ -86,7 +86,7 @@ class StudentImportController extends Controller
         session()->forget('import_student_file_path');
 
         return redirect()
-            ->route('admin.students.index')
+            ->route('admin.siswa.index')
             ->with('import_result', [
                 'students_created' => $import->studentsCreated,
                 'students_existing' => $import->studentsExisting,

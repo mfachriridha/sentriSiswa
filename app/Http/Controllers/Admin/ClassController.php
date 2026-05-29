@@ -70,7 +70,7 @@ class ClassController extends Controller
 
         SchoolClass::create($data);
 
-        return redirect()->route('admin.classes.index')->with('success', 'Kelas berhasil ditambahkan.');
+        return redirect()->route('admin.kelas.index')->with('success', 'Kelas berhasil ditambahkan.');
     }
 
     public function show(SchoolClass $class): View
@@ -100,20 +100,20 @@ class ClassController extends Controller
 
         $class->update($data);
 
-        return redirect()->route('admin.classes.index')->with('success', 'Kelas berhasil diperbarui.');
+        return redirect()->route('admin.kelas.index')->with('success', 'Kelas berhasil diperbarui.');
     }
 
     public function destroy(SchoolClass $class): RedirectResponse
     {
         $class->delete();
 
-        return redirect()->route('admin.classes.index')->with('success', 'Kelas berhasil dihapus.');
+        return redirect()->route('admin.kelas.index')->with('success', 'Kelas berhasil dihapus.');
     }
 
     public function deleteAll(): RedirectResponse
     {
         SchoolClass::query()->delete();
 
-        return redirect()->route('admin.classes.index')->with('success', 'Semua kelas berhasil dihapus.');
+        return redirect()->route('admin.kelas.index')->with('success', 'Semua kelas berhasil dihapus.');
     }
 }

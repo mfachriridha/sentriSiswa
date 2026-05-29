@@ -99,7 +99,7 @@ class StudentController extends Controller
             ]);
         });
 
-        return redirect()->route('admin.students.index')->with('success', 'Siswa berhasil ditambahkan.');
+        return redirect()->route('admin.siswa.index')->with('success', 'Siswa berhasil ditambahkan.');
     }
 
     public function show(User $student): View
@@ -141,14 +141,14 @@ class StudentController extends Controller
             );
         });
 
-        return redirect()->route('admin.students.index')->with('success', 'Siswa berhasil diperbarui.');
+        return redirect()->route('admin.siswa.index')->with('success', 'Siswa berhasil diperbarui.');
     }
 
     public function destroy(User $student): RedirectResponse
     {
         $student->delete();
 
-        return redirect()->route('admin.students.index')->with('success', 'Siswa berhasil dihapus.');
+        return redirect()->route('admin.siswa.index')->with('success', 'Siswa berhasil dihapus.');
     }
 
     public function deleteAll(): RedirectResponse
@@ -156,6 +156,6 @@ class StudentController extends Controller
         StudentProfile::whereHas('user', fn ($q) => $q->where('role', 'student'))->delete();
         User::where('role', 'student')->delete();
 
-        return redirect()->route('admin.students.index')->with('success', 'Semua siswa berhasil dihapus.');
+        return redirect()->route('admin.siswa.index')->with('success', 'Semua siswa berhasil dihapus.');
     }
 }

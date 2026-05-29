@@ -4,14 +4,14 @@
 
 @section('content')
 <div class="mb-6 flex items-center justify-between">
-    <a href="{{ route('admin.classes.index') }}"
+    <a href="{{ route('admin.kelas.index') }}"
        class="inline-flex items-center gap-2 text-base text-gray-500 hover:text-gray-700 transition-colors">
         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
         </svg>
         Kembali
     </a>
-    <a href="{{ route('admin.classes.edit', $class) }}"
+    <a href="{{ route('admin.kelas.edit', $class) }}"
        class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-base font-semibold text-white shadow-sm
               hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors">
         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -54,7 +54,7 @@
             <p class="text-sm font-medium text-gray-500">Wali Kelas</p>
             <p class="mt-1.5 text-base text-gray-900">
                 @if ($class->homeroomTeacher)
-                    <a href="{{ route('admin.teachers.show', $class->homeroomTeacher) }}"
+                    <a href="{{ route('admin.guru.show', $class->homeroomTeacher) }}"
                        class="text-primary hover:underline">
                         {{ $class->homeroomTeacher->name }}
                     </a>

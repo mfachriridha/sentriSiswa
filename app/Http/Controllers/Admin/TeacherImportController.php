@@ -36,7 +36,7 @@ class TeacherImportController extends Controller
 
         session(['import_file_path' => $file->store('imports')]);
 
-        return redirect()->route('admin.teachers.import.preview');
+        return redirect()->route('admin.guru.impor.pratinjau');
     }
 
     public function preview(Request $request): View
@@ -44,7 +44,7 @@ class TeacherImportController extends Controller
         $path = session('import_file_path');
 
         if (! $path) {
-            return redirect()->route('admin.teachers.import');
+            return redirect()->route('admin.guru.impor');
         }
 
         $fullPath = storage_path('app/private/'.$path);
@@ -89,7 +89,7 @@ class TeacherImportController extends Controller
             $total,
             $this->perPage,
             $page,
-            ['path' => route('admin.teachers.import.preview')],
+            ['path' => route('admin.guru.impor.pratinjau')],
         );
 
         return view('admin.teacher.import-preview', [
@@ -116,7 +116,7 @@ class TeacherImportController extends Controller
         session()->forget('import_file_path');
 
         return redirect()
-            ->route('admin.teachers.index')
+            ->route('admin.guru.index')
             ->with('import_result', [
                 'teachers_created' => $import->teachersCreated,
                 'teachers_existing' => $import->teachersExisting,

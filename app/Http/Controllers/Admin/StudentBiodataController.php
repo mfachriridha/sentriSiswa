@@ -31,7 +31,7 @@ class StudentBiodataController extends Controller
         );
 
         return redirect()
-            ->route('admin.students.biodata.edit', $student)
+            ->route('admin.siswa.biodata.edit', $student)
             ->with('success', 'Biodata berhasil diperbarui.');
     }
 

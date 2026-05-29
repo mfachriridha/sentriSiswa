@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="mb-6">
-    <a href="{{ route('admin.teachers.index') }}"
+    <a href="{{ route('admin.guru.index') }}"
        class="inline-flex items-center gap-2 text-base text-gray-500 hover:text-gray-700 transition-colors">
         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
@@ -26,7 +26,7 @@
     </div>
 
     <div class="mb-6 flex items-center justify-center">
-        <a href="{{ route('admin.teachers.import.template') }}"
+        <a href="{{ route('admin.guru.impor.template') }}"
            class="inline-flex items-center gap-2 rounded-lg border border-primary/30 px-5 py-3 text-base font-medium text-primary
                   hover:bg-primary/5 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors">
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -37,7 +37,7 @@
         </a>
     </div>
 
-    <form method="POST" action="{{ route('admin.teachers.import.upload') }}" enctype="multipart/form-data" class="space-y-6"
+    <form method="POST" action="{{ route('admin.guru.impor.unggah') }}" enctype="multipart/form-data" class="space-y-6"
           x-data="{ loading: false }" @submit="loading = true">
         @csrf
 

@@ -9,7 +9,7 @@
         <p class="mt-2 text-base text-gray-500">Kelola data siswa</p>
     </div>
     <div class="flex items-center gap-3">
-        <a href="{{ route('admin.students.import') }}"
+        <a href="{{ route('admin.siswa.impor') }}"
            class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-5 py-3 text-base font-medium text-gray-700 shadow-sm
                   hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors">
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -37,7 +37,7 @@
             </svg>
             Hapus Semua
         </button>
-        <a href="{{ route('admin.students.create') }}"
+        <a href="{{ route('admin.siswa.create') }}"
            class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-base font-semibold text-white shadow-sm
                   hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors">
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -51,7 +51,7 @@
 <x-alert type="success" :message="session('success')" />
 
 <x-search-filter-form
-    :action="route('admin.students.index')"
+    :action="route('admin.siswa.index')"
     :search="$search"
     placeholder="Cari nama, NISN, atau NIS..."
     :filters="[
@@ -122,7 +122,7 @@
                     <td class="px-6 py-5 font-medium text-gray-900">{{ $student->name }}</td>
                     <td class="px-6 py-5 text-gray-700">
                         @if ($student->studentProfile?->class)
-                            <a href="{{ route('admin.classes.show', $student->studentProfile->class) }}" class="text-primary hover:underline">
+                            <a href="{{ route('admin.kelas.show', $student->studentProfile->class) }}" class="text-primary hover:underline">
                                 {{ $student->studentProfile->class->name }}
                             </a>
                         @else
@@ -138,7 +138,7 @@
                     </td>
                     <td class="px-6 py-5">
                         <div class="flex items-center gap-2">
-                            <a href="{{ route('admin.students.show', $student) }}"
+                            <a href="{{ route('admin.siswa.show', $student) }}"
                                class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">
                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -148,7 +148,7 @@
                                 </svg>
                                 Lihat
                             </a>
-                            <a href="{{ route('admin.students.edit', $student) }}"
+                            <a href="{{ route('admin.siswa.edit', $student) }}"
                                class="inline-flex items-center gap-1.5 rounded-lg border border-primary/30 px-3 py-2 text-sm font-medium text-primary hover:bg-primary/5 transition-colors">
                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -171,7 +171,7 @@
                                 </svg>
                                 Hapus
                             </button>
-                            <form id="delete-student-{{ $student->id }}" method="POST" action="{{ route('admin.students.destroy', $student) }}" class="hidden">
+                            <form id="delete-student-{{ $student->id }}" method="POST" action="{{ route('admin.siswa.destroy', $student) }}" class="hidden">
                                 @csrf
                                 @method('DELETE')
                             </form>
@@ -196,7 +196,7 @@
     @endif
 </div>
 
-<form id="delete-all-students-form" method="POST" action="{{ route('admin.students.delete-all') }}" class="hidden">
+<form id="delete-all-students-form" method="POST" action="{{ route('admin.siswa.hapus-semua') }}" class="hidden">
     @csrf
     @method('DELETE')
 </form>

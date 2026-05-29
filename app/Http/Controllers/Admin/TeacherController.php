@@ -103,7 +103,7 @@ class TeacherController extends Controller
             ]);
         });
 
-        return redirect()->route('admin.teachers.index')->with('success', 'Guru berhasil ditambahkan.');
+        return redirect()->route('admin.guru.index')->with('success', 'Guru berhasil ditambahkan.');
     }
 
     public function show(User $teacher): View
@@ -143,14 +143,14 @@ class TeacherController extends Controller
             );
         });
 
-        return redirect()->route('admin.teachers.index')->with('success', 'Guru berhasil diperbarui.');
+        return redirect()->route('admin.guru.index')->with('success', 'Guru berhasil diperbarui.');
     }
 
     public function destroy(User $teacher): RedirectResponse
     {
         $teacher->delete();
 
-        return redirect()->route('admin.teachers.index')->with('success', 'Guru berhasil dihapus.');
+        return redirect()->route('admin.guru.index')->with('success', 'Guru berhasil dihapus.');
     }
 
     public function deleteAll(): RedirectResponse
@@ -158,6 +158,6 @@ class TeacherController extends Controller
         TeacherProfile::whereHas('user', fn ($q) => $q->where('role', 'teacher'))->delete();
         User::where('role', 'teacher')->delete();
 
-        return redirect()->route('admin.teachers.index')->with('success', 'Semua guru berhasil dihapus.');
+        return redirect()->route('admin.guru.index')->with('success', 'Semua guru berhasil dihapus.');
     }
 }

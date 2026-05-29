@@ -16,7 +16,7 @@ test('admin can create a student without a password and gets the default hashed 
         'grade' => '10',
     ]);
 
-    $response = $this->actingAs($admin)->post(route('admin.students.store'), [
+    $response = $this->actingAs($admin)->post(route('admin.siswa.store'), [
         'name' => 'Siswa Tes',
         'email' => 'siswa.tes@example.com',
         'nisn' => '1234567890',
@@ -27,7 +27,7 @@ test('admin can create a student without a password and gets the default hashed 
     ]);
 
     expect($response->getStatusCode())->toBe(302);
-    expect($response->headers->get('Location'))->toBe(route('admin.students.index'));
+    expect($response->headers->get('Location'))->toBe(route('admin.siswa.index'));
 
     $student = User::where('email', 'siswa.tes@example.com')->firstOrFail();
 
@@ -52,7 +52,7 @@ test('admin can create a student without a password and gets the default hashed 
 test('admin can create a teacher without a password and gets the default hashed fallback', function () {
     $admin = User::factory()->admin()->create();
 
-    $response = $this->actingAs($admin)->post(route('admin.teachers.store'), [
+    $response = $this->actingAs($admin)->post(route('admin.guru.store'), [
         'name' => 'Guru Tes',
         'email' => 'guru.tes@example.com',
         'nip' => '198765432109876543',
@@ -60,7 +60,7 @@ test('admin can create a teacher without a password and gets the default hashed 
         'teacher_type' => 'homeroom',
     ]);
 
-    $response->assertRedirect(route('admin.teachers.index'));
+    $response->assertRedirect(route('admin.guru.index'));
 
     $teacher = User::where('email', 'guru.tes@example.com')->firstOrFail();
 
@@ -89,7 +89,7 @@ test('admin can create a student with a manual password and still gets unregiste
         'grade' => '10',
     ]);
 
-    $response = $this->actingAs($admin)->post(route('admin.students.store'), [
+    $response = $this->actingAs($admin)->post(route('admin.siswa.store'), [
         'name' => 'Siswa Manual',
         'email' => 'siswa.manual@example.com',
         'password' => 'Secret123',
@@ -101,7 +101,7 @@ test('admin can create a student with a manual password and still gets unregiste
     ]);
 
     expect($response->getStatusCode())->toBe(302);
-    expect($response->headers->get('Location'))->toBe(route('admin.students.index'));
+    expect($response->headers->get('Location'))->toBe(route('admin.siswa.index'));
 
     $student = User::where('email', 'siswa.manual@example.com')->firstOrFail();
 
@@ -120,7 +120,7 @@ test('admin can create a student with a manual password and still gets unregiste
 test('admin can create a teacher with a manual password and still gets unregistered status', function () {
     $admin = User::factory()->admin()->create();
 
-    $response = $this->actingAs($admin)->post(route('admin.teachers.store'), [
+    $response = $this->actingAs($admin)->post(route('admin.guru.store'), [
         'name' => 'Guru Manual',
         'email' => 'guru.manual@example.com',
         'password' => 'Secret123',
@@ -131,7 +131,7 @@ test('admin can create a teacher with a manual password and still gets unregiste
     ]);
 
     expect($response->getStatusCode())->toBe(302);
-    expect($response->headers->get('Location'))->toBe(route('admin.teachers.index'));
+    expect($response->headers->get('Location'))->toBe(route('admin.guru.index'));
 
     $teacher = User::where('email', 'guru.manual@example.com')->firstOrFail();
 
