@@ -148,13 +148,13 @@ class TeacherImport implements ToCollection, WithChunkReading, WithHeadingRow
                 $inserts[] = [
                     'user_id' => $userId,
                     'nip' => $nip,
-                    'teacher_type' => $profile['teacherType'],
+                    'teacher_type' => $profile['teacher_type'],
                     'grade' => $profile['grade'],
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];
 
-                if ($profile['teacherType'] === 'homeroom' && $className && isset($this->classCache[$className]) && $userId) {
+                if ($profile['teacher_type'] === 'homeroom' && $className && isset($this->classCache[$className]) && $userId) {
                     SchoolClass::where('id', $this->classCache[$className])
                         ->update(['homeroom_teacher_id' => $userId]);
                 }

@@ -66,7 +66,11 @@ class TeacherImportController extends Controller
                 $nip = $nipRaw ? str_replace(' ', '', $nipRaw) : null;
                 $className = trim((string) ($row['kelas'] ?? ''));
                 $typeRaw = trim((string) ($row['tipe'] ?? ''));
-                $type = in_array(strtolower($typeRaw), ['bk', 'guru bk']) ? 'BK' : 'Wali Kelas';
+                $type = match (true) {
+                    in_array(strtolower($typeRaw), ['bk', 'guru bk']) => 'BK',
+                    in_array(strtolower($typeRaw), ['kesiswaan', 'student_affairs']) => 'Kesiswaan',
+                    default => 'Wali Kelas',
+                };
             }
 
             return [
