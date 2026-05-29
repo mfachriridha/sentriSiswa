@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\View\View;
 use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\ImageManager;
@@ -24,9 +25,12 @@ class StudentBiodataController extends Controller
     public function update(UpdateStudentBiodataRequest $request, User $student): RedirectResponse
     {
         $student->load('studentProfile');
+        $profile = $student->studentProfile;
 
-        $student->studentProfile->biodata()->updateOrCreate(
-            ['student_profile_id' => $student->studentProfile->id],
+        abort_if(! $profile, 404);
+
+        $profile->biodata()->updateOrCreate(
+            ['student_profile_id' => $profile->id],
             $request->validated(),
         );
 
@@ -42,24 +46,30 @@ class StudentBiodataController extends Controller
         ]);
 
         $student->load('studentProfile');
+        $profile = $student->studentProfile;
+        $file = $request->file('photo');
 
-        if ($student->studentProfile->photo) {
-            $oldPath = storage_path('app/public/'.$student->studentProfile->photo);
+        abort_if(! $profile || ! $file instanceof UploadedFile, 422);
+
+        if ($profile->photo) {
+            $oldPath = storage_path('app/public/'.$profile->photo);
             if (file_exists($oldPath)) {
                 unlink($oldPath);
             }
         }
 
-        $file = $request->file('photo');
         $filename = $student->id.'.'.$file->getClientOriginalExtension();
         $path = 'photos/students/'.$filename;
+        $realPath = $file->getRealPath();
+
+        abort_if($realPath === false, 422);
 
         $manager = new ImageManager(new Driver);
-        $image = $manager->read($file->getRealPath());
+        $image = $manager->read($realPath);
         $image->cover(300, 400);
         $image->toJpeg(85)->save(storage_path('app/public/'.$path));
 
-        $student->studentProfile->update(['photo' => $path]);
+        $profile->update(['photo' => $path]);
 
         return response()->json(['url' => asset('storage/'.$path)]);
     }
@@ -67,14 +77,15 @@ class StudentBiodataController extends Controller
     public function deletePhoto(User $student): JsonResponse
     {
         $student->load('studentProfile');
+        $profile = $student->studentProfile;
 
-        if ($student->studentProfile->photo) {
-            $oldPath = storage_path('app/public/'.$student->studentProfile->photo);
+        if ($profile?->photo) {
+            $oldPath = storage_path('app/public/'.$profile->photo);
             if (file_exists($oldPath)) {
                 unlink($oldPath);
             }
 
-            $student->studentProfile->update(['photo' => null]);
+            $profile->update(['photo' => null]);
         }
 
         return response()->json(['success' => true]);

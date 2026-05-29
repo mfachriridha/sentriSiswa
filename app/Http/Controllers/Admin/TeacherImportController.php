@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Imports\TeacherImport;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
@@ -34,12 +35,16 @@ class TeacherImportController extends Controller
 
         $file = $request->file('file');
 
+        if (! $file instanceof UploadedFile) {
+            return back()->withErrors(['file' => 'File impor tidak valid.']);
+        }
+
         session(['import_file_path' => $file->store('imports')]);
 
         return redirect()->route('admin.guru.impor.pratinjau');
     }
 
-    public function preview(Request $request): View
+    public function preview(Request $request): RedirectResponse|View
     {
         $path = session('import_file_path');
 
