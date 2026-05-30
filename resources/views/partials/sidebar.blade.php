@@ -107,6 +107,20 @@
                     </li>
 
                     <li>
+                        <a href="{{ route('guru.monitoring.index') }}"
+                           class="flex items-center gap-3 rounded-lg px-4 py-3 text-base font-medium transition-colors
+                                  {{ request()->routeIs('guru.monitoring.*') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
+                            <svg class="h-6 w-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            Monitoring Siswa
+                        </a>
+                    </li>
+
+                    <li>
                         <a href="{{ route('guru.pelanggaran-siswa.index') }}"
                            class="flex items-center gap-3 rounded-lg px-4 py-3 text-base font-medium transition-colors
                                   {{ request()->routeIs('guru.pelanggaran-siswa.*') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">

@@ -156,7 +156,7 @@ class StudentViolationController extends Controller
                 $query->where('is_active', true);
 
                 if ($currentViolationType) {
-                    $query->orWhereKey($currentViolationType->id);
+                    $query->orWhere('id', $currentViolationType->id);
                 }
             });
         }

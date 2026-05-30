@@ -20,6 +20,7 @@ class UpdateProfilRequest extends FormRequest
         $userId = Auth::id();
 
         return [
+            'name' => ['required', 'string', 'max:255'],
             'email' => ['nullable', 'email', 'max:255', "unique:users,email,{$userId}"],
             'phone' => ['nullable', 'string', 'min:10', 'max:20', 'regex:/^[0-9+\-\s()]*$/'],
             'password' => ['nullable', 'string', 'min:8', 'regex:/[a-z]/i', 'regex:/[0-9]/'],
@@ -32,6 +33,8 @@ class UpdateProfilRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'name.required' => 'Nama tidak boleh kosong.',
+            'name.max' => 'Nama tidak boleh lebih dari 255 karakter.',
             'email.email' => 'Format email tidak valid.',
             'email.unique' => 'Email sudah digunakan.',
             'email.max' => 'Email tidak boleh lebih dari 255 karakter.',

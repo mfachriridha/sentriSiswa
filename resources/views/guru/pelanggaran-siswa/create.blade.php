@@ -26,7 +26,7 @@
                         class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                     <option value="">Pilih siswa</option>
                     @foreach ($students as $student)
-                        <option value="{{ $student->id }}" {{ (string) old('student_profile_id') === (string) $student->id ? 'selected' : '' }}>
+                        <option value="{{ $student->id }}" {{ (string) old('student_profile_id', request('student_profile_id')) === (string) $student->id ? 'selected' : '' }}>
                             {{ $student->user?->name }} - {{ $student->class?->name ?? 'Tanpa kelas' }} - NISN {{ $student->nisn ?? '-' }}
                         </option>
                     @endforeach

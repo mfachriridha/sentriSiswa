@@ -40,18 +40,23 @@ class StudentProfile extends Model
         return $this->hasMany(StudentViolation::class);
     }
 
-    // TODO: Replace in the dedicated point summary phase.
-    // public function getPointsAttribute(): int
-    // {
-    //     $deductions = $this->violations()
-    //         ->join('violation_types', 'student_violations.violation_type_id', '=', 'violation_types.id')
-    //         ->sum('violation_types.point_deduction');
-    //
-    //     return max(0, 100 - $deductions);
-    // }
-
     public function getPointsAttribute(): int
     {
-        return 100;
+        $deductions = 0;
+
+        // Jika aggregate sum sudah diload dari query builder (withSum)
+        if (array_key_exists('student_violations_sum_point_deduction', $this->attributes)) {
+            $deductions = (int) $this->attributes['student_violations_sum_point_deduction'];
+        } 
+        // Jika relasi sudah diload semua (with)
+        elseif ($this->relationLoaded('studentViolations')) {
+            $deductions = $this->studentViolations->sum('point_deduction');
+        } 
+        // Fallback: query database langsung
+        else {
+            $deductions = (int) $this->studentViolations()->sum('point_deduction');
+        }
+
+        return max(0, 100 - $deductions);
     }
 }

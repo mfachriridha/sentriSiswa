@@ -75,6 +75,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 Route::middleware(['auth', 'registered', 'guru'])->prefix('guru')->name('guru.')->group(function () {
     Route::get('/dashboard', [GuruDashboardController::class, 'index'])->name('dashboard');
     Route::middleware('kesiswaan')->group(function () {
+        Route::get('/monitoring', [App\Http\Controllers\Guru\MonitoringController::class, 'index'])->name('monitoring.index');
+        Route::get('/monitoring/{monitoring}', [App\Http\Controllers\Guru\MonitoringController::class, 'show'])->name('monitoring.show');
         Route::resource('pelanggaran-siswa', StudentViolationController::class)
             ->parameters(['pelanggaran-siswa' => 'studentViolation']);
         Route::resource('jenis-pelanggaran', ViolationTypeController::class)
@@ -83,6 +85,8 @@ Route::middleware(['auth', 'registered', 'guru'])->prefix('guru')->name('guru.')
     Route::get('/profil', [GuruProfilController::class, 'show'])->name('profil');
     Route::get('/profil/edit', [GuruProfilController::class, 'edit'])->name('profil.edit');
     Route::put('/profil', [GuruProfilController::class, 'update'])->name('profil.update');
+    Route::post('/profil/photo', [GuruProfilController::class, 'uploadPhoto'])->name('profil.photo');
+    Route::delete('/profil/photo', [GuruProfilController::class, 'deletePhoto'])->name('profil.photo.delete');
 });
 
 Route::middleware(['auth', 'registered', 'siswa'])->prefix('siswa')->name('siswa.')->group(function () {

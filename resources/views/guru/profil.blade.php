@@ -36,13 +36,18 @@
 </div>
 
 <div class="rounded-xl border border-gray-200 bg-white p-8">
-    <div class="mb-8 flex items-center gap-5">
-        <div class="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary">
-            {{ strtoupper(substr($teacher->name, 0, 1)) }}
-        </div>
+    <div class="mb-6 flex items-center gap-5">
+        @if ($profile?->photo)
+            <img src="{{ asset('storage/'.$profile->photo) }}" alt="{{ $teacher->name }}"
+                 class="h-20 w-20 rounded-full object-cover border-2 border-gray-200">
+        @else
+            <div class="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary">
+                {{ strtoupper(substr($teacher->name, 0, 1)) }}
+            </div>
+        @endif
         <div>
             <h2 class="text-2xl font-bold text-gray-900">{{ $teacher->name }}</h2>
-            <p class="mt-1 text-base text-gray-500">{{ $teacherTypeLabels[$profile?->teacher_type] ?? 'Guru' }}</p>
+            <p class="mt-1 text-base text-gray-500">{{ $teacherTypeLabels[$profile?->teacher_type] ?? 'Guru Umum' }}</p>
         </div>
     </div>
 
