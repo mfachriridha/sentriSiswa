@@ -7,9 +7,8 @@ use App\Http\Requests\Guru\UpdateProfilRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\View\View;
-
 use Illuminate\Support\Facades\Storage;
+use Illuminate\View\View;
 
 class ProfilController extends Controller
 {
@@ -34,6 +33,7 @@ class ProfilController extends Controller
         $teacher = Auth::user();
         $data = $request->validated();
 
+        // Update user fields
         $teacher->update([
             'name' => $data['name'],
             'email' => $data['email'] ?? null,
@@ -45,10 +45,31 @@ class ProfilController extends Controller
             ]);
         }
 
-        $teacher->teacherProfile()->updateOrCreate(
-            ['user_id' => $teacher->id],
-            ['phone' => $data['phone'] ?? null],
-        );
+        // Handle profile photo
+        $profile = $teacher->teacherProfile;
+        if (! $profile) {
+            $profile = $teacher->teacherProfile()->create([]);
+        }
+
+        // Delete photo if requested
+        if ($request->has('delete_photo') && filter_var($request->input('delete_photo'), FILTER_VALIDATE_BOOLEAN)) {
+            if ($profile->photo) {
+                Storage::disk('public')->delete($profile->photo);
+                $profile->update(['photo' => null]);
+            }
+        }
+        // Upload new photo
+        elseif ($request->hasFile('photo')) {
+            // Delete old photo if exists
+            if ($profile->photo) {
+                Storage::disk('public')->delete($profile->photo);
+            }
+            $path = $request->file('photo')->store('photos/teachers', 'public');
+            $profile->update(['photo' => $path]);
+        }
+
+        // Update phone (still separate)
+        $profile->update(['phone' => $data['phone'] ?? null]);
 
         return redirect()->route('guru.profil')->with('success', 'Profil berhasil diperbarui.');
     }

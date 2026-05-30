@@ -11,8 +11,9 @@
 <x-alert type="success" :message="session('success')" />
 <x-alert type="error" :message="session('error')" />
 
-<div class="rounded-xl border border-gray-200 bg-white p-6 sm:p-8">
-    <div class="mb-6 flex items-start justify-between gap-4">
+<div class="grid gap-6 lg:grid-cols-[420px_1fr] items-start">
+    <div class="rounded-xl border border-gray-200 bg-white p-6 sm:p-8">
+        <div class="mb-6 flex items-start justify-between gap-4">
         <div>
             <h2 class="text-lg font-semibold text-gray-900">Absen Hari Ini</h2>
             <div class="mt-8 space-y-1">
@@ -29,7 +30,7 @@
     </div>
 
     @if($todayAttendance)
-        <div class="grid gap-6 lg:grid-cols-[280px_1fr]">
+        <div class="grid gap-6 lg:grid-cols-[280px_auto]">
             <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
                 @if($todayAttendance->selfie_path)
                     <img src="{{ asset('storage/'.$todayAttendance->selfie_path) }}"
@@ -89,112 +90,99 @@
             <input type="hidden" name="longitude" x-model="longitude">
             <input type="hidden" name="accuracy" x-model="accuracy">
 
-            <div class="grid gap-6 lg:grid-cols-[320px_1fr]">
-                <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
-                    <div class="flex items-start justify-between gap-3">
-                        <div>
-                            <h3 class="text-sm font-semibold text-gray-900">Selfie Absensi</h3>
-                            <p class="mt-1 text-sm text-gray-500">Selfie wajib untuk absen hari ini.</p>
+            <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                @if($geofenceActive)
+                    <div class="mb-4 flex items-center justify-between rounded-lg border border-gray-200 bg-white px-4 py-3">
+                        <div class="flex items-center gap-2">
+                            <svg class="h-4 w-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                            <span class="text-xs font-medium text-gray-700">Lokasi GPS</span>
                         </div>
-                    </div>
-
-                    <div class="mt-4 overflow-hidden rounded-lg border border-gray-200 bg-white">
-                        <div class="relative aspect-[3/4] w-full bg-gray-100">
-                            <img x-show="previewUrl"
-                                 :src="previewUrl"
-                                 alt="Preview selfie"
-                                 class="h-full w-full object-cover">
-                            <div x-show="!previewUrl" class="flex h-full w-full items-center justify-center p-6 text-center text-sm text-gray-400">
-                                Belum ada selfie
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mt-4 space-y-3">
-                        <button type="button"
-                                @click="openSelfieModal()"
-                                :disabled="!canOpenSelfieModal"
-                                class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:cursor-not-allowed disabled:bg-gray-300">
-                            Absen Sekarang
-                        </button>
-
-                        <p class="text-sm" :class="canOpenSelfieModal ? 'text-green-700' : 'text-amber-700'" x-text="openDisabledMessage"></p>
-                        <p x-show="compressedSizeKb" class="text-sm text-gray-500">
-                            Ukuran foto: <span x-text="compressedSizeKb"></span> KB
-                        </p>
-                        <p x-show="error" x-text="error" class="text-sm text-red-600"></p>
-                        @error('selfie')
-                            <p class="text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                        @error('latitude')
-                            <p class="text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                        @error('longitude')
-                            <p class="text-sm text-red-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
-
-                <div class="rounded-xl border border-gray-200 bg-gray-50 p-5">
-                    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                        <div>
-                            <h3 class="text-sm font-semibold text-gray-900">Lokasi GPS</h3>
-                            @if($geofenceActive)
-                                <p class="mt-1 text-sm text-gray-500">Aktifkan lokasi sebelum absen. Jika akurasi masih rendah, tekan refresh.</p>
-                            @else
-                                <p class="mt-1 text-sm text-gray-500">Area absensi belum dikonfigurasi, sehingga GPS tidak diwajibkan.</p>
-                            @endif
-                        </div>
-
-                        @if($geofenceActive)
+                        <div class="flex items-center gap-2">
+                            <span x-show="gpsReady" class="text-xs" :class="accuracy <= 100 ? 'text-green-600' : accuracy <= 500 ? 'text-amber-600' : 'text-red-600'">
+                                ±<span x-text="Math.round(accuracy)"></span> m
+                            </span>
                             <button type="button"
                                     @click="getGpsLocation()"
                                     :disabled="gpsLoading"
-                                    class="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60">
-                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"/>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                </svg>
-                                <span x-text="gpsReady ? 'Refresh Lokasi' : 'Aktifkan Lokasi'"></span>
+                                    class="shrink-0 inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-2.5 py-1 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60">
+                                <span x-text="gpsReady ? 'Refresh' : 'Aktifkan'"></span>
                             </button>
-                        @endif
+                        </div>
                     </div>
 
-                    <div class="mt-4 rounded-lg border border-gray-200 bg-white p-4">
-                        @if($geofenceActive)
-                            <p x-show="gpsLoading" class="text-sm text-gray-600">Mengambil lokasi...</p>
-                            <p x-show="gpsError" x-text="gpsError" class="text-sm text-red-600"></p>
-                            <template x-if="gpsReady">
-                                <div>
-                                    <div class="space-y-1">
-                                        <p class="text-sm font-medium" :class="accuracy <= 100 ? 'text-green-700' : accuracy <= 500 ? 'text-amber-700' : 'text-red-700'">
-                                            Lokasi ditemukan, akurasi ±<span x-text="Math.round(accuracy)"></span> m
-                                        </p>
-                                        <p class="text-xs text-gray-500">
-                                            <span x-text="Number(latitude).toFixed(7)"></span>, <span x-text="Number(longitude).toFixed(7)"></span>
-                                        </p>
-                                        <p x-show="accuracy > 500" class="text-xs text-amber-600">Akurasi masih rendah. Coba tekan Refresh Lokasi sebelum absen.</p>
-                                    </div>
-                                    <div x-show="locationStatus" class="mt-3 rounded-lg border px-3 py-2 text-sm font-medium"
-                                         :class="{
-                                             'border-green-200 bg-green-50 text-green-700': locationStatus === 'inside',
-                                             'border-amber-200 bg-amber-50 text-amber-700': locationStatus === 'tolerance',
-                                             'border-red-200 bg-red-50 text-red-700': locationStatus === 'outside'
-                                         }">
-                                        <span x-text="locationMessage"></span>
-                                        <span x-show="locationDistance !== null && locationDistance > 0"
-                                              class="ml-1 text-xs opacity-75">(<span x-text="Math.round(locationDistance)"></span> m dari area)</span>
-                                    </div>
-                                    <p x-show="locationChecking" class="mt-2 text-sm text-gray-500">Memeriksa lokasi...</p>
-                                </div>
-                            </template>
-                            <p x-show="!gpsLoading && !gpsError && !gpsReady" class="text-sm text-gray-400">Lokasi belum diambil.</p>
-                        @else
-                            <div class="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-medium text-blue-700">
-                                Lokasi GPS tidak aktif untuk sesi absensi ini.
+                    <div class="mb-3 space-y-1">
+                        <p x-show="gpsLoading" class="text-xs text-gray-500">Mengambil lokasi...</p>
+                        <p x-show="gpsError" x-text="gpsError" class="text-xs text-red-600"></p>
+
+                        <template x-if="gpsReady">
+                            <div class="space-y-0.5">
+                                <p x-show="locationStatus" class="text-xs font-medium" :class="{
+                                    'text-green-700': locationStatus === 'inside',
+                                    'text-amber-700': locationStatus === 'tolerance',
+                                    'text-red-700': locationStatus === 'outside'
+                                }">
+                                    <span x-text="locationMessage"></span>
+                                    <span x-show="locationDistance !== null && locationDistance > 0" class="opacity-75">
+                                        (<span x-text="Math.round(locationDistance)"></span> m)
+                                    </span>
+                                </p>
+                                <p x-show="locationChecking" class="text-xs text-gray-500">Memeriksa lokasi...</p>
+                                <p x-show="accuracy > 500" class="text-xs text-amber-600">Akurasi rendah, tekan Refresh.</p>
                             </div>
-                        @endif
+                        </template>
+                        <p x-show="!gpsLoading && !gpsError && !gpsReady" class="text-xs text-gray-400">Lokasi belum diambil.</p>
                     </div>
+                @else
+                    <div class="mb-4 flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2">
+                        <svg class="h-4 w-4 shrink-0 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span class="text-xs font-medium text-blue-700">Lokasi GPS tidak diperlukan untuk sesi ini.</span>
+                    </div>
+                @endif
+
+                <div class="mb-3">
+                    <h3 class="text-sm font-semibold text-gray-900">Selfie Absensi</h3>
+                    <p class="mt-0.5 text-xs text-gray-500">Selfie wajib untuk absen hari ini.</p>
+                </div>
+
+                <div class="overflow-hidden rounded-lg border border-gray-200 bg-white">
+                    <div class="relative aspect-[3/4] w-full bg-gray-100">
+                        <img x-show="previewUrl"
+                             :src="previewUrl"
+                             alt="Preview selfie"
+                             class="h-full w-full object-cover">
+                        <div x-show="!previewUrl" class="flex h-full w-full items-center justify-center p-6 text-center text-sm text-gray-400">
+                            Belum ada selfie
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 space-y-3">
+                    <button type="button"
+                            @click="openSelfieModal()"
+                            :disabled="!canOpenSelfieModal"
+                            class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:cursor-not-allowed disabled:bg-gray-300">
+                        Absen Sekarang
+                    </button>
+
+                    <p class="text-sm" :class="canOpenSelfieModal ? 'text-green-700' : 'text-amber-700'" x-text="openDisabledMessage"></p>
+                    <p x-show="compressedSizeKb" class="text-sm text-gray-500">
+                        Ukuran foto: <span x-text="compressedSizeKb"></span> KB
+                    </p>
+                    <p x-show="error" x-text="error" class="text-sm text-red-600"></p>
+                    @error('selfie')
+                        <p class="text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                    @error('latitude')
+                        <p class="text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                    @error('longitude')
+                        <p class="text-sm text-red-600">{{ $message }}</p>
+                    @enderror
                 </div>
             </div>
 
@@ -295,7 +283,34 @@
             @endif
         </p>
     @endif
-</div>
+</div>{{-- left col --}}
+
+    <div class="rounded-xl border border-gray-200 bg-white p-6">
+        <h2 class="mb-5 text-lg font-semibold text-gray-900">Ringkasan Bulan Ini</h2>
+        <div class="grid grid-cols-2 gap-4">
+            <div class="rounded-lg border border-green-200 bg-green-50 p-4 text-center">
+                <p class="text-2xl font-bold text-green-700">{{ $stats['hadir'] }}</p>
+                <p class="mt-1 text-sm font-medium text-green-600">Hadir</p>
+            </div>
+            <div class="rounded-lg border border-amber-200 bg-amber-50 p-4 text-center">
+                <p class="text-2xl font-bold text-amber-700">{{ $stats['terlambat'] }}</p>
+                <p class="mt-1 text-sm font-medium text-amber-600">Terlambat</p>
+            </div>
+            <div class="rounded-lg border border-blue-200 bg-blue-50 p-4 text-center">
+                <p class="text-2xl font-bold text-blue-700">{{ $stats['izin'] }}</p>
+                <p class="mt-1 text-sm font-medium text-blue-600">Izin</p>
+            </div>
+            <div class="rounded-lg border border-purple-200 bg-purple-50 p-4 text-center">
+                <p class="text-2xl font-bold text-purple-700">{{ $stats['sakit'] }}</p>
+                <p class="mt-1 text-sm font-medium text-purple-600">Sakit</p>
+            </div>
+            <div class="rounded-lg border border-red-200 bg-red-50 p-4 text-center">
+                <p class="text-2xl font-bold text-red-700">{{ $stats['alpha'] }}</p>
+                <p class="mt-1 text-sm font-medium text-red-600">Alpha</p>
+            </div>
+        </div>
+    </div>
+</div>{{-- end grid --}}
 
 @push('scripts')
 <script>
@@ -593,31 +608,4 @@
     }
 </script>
 @endpush
-
-<div class="mt-6 rounded-xl border border-gray-200 bg-white p-8">
-    <h2 class="mb-6 text-lg font-semibold text-gray-900">Ringkasan Bulan Ini</h2>
-
-    <div class="grid grid-cols-2 gap-4 sm:grid-cols-5">
-        <div class="rounded-lg border border-green-200 bg-green-50 p-4 text-center">
-            <p class="text-2xl font-bold text-green-700">{{ $stats['hadir'] }}</p>
-            <p class="mt-1 text-sm font-medium text-green-600">Hadir</p>
-        </div>
-        <div class="rounded-lg border border-amber-200 bg-amber-50 p-4 text-center">
-            <p class="text-2xl font-bold text-amber-700">{{ $stats['terlambat'] }}</p>
-            <p class="mt-1 text-sm font-medium text-amber-600">Terlambat</p>
-        </div>
-        <div class="rounded-lg border border-blue-200 bg-blue-50 p-4 text-center">
-            <p class="text-2xl font-bold text-blue-700">{{ $stats['izin'] }}</p>
-            <p class="mt-1 text-sm font-medium text-blue-600">Izin</p>
-        </div>
-        <div class="rounded-lg border border-purple-200 bg-purple-50 p-4 text-center">
-            <p class="text-2xl font-bold text-purple-700">{{ $stats['sakit'] }}</p>
-            <p class="mt-1 text-sm font-medium text-purple-600">Sakit</p>
-        </div>
-        <div class="rounded-lg border border-red-200 bg-red-50 p-4 text-center">
-            <p class="text-2xl font-bold text-red-700">{{ $stats['alpha'] }}</p>
-            <p class="mt-1 text-sm font-medium text-red-600">Alpha</p>
-        </div>
-    </div>
-</div>
 @endsection

@@ -19,104 +19,94 @@
     };
 @endphp
 
-<div class="mb-6">
-    <a href="{{ route('guru.profil') }}"
-       class="inline-flex items-center gap-2 text-base text-gray-500 hover:text-gray-700 transition-colors">
-        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-        </svg>
-        Kembali
-    </a>
-</div>
-
 <div class="rounded-xl border border-gray-200 bg-white p-8">
     <h1 class="mb-8 text-2xl font-bold text-gray-900">Edit Profil</h1>
 
-    {{-- Photo section (separate forms, not nested) --}}
-     <div class="mb-8">
-        @if ($errors->any())
-            <div class="mb-4 rounded-lg border border-red-200 bg-red-50 p-4">
-                <div class="flex">
-                    <div class="flex-shrink-0">
-                        <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                        </svg>
-                    </div>
-                    <div class="ml-3">
-                        <h3 class="text-sm font-medium text-red-800">Terjadi kesalahan:</h3>
-                        <div class="mt-2 text-sm text-red-700">
-                            <ul class="list-disc space-y-1 pl-5">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
+    @if ($errors->any())
+        <div class="mb-4 rounded-lg border border-red-200 bg-red-50 p-4">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-red-800">Terjadi kesalahan:</h3>
+                    <div class="mt-2 text-sm text-red-700">
+                        <ul class="list-disc space-y-1 pl-5">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
                     </div>
                 </div>
             </div>
-        @endif
+        </div>
+    @endif
 
-        <div class="flex items-center gap-6">
-            @if ($profile?->photo)
-                <img src="{{ asset('storage/'.$profile->photo) }}" alt="{{ $teacher->name }}"
-                     class="h-20 w-20 rounded-full object-cover border-2 border-gray-200">
-            @else
-                <div class="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary">
-                    {{ strtoupper(substr($teacher->name, 0, 1)) }}
-                </div>
-            @endif
-            <div class="flex items-center gap-3">
-            <form method="POST" action="{{ route('guru.profil.photo') }}" enctype="multipart/form-data">
-                @csrf
-                 <label for="photo" class="cursor-pointer inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                     </svg>
-                     Ubah Foto
-                 </label>
-                 <input id="photo" type="file" name="photo" accept="image/*" class="hidden" onchange="this.closest('form').submit()">
-                 @error('photo')
-                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                 @enderror
-             </form>
-            @if ($profile?->photo)
-                <form method="POST" action="{{ route('guru.profil.photo.delete') }}">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="text-sm text-red-600 hover:text-red-800 transition-colors"
-                            onclick="return confirm('Hapus foto?')">
-                        Hapus Foto
-                    </button>
-                </form>
-            @endif
-        </div>
-    </div>
-
-    <div class="mb-8 grid grid-cols-1 gap-5 md:grid-cols-2">
-        <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
-            <p class="text-sm font-medium text-gray-500">NIP</p>
-            <p class="mt-1.5 text-base text-gray-900">{{ $profile?->nip ?? '-' }}</p>
-        </div>
-        <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
-            <p class="text-sm font-medium text-gray-500">Tipe Guru</p>
-            <p class="mt-1.5 text-base text-gray-900">{{ $teacherTypeLabels[$profile?->teacher_type] ?? '-' }}</p>
-        </div>
-        <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
-            <p class="text-sm font-medium text-gray-500">Tingkat/Kelas Binaan</p>
-            <p class="mt-1.5 text-base text-gray-900">{{ $teacherScope ?? '-' }}</p>
-        </div>
-    </div>
-
-    <form method="POST" action="{{ route('guru.profil.update') }}" class="space-y-6" x-data="{ loading: false }" @submit="loading = true">
+    <form method="POST" action="{{ route('guru.profil.update') }}" class="space-y-10" enctype="multipart/form-data" x-data="{ loading: false }" @submit="loading = true">
         @csrf
         @method('PUT')
 
+        {{-- Foto dengan preview dan tombol hapus --}}
+        <div class="flex flex-col items-start gap-8 sm:flex-row sm:items-center sm:gap-10">
+            <div class="relative">
+                @if ($profile?->photo)
+                    <img id="photo-preview" src="{{ asset('storage/'.$profile->photo) }}" alt="{{ $teacher->name }}"
+                         class="h-24 w-24 rounded-full object-cover border-4 border-gray-100">
+                @else
+                    <div id="photo-preview" class="flex h-24 w-24 items-center justify-center rounded-full bg-primary/10 text-3xl font-bold text-primary border-4 border-gray-100">
+                        {{ strtoupper(substr($teacher->name, 0, 1)) }}
+                    </div>
+                @endif
+            </div>
+
+            <div class="flex flex-col gap-4">
+                <div class="flex flex-wrap items-center gap-4">
+                    <label for="photo" class="cursor-pointer inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        Ubah Foto
+                    </label>
+                    <input id="photo" type="file" name="photo" accept=".jpg,.jpeg,.png,image/jpeg,image/png" class="hidden">
+
+                    @if ($profile?->photo)
+                        <button type="button" id="remove-photo" class="text-sm text-red-600 hover:text-red-800 transition-colors">
+                            Hapus Foto
+                        </button>
+                    @endif
+                </div>
+                @error('photo')
+                    <p class="text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+        </div>
+
+        <input type="hidden" name="delete_photo" id="delete_photo" value="0">
+
+        {{-- Info singkat guru (read‑only) --}}
+        <div class="mb-10 grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
+                <p class="text-sm font-medium text-gray-500">NIP</p>
+                <p class="mt-1.5 text-base text-gray-900">{{ $profile?->nip ?? '-' }}</p>
+            </div>
+            <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
+                <p class="text-sm font-medium text-gray-500">Tipe Guru</p>
+                <p class="mt-1.5 text-base text-gray-900">{{ $teacherTypeLabels[$profile?->teacher_type] ?? '-' }}</p>
+            </div>
+            <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
+                <p class="text-sm font-medium text-gray-500">Tingkat/Kelas Binaan</p>
+                <p class="mt-1.5 text-base text-gray-900">{{ $teacherScope ?? '-' }}</p>
+            </div>
+        </div>
+
+        {{-- Input lain (nama, email, hp, password) --}}
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div class="md:col-span-2">
                 <label for="name" class="block text-base font-medium text-gray-700">Nama <span class="text-red-500">*</span></label>
                 <input id="name" type="text" name="name" value="{{ old('name', $teacher->name) }}" required
-                       class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm
-                              placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
+                       class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                 @error('name')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror
@@ -125,8 +115,7 @@
             <div>
                 <label for="email" class="block text-base font-medium text-gray-700">Email <span class="text-sm font-normal text-gray-400">(opsional)</span></label>
                 <input id="email" type="email" name="email" value="{{ old('email', $teacher->email) }}"
-                       class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm
-                              placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
+                       class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                 @error('email')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror
@@ -135,8 +124,7 @@
             <div>
                 <label for="phone" class="block text-base font-medium text-gray-700">Nomor HP</label>
                 <input id="phone" type="text" name="phone" value="{{ old('phone', $profile?->phone) }}"
-                       class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm
-                              placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
+                       class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                 @error('phone')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror
@@ -145,18 +133,16 @@
             <div class="md:col-span-2">
                 <label for="password" class="block text-base font-medium text-gray-700">Kata Sandi Baru <span class="text-sm font-normal text-gray-400">(kosongkan jika tidak diubah)</span></label>
                 <input id="password" type="password" name="password"
-                       class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm
-                              placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
+                       class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                 @error('password')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
         </div>
 
-        <div class="flex items-center gap-4 pt-2">
+        <div class="flex items-center gap-6 pt-4">
             <button type="submit" :disabled="loading"
-                    class="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-base font-semibold text-white shadow-sm
-                           hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors disabled:opacity-60">
+                    class="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-base font-semibold text-white shadow-sm hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors disabled:opacity-60">
                 <span x-show="loading">
                     <svg class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -165,11 +151,44 @@
                 </span>
                 Simpan
             </button>
-            <a href="{{ route('guru.profil') }}"
-               class="rounded-lg border border-gray-300 px-6 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+            <a href="{{ route('guru.profil') }}" class="rounded-lg border border-gray-300 px-6 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 transition-colors">
                 Batal
             </a>
         </div>
     </form>
 </div>
+
+@push('scripts')
+<script>
+    // Preview foto setelah dipilih
+    document.getElementById('photo').addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function (ev) {
+            const preview = document.getElementById('photo-preview');
+            preview.src = ev.target.result;
+            preview.classList.remove('bg-primary/10', 'text-primary', 'font-bold');
+            // Hapus avatar huruf bila ada
+            const existingLetter = preview.querySelector('span');
+            if (existingLetter) existingLetter.remove();
+        };
+        reader.readAsDataURL(file);
+    });
+
+    // Tombol hapus foto (tanda delete, tidak langsung meng‑hapus di server)
+    const removeBtn = document.getElementById('remove-photo');
+    if (removeBtn) {
+        removeBtn.addEventListener('click', function () {
+            document.getElementById('delete_photo').value = '1';
+            const preview = document.getElementById('photo-preview');
+            // Ganti menjadi avatar huruf
+            preview.src = '';
+            preview.className = 'flex h-24 w-24 items-center justify-center rounded-full bg-primary/10 text-3xl font-bold text-primary border-4 border-gray-100';
+            preview.innerHTML = '<span>{{ strtoupper(substr($teacher->name, 0, 1)) }}</span>';
+        });
+    }
+</script>
+@endpush
+
 @endsection

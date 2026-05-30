@@ -25,14 +25,14 @@ class MonitoringController extends Controller
             // Untuk persentase (total hari hadir vs total hari dicatat)
             ->withCount(['attendances as total_attendances'])
             ->withCount(['attendances as present_attendances' => function ($query) {
-                $query->whereIn('status', ['present', 'late']);
+                $query->whereIn('status', ['hadir', 'terlambat']);
             }]);
 
         if ($search) {
             $query->whereHas('user', function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%");
             })->orWhere('nisn', 'like', "%{$search}%")
-              ->orWhere('nis', 'like', "%{$search}%");
+                ->orWhere('nis', 'like', "%{$search}%");
         }
 
         if ($filterClass) {
@@ -53,19 +53,19 @@ class MonitoringController extends Controller
     {
         // Load relasi yang diperlukan untuk detail
         $monitoring->load([
-            'user', 
+            'user',
             'class',
             'biodata',
-            'studentViolations' => function($q) {
+            'studentViolations' => function ($q) {
                 $q->latest('violation_date')->with(['recordedBy', 'violationType']);
             },
-            'attendances' => function($q) {
+            'attendances' => function ($q) {
                 $q->latest('date')->take(30); // 30 hari terakhir
-            }
+            },
         ]);
 
         return view('guru.monitoring.show', [
-            'student' => $monitoring
+            'student' => $monitoring,
         ]);
     }
 }

@@ -47,11 +47,11 @@ class StudentProfile extends Model
         // Jika aggregate sum sudah diload dari query builder (withSum)
         if (array_key_exists('student_violations_sum_point_deduction', $this->attributes)) {
             $deductions = (int) $this->attributes['student_violations_sum_point_deduction'];
-        } 
+        }
         // Jika relasi sudah diload semua (with)
         elseif ($this->relationLoaded('studentViolations')) {
             $deductions = $this->studentViolations->sum('point_deduction');
-        } 
+        }
         // Fallback: query database langsung
         else {
             $deductions = (int) $this->studentViolations()->sum('point_deduction');

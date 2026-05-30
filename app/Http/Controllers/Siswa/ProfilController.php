@@ -11,6 +11,21 @@ use Illuminate\View\View;
 
 class ProfilController extends Controller
 {
+    public function poin(): View
+    {
+        $student = Auth::user();
+        $student->loadMissing(['studentProfile.studentViolations' => function ($q) {
+            $q->latest('violation_date');
+        }]);
+
+        $profile = $student->studentProfile;
+        $violations = $profile?->studentViolations ?? collect();
+        $totalPoints = $profile?->points ?? 100;
+        $totalDeductions = $violations->sum('point_deduction');
+
+        return view('siswa.poin', compact('profile', 'violations', 'totalPoints', 'totalDeductions'));
+    }
+
     public function show(): View
     {
         $student = Auth::user();

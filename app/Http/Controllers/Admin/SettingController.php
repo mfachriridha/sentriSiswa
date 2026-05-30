@@ -166,20 +166,20 @@ class SettingController extends Controller
     public function whatsapp(): View
     {
         return view('admin.settings.whatsapp', [
-            'fonnteApiKey' => Setting::get('fonnte_api_key', ''),
+            'fonnteToken' => Setting::get('fonnte_token', ''),
         ]);
     }
 
     public function whatsappUpdate(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'fonnte_api_key' => ['nullable', 'string', 'max:255'],
+            'fonnte_token' => ['nullable', 'string', 'max:255'],
         ], [
-            'fonnte_api_key.max' => 'API key tidak boleh lebih dari 255 karakter.',
+            'fonnte_token.max' => 'Token tidak boleh lebih dari 255 karakter.',
         ]);
 
-        Setting::set('fonnte_api_key', $validated['fonnte_api_key'] ?? '');
+        Setting::set('fonnte_token', $validated['fonnte_token'] ?? '');
 
-        return redirect()->route('admin.settings.whatsapp.index')->with('success', 'Konfigurasi WhatsApp API berhasil disimpan.');
+        return redirect()->route('admin.settings.whatsapp.index')->with('success', 'Konfigurasi WhatsApp berhasil disimpan.');
     }
 }

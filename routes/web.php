@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\TeacherController;
 use App\Http\Controllers\Admin\TeacherImportController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Guru\DashboardController as GuruDashboardController;
+use App\Http\Controllers\Guru\MonitoringController;
 use App\Http\Controllers\Guru\ProfilController as GuruProfilController;
 use App\Http\Controllers\Guru\StudentViolationController;
 use App\Http\Controllers\Guru\ViolationTypeController;
@@ -75,8 +76,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 Route::middleware(['auth', 'registered', 'guru'])->prefix('guru')->name('guru.')->group(function () {
     Route::get('/dashboard', [GuruDashboardController::class, 'index'])->name('dashboard');
     Route::middleware('kesiswaan')->group(function () {
-        Route::get('/monitoring', [App\Http\Controllers\Guru\MonitoringController::class, 'index'])->name('monitoring.index');
-        Route::get('/monitoring/{monitoring}', [App\Http\Controllers\Guru\MonitoringController::class, 'show'])->name('monitoring.show');
+        Route::get('/monitoring', [MonitoringController::class, 'index'])->name('monitoring.index');
+        Route::get('/monitoring/{monitoring}', [MonitoringController::class, 'show'])->name('monitoring.show');
         Route::resource('pelanggaran-siswa', StudentViolationController::class)
             ->parameters(['pelanggaran-siswa' => 'studentViolation']);
         Route::resource('jenis-pelanggaran', ViolationTypeController::class)
@@ -91,6 +92,7 @@ Route::middleware(['auth', 'registered', 'guru'])->prefix('guru')->name('guru.')
 
 Route::middleware(['auth', 'registered', 'siswa'])->prefix('siswa')->name('siswa.')->group(function () {
     Route::get('/dashboard', [SiswaDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/poin', [SiswaProfilController::class, 'poin'])->name('poin');
     Route::get('/absensi', [SiswaAbsensiController::class, 'index'])->name('absensi');
     Route::post('/absensi/cek-lokasi', [SiswaAbsensiController::class, 'checkLocation'])->name('absensi.check-location');
     Route::post('/absensi', [SiswaAbsensiController::class, 'store'])->name('absensi.store');
