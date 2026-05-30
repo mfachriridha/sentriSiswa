@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\TeacherImportController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Guru\DashboardController as GuruDashboardController;
 use App\Http\Controllers\Guru\ProfilController as GuruProfilController;
+use App\Http\Controllers\Guru\StudentViolationController;
 use App\Http\Controllers\Guru\ViolationTypeController;
 use App\Http\Controllers\Siswa\AbsensiController as SiswaAbsensiController;
 use App\Http\Controllers\Siswa\DashboardController as SiswaDashboardController;
@@ -74,6 +75,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 Route::middleware(['auth', 'registered', 'guru'])->prefix('guru')->name('guru.')->group(function () {
     Route::get('/dashboard', [GuruDashboardController::class, 'index'])->name('dashboard');
     Route::middleware('kesiswaan')->group(function () {
+        Route::resource('pelanggaran-siswa', StudentViolationController::class)
+            ->parameters(['pelanggaran-siswa' => 'studentViolation']);
         Route::resource('jenis-pelanggaran', ViolationTypeController::class)
             ->parameters(['jenis-pelanggaran' => 'violationType']);
     });

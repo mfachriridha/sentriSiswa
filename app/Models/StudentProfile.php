@@ -35,13 +35,12 @@ class StudentProfile extends Model
         return $this->hasMany(Attendance::class);
     }
 
-    // TODO: Uncomment when violation_types & student_violations tables are created
-    // public function violations()
-    // {
-    //     return $this->hasMany(StudentViolation::class);
-    // }
+    public function studentViolations(): HasMany
+    {
+        return $this->hasMany(StudentViolation::class);
+    }
 
-    // TODO: Uncomment when violation_types & student_violations tables are created
+    // TODO: Replace in the dedicated point summary phase.
     // public function getPointsAttribute(): int
     // {
     //     $deductions = $this->violations()

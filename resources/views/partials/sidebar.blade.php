@@ -107,6 +107,18 @@
                     </li>
 
                     <li>
+                        <a href="{{ route('guru.pelanggaran-siswa.index') }}"
+                           class="flex items-center gap-3 rounded-lg px-4 py-3 text-base font-medium transition-colors
+                                  {{ request()->routeIs('guru.pelanggaran-siswa.*') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
+                            <svg class="h-6 w-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M12 9v2m0 4h.01M5.07 19h13.86a2 2 0 001.74-2.99L13.74 4a2 2 0 00-3.48 0L3.33 16.01A2 2 0 005.07 19z"/>
+                            </svg>
+                            Pelanggaran Siswa
+                        </a>
+                    </li>
+
+                    <li>
                         <a href="{{ route('guru.jenis-pelanggaran.index') }}"
                            class="flex items-center gap-3 rounded-lg px-4 py-3 text-base font-medium transition-colors
                                   {{ request()->routeIs('guru.jenis-pelanggaran.*') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">

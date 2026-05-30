@@ -6,6 +6,7 @@ use Database\Factories\ViolationTypeFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable(['name', 'category', 'point_deduction', 'description', 'is_active'])]
 class ViolationType extends Model
@@ -45,6 +46,11 @@ class ViolationType extends Model
             self::CATEGORY_HEAVY => [51, 75],
             self::CATEGORY_SEVERE => [76, 100],
         ];
+    }
+
+    public function studentViolations(): HasMany
+    {
+        return $this->hasMany(StudentViolation::class);
     }
 
     /**

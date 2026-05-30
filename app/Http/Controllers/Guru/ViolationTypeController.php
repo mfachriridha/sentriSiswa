@@ -103,6 +103,10 @@ class ViolationTypeController extends Controller
 
     public function destroy(ViolationType $violationType): RedirectResponse
     {
+        if ($violationType->studentViolations()->exists()) {
+            return redirect()->route('guru.jenis-pelanggaran.index')->with('error', 'Jenis pelanggaran sudah dipakai pada data pelanggaran siswa. Nonaktifkan jika tidak ingin digunakan lagi.');
+        }
+
         $violationType->delete();
 
         return redirect()->route('guru.jenis-pelanggaran.index')->with('success', 'Jenis pelanggaran berhasil dihapus.');

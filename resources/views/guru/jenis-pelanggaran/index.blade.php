@@ -28,6 +28,7 @@
 </div>
 
 <x-alert type="success" :message="session('success')" />
+<x-alert type="error" :message="session('error')" />
 
 <x-search-filter-form
     :action="route('guru.jenis-pelanggaran.index')"
