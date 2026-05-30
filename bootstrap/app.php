@@ -4,6 +4,7 @@ use App\Http\Middleware\EnsureUserIsAdmin;
 use App\Http\Middleware\EnsureUserIsGuru;
 use App\Http\Middleware\EnsureUserIsRegistered;
 use App\Http\Middleware\EnsureUserIsSiswa;
+use App\Http\Middleware\EnsureUserIsStudentAffairs;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -19,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => EnsureUserIsAdmin::class,
             'registered' => EnsureUserIsRegistered::class,
             'guru' => EnsureUserIsGuru::class,
+            'kesiswaan' => EnsureUserIsStudentAffairs::class,
             'siswa' => EnsureUserIsSiswa::class,
         ]);
     })
