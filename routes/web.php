@@ -71,6 +71,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::delete('/settings/attendance-location', [SettingController::class, 'attendanceLocationDelete'])->name('settings.attendance-location.destroy');
     Route::get('/settings/whatsapp', [SettingController::class, 'whatsapp'])->name('settings.whatsapp.index');
     Route::put('/settings/whatsapp', [SettingController::class, 'whatsappUpdate'])->name('settings.whatsapp.update');
+    Route::post('/settings/whatsapp/test', [SettingController::class, 'whatsappTest'])->name('settings.whatsapp.test');
 });
 
 Route::middleware(['auth', 'registered', 'guru'])->prefix('guru')->name('guru.')->group(function () {

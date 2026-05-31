@@ -28,10 +28,16 @@ class FonnteService
             ];
         }
 
-        $response = Http::withHeaders([
+        $request = Http::withHeaders([
             'Authorization' => $this->token,
-        ])->asForm()->post('https://api.fonnte.com/send', [
-            'target' => $target,
+        ])->asForm();
+
+        if (app()->environment('local')) {
+            $request->withoutVerifying();
+        }
+
+        $response = $request->post('https://api.fonnte.com/send', [
+            'target' => $this->normalizePhone($target),
             'message' => $message,
         ]);
 
@@ -49,5 +55,20 @@ class FonnteService
             'error' => $body['reason'] ?? 'Gagal mengirim pesan WhatsApp.',
             'response' => $body,
         ];
+    }
+
+    public function normalizePhone(string $phone): string
+    {
+        $phone = preg_replace('/[^0-9+]/', '', $phone);
+
+        if (str_starts_with($phone, '+62')) {
+            return substr($phone, 1);
+        }
+
+        if (str_starts_with($phone, '0')) {
+            return '62'.substr($phone, 1);
+        }
+
+        return $phone;
     }
 }

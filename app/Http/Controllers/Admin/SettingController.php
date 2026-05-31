@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Services\FonnteService;
 use App\Services\KmlParser;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -181,5 +183,21 @@ class SettingController extends Controller
         Setting::set('fonnte_token', $validated['fonnte_token'] ?? '');
 
         return redirect()->route('admin.settings.whatsapp.index')->with('success', 'Konfigurasi WhatsApp berhasil disimpan.');
+    }
+
+    public function whatsappTest(Request $request, FonnteService $fonnte): JsonResponse
+    {
+        $validated = $request->validate([
+            'phone' => ['required', 'string', 'max:20'],
+            'message' => ['required', 'string', 'max:500'],
+        ], [
+            'phone.required' => 'Nomor HP wajib diisi.',
+            'message.required' => 'Pesan wajib diisi.',
+            'message.max' => 'Pesan maksimal 500 karakter.',
+        ]);
+
+        $result = $fonnte->send($validated['phone'], $validated['message']);
+
+        return response()->json($result);
     }
 }
