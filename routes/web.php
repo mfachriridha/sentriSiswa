@@ -10,10 +10,13 @@ use App\Http\Controllers\Admin\StudentImportController;
 use App\Http\Controllers\Admin\TeacherController;
 use App\Http\Controllers\Admin\TeacherImportController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Guru\AttendanceRecapController;
+use App\Http\Controllers\Guru\ClassRosterController;
 use App\Http\Controllers\Guru\DashboardController as GuruDashboardController;
 use App\Http\Controllers\Guru\MonitoringController;
 use App\Http\Controllers\Guru\ProfilController as GuruProfilController;
 use App\Http\Controllers\Guru\StudentViolationController;
+use App\Http\Controllers\Guru\ViolationHistoryController;
 use App\Http\Controllers\Guru\ViolationTypeController;
 use App\Http\Controllers\Siswa\AbsensiController as SiswaAbsensiController;
 use App\Http\Controllers\Siswa\DashboardController as SiswaDashboardController;
@@ -83,6 +86,14 @@ Route::middleware(['auth', 'registered', 'guru'])->prefix('guru')->name('guru.')
             ->parameters(['pelanggaran-siswa' => 'studentViolation']);
         Route::resource('jenis-pelanggaran', ViolationTypeController::class)
             ->parameters(['jenis-pelanggaran' => 'violationType']);
+    });
+    Route::middleware('wali-kelas')->group(function () {
+        Route::get('/kelas-saya', [ClassRosterController::class, 'index'])->name('kelas-saya');
+        Route::get('/absensi', [AttendanceRecapController::class, 'index'])->name('absensi.index');
+        Route::get('/absensi/export-excel', [AttendanceRecapController::class, 'exportExcel'])->name('absensi.export-excel');
+        Route::get('/absensi/export-pdf', [AttendanceRecapController::class, 'exportPdf'])->name('absensi.export-pdf');
+        Route::put('/absensi/{attendance}', [AttendanceRecapController::class, 'update'])->name('absensi.update');
+        Route::get('/pelanggaran', [ViolationHistoryController::class, 'index'])->name('pelanggaran');
     });
     Route::get('/profil', [GuruProfilController::class, 'show'])->name('profil');
     Route::get('/profil/edit', [GuruProfilController::class, 'edit'])->name('profil.edit');

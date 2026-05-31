@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\EnsureUserIsAdmin;
 use App\Http\Middleware\EnsureUserIsGuru;
+use App\Http\Middleware\EnsureUserIsHomeroom;
 use App\Http\Middleware\EnsureUserIsRegistered;
 use App\Http\Middleware\EnsureUserIsSiswa;
 use App\Http\Middleware\EnsureUserIsStudentAffairs;
@@ -21,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'registered' => EnsureUserIsRegistered::class,
             'guru' => EnsureUserIsGuru::class,
             'kesiswaan' => EnsureUserIsStudentAffairs::class,
+            'wali-kelas' => EnsureUserIsHomeroom::class,
             'siswa' => EnsureUserIsSiswa::class,
         ]);
     })
