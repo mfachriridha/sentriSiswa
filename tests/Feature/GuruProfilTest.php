@@ -29,6 +29,7 @@ test('registered teacher can view and update own profile', function () {
 
     $this->actingAs($teacher)
         ->put(route('guru.profil.update'), [
+            'name' => $teacher->name,
             'email' => 'guru.baru@example.com',
             'phone' => '081298765432',
             'password' => 'Secret123',

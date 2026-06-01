@@ -14,6 +14,12 @@ class UpdateUnmarkedAttendance extends Command
 
     public function handle(): int
     {
+        if (now()->isWeekend()) {
+            $this->info('Hari ini bukan hari aktif absensi. Tidak ada status yang diperbarui.');
+
+            return self::SUCCESS;
+        }
+
         $endTime = Setting::get('attendance_end_time', '07:00');
         $graceMinutes = 5;
         $updateAfter = now()->setTimeFromTimeString($endTime)->addMinutes($graceMinutes);
@@ -26,7 +32,7 @@ class UpdateUnmarkedAttendance extends Command
 
         $today = now()->toDateString();
 
-        $updated = Attendance::where('date', $today)
+        $updated = Attendance::whereDate('date', $today)
             ->where('status', 'belum_absen')
             ->update(['status' => 'alpha']);
 

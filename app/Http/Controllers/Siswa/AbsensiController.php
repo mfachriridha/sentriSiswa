@@ -28,7 +28,8 @@ class AbsensiController extends Controller
         $now = now();
         $currentTime = $now->format('H:i');
         $currentTimeLabel = $now->format('H:i');
-        $canCheckIn = $currentTime >= $startTime && $currentTime <= $endTime;
+        $isWeekday = $now->isWeekday();
+        $canCheckIn = $isWeekday && $currentTime >= $startTime && $currentTime <= $endTime;
 
         $geofenceData = Setting::get('attendance_geofence_data');
         $geofenceActive = false;
@@ -63,7 +64,8 @@ class AbsensiController extends Controller
             'currentMonth',
             'currentYear',
             'geofenceActive',
-            'currentTimeLabel'
+            'currentTimeLabel',
+            'isWeekday',
         ));
     }
 
@@ -90,10 +92,21 @@ class AbsensiController extends Controller
             return redirect()->route('siswa.absensi')->with('error', 'Profil siswa tidak ditemukan.');
         }
 
-        $today = now()->toDateString();
-        $existing = $profile->attendances()->where('date', $today)->first();
+        if (now()->isWeekend()) {
+            return redirect()->route('siswa.absensi')->with('error', 'Absensi hanya tersedia pada hari Senin sampai Jumat.');
+        }
 
-        if ($existing) {
+        $today = now()->toDateString();
+        $attendance = $profile->attendances()->whereDate('date', $today)->first();
+
+        if (! $attendance) {
+            $attendance = $profile->attendances()->create([
+                'date' => $today,
+                'status' => 'belum_absen',
+            ]);
+        }
+
+        if ($attendance->status !== 'belum_absen') {
             return redirect()->route('siswa.absensi')->with('error', 'Anda sudah absen hari ini.');
         }
 
@@ -156,8 +169,7 @@ class AbsensiController extends Controller
         $status = ($this->minutesFromTime($currentTime) > $lateThresholdMinutes) ? 'terlambat' : 'hadir';
         $selfiePath = $request->file('selfie')->store('attendance-selfies/'.$profile->id, 'public');
 
-        $profile->attendances()->create([
-            'date' => $today,
+        $attendance->update([
             'status' => $status,
             'check_in_time' => $currentTime,
             'selfie_path' => $selfiePath,

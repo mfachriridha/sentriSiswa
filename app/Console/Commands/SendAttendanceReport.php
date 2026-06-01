@@ -19,6 +19,12 @@ class SendAttendanceReport extends Command
 
     public function handle(FonnteService $fonnte): int
     {
+        if (now()->isWeekend()) {
+            $this->info('Hari ini bukan hari aktif absensi. Laporan tidak dikirim.');
+
+            return self::SUCCESS;
+        }
+
         if (! $fonnte->isConfigured()) {
             $this->warn('Fonnte token belum dikonfigurasi. Lewati pengiriman laporan.');
 
@@ -70,7 +76,7 @@ class SendAttendanceReport extends Command
 
             $profileIds = $studentProfiles->pluck('id');
             $attendances = Attendance::whereIn('student_profile_id', $profileIds)
-                ->where('date', $today)
+                ->whereDate('date', $today)
                 ->get()
                 ->keyBy('student_profile_id');
 

@@ -14,6 +14,12 @@ class CreateDailyAttendanceRecords extends Command
 
     public function handle(): int
     {
+        if (now()->isWeekend()) {
+            $this->info('Hari ini bukan hari aktif absensi. Tidak ada record yang dibuat.');
+
+            return self::SUCCESS;
+        }
+
         $today = now()->toDateString();
 
         $students = StudentProfile::all();

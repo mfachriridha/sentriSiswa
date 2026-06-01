@@ -89,10 +89,9 @@ Route::middleware(['auth', 'registered', 'guru'])->prefix('guru')->name('guru.')
     });
     Route::middleware('wali-kelas')->group(function () {
         Route::get('/kelas-saya', [ClassRosterController::class, 'index'])->name('kelas-saya');
+        Route::put('/kelas-saya/{studentProfile}/absensi', [ClassRosterController::class, 'updateAttendance'])->name('kelas-saya.absensi.update');
         Route::get('/absensi', [AttendanceRecapController::class, 'index'])->name('absensi.index');
         Route::get('/absensi/export-excel', [AttendanceRecapController::class, 'exportExcel'])->name('absensi.export-excel');
-        Route::get('/absensi/export-pdf', [AttendanceRecapController::class, 'exportPdf'])->name('absensi.export-pdf');
-        Route::put('/absensi/{attendance}', [AttendanceRecapController::class, 'update'])->name('absensi.update');
         Route::get('/pelanggaran', [ViolationHistoryController::class, 'index'])->name('pelanggaran');
     });
     Route::get('/profil', [GuruProfilController::class, 'show'])->name('profil');

@@ -29,7 +29,7 @@
         </a>
     </div>
 
-    @if($todayAttendance)
+    @if($todayAttendance && $todayAttendance->status !== 'belum_absen')
         <div class="grid gap-6 lg:grid-cols-[280px_auto]">
             <div class="rounded-xl border border-gray-200 bg-gray-50 p-4">
                 @if($todayAttendance->selfie_path)
@@ -276,7 +276,9 @@
         </form>
     @else
         <p class="text-base text-gray-400">
-            @if(now()->format('H:i') < $startTime)
+            @if(! $isWeekday)
+                Absensi hanya tersedia pada hari Senin sampai Jumat.
+            @elseif(now()->format('H:i') < $startTime)
                 Belum waktunya absen. Waktu aplikasi sekarang {{ $currentTimeLabel }}, absen dimulai pukul {{ $startTime }}.
             @else
                 Waktu absen sudah berakhir. Waktu aplikasi sekarang {{ $currentTimeLabel }}, batas absen pukul {{ $endTime }}.

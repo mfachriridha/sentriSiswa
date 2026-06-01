@@ -2,15 +2,20 @@
 
 namespace App\Http\Controllers\Guru;
 
+use App\Exports\AttendanceRecapExport;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Guru\AttendanceRecapFilterRequest;
 use App\Models\Attendance;
-use Illuminate\Http\Request;
+use App\Models\StudentProfile;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class AttendanceRecapController extends Controller
 {
-    public function index(Request $request): View
+    public function index(AttendanceRecapFilterRequest $request): View
     {
         $class = Auth::user()->homeroomClass;
 
@@ -18,89 +23,110 @@ class AttendanceRecapController extends Controller
             return view('guru.absensi.empty');
         }
 
-        $mode = $request->get('mode', 'daily');
-        $date = $request->get('date', now()->toDateString());
-        $month = $request->get('month', now()->format('Y-m'));
+        [$startDate, $endDate] = $this->dateRange($request);
+        $students = $this->classStudents($class->id);
+        $stats = $this->calculateStats($students, $this->attendancesByStudent($students, $startDate, $endDate));
 
-        $students = $class->students()
-            ->join('users', 'student_profiles.user_id', '=', 'users.id')
-            ->with(['user', 'biodata'])
-            ->orderBy('users.name')
-            ->select('student_profiles.*')
-            ->get();
-
-        if ($mode === 'daily') {
-            $attendances = Attendance::where('date', $date)
-                ->whereIn('student_profile_id', $students->pluck('id'))
-                ->get()
-                ->keyBy('student_profile_id');
-
-            $stats = [
-                'hadir' => $attendances->where('status', 'hadir')->count(),
-                'terlambat' => $attendances->where('status', 'terlambat')->count(),
-                'izin' => $attendances->where('status', 'izin')->count(),
-                'sakit' => $attendances->where('status', 'sakit')->count(),
-                'alpha' => $attendances->where('status', 'alpha')->count(),
-                'belum_absen' => $students->count() - $attendances->count(),
-            ];
-        } else {
-            $attendances = Attendance::whereMonth('date', substr($month, 5, 2))
-                ->whereYear('date', substr($month, 0, 4))
-                ->whereIn('student_profile_id', $students->pluck('id'))
-                ->get()
-                ->groupBy('student_profile_id');
-
-            $stats = $this->calculateMonthlyStats($students, $attendances);
-        }
-
-        return view('guru.absensi.index', compact('class', 'students', 'attendances', 'stats', 'mode', 'date', 'month'));
+        return view('guru.absensi.index', compact('class', 'students', 'stats', 'startDate', 'endDate'));
     }
 
-    public function update(Request $request, Attendance $attendance)
+    public function exportExcel(AttendanceRecapFilterRequest $request): BinaryFileResponse
     {
         $class = Auth::user()->homeroomClass;
 
-        if (! $class || $attendance->studentProfile->class_id !== $class->id) {
+        if (! $class) {
             abort(403);
         }
 
-        $validated = $request->validate([
-            'status' => ['required', 'in:hadir,terlambat,izin,sakit,alpha'],
-        ]);
+        [$startDate, $endDate] = $this->dateRange($request);
+        $students = $this->classStudents($class->id);
+        $stats = $this->calculateStats($students, $this->attendancesByStudent($students, $startDate, $endDate));
 
-        $attendance->update($validated);
+        $rows = $students->map(function (StudentProfile $student) use ($stats): array {
+            $stat = $stats[$student->id];
 
-        return redirect()->back()->with('success', 'Status absensi berhasil diperbarui.');
+            return [
+                $student->nis ?? '-',
+                $student->user->name,
+                $stat['hadir'],
+                $stat['terlambat'],
+                $stat['izin'],
+                $stat['sakit'],
+                $stat['alpha'],
+                $stat['percentage'].'%',
+            ];
+        })->values()->all();
+
+        return Excel::download(
+            new AttendanceRecapExport($rows),
+            "rekap-absensi-{$class->name}-{$startDate}-sampai-{$endDate}.xlsx",
+        );
     }
 
-    public function exportExcel(Request $request)
+    /**
+     * @return array{0: string, 1: string}
+     */
+    private function dateRange(AttendanceRecapFilterRequest $request): array
     {
-        // TODO: Implement Excel export
-        return redirect()->back()->with('info', 'Fitur export Excel akan segera tersedia.');
+        $validated = $request->validated();
+
+        return [
+            $validated['start_date'] ?? now()->startOfMonth()->toDateString(),
+            $validated['end_date'] ?? now()->toDateString(),
+        ];
     }
 
-    public function exportPdf(Request $request)
+    /**
+     * @return Collection<int, StudentProfile>
+     */
+    private function classStudents(int $classId): Collection
     {
-        // TODO: Implement PDF export
-        return redirect()->back()->with('info', 'Fitur export PDF akan segera tersedia.');
+        return StudentProfile::query()
+            ->where('class_id', $classId)
+            ->join('users', 'student_profiles.user_id', '=', 'users.id')
+            ->with('user')
+            ->orderBy('users.name')
+            ->select('student_profiles.*')
+            ->get();
     }
 
-    private function calculateMonthlyStats($students, $attendances): array
+    /**
+     * @param  Collection<int, StudentProfile>  $students
+     * @return Collection<int, Collection<int, Attendance>>
+     */
+    private function attendancesByStudent(Collection $students, string $startDate, string $endDate): Collection
     {
-        $totalDays = now()->daysInMonth;
+        return Attendance::query()
+            ->whereDate('date', '>=', $startDate)
+            ->whereDate('date', '<=', $endDate)
+            ->whereIn('student_profile_id', $students->pluck('id'))
+            ->get()
+            ->filter(fn (Attendance $attendance): bool => $attendance->date->isWeekday())
+            ->groupBy('student_profile_id');
+    }
+
+    /**
+     * @param  Collection<int, StudentProfile>  $students
+     * @param  Collection<int, Collection<int, Attendance>>  $attendances
+     * @return array<int, array{hadir: int, terlambat: int, izin: int, sakit: int, alpha: int, percentage: float}>
+     */
+    private function calculateStats(Collection $students, Collection $attendances): array
+    {
         $stats = [];
 
         foreach ($students as $student) {
             $studentAttendances = $attendances->get($student->id, collect());
+            $finalAttendances = $studentAttendances->whereIn('status', ['hadir', 'terlambat', 'izin', 'sakit', 'alpha']);
+            $finalAttendanceCount = $finalAttendances->count();
 
             $stats[$student->id] = [
-                'hadir' => $studentAttendances->where('status', 'hadir')->count(),
-                'terlambat' => $studentAttendances->where('status', 'terlambat')->count(),
-                'izin' => $studentAttendances->where('status', 'izin')->count(),
-                'sakit' => $studentAttendances->where('status', 'sakit')->count(),
-                'alpha' => $studentAttendances->where('status', 'alpha')->count(),
-                'percentage' => $totalDays > 0
-                    ? round(($studentAttendances->whereIn('status', ['hadir', 'terlambat'])->count() / $totalDays) * 100, 1)
+                'hadir' => $finalAttendances->where('status', 'hadir')->count(),
+                'terlambat' => $finalAttendances->where('status', 'terlambat')->count(),
+                'izin' => $finalAttendances->where('status', 'izin')->count(),
+                'sakit' => $finalAttendances->where('status', 'sakit')->count(),
+                'alpha' => $finalAttendances->where('status', 'alpha')->count(),
+                'percentage' => $finalAttendanceCount > 0
+                    ? round(($finalAttendances->whereIn('status', ['hadir', 'terlambat'])->count() / $finalAttendanceCount) * 100, 1)
                     : 0,
             ];
         }
