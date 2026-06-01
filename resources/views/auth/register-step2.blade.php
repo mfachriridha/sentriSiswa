@@ -5,8 +5,8 @@
 @section('content')
 <div class="flex min-h-screen items-center justify-center px-4">
     <div class="w-full max-w-md">
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-            <div class="mb-8 text-center">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div class="mb-6 text-center">
                 <img src="{{ asset('storage/assets/logo/logo-website.png') }}" alt="Sentri Siswa"
                      class="mx-auto h-24 w-auto rounded-xl border-4 border-white shadow-lg">
                 <h2 class="mt-6 text-2xl font-bold text-gray-900">Lengkapi Pendaftaran</h2>
@@ -18,7 +18,7 @@
                     @endif
                 </p>
                 @if($name)
-                    <p class="mt-1 text-base font-semibold text-gray-900">{{ $name }}</p>
+                    <p class="mt-1 text-sm font-semibold text-gray-900">{{ $name }}</p>
                 @endif
             </div>
 

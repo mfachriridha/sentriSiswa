@@ -5,7 +5,7 @@
 @section('content')
 <div class="mb-6">
     <h1 class="text-2xl font-bold text-gray-900">Rekap Absensi</h1>
-    <p class="mt-1 text-base text-gray-500">Laporan absensi siswa kelas {{ $class->name }}</p>
+    <p class="mt-1 text-sm text-gray-500">Laporan absensi siswa kelas {{ $class->name }}</p>
 </div>
 
 <div class="rounded-xl border border-gray-200 bg-white p-6">
@@ -50,30 +50,30 @@
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">No</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">NIS</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Nama</th>
-                    <th class="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">H</th>
-                    <th class="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">T</th>
-                    <th class="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">I</th>
-                    <th class="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">S</th>
-                    <th class="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">A</th>
-                    <th class="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">%</th>
+                    <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">No</th>
+                    <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">NIS</th>
+                    <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Nama</th>
+                    <th class="px-4 py-2.5 text-center text-xs font-medium uppercase tracking-wider text-gray-500">H</th>
+                    <th class="px-4 py-2.5 text-center text-xs font-medium uppercase tracking-wider text-gray-500">T</th>
+                    <th class="px-4 py-2.5 text-center text-xs font-medium uppercase tracking-wider text-gray-500">I</th>
+                    <th class="px-4 py-2.5 text-center text-xs font-medium uppercase tracking-wider text-gray-500">S</th>
+                    <th class="px-4 py-2.5 text-center text-xs font-medium uppercase tracking-wider text-gray-500">A</th>
+                    <th class="px-4 py-2.5 text-center text-xs font-medium uppercase tracking-wider text-gray-500">%</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200 bg-white">
                 @forelse($students as $index => $student)
                     @php($stat = $stats[$student->id])
                     <tr class="hover:bg-gray-50">
-                        <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-900">{{ $index + 1 }}</td>
-                        <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{{ $student->nis ?? '-' }}</td>
-                        <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">{{ $student->user->name }}</td>
-                        <td class="whitespace-nowrap px-6 py-4 text-center text-sm font-medium text-green-600">{{ $stat['hadir'] }}</td>
-                        <td class="whitespace-nowrap px-6 py-4 text-center text-sm font-medium text-amber-600">{{ $stat['terlambat'] }}</td>
-                        <td class="whitespace-nowrap px-6 py-4 text-center text-sm font-medium text-blue-600">{{ $stat['izin'] }}</td>
-                        <td class="whitespace-nowrap px-6 py-4 text-center text-sm font-medium text-purple-600">{{ $stat['sakit'] }}</td>
-                        <td class="whitespace-nowrap px-6 py-4 text-center text-sm font-medium text-red-600">{{ $stat['alpha'] }}</td>
-                        <td class="whitespace-nowrap px-6 py-4 text-center text-sm font-medium
+                        <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-900">{{ $index + 1 }}</td>
+                        <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-500">{{ $student->nis ?? '-' }}</td>
+                        <td class="whitespace-nowrap px-4 py-3 text-sm font-medium text-gray-900">{{ $student->user->name }}</td>
+                        <td class="whitespace-nowrap px-4 py-3 text-center text-sm font-medium text-green-600">{{ $stat['hadir'] }}</td>
+                        <td class="whitespace-nowrap px-4 py-3 text-center text-sm font-medium text-amber-600">{{ $stat['terlambat'] }}</td>
+                        <td class="whitespace-nowrap px-4 py-3 text-center text-sm font-medium text-blue-600">{{ $stat['izin'] }}</td>
+                        <td class="whitespace-nowrap px-4 py-3 text-center text-sm font-medium text-purple-600">{{ $stat['sakit'] }}</td>
+                        <td class="whitespace-nowrap px-4 py-3 text-center text-sm font-medium text-red-600">{{ $stat['alpha'] }}</td>
+                        <td class="whitespace-nowrap px-4 py-3 text-center text-sm font-medium
                             {{ $stat['percentage'] >= 80 ? 'text-green-600' : ($stat['percentage'] >= 60 ? 'text-yellow-600' : 'text-red-600') }}">
                             {{ $stat['percentage'] }}%
                         </td>

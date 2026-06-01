@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Guru;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    public function index(): RedirectResponse
+    public function index(): View
     {
-        return redirect()->route('guru.profil');
+        return view('guru.dashboard');
     }
 }

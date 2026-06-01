@@ -5,7 +5,7 @@
 @section('content')
 <div class="mb-6">
     <a href="{{ route('admin.guru.impor') }}"
-       class="inline-flex items-center gap-2 text-base text-gray-500 hover:text-gray-700 transition-colors">
+       class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition-colors">
         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
         </svg>
@@ -13,32 +13,32 @@
     </a>
 </div>
 
-<div class="rounded-xl border border-gray-200 bg-white p-8">
+<div class="rounded-xl border border-gray-200 bg-white p-6">
     <h1 class="mb-2 text-2xl font-bold text-gray-900">Pratinjau Impor</h1>
-    <p class="mb-8 text-base text-gray-500">Total {{ $totalRows }} baris akan diproses. Halaman {{ $previewRows->currentPage() }} dari {{ $previewRows->lastPage() }}.</p>
+    <p class="mb-6 text-sm text-gray-500">Total {{ $totalRows }} baris akan diproses. Halaman {{ $previewRows->currentPage() }} dari {{ $previewRows->lastPage() }}.</p>
 
     <div class="overflow-hidden rounded-lg border border-gray-200">
         <div class="overflow-x-auto">
-            <table class="min-w-full text-left text-base">
+            <table class="min-w-full text-left text-sm">
                 <thead class="border-b border-gray-200 bg-gray-50">
                     <tr>
-                        <th class="px-6 py-4 font-semibold text-gray-600 w-16">#</th>
-                        <th class="px-6 py-4 font-semibold text-gray-600">Nama</th>
-                        <th class="px-6 py-4 font-semibold text-gray-600">NIP</th>
-                        <th class="px-6 py-4 font-semibold text-gray-600">Tipe</th>
-                        <th class="px-6 py-4 font-semibold text-gray-600">Kelas</th>
-                        <th class="px-6 py-4 font-semibold text-gray-600">Status</th>
+                        <th class="px-4 py-3 font-semibold text-gray-600 w-16">#</th>
+                        <th class="px-4 py-3 font-semibold text-gray-600">Nama</th>
+                        <th class="px-4 py-3 font-semibold text-gray-600">NIP</th>
+                        <th class="px-4 py-3 font-semibold text-gray-600">Tipe</th>
+                        <th class="px-4 py-3 font-semibold text-gray-600">Kelas</th>
+                        <th class="px-4 py-3 font-semibold text-gray-600">Status</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
                     @foreach ($previewRows as $index => $row)
                         <tr>
-                            <td class="px-6 py-4 text-gray-500">{{ ($previewRows->currentPage() - 1) * 25 + $index + 1 }}</td>
-                            <td class="px-6 py-4 font-medium text-gray-900">{{ $row['nama'] ?? '-' }}</td>
-                            <td class="px-6 py-4 text-gray-700">{{ $row['nip'] ?? '-' }}</td>
-                            <td class="px-6 py-4 text-gray-700">{{ $row['tipe'] ?? '-' }}</td>
-                            <td class="px-6 py-4 text-gray-700">{{ $row['kelas'] ?? '-' }}</td>
-                            <td class="px-6 py-4">
+                            <td class="px-4 py-3 text-gray-500">{{ ($previewRows->currentPage() - 1) * 25 + $index + 1 }}</td>
+                            <td class="px-4 py-3 font-medium text-gray-900">{{ $row['nama'] ?? '-' }}</td>
+                            <td class="px-4 py-3 text-gray-700">{{ $row['nip'] ?? '-' }}</td>
+                            <td class="px-4 py-3 text-gray-700">{{ $row['tipe'] ?? '-' }}</td>
+                            <td class="px-4 py-3 text-gray-700">{{ $row['kelas'] ?? '-' }}</td>
+                            <td class="px-4 py-3">
                                 @if (empty(trim($row['nama'] ?? '')))
                                     <span class="inline-flex items-center gap-1 rounded-full bg-red-50 px-3 py-1 text-sm font-medium text-red-700">
                                         ✗ Nama kosong
@@ -67,12 +67,12 @@
     @endif
 
     <div class="mt-8 flex items-center justify-between border-t border-gray-200 pt-6">
-        <p class="text-base text-gray-500">Total {{ $totalRows }} baris akan diproses</p>
+        <p class="text-sm text-gray-500">Total {{ $totalRows }} baris akan diproses</p>
         <form method="POST" action="{{ route('admin.guru.impor.store') }}" x-data="{ loading: false }" @submit="loading = true">
             @csrf
             <input type="hidden" name="file_path" value="{{ $filePath }}">
             <button type="submit" :disabled="loading"
-                    class="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-base font-semibold text-white shadow-sm
+                    class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm
                            hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50
                            transition-colors disabled:opacity-60">
                 <span x-show="loading">

@@ -11,7 +11,7 @@
         };
     @endphp
 
-    <div class="mb-6 rounded-lg border px-5 py-4 text-base {{ $colors }}">
+    <div class="mb-6 rounded-lg border px-4 py-3 text-sm {{ $colors }}">
         {{ $message }}
     </div>
 @endif

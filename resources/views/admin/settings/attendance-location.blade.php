@@ -5,7 +5,7 @@
 @section('content')
 <div class="mb-6">
     <h1 class="text-2xl font-bold text-gray-900">Lokasi Absen</h1>
-    <p class="mt-1 text-base text-gray-500">Impor area absensi dari file KML (Google My Maps).</p>
+    <p class="mt-1 text-sm text-gray-500">Impor area absensi dari file KML (Google My Maps).</p>
 </div>
 
 <x-alert type="success" :message="session('success')" />
@@ -21,7 +21,7 @@
 @endif
 
 <div class="space-y-6">
-    <div class="rounded-xl border border-gray-200 bg-white p-8">
+    <div class="rounded-xl border border-gray-200 bg-white p-6">
         <h2 class="mb-4 text-lg font-semibold text-gray-900">Impor Area dari KML</h2>
         <p class="mb-4 text-sm text-gray-500">
             Buat area di <a href="https://mymaps.google.com" target="_blank" rel="noopener" class="text-primary hover:underline">Google My Maps</a>,
@@ -51,7 +51,7 @@
 
                 <button type="submit"
                         :disabled="loading"
-                        class="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-base font-semibold text-white shadow-sm hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+                        class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
                     <span x-show="loading">
                         <svg class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -82,7 +82,7 @@
     </div>
 
     @if($geofenceData)
-        <div class="rounded-xl border border-gray-200 bg-white p-8">
+        <div class="rounded-xl border border-gray-200 bg-white p-6">
             <h2 class="mb-4 text-lg font-semibold text-gray-900">Toleransi Jarak</h2>
             <p class="mb-4 text-sm text-gray-500">
                 Tambahkan toleransi di luar area polygon. Siswa yang berada di luar area tetapi dalam jarak toleransi masih bisa absen.
@@ -115,7 +115,7 @@
             </form>
         </div>
 
-        <div class="rounded-xl border border-gray-200 bg-white p-8">
+        <div class="rounded-xl border border-gray-200 bg-white p-6">
             <h2 class="mb-4 text-lg font-semibold text-gray-900">Area Absensi</h2>
             <p class="mb-2 text-sm text-gray-500">
                 <span class="inline-block h-3 w-3 rounded-sm bg-teal-500/70 mr-1 align-middle"></span> Area polygon

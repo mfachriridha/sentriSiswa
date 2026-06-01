@@ -5,7 +5,7 @@
 @section('content')
 <div class="mb-6">
     <h1 class="text-2xl font-bold text-gray-900">WhatsApp</h1>
-    <p class="mt-1 text-base text-gray-500">Konfigurasi token Fonnte untuk mengirim notifikasi WhatsApp otomatis ke wali kelas.</p>
+    <p class="mt-1 text-sm text-gray-500">Konfigurasi token Fonnte untuk mengirim notifikasi WhatsApp otomatis ke wali kelas.</p>
 </div>
 
 <x-alert type="success" :message="session('success')" />
@@ -36,12 +36,12 @@
     @csrf
     @method('PUT')
 
-    <div class="rounded-xl border border-gray-200 bg-white p-8">
+    <div class="rounded-xl border border-gray-200 bg-white p-6">
         <div class="max-w-xl space-y-6">
             <div>
-                <label for="fonnte_token" class="block text-base font-medium text-gray-700">Fonnte Token</label>
+                <label for="fonnte_token" class="block text-sm font-medium text-gray-700">Fonnte Token</label>
                 <input id="fonnte_token" type="password" name="fonnte_token" value="{{ old('fonnte_token') }}"
-                       class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm
+                       class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                               placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors"
                        placeholder="{{ $fonnteToken ? 'Kosongkan jika tidak ingin mengubah' : 'Masukkan token dari Fonnte' }}">
                 <p class="mt-1.5 text-sm text-gray-500">Dapatkan token dari <a href="https://fonnte.com" target="_blank" class="text-primary hover:underline">fonnte.com</a>.</p>
@@ -54,7 +54,7 @@
 
     <div class="flex items-center gap-4">
         <button type="submit" :disabled="loading"
-                class="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-base font-semibold text-white shadow-sm
+                class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm
                        hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50
                        transition-colors disabled:opacity-60">
             <span x-show="loading">
@@ -70,7 +70,7 @@
 
 @if ($fonnteToken)
     {{-- Test Kirim --}}
-    <div class="mt-8 rounded-xl border border-gray-200 bg-white p-8"
+    <div class="mt-8 rounded-xl border border-gray-200 bg-white p-6"
          x-data="{
              phone: '',
              message: '',
@@ -114,7 +114,7 @@
             <div>
                 <label for="test_phone" class="block text-sm font-medium text-gray-700">Nomor HP</label>
                 <input id="test_phone" type="text" x-model="phone"
-                       class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm
+                       class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                               placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors"
                        placeholder="08xxx atau 628xxx atau +628xxx">
                 <p class="mt-1 text-xs text-gray-500">Format otomatis disesuaikan (08xxx → 628xxx).</p>
@@ -123,14 +123,14 @@
             <div>
                 <label for="test_message" class="block text-sm font-medium text-gray-700">Pesan</label>
                 <textarea id="test_message" x-model="message" rows="3"
-                          class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm
+                          class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                                  placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors"
                           placeholder="Tulis pesan percobaan..."></textarea>
             </div>
 
             <div class="flex items-center gap-4">
                 <button type="button" @click="sendTest()" :disabled="loading || !phone || !message"
-                        class="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-base font-semibold text-white shadow-sm
+                        class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm
                                hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50
                                transition-colors disabled:opacity-60">
                     <span x-show="loading">

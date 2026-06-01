@@ -5,7 +5,7 @@
 @section('content')
 <div class="mb-6">
     <h1 class="text-2xl font-bold text-gray-900">Riwayat Pelanggaran</h1>
-    <p class="mt-1 text-base text-gray-500">Riwayat pelanggaran siswa kelas {{ $class->name }}</p>
+    <p class="mt-1 text-sm text-gray-500">Riwayat pelanggaran siswa kelas {{ $class->name }}</p>
 </div>
 
 <div class="rounded-xl border border-gray-200 bg-white p-12 text-center">

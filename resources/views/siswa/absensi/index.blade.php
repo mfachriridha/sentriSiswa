@@ -5,19 +5,19 @@
 @section('content')
 <div class="mb-6">
     <h1 class="text-2xl font-bold text-gray-900">Absensi</h1>
-    <p class="mt-1 text-base text-gray-500">Catat kehadiran harian Anda</p>
+    <p class="mt-1 text-sm text-gray-500">Catat kehadiran harian Anda</p>
 </div>
 
 <x-alert type="success" :message="session('success')" />
 <x-alert type="error" :message="session('error')" />
 
 <div class="grid gap-6 lg:grid-cols-[420px_1fr] items-start">
-    <div class="rounded-xl border border-gray-200 bg-white p-6 sm:p-8">
+    <div class="rounded-xl border border-gray-200 bg-white p-5 sm:p-6">
         <div class="mb-6 flex items-start justify-between gap-4">
         <div>
             <h2 class="text-lg font-semibold text-gray-900">Absen Hari Ini</h2>
             <div class="mt-8 space-y-1">
-                <p class="text-base font-medium text-gray-700">{{ now()->locale('id')->translatedFormat('l, d F Y') }}</p>
+                <p class="text-sm font-medium text-gray-700">{{ now()->locale('id')->translatedFormat('l, d F Y') }}</p>
                 <p class="text-sm text-gray-400">Jam absen: {{ $startTime }} - {{ $endTime }}</p>
                 <p class="text-sm text-gray-400">Waktu aplikasi sekarang: {{ $currentTimeLabel }}</p>
             </div>
@@ -165,7 +165,7 @@
                     <button type="button"
                             @click="openSelfieModal()"
                             :disabled="!canOpenSelfieModal"
-                            class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:cursor-not-allowed disabled:bg-gray-300">
+                            class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:cursor-not-allowed disabled:bg-gray-300">
                         Absen Sekarang
                     </button>
 
@@ -192,7 +192,7 @@
                  class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 p-4"
                  @keydown.escape.window="cancelSelfieModal()">
                 <div class="w-full max-w-3xl rounded-2xl bg-white shadow-xl" @click.outside="cancelSelfieModal()">
-                    <div class="flex items-start justify-between gap-4 border-b border-gray-200 px-6 py-4">
+                    <div class="flex items-start justify-between gap-4 border-b border-gray-200 px-4 py-3">
                         <div>
                             <h3 class="text-lg font-semibold text-gray-900">Ambil Selfie Absensi</h3>
                             <p class="mt-1 text-sm text-gray-500">Pastikan wajah terlihat jelas sebelum menekan Absen Sekarang.</p>
@@ -207,7 +207,7 @@
                         </button>
                     </div>
 
-                    <div class="grid gap-6 px-6 py-5 md:grid-cols-[260px_1fr]">
+                    <div class="grid gap-6 px-4 py-3 md:grid-cols-[260px_1fr]">
                         <div class="relative aspect-[3/4] overflow-hidden rounded-xl border border-gray-200 bg-gray-100">
                             <video x-ref="video"
                                    x-show="cameraReady && !previewUrl"
@@ -257,7 +257,7 @@
                         </div>
                     </div>
 
-                    <div class="flex flex-col-reverse gap-3 border-t border-gray-200 px-6 py-4 sm:flex-row sm:justify-end">
+                    <div class="flex flex-col-reverse gap-3 border-t border-gray-200 px-4 py-3 sm:flex-row sm:justify-end">
                         <button type="button"
                                 @click="cancelSelfieModal()"
                                 class="inline-flex items-center justify-center rounded-lg border border-gray-300 px-5 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
@@ -275,7 +275,7 @@
             <canvas x-ref="canvas" class="hidden"></canvas>
         </form>
     @else
-        <p class="text-base text-gray-400">
+        <p class="text-sm text-gray-400">
             @if(! $isWeekday)
                 Absensi hanya tersedia pada hari Senin sampai Jumat.
             @elseif(now()->format('H:i') < $startTime)

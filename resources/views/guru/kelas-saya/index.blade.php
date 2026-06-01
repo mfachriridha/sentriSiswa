@@ -5,7 +5,7 @@
 @section('content')
 <div class="mb-6">
     <h1 class="text-2xl font-bold text-gray-900">Kelas Saya</h1>
-    <p class="mt-1 text-base text-gray-500">Pantau absensi hari ini untuk kelas {{ $class->name }}</p>
+    <p class="mt-1 text-sm text-gray-500">Pantau absensi hari ini untuk kelas {{ $class->name }}</p>
 </div>
 
 <x-alert type="success" :message="session('success')" />
@@ -77,13 +77,13 @@
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">No</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">NIS</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Nama</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Jam Absen</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Selfie</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Aksi</th>
+                        <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">No</th>
+                        <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">NIS</th>
+                        <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Nama</th>
+                        <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Status</th>
+                        <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Jam Absen</th>
+                        <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Selfie</th>
+                        <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 bg-white">
@@ -94,18 +94,18 @@
                             [$badgeClass, $statusLabel] = $statusConfig[$status];
                         @endphp
                         <tr class="hover:bg-gray-50">
-                            <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-900">{{ $index + 1 }}</td>
-                            <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">{{ $student->nis ?? '-' }}</td>
-                            <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">{{ $student->user->name }}</td>
-                            <td class="whitespace-nowrap px-6 py-4 text-sm">
+                            <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-900">{{ $index + 1 }}</td>
+                            <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-500">{{ $student->nis ?? '-' }}</td>
+                            <td class="whitespace-nowrap px-4 py-3 text-sm font-medium text-gray-900">{{ $student->user->name }}</td>
+                            <td class="whitespace-nowrap px-4 py-3 text-sm">
                                 <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {{ $badgeClass }}">
                                     {{ $statusLabel }}
                                 </span>
                             </td>
-                            <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                            <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-500">
                                 {{ $attendance?->check_in_time?->format('H:i') ?? '-' }}
                             </td>
-                            <td class="whitespace-nowrap px-6 py-4 text-sm">
+                            <td class="whitespace-nowrap px-4 py-3 text-sm">
                                 @if($attendance?->selfie_path)
                                     <button type="button"
                                             data-selfie-url="{{ asset('storage/'.$attendance->selfie_path) }}"
@@ -120,7 +120,7 @@
                                     <span class="text-gray-400">-</span>
                                 @endif
                             </td>
-                            <td class="whitespace-nowrap px-6 py-4 text-sm">
+                            <td class="whitespace-nowrap px-4 py-3 text-sm">
                                 @if($isWeekday)
                                     <button type="button"
                                             data-update-url="{{ route('guru.kelas-saya.absensi.update', $student) }}"
@@ -144,12 +144,12 @@
 
 <div id="editModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-gray-900/60 p-4">
     <div class="w-full max-w-md rounded-2xl bg-white shadow-xl">
-        <div class="border-b border-gray-200 px-6 py-4">
+        <div class="border-b border-gray-200 px-4 py-3">
             <h3 class="text-lg font-semibold text-gray-900">Edit Status Absensi Hari Ini</h3>
             <p id="modalStudentName" class="mt-1 text-sm text-gray-500"></p>
         </div>
 
-        <form id="editForm" method="POST" class="px-6 py-5">
+        <form id="editForm" method="POST" class="px-4 py-3">
             @csrf
             @method('PUT')
 

@@ -25,17 +25,17 @@
                 </div>
                 <div class="flex-1">
                     <h3 class="text-lg font-semibold text-gray-900" x-text="title"></h3>
-                    <p class="mt-2 text-base text-gray-600" x-text="step === 1 ? message : secondMessage"></p>
+                    <p class="mt-2 text-sm text-gray-600" x-text="step === 1 ? message : secondMessage"></p>
                 </div>
             </div>
             <div class="mt-6 flex justify-end gap-3">
                 <button @click="open = false; step = 1"
-                        class="rounded-lg border border-gray-300 px-5 py-2.5 text-base font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                        class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
                     Batal
                 </button>
                 <template x-if="!secondMessage">
                     <button @click="loading = true; document.getElementById(formId).submit()"
-                            class="inline-flex items-center gap-2 rounded-lg bg-red-600 px-5 py-2.5 text-base font-semibold text-white hover:bg-red-700 transition-colors disabled:opacity-60"
+                            class="inline-flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 transition-colors disabled:opacity-60"
                             :disabled="loading">
                         <span x-show="loading">
                             <svg class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
@@ -48,7 +48,7 @@
                 </template>
                 <template x-if="secondMessage">
                     <button @click="step = step === 1 ? 2 : (loading = true, document.getElementById(formId).submit())"
-                            class="inline-flex items-center gap-2 rounded-lg bg-red-600 px-5 py-2.5 text-base font-semibold text-white hover:bg-red-700 transition-colors disabled:opacity-60"
+                            class="inline-flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 transition-colors disabled:opacity-60"
                             :disabled="loading">
                         <span x-show="loading && step === 2">
                             <svg class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">

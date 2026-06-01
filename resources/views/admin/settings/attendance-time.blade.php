@@ -11,7 +11,7 @@
 
 <div class="mb-6">
     <h1 class="text-2xl font-bold text-gray-900">Waktu Absen</h1>
-    <p class="mt-1 text-base text-gray-500">Konfigurasi jam absensi dan toleransi keterlambatan.</p>
+    <p class="mt-1 text-sm text-gray-500">Konfigurasi jam absensi dan toleransi keterlambatan.</p>
 </div>
 
 <form method="POST" action="{{ route('admin.settings.attendance-time.update') }}" class="space-y-6"
@@ -39,15 +39,15 @@
     <input type="hidden" name="attendance_end_hour" x-model="endHour">
     <input type="hidden" name="attendance_end_minute" x-model="endMinute">
 
-    <div class="rounded-xl border border-gray-200 bg-white p-8">
+    <div class="rounded-xl border border-gray-200 bg-white p-6">
         <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
             <div class="relative" @click.outside="activePicker === 'start' && (activePicker = null)">
-                <label class="block text-base font-medium text-gray-700">
+                <label class="block text-sm font-medium text-gray-700">
                     Jam Mulai Absen <span class="text-red-500">*</span>
                 </label>
                 <button type="button"
                         @click="activePicker = activePicker === 'start' ? null : 'start'"
-                        class="mt-1.5 inline-flex w-36 items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-3 text-base font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
+                        class="mt-1.5 inline-flex w-36 items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
                     <span x-text="startHour"></span>
                     <span class="text-gray-400">:</span>
                     <span x-text="startMinute"></span>
@@ -87,12 +87,12 @@
             </div>
 
             <div class="relative" @click.outside="activePicker === 'end' && (activePicker = null)">
-                <label class="block text-base font-medium text-gray-700">
+                <label class="block text-sm font-medium text-gray-700">
                     Jam Selesai Absen <span class="text-red-500">*</span>
                 </label>
                 <button type="button"
                         @click="activePicker = activePicker === 'end' ? null : 'end'"
-                        class="mt-1.5 inline-flex w-36 items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-3 text-base font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
+                        class="mt-1.5 inline-flex w-36 items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
                     <span x-text="endHour"></span>
                     <span class="text-gray-400">:</span>
                     <span x-text="endMinute"></span>
@@ -132,20 +132,20 @@
             </div>
 
             <div>
-                <label for="attendance_late_tolerance_minutes" class="block text-base font-medium text-gray-700">
+                <label for="attendance_late_tolerance_minutes" class="block text-sm font-medium text-gray-700">
                     Toleransi Terlambat <span class="text-red-500">*</span>
                 </label>
-                <div class="mt-1.5 flex items-center gap-3">
+                <div class="mt-1.5 flex flex-wrap items-center gap-2">
                     <select id="attendance_late_tolerance_minutes"
                             name="attendance_late_tolerance_minutes"
                             x-model="lateTolerance"
                             required
-                            class="block w-28 rounded-lg border border-gray-300 px-3 py-3 text-base text-gray-900 shadow-sm transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20">
+                            class="block w-28 rounded-lg border border-gray-300 px-3 py-3 text-sm text-gray-900 shadow-sm transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20">
                         @foreach($lateToleranceOptions as $option)
                             <option value="{{ $option }}" @selected((string) old('attendance_late_tolerance_minutes', $lateToleranceMinutes) === (string) $option)>{{ $option }}</option>
                         @endforeach
                     </select>
-                    <span class="text-base text-gray-500">menit</span>
+                    <span class="text-sm text-gray-500">menit</span>
                 </div>
                 <p class="mt-1.5 text-sm text-gray-500">Toleransi keterlambatan hingga jam <span x-text="lateUntil"></span>.</p>
 
@@ -158,7 +158,7 @@
 
     <div class="flex items-center gap-4">
         <button type="submit" :disabled="loading"
-                class="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-base font-semibold text-white shadow-sm
+                class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm
                        transition-colors hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-60">
             <span x-show="loading">
                 <svg class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">

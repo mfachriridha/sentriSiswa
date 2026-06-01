@@ -5,7 +5,7 @@
 @section('content')
 <div class="mb-6">
     <a href="{{ route('admin.siswa.index') }}"
-       class="inline-flex items-center gap-2 text-base text-gray-500 hover:text-gray-700 transition-colors">
+       class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition-colors">
         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
         </svg>
@@ -13,8 +13,8 @@
     </a>
 </div>
 
-<div class="rounded-xl border border-gray-200 bg-white p-8">
-    <h1 class="mb-8 text-2xl font-bold text-gray-900">Edit Siswa</h1>
+<div class="rounded-xl border border-gray-200 bg-white p-6">
+    <h1 class="mb-6 text-2xl font-bold text-gray-900">Edit Siswa</h1>
 
     <form method="POST" action="{{ route('admin.siswa.update', $student) }}" class="space-y-6"
           x-data="{ loading: false }" @submit="loading = true">
@@ -23,9 +23,9 @@
 
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
-                <label for="name" class="block text-base font-medium text-gray-700">Nama <span class="text-red-500">*</span></label>
+                <label for="name" class="block text-sm font-medium text-gray-700">Nama <span class="text-red-500">*</span></label>
                 <input id="name" type="text" name="name" value="{{ old('name', $student->name) }}" required
-                       class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm
+                       class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                               placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                 @error('name')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
@@ -33,9 +33,9 @@
             </div>
 
             <div>
-                <label for="email" class="block text-base font-medium text-gray-700">Email <span class="text-sm font-normal text-gray-400">(opsional)</span></label>
+                <label for="email" class="block text-sm font-medium text-gray-700">Email <span class="text-sm font-normal text-gray-400">(opsional)</span></label>
                 <input id="email" type="email" name="email" value="{{ old('email', $student->email) }}"
-                       class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm
+                       class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                               placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                 @error('email')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
@@ -43,9 +43,9 @@
             </div>
 
             <div>
-                <label for="nisn" class="block text-base font-medium text-gray-700">NISN <span class="text-red-500">*</span></label>
+                <label for="nisn" class="block text-sm font-medium text-gray-700">NISN <span class="text-red-500">*</span></label>
                 <input id="nisn" type="text" name="nisn" value="{{ old('nisn', $student->studentProfile?->nisn) }}" required
-                       class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm
+                       class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                               placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                 @error('nisn')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
@@ -53,9 +53,9 @@
             </div>
 
             <div>
-                <label for="nis" class="block text-base font-medium text-gray-700">NIS <span class="text-red-500">*</span></label>
+                <label for="nis" class="block text-sm font-medium text-gray-700">NIS <span class="text-red-500">*</span></label>
                 <input id="nis" type="text" name="nis" value="{{ old('nis', $student->studentProfile?->nis) }}" required
-                       class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm
+                       class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                               placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                 @error('nis')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
@@ -63,9 +63,9 @@
             </div>
 
             <div>
-                <label for="class_id" class="block text-base font-medium text-gray-700">Kelas</label>
+                <label for="class_id" class="block text-sm font-medium text-gray-700">Kelas</label>
                 <select id="class_id" name="class_id"
-                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm
+                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                                focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                     <option value="">Pilih kelas</option>
                     @foreach ($classes as $class)
@@ -80,9 +80,9 @@
             </div>
 
             <div>
-                <label for="phone" class="block text-base font-medium text-gray-700">Telepon</label>
+                <label for="phone" class="block text-sm font-medium text-gray-700">Telepon</label>
                 <input id="phone" type="text" name="phone" value="{{ old('phone', $student->studentProfile?->phone) }}"
-                       class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm
+                       class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                               placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                 @error('phone')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
@@ -90,9 +90,9 @@
             </div>
 
             <div class="md:col-span-2">
-                <label for="address" class="block text-base font-medium text-gray-700">Alamat</label>
+                <label for="address" class="block text-sm font-medium text-gray-700">Alamat</label>
                 <textarea id="address" name="address" rows="3"
-                          class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm
+                          class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                                  placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">{{ old('address', $student->studentProfile?->address) }}</textarea>
                 @error('address')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
@@ -100,9 +100,9 @@
             </div>
 
             <div>
-                <label for="password" class="block text-base font-medium text-gray-700">Kata Sandi <span class="text-sm font-normal text-gray-400">(kosongkan jika tidak diubah)</span></label>
+                <label for="password" class="block text-sm font-medium text-gray-700">Kata Sandi <span class="text-sm font-normal text-gray-400">(kosongkan jika tidak diubah)</span></label>
                 <input id="password" type="password" name="password"
-                       class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm
+                       class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                               placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                 @error('password')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
@@ -112,7 +112,7 @@
 
         <div class="flex items-center gap-4 pt-2">
             <button type="submit" :disabled="loading"
-                    class="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-base font-semibold text-white shadow-sm
+                    class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm
                            hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50
                            transition-colors disabled:opacity-60">
                 <span x-show="loading">
@@ -124,7 +124,7 @@
                 Perbarui
             </button>
             <a href="{{ route('admin.siswa.index') }}"
-               class="rounded-lg border border-gray-300 px-6 py-3 text-base font-medium text-gray-700
+               class="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700
                       hover:bg-gray-50 transition-colors">
                 Batal
             </a>

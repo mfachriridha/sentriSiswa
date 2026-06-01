@@ -3,14 +3,14 @@
 @section('title', 'Siswa')
 
 @section('content')
-<div class="mb-6 flex items-center justify-between">
+<div class="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
     <div>
-        <h1 class="text-3xl font-bold text-gray-900">Siswa</h1>
-        <p class="mt-2 text-base text-gray-500">Kelola data siswa</p>
+        <h1 class="text-2xl font-bold text-gray-900">Siswa</h1>
+        <p class="mt-2 text-sm text-gray-500">Kelola data siswa</p>
     </div>
-    <div class="flex items-center gap-3">
+    <div class="flex flex-wrap items-center gap-2">
         <a href="{{ route('admin.siswa.impor') }}"
-           class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-5 py-3 text-base font-medium text-gray-700 shadow-sm
+           class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm
                   hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors">
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -28,7 +28,7 @@
                     }
                 }))"
                 @disabled($students->isEmpty())
-                class="inline-flex items-center gap-2 rounded-lg border border-red-200 px-5 py-3 text-base font-medium text-red-600 shadow-sm
+                class="inline-flex items-center gap-2 rounded-lg border border-red-200 px-4 py-2.5 text-sm font-medium text-red-600 shadow-sm
                        hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-300 transition-colors cursor-pointer
                        disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent">
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -38,7 +38,7 @@
             Hapus Semua
         </button>
         <a href="{{ route('admin.siswa.create') }}"
-           class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-base font-semibold text-white shadow-sm
+           class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm
                   hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors">
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -62,7 +62,7 @@
 />
 
 @if (session('import_result'))
-    <div class="mb-6 rounded-lg border border-green-200 bg-green-50 px-5 py-4 text-base">
+    <div class="mb-6 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm">
         <p class="font-semibold text-green-800">Impor berhasil!</p>
         <ul class="mt-2 list-disc pl-5 space-y-1 text-green-700">
             <li>{{ session('import_result.students_created') }} siswa baru dibuat</li>
@@ -103,24 +103,24 @@
 
 <div class="overflow-hidden rounded-xl border border-gray-200 bg-white">
     <div class="overflow-x-auto">
-        <table class="min-w-full text-left text-base">
+        <table class="min-w-full text-left text-sm">
         <thead class="border-b border-gray-200 bg-gray-50">
             <tr>
-                <th class="px-6 py-5"><x-sort-link label="NISN" column="nisn" :sort="$sort" :direction="$direction" /></th>
-                <th class="px-6 py-5"><x-sort-link label="NIS" column="nis" :sort="$sort" :direction="$direction" /></th>
-                <th class="px-6 py-5"><x-sort-link label="Nama" column="name" :sort="$sort" :direction="$direction" /></th>
-                <th class="px-6 py-5"><x-sort-link label="Kelas" column="class_name" :sort="$sort" :direction="$direction" /></th>
-                <th class="px-6 py-5 text-gray-600 font-semibold">Status</th>
-                <th class="px-6 py-5 text-gray-600 font-semibold">Aksi</th>
+                <th class="hidden px-4 py-3 md:table-cell"><x-sort-link label="NISN" column="nisn" :sort="$sort" :direction="$direction" /></th>
+                <th class="px-4 py-3"><x-sort-link label="NIS" column="nis" :sort="$sort" :direction="$direction" /></th>
+                <th class="px-4 py-3"><x-sort-link label="Nama" column="name" :sort="$sort" :direction="$direction" /></th>
+                <th class="px-4 py-3"><x-sort-link label="Kelas" column="class_name" :sort="$sort" :direction="$direction" /></th>
+                <th class="px-4 py-3 text-gray-600 font-semibold">Status</th>
+                <th class="px-4 py-3 text-gray-600 font-semibold">Aksi</th>
             </tr>
         </thead>
         <tbody class="divide-y divide-gray-100">
             @forelse ($students as $student)
                 <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-5 text-gray-700">{{ $student->studentProfile?->nisn ?? '-' }}</td>
-                    <td class="px-6 py-5 text-gray-700">{{ $student->studentProfile?->nis ?? '-' }}</td>
-                    <td class="px-6 py-5 font-medium text-gray-900">{{ $student->name }}</td>
-                    <td class="px-6 py-5 text-gray-700">
+                    <td class="hidden px-4 py-3 text-gray-700 md:table-cell">{{ $student->studentProfile?->nisn ?? '-' }}</td>
+                    <td class="px-4 py-3 text-gray-700">{{ $student->studentProfile?->nis ?? '-' }}</td>
+                    <td class="px-4 py-3 font-medium text-gray-900">{{ $student->name }}</td>
+                    <td class="px-4 py-3 text-gray-700">
                         @if ($student->studentProfile?->class)
                             <a href="{{ route('admin.kelas.show', $student->studentProfile->class) }}" class="text-primary hover:underline">
                                 {{ $student->studentProfile->class->name }}
@@ -129,14 +129,14 @@
                             -
                         @endif
                     </td>
-                    <td class="px-6 py-5">
+                    <td class="px-4 py-3">
                         @if ($student->isRegistered())
                             <span class="inline-flex items-center gap-1 rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-700">Terdaftar</span>
                         @else
                             <span class="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-500">Belum</span>
                         @endif
                     </td>
-                    <td class="px-6 py-5">
+                    <td class="px-4 py-3">
                         <div class="flex items-center gap-2">
                             <a href="{{ route('admin.siswa.show', $student) }}"
                                class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">
@@ -180,7 +180,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5" class="px-6 py-16 text-center text-base text-gray-500">
+                    <td colspan="5" class="px-6 py-16 text-center text-sm text-gray-500">
                     {{ $search || $filterGrade ? 'Tidak ada siswa yang sesuai dengan pencarian.' : 'Belum ada data siswa.' }}
                 </td>
                 </tr>
@@ -190,7 +190,7 @@
     </div>
 
     @if ($students->hasPages())
-        <div class="border-t border-gray-200 px-6 py-4">
+        <div class="border-t border-gray-200 px-4 py-3">
             <x-pagination :paginator="$students" />
         </div>
     @endif

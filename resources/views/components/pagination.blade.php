@@ -29,17 +29,17 @@
 
     <div class="flex items-center justify-center gap-1">
         @if ($paginator->onFirstPage())
-            <span class="rounded-lg border border-gray-200 px-4 py-2 text-base text-gray-300 cursor-not-allowed">Sebelumnya</span>
+            <span class="rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-300 cursor-not-allowed">Sebelumnya</span>
         @else
-            <a href="{{ $paginator->previousPageUrl() }}" class="rounded-lg border border-gray-300 px-4 py-2 text-base text-gray-700 hover:bg-gray-50 transition-colors">Sebelumnya</a>
+            <a href="{{ $paginator->previousPageUrl() }}" class="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">Sebelumnya</a>
         @endif
 
         @foreach ($pages as $page)
             @if ($page === '...')
-                <span class="px-2 text-base text-gray-400">...</span>
+                <span class="px-2 text-sm text-gray-400">...</span>
             @else
                 <a href="{{ $paginator->url($page) }}"
-                   class="rounded-lg border px-4 py-2 text-base transition-colors
+                   class="rounded-lg border px-4 py-2 text-sm transition-colors
                           {{ $page === $current ? 'border-primary bg-primary text-white' : 'border-gray-300 text-gray-700 hover:bg-gray-50' }}">
                     {{ $page }}
                 </a>
@@ -47,9 +47,9 @@
         @endforeach
 
         @if ($paginator->hasMorePages())
-            <a href="{{ $paginator->nextPageUrl() }}" class="rounded-lg border border-gray-300 px-4 py-2 text-base text-gray-700 hover:bg-gray-50 transition-colors">Berikutnya</a>
+            <a href="{{ $paginator->nextPageUrl() }}" class="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">Berikutnya</a>
         @else
-            <span class="rounded-lg border border-gray-200 px-4 py-2 text-base text-gray-300 cursor-not-allowed">Berikutnya</span>
+            <span class="rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-300 cursor-not-allowed">Berikutnya</span>
         @endif
     </div>
 @endif

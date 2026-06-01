@@ -27,6 +27,9 @@ importers:
       concurrently:
         specifier: ^9.0.1
         version: 9.2.1
+      daisyui:
+        specifier: ^5.5.20
+        version: 5.5.20
       laravel-vite-plugin:
         specifier: ^3.1
         version: 3.1.0(vite@8.0.14(jiti@2.7.0))
@@ -337,6 +340,9 @@ packages:
 
   d3-geo@1.7.1:
     resolution: {integrity: sha512-O4AempWAr+P5qbk2bC2FuN/sDW4z+dN2wDf9QV3bxQt4M5HfOEeXLgJ/UKQW0+o1Dj8BE+L5kiDbdWUMjsmQpw==}
+
+  daisyui@5.5.20:
+    resolution: {integrity: sha512-HemJcjl0Gk9rQ8BcgofN6p+EURrqftQG9wK1Hkxs98i49xe68+QxpNvry+PyxwkIUgrbMpNmZ5ZWjmtffAjfhQ==}
 
   detect-libc@2.1.2:
     resolution: {integrity: sha512-Btj2BOOO83o3WyH59e8MgXsxEQVcarkUOpEYrubB0urwnN10yQ364rsiByU11nZlqWYZm05i/of7io4mzihBtQ==}
@@ -915,6 +921,8 @@ snapshots:
   d3-geo@1.7.1:
     dependencies:
       d3-array: 1.2.4
+
+  daisyui@5.5.20: {}
 
   detect-libc@2.1.2: {}
 

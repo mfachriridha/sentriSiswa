@@ -5,7 +5,7 @@
 @section('content')
 <div class="mb-6">
     <h1 class="text-2xl font-bold text-gray-900">Riwayat Pelanggaran</h1>
-    <p class="mt-1 text-base text-gray-500">Riwayat pelanggaran siswa kelas {{ $class->name }}</p>
+    <p class="mt-1 text-sm text-gray-500">Riwayat pelanggaran siswa kelas {{ $class->name }}</p>
 </div>
 
 <div class="rounded-xl border border-gray-200 bg-white p-6">
@@ -68,28 +68,28 @@
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Tanggal</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Siswa</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Pelanggaran</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Kategori</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Poin</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Catatan</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Dicatat Oleh</th>
+                        <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Tanggal</th>
+                        <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Siswa</th>
+                        <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Pelanggaran</th>
+                        <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Kategori</th>
+                        <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Poin</th>
+                        <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Catatan</th>
+                        <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Dicatat Oleh</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 bg-white">
                     @foreach($violations as $violation)
                         <tr class="hover:bg-gray-50">
-                            <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-900">
+                            <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-900">
                                 {{ $violation->violation_date->format('d/m/Y') }}
                             </td>
-                            <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
+                            <td class="whitespace-nowrap px-4 py-3 text-sm font-medium text-gray-900">
                                 {{ $violation->studentProfile->user->name }}
                             </td>
-                            <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                            <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-500">
                                 {{ $violation->violation_name }}
                             </td>
-                            <td class="whitespace-nowrap px-6 py-4 text-sm">
+                            <td class="whitespace-nowrap px-4 py-3 text-sm">
                                 @php
                                     $categoryConfig = [
                                         'light' => ['bg-green-100 text-green-800', 'Ringan'],
@@ -103,13 +103,13 @@
                                     {{ $categoryLabel }}
                                 </span>
                             </td>
-                            <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-red-600">
+                            <td class="whitespace-nowrap px-4 py-3 text-sm font-medium text-red-600">
                                 -{{ $violation->point_deduction }}
                             </td>
-                            <td class="px-6 py-4 text-sm text-gray-500">
+                            <td class="px-4 py-3 text-sm text-gray-500">
                                 {{ $violation->notes ?? '-' }}
                             </td>
-                            <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                            <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-500">
                                 {{ $violation->recordedBy?->name ?? '-' }}
                             </td>
                         </tr>

@@ -5,7 +5,7 @@
 @section('content')
 <div class="mb-6">
     <a href="{{ route('siswa.absensi') }}"
-       class="inline-flex items-center gap-2 text-base text-gray-500 hover:text-gray-700 transition-colors">
+       class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition-colors">
         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
         </svg>
@@ -13,14 +13,14 @@
     </a>
 </div>
 
-<div class="rounded-xl border border-gray-200 bg-white p-8">
+<div class="rounded-xl border border-gray-200 bg-white p-6">
     <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
             <h1 class="text-2xl font-bold text-gray-900">Riwayat Absensi</h1>
-            <p class="mt-1 text-base text-gray-500">Catatan kehadiran bulan {{ $monthLabel }}</p>
+            <p class="mt-1 text-sm text-gray-500">Catatan kehadiran bulan {{ $monthLabel }}</p>
         </div>
 
-        <form method="GET" action="{{ route('siswa.absensi.riwayat') }}" class="flex items-center gap-3">
+        <form method="GET" action="{{ route('siswa.absensi.riwayat') }}" class="flex flex-wrap items-center gap-2">
             <label for="month" class="text-sm font-medium text-gray-600">Bulan</label>
             <input id="month"
                    type="month"
@@ -82,7 +82,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="4" class="px-4 py-10 text-center text-base text-gray-500">
+                        <td colspan="4" class="px-4 py-10 text-center text-sm text-gray-500">
                             Belum ada catatan absensi pada bulan ini.
                         </td>
                     </tr>

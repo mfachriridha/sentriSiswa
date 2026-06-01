@@ -12,13 +12,13 @@
     ];
 @endphp
 
-<div class="mb-6 flex items-center justify-between">
+<div class="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
     <div>
-        <h1 class="text-3xl font-bold text-gray-900">Jenis Pelanggaran</h1>
-        <p class="mt-2 text-base text-gray-500">Kelola daftar poin pelanggaran siswa berdasarkan aturan sekolah.</p>
+        <h1 class="text-2xl font-bold text-gray-900">Jenis Pelanggaran</h1>
+        <p class="mt-2 text-sm text-gray-500">Kelola daftar poin pelanggaran siswa berdasarkan aturan sekolah.</p>
     </div>
     <a href="{{ route('guru.jenis-pelanggaran.create') }}"
-       class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-base font-semibold text-white shadow-sm
+       class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm
               hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors">
         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -44,34 +44,34 @@
 
 <div class="overflow-hidden rounded-xl border border-gray-200 bg-white">
     <div class="overflow-x-auto">
-        <table class="min-w-full text-left text-base">
+        <table class="min-w-full text-left text-sm">
             <thead class="border-b border-gray-200 bg-gray-50">
                 <tr>
-                    <th class="px-6 py-5"><x-sort-link label="Nama" column="name" :sort="$sort" :direction="$direction" /></th>
-                    <th class="px-6 py-5"><x-sort-link label="Kategori" column="category" :sort="$sort" :direction="$direction" /></th>
-                    <th class="px-6 py-5"><x-sort-link label="Poin" column="point_deduction" :sort="$sort" :direction="$direction" /></th>
-                    <th class="px-6 py-5"><x-sort-link label="Status" column="is_active" :sort="$sort" :direction="$direction" /></th>
-                    <th class="px-6 py-5 text-gray-600 font-semibold">Aksi</th>
+                    <th class="px-4 py-3"><x-sort-link label="Nama" column="name" :sort="$sort" :direction="$direction" /></th>
+                    <th class="px-4 py-3"><x-sort-link label="Kategori" column="category" :sort="$sort" :direction="$direction" /></th>
+                    <th class="px-4 py-3"><x-sort-link label="Poin" column="point_deduction" :sort="$sort" :direction="$direction" /></th>
+                    <th class="px-4 py-3"><x-sort-link label="Status" column="is_active" :sort="$sort" :direction="$direction" /></th>
+                    <th class="px-4 py-3 text-gray-600 font-semibold">Aksi</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
                 @forelse ($violationTypes as $violationType)
                     <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-5 font-medium text-gray-900">{{ $violationType->name }}</td>
-                        <td class="px-6 py-5">
+                        <td class="px-4 py-3 font-medium text-gray-900">{{ $violationType->name }}</td>
+                        <td class="px-4 py-3">
                             <span class="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium {{ $categoryBadgeClasses[$violationType->category] ?? 'bg-gray-50 text-gray-700' }}">
                                 {{ $categoryLabels[$violationType->category] ?? '-' }}
                             </span>
                         </td>
-                        <td class="px-6 py-5 text-gray-700">{{ $violationType->point_deduction }} poin</td>
-                        <td class="px-6 py-5">
+                        <td class="px-4 py-3 text-gray-700">{{ $violationType->point_deduction }} poin</td>
+                        <td class="px-4 py-3">
                             @if ($violationType->is_active)
                                 <span class="inline-flex items-center rounded-full bg-green-50 px-3 py-1 text-sm font-medium text-green-700">Aktif</span>
                             @else
                                 <span class="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-600">Nonaktif</span>
                             @endif
                         </td>
-                        <td class="px-6 py-5">
+                        <td class="px-4 py-3">
                             <div class="flex items-center gap-2">
                                 <a href="{{ route('guru.jenis-pelanggaran.show', $violationType) }}"
                                    class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">
@@ -111,7 +111,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="px-6 py-16 text-center text-base text-gray-500">
+                        <td colspan="5" class="px-6 py-16 text-center text-sm text-gray-500">
                             {{ $search || $filterCategory || $filterStatus ? 'Tidak ada jenis pelanggaran yang sesuai dengan filter.' : 'Belum ada data jenis pelanggaran.' }}
                         </td>
                     </tr>
@@ -121,7 +121,7 @@
     </div>
 
     @if ($violationTypes->hasPages())
-        <div class="border-t border-gray-200 px-6 py-4">
+        <div class="border-t border-gray-200 px-4 py-3">
             <x-pagination :paginator="$violationTypes" />
         </div>
     @endif

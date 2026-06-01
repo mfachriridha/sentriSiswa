@@ -4,8 +4,8 @@
 
 @section('content')
 <div class="mb-6">
-    <h1 class="text-3xl font-bold text-gray-900">Poin Saya</h1>
-    <p class="mt-2 text-base text-gray-500">Pantau sisa poin disiplin dan riwayat pelanggaran Anda.</p>
+    <h1 class="text-2xl font-bold text-gray-900">Poin Saya</h1>
+    <p class="mt-2 text-sm text-gray-500">Pantau sisa poin disiplin dan riwayat pelanggaran Anda.</p>
 </div>
 
 {{-- Kartu Poin --}}
@@ -15,13 +15,13 @@
     $levelBadgeClass = $totalPoints > 75 ? 'bg-green-100 text-green-700' : ($totalPoints > 50 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700');
 @endphp
 
-<div class="mb-8 overflow-hidden rounded-xl border-2 {{ $levelClass }}">
-    <div class="p-8">
+<div class="mb-6 overflow-hidden rounded-xl border-2 {{ $levelClass }}">
+    <div class="p-6">
         <div class="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
             <div>
                 <p class="text-sm font-semibold uppercase tracking-wider opacity-75">Sisa Poin Disiplin</p>
                 <p class="mt-2 text-5xl font-bold tracking-tight">{{ $totalPoints }}</p>
-                <p class="mt-2 text-base opacity-75">Dari 100 poin · {{ $totalDeductions }} poin terpakai</p>
+                <p class="mt-2 text-sm opacity-75">Dari 100 poin · {{ $totalDeductions }} poin terpakai</p>
             </div>
             <div class="text-right">
                 <span class="inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold {{ $levelBadgeClass }}">
@@ -34,29 +34,29 @@
 
 {{-- Riwayat Pelanggaran --}}
 <div class="rounded-xl border border-gray-200 bg-white">
-    <div class="border-b border-gray-200 px-6 py-5">
+    <div class="border-b border-gray-200 px-4 py-3">
         <h2 class="text-lg font-bold text-gray-900">Riwayat Pelanggaran</h2>
     </div>
 
     <div class="overflow-x-auto">
-        <table class="min-w-full text-left text-base">
+        <table class="min-w-full text-left text-sm">
             <thead class="border-b border-gray-200 bg-gray-50">
                 <tr>
-                    <th class="px-6 py-5 font-semibold text-gray-600">Tanggal</th>
-                    <th class="px-6 py-5 font-semibold text-gray-600">Pelanggaran</th>
-                    <th class="px-6 py-5 font-semibold text-gray-600">Kategori</th>
-                    <th class="px-6 py-5 font-semibold text-gray-600">Poin</th>
-                    <th class="px-6 py-5 font-semibold text-gray-600">Catatan</th>
+                    <th class="px-4 py-3 font-semibold text-gray-600">Tanggal</th>
+                    <th class="px-4 py-3 font-semibold text-gray-600">Pelanggaran</th>
+                    <th class="hidden px-4 py-3 font-semibold text-gray-600 md:table-cell">Kategori</th>
+                    <th class="px-4 py-3 font-semibold text-gray-600">Poin</th>
+                    <th class="hidden px-4 py-3 font-semibold text-gray-600 lg:table-cell">Catatan</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
                 @forelse ($violations as $violation)
                     <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="whitespace-nowrap px-6 py-5 text-gray-700">
+                        <td class="whitespace-nowrap px-4 py-3 text-gray-700">
                             {{ Carbon\Carbon::parse($violation->violation_date)->translatedFormat('d M Y') }}
                         </td>
-                        <td class="px-6 py-5 font-medium text-gray-900">{{ $violation->violation_name }}</td>
-                        <td class="px-6 py-5">
+                        <td class="px-4 py-3 font-medium text-gray-900">{{ $violation->violation_name }}</td>
+                        <td class="hidden px-4 py-3 md:table-cell">
                             @php
                                 $catLabels = ['light' => 'Ringan', 'medium' => 'Sedang', 'heavy' => 'Berat', 'severe' => 'Sangat Berat'];
                                 $catBadges = ['light' => 'bg-green-50 text-green-700', 'medium' => 'bg-amber-50 text-amber-700', 'heavy' => 'bg-orange-50 text-orange-700', 'severe' => 'bg-red-50 text-red-700'];
@@ -66,12 +66,12 @@
                                 {{ $catLabels[$cat] ?? '-' }}
                             </span>
                         </td>
-                        <td class="px-6 py-5 text-center font-bold text-red-600">-{{ $violation->point_deduction }}</td>
-                        <td class="px-6 py-5 text-gray-600">{{ $violation->notes ?? '-' }}</td>
+                        <td class="px-4 py-3 text-center font-bold text-red-600">-{{ $violation->point_deduction }}</td>
+                        <td class="hidden px-4 py-3 text-gray-600 lg:table-cell">{{ $violation->notes ?? '-' }}</td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="px-6 py-16 text-center text-base text-gray-500">Belum ada catatan pelanggaran untuk Anda.</td>
+                        <td colspan="5" class="px-6 py-16 text-center text-sm text-gray-500">Belum ada catatan pelanggaran untuk Anda.</td>
                     </tr>
                 @endforelse
             </tbody>

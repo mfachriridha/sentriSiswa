@@ -3,12 +3,12 @@
 @section('title', 'Kelas')
 
 @section('content')
-<div class="mb-6 flex items-center justify-between">
+<div class="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
     <div>
-        <h1 class="text-3xl font-bold text-gray-900">Kelas</h1>
-        <p class="mt-2 text-base text-gray-500">Kelola data kelas</p>
+        <h1 class="text-2xl font-bold text-gray-900">Kelas</h1>
+        <p class="mt-2 text-sm text-gray-500">Kelola data kelas</p>
     </div>
-    <div class="flex items-center gap-3">
+    <div class="flex flex-wrap items-center gap-2">
         <button type="button"
                 onclick="window.dispatchEvent(new CustomEvent('open-confirm-modal', {
                     detail: {
@@ -19,7 +19,7 @@
                     }
                 }))"
                 @disabled($classes->isEmpty())
-                class="inline-flex items-center gap-2 rounded-lg border border-red-200 px-5 py-3 text-base font-medium text-red-600 shadow-sm
+                class="inline-flex items-center gap-2 rounded-lg border border-red-200 px-4 py-2.5 text-sm font-medium text-red-600 shadow-sm
                        hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-300 transition-colors cursor-pointer
                        disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent">
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -29,7 +29,7 @@
             Hapus Semua
         </button>
         <a href="{{ route('admin.kelas.create') }}"
-           class="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-base font-semibold text-white shadow-sm
+           class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm
                   hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors">
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -54,20 +54,20 @@
 
 <div class="overflow-hidden rounded-xl border border-gray-200 bg-white">
     <div class="overflow-x-auto">
-        <table class="min-w-full text-left text-base">
+        <table class="min-w-full text-left text-sm">
         <thead class="border-b border-gray-200 bg-gray-50">
             <tr>
-                <th class="px-6 py-5"><x-sort-link label="Nama" column="name" :sort="$sort" :direction="$direction" /></th>
-                <th class="px-6 py-5"><x-sort-link label="Tingkat" column="grade" :sort="$sort" :direction="$direction" /></th>
-                <th class="px-6 py-5 text-gray-600 font-semibold">Wali Kelas</th>
-                <th class="px-6 py-5 text-gray-600 font-semibold">Aksi</th>
+                <th class="px-4 py-3"><x-sort-link label="Nama" column="name" :sort="$sort" :direction="$direction" /></th>
+                <th class="px-4 py-3"><x-sort-link label="Tingkat" column="grade" :sort="$sort" :direction="$direction" /></th>
+                <th class="px-4 py-3 text-gray-600 font-semibold">Wali Kelas</th>
+                <th class="px-4 py-3 text-gray-600 font-semibold">Aksi</th>
             </tr>
         </thead>
         <tbody class="divide-y divide-gray-100">
             @forelse ($classes as $class)
                 <tr class="hover:bg-gray-50">
-                    <td class="px-6 py-5 font-medium text-gray-900">{{ $class->name }}</td>
-                    <td class="px-6 py-5">
+                    <td class="px-4 py-3 font-medium text-gray-900">{{ $class->name }}</td>
+                    <td class="px-4 py-3">
                         @if ($class->grade === '10')
                             <span class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">Tingkat 10</span>
                         @elseif ($class->grade === '11')
@@ -76,8 +76,8 @@
                             <span class="inline-flex items-center rounded-full bg-purple-50 px-3 py-1 text-sm font-medium text-purple-700">Tingkat 12</span>
                         @endif
                     </td>
-                    <td class="px-6 py-5 text-gray-700">{{ $class->homeroomTeacher?->name ?? '-' }}</td>
-                    <td class="px-6 py-5">
+                    <td class="px-4 py-3 text-gray-700">{{ $class->homeroomTeacher?->name ?? '-' }}</td>
+                    <td class="px-4 py-3">
                         <div class="flex items-center gap-2">
                             <a href="{{ route('admin.kelas.show', $class) }}"
                                class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">
@@ -121,7 +121,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="4" class="px-6 py-16 text-center text-base text-gray-500">
+                    <td colspan="4" class="px-6 py-16 text-center text-sm text-gray-500">
                     {{ $search || $filterGrade ? 'Tidak ada kelas yang sesuai dengan pencarian.' : 'Belum ada data kelas.' }}
                 </td>
                 </tr>
@@ -131,7 +131,7 @@
     </div>
 
     @if ($classes->hasPages())
-        <div class="border-t border-gray-200 px-6 py-4">
+        <div class="border-t border-gray-200 px-4 py-3">
             <x-pagination :paginator="$classes" />
         </div>
     @endif

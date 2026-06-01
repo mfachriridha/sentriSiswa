@@ -49,7 +49,7 @@ test('registered teacher can view and update own profile', function () {
     ]);
 });
 
-test('guru dashboard redirects to profile while dashboard is deferred', function () {
+test('guru dashboard shows shortcuts for available features', function () {
     $teacher = User::factory()->homeroom()->create([
         'status' => 'registered',
     ]);
@@ -63,7 +63,10 @@ test('guru dashboard redirects to profile while dashboard is deferred', function
 
     $this->actingAs($teacher)
         ->get(route('guru.dashboard'))
-        ->assertRedirect(route('guru.profil'));
+        ->assertSuccessful()
+        ->assertSee('Kelas Saya')
+        ->assertSee('Rekap Absensi')
+        ->assertSee('Profil Saya');
 });
 
 test('registered student cannot access guru profile', function () {

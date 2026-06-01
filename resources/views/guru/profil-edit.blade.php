@@ -19,8 +19,8 @@
     };
 @endphp
 
-<div class="rounded-xl border border-gray-200 bg-white p-8">
-    <h1 class="mb-8 text-2xl font-bold text-gray-900">Edit Profil</h1>
+<div class="rounded-xl border border-gray-200 bg-white p-6">
+    <h1 class="mb-6 text-2xl font-bold text-gray-900">Edit Profil</h1>
 
     @if ($errors->any())
         <div class="mb-4 rounded-lg border border-red-200 bg-red-50 p-4">
@@ -49,13 +49,13 @@
         @method('PUT')
 
         {{-- Foto dengan preview dan tombol hapus --}}
-        <div class="flex flex-col items-start gap-8 sm:flex-row sm:items-center sm:gap-10">
+        <div class="flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:gap-10">
             <div class="relative">
                 @if ($profile?->photo)
                     <img id="photo-preview" src="{{ asset('storage/'.$profile->photo) }}" alt="{{ $teacher->name }}"
                          class="h-24 w-24 rounded-full object-cover border-4 border-gray-100">
                 @else
-                    <div id="photo-preview" class="flex h-24 w-24 items-center justify-center rounded-full bg-primary/10 text-3xl font-bold text-primary border-4 border-gray-100">
+                    <div id="photo-preview" class="flex h-24 w-24 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary border-4 border-gray-100">
                         {{ strtoupper(substr($teacher->name, 0, 1)) }}
                     </div>
                 @endif
@@ -89,51 +89,51 @@
         <div class="mb-10 grid grid-cols-1 gap-6 md:grid-cols-2">
             <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
                 <p class="text-sm font-medium text-gray-500">NIP</p>
-                <p class="mt-1.5 text-base text-gray-900">{{ $profile?->nip ?? '-' }}</p>
+                <p class="mt-1.5 text-sm text-gray-900">{{ $profile?->nip ?? '-' }}</p>
             </div>
             <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
                 <p class="text-sm font-medium text-gray-500">Tipe Guru</p>
-                <p class="mt-1.5 text-base text-gray-900">{{ $teacherTypeLabels[$profile?->teacher_type] ?? '-' }}</p>
+                <p class="mt-1.5 text-sm text-gray-900">{{ $teacherTypeLabels[$profile?->teacher_type] ?? '-' }}</p>
             </div>
             <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
                 <p class="text-sm font-medium text-gray-500">Tingkat/Kelas Binaan</p>
-                <p class="mt-1.5 text-base text-gray-900">{{ $teacherScope ?? '-' }}</p>
+                <p class="mt-1.5 text-sm text-gray-900">{{ $teacherScope ?? '-' }}</p>
             </div>
         </div>
 
         {{-- Input lain (nama, email, hp, password) --}}
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div class="md:col-span-2">
-                <label for="name" class="block text-base font-medium text-gray-700">Nama <span class="text-red-500">*</span></label>
+                <label for="name" class="block text-sm font-medium text-gray-700">Nama <span class="text-red-500">*</span></label>
                 <input id="name" type="text" name="name" value="{{ old('name', $teacher->name) }}" required
-                       class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
+                       class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                 @error('name')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
 
             <div>
-                <label for="email" class="block text-base font-medium text-gray-700">Email <span class="text-sm font-normal text-gray-400">(opsional)</span></label>
+                <label for="email" class="block text-sm font-medium text-gray-700">Email <span class="text-sm font-normal text-gray-400">(opsional)</span></label>
                 <input id="email" type="email" name="email" value="{{ old('email', $teacher->email) }}"
-                       class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
+                       class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                 @error('email')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
 
             <div>
-                <label for="phone" class="block text-base font-medium text-gray-700">Nomor HP</label>
+                <label for="phone" class="block text-sm font-medium text-gray-700">Nomor HP</label>
                 <input id="phone" type="text" name="phone" value="{{ old('phone', $profile?->phone) }}"
-                       class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
+                       class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                 @error('phone')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
 
             <div class="md:col-span-2">
-                <label for="password" class="block text-base font-medium text-gray-700">Kata Sandi Baru <span class="text-sm font-normal text-gray-400">(kosongkan jika tidak diubah)</span></label>
+                <label for="password" class="block text-sm font-medium text-gray-700">Kata Sandi Baru <span class="text-sm font-normal text-gray-400">(kosongkan jika tidak diubah)</span></label>
                 <input id="password" type="password" name="password"
-                       class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
+                       class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                 @error('password')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror
@@ -142,7 +142,7 @@
 
         <div class="flex items-center gap-6 pt-4">
             <button type="submit" :disabled="loading"
-                    class="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-base font-semibold text-white shadow-sm hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors disabled:opacity-60">
+                    class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors disabled:opacity-60">
                 <span x-show="loading">
                     <svg class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -151,7 +151,7 @@
                 </span>
                 Simpan
             </button>
-            <a href="{{ route('guru.profil') }}" class="rounded-lg border border-gray-300 px-6 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+            <a href="{{ route('guru.profil') }}" class="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
                 Batal
             </a>
         </div>
@@ -184,7 +184,7 @@
             const preview = document.getElementById('photo-preview');
             // Ganti menjadi avatar huruf
             preview.src = '';
-            preview.className = 'flex h-24 w-24 items-center justify-center rounded-full bg-primary/10 text-3xl font-bold text-primary border-4 border-gray-100';
+            preview.className = 'flex h-24 w-24 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary border-4 border-gray-100';
             preview.innerHTML = '<span>{{ strtoupper(substr($teacher->name, 0, 1)) }}</span>';
         });
     }

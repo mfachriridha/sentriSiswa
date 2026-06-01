@@ -1,3 +1,3 @@
-<footer class="border-t border-gray-200 px-6 py-4">
-    <p class="text-center text-sm text-gray-500">&copy; {{ date('Y') }} Sentri Siswa</p>
+<footer class="border-t border-gray-200 px-4 py-3">
+    <p class="text-center text-xs text-gray-400">&copy; {{ date('Y') }} Sentri Siswa</p>
 </footer>

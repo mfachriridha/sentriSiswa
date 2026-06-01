@@ -5,7 +5,7 @@
 @section('content')
 <div class="mb-6">
     <a href="{{ route('admin.kelas.index') }}"
-       class="inline-flex items-center gap-2 text-base text-gray-500 hover:text-gray-700 transition-colors">
+       class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition-colors">
         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
         </svg>
@@ -13,8 +13,8 @@
     </a>
 </div>
 
-<div class="rounded-xl border border-gray-200 bg-white p-8">
-    <h1 class="mb-8 text-2xl font-bold text-gray-900">Edit Kelas</h1>
+<div class="rounded-xl border border-gray-200 bg-white p-6">
+    <h1 class="mb-6 text-2xl font-bold text-gray-900">Edit Kelas</h1>
 
     <form method="POST" action="{{ route('admin.kelas.update', $class) }}" class="space-y-6"
           x-data="{ loading: false }" @submit="loading = true">
@@ -23,9 +23,9 @@
 
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
-                <label for="grade" class="block text-base font-medium text-gray-700">Tingkat <span class="text-red-500">*</span></label>
+                <label for="grade" class="block text-sm font-medium text-gray-700">Tingkat <span class="text-red-500">*</span></label>
                 <select id="grade" name="grade" required
-                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm
+                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                                focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                     <option value="">Pilih tingkat</option>
                     <option value="10" {{ old('grade', $class->grade) === '10' ? 'selected' : '' }}>10</option>
@@ -38,10 +38,10 @@
             </div>
 
             <div>
-                <label for="identifier" class="block text-base font-medium text-gray-700">Nama Kelas <span class="text-red-500">*</span></label>
+                <label for="identifier" class="block text-sm font-medium text-gray-700">Nama Kelas <span class="text-red-500">*</span></label>
                 <input id="identifier" type="text" name="identifier" value="{{ old('identifier', $identifier) }}" required
                        placeholder="contoh: 1, IPA 1, SAINS 1"
-                       class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm
+                       class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                               placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20
                               transition-colors">
                 @error('identifier')
@@ -50,9 +50,9 @@
             </div>
 
             <div>
-                <label for="homeroom_teacher_id" class="block text-base font-medium text-gray-700">Wali Kelas</label>
+                <label for="homeroom_teacher_id" class="block text-sm font-medium text-gray-700">Wali Kelas</label>
                 <select id="homeroom_teacher_id" name="homeroom_teacher_id"
-                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 shadow-sm
+                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                                focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                     <option value="">Pilih wali kelas</option>
                     @foreach ($homeroomTeachers as $teacher)
@@ -70,7 +70,7 @@
 
         <div class="flex items-center gap-4 pt-2">
             <button type="submit" :disabled="loading"
-                    class="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-base font-semibold text-white shadow-sm
+                    class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm
                            hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50
                            transition-colors disabled:opacity-60">
                 <span x-show="loading">
@@ -82,7 +82,7 @@
                 Perbarui
             </button>
             <a href="{{ route('admin.kelas.index') }}"
-               class="rounded-lg border border-gray-300 px-6 py-3 text-base font-medium text-gray-700
+               class="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700
                       hover:bg-gray-50 transition-colors">
                 Batal
             </a>

@@ -23,14 +23,14 @@ $hasActiveFilters = filled($search) || collect($filters)->contains(fn ($f) => fi
                placeholder="{{ $placeholder }}"
                x-ref="searchInput"
                @input.debounce.500ms="$refs.searchFilterForm.submit()"
-               class="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-4 text-base text-gray-900 placeholder-gray-400
+               class="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-4 text-sm text-gray-900 placeholder-gray-400
                       focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors">
     </div>
 
     @foreach ($filters as $filter)
         <select name="{{ $filter['name'] }}"
                 @change="$refs.searchFilterForm.submit()"
-                class="rounded-lg border border-gray-300 bg-white py-2.5 px-4 text-base text-gray-700
+                class="rounded-lg border border-gray-300 bg-white py-2.5 px-4 text-sm text-gray-700
                        focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors">
             @foreach ($filter['options'] as $value => $label)
                 <option value="{{ $value }}" {{ ($filter['value'] ?? '') === (string) $value ? 'selected' : '' }}>{{ $label }}</option>
@@ -43,7 +43,7 @@ $hasActiveFilters = filled($search) || collect($filters)->contains(fn ($f) => fi
 
     @if($hasActiveFilters)
         <a href="{{ $action }}"
-           class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-4 py-2.5 text-base font-medium text-gray-600
+           class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-600
                   hover:bg-gray-50 transition-colors">
             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
