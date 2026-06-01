@@ -17,7 +17,6 @@
 <form method="POST" action="{{ route('admin.settings.attendance-time.update') }}" class="space-y-6"
       x-data="{
           loading: false,
-          activePicker: null,
           startHour: @js(old('attendance_start_hour', $startHour)),
           startMinute: @js(old('attendance_start_minute', $startMinute)),
           endHour: @js(old('attendance_end_hour', $endHour)),
@@ -34,48 +33,34 @@
     @csrf
     @method('PUT')
 
-    <input type="hidden" name="attendance_start_hour" x-model="startHour">
-    <input type="hidden" name="attendance_start_minute" x-model="startMinute">
-    <input type="hidden" name="attendance_end_hour" x-model="endHour">
-    <input type="hidden" name="attendance_end_minute" x-model="endMinute">
-
     <div class="rounded-xl border border-gray-200 bg-white p-6">
         <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
-            <div class="relative" @click.outside="activePicker === 'start' && (activePicker = null)">
+            <div>
                 <label class="block text-sm font-medium text-gray-700">
                     Jam Mulai Absen <span class="text-red-500">*</span>
                 </label>
-                <button type="button"
-                        @click="activePicker = activePicker === 'start' ? null : 'start'"
-                        class="mt-1.5 inline-flex w-36 items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
-                    <span x-text="startHour"></span>
-                    <span class="text-gray-400">:</span>
-                    <span x-text="startMinute"></span>
-                </button>
-
-                <div x-show="activePicker === 'start'" x-transition
-                     class="absolute z-20 mt-2 w-72 rounded-xl border border-gray-200 bg-white p-4 shadow-lg">
-                    <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">Jam</p>
-                    <div class="grid grid-cols-6 gap-1">
+                <div class="mt-1.5 flex items-center gap-2">
+                    <select name="attendance_start_hour"
+                            x-model="startHour"
+                            required
+                            aria-label="Jam mulai absen"
+                            class="block w-24 rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20">
                         @foreach(range(0, 23) as $hour)
                             @php($value = sprintf('%02d', $hour))
-                            <button type="button"
-                                    @click="startHour = @js($value)"
-                                    :class="startHour === @js($value) ? 'bg-primary text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'"
-                                    class="rounded-md px-2 py-1.5 text-sm font-medium transition-colors">{{ $value }}</button>
+                            <option value="{{ $value }}">{{ $value }}</option>
                         @endforeach
-                    </div>
-
-                    <p class="mb-2 mt-4 text-xs font-semibold uppercase tracking-wide text-gray-500">Menit</p>
-                    <div class="grid grid-cols-10 gap-1">
+                    </select>
+                    <span class="font-semibold text-gray-400">:</span>
+                    <select name="attendance_start_minute"
+                            x-model="startMinute"
+                            required
+                            aria-label="Menit mulai absen"
+                            class="block w-24 rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20">
                         @foreach(range(0, 59) as $minute)
                             @php($value = sprintf('%02d', $minute))
-                            <button type="button"
-                                    @click="startMinute = @js($value)"
-                                    :class="startMinute === @js($value) ? 'bg-primary text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'"
-                                    class="rounded-md px-1.5 py-1.5 text-xs font-medium transition-colors">{{ $value }}</button>
+                            <option value="{{ $value }}">{{ $value }}</option>
                         @endforeach
-                    </div>
+                    </select>
                 </div>
 
                 @error('attendance_start_hour')
@@ -86,41 +71,32 @@
                 @enderror
             </div>
 
-            <div class="relative" @click.outside="activePicker === 'end' && (activePicker = null)">
+            <div>
                 <label class="block text-sm font-medium text-gray-700">
                     Jam Selesai Absen <span class="text-red-500">*</span>
                 </label>
-                <button type="button"
-                        @click="activePicker = activePicker === 'end' ? null : 'end'"
-                        class="mt-1.5 inline-flex w-36 items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm font-semibold text-gray-900 shadow-sm transition-colors hover:bg-gray-50 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
-                    <span x-text="endHour"></span>
-                    <span class="text-gray-400">:</span>
-                    <span x-text="endMinute"></span>
-                </button>
-
-                <div x-show="activePicker === 'end'" x-transition
-                     class="absolute z-20 mt-2 w-72 rounded-xl border border-gray-200 bg-white p-4 shadow-lg md:left-0">
-                    <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">Jam</p>
-                    <div class="grid grid-cols-6 gap-1">
+                <div class="mt-1.5 flex items-center gap-2">
+                    <select name="attendance_end_hour"
+                            x-model="endHour"
+                            required
+                            aria-label="Jam selesai absen"
+                            class="block w-24 rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20">
                         @foreach(range(0, 23) as $hour)
                             @php($value = sprintf('%02d', $hour))
-                            <button type="button"
-                                    @click="endHour = @js($value)"
-                                    :class="endHour === @js($value) ? 'bg-primary text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'"
-                                    class="rounded-md px-2 py-1.5 text-sm font-medium transition-colors">{{ $value }}</button>
+                            <option value="{{ $value }}">{{ $value }}</option>
                         @endforeach
-                    </div>
-
-                    <p class="mb-2 mt-4 text-xs font-semibold uppercase tracking-wide text-gray-500">Menit</p>
-                    <div class="grid grid-cols-10 gap-1">
+                    </select>
+                    <span class="font-semibold text-gray-400">:</span>
+                    <select name="attendance_end_minute"
+                            x-model="endMinute"
+                            required
+                            aria-label="Menit selesai absen"
+                            class="block w-24 rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20">
                         @foreach(range(0, 59) as $minute)
                             @php($value = sprintf('%02d', $minute))
-                            <button type="button"
-                                    @click="endMinute = @js($value)"
-                                    :class="endMinute === @js($value) ? 'bg-primary text-white' : 'bg-gray-50 text-gray-700 hover:bg-gray-100'"
-                                    class="rounded-md px-1.5 py-1.5 text-xs font-medium transition-colors">{{ $value }}</button>
+                            <option value="{{ $value }}">{{ $value }}</option>
                         @endforeach
-                    </div>
+                    </select>
                 </div>
 
                 @error('attendance_end_hour')
