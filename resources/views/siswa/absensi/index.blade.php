@@ -101,7 +101,7 @@
                             <span class="text-xs font-medium text-gray-700">Lokasi GPS</span>
                         </div>
                         <div class="flex items-center gap-2">
-                            <span x-show="gpsReady" class="text-xs" :class="accuracy <= 100 ? 'text-green-600' : accuracy <= 500 ? 'text-amber-600' : 'text-red-600'">
+                            <span x-cloak x-show="gpsReady" class="text-xs" :class="accuracy <= 100 ? 'text-green-600' : accuracy <= 500 ? 'text-amber-600' : 'text-red-600'">
                                 ±<span x-text="Math.round(accuracy)"></span> m
                             </span>
                             <button type="button"
@@ -114,26 +114,26 @@
                     </div>
 
                     <div class="mb-3 space-y-1">
-                        <p x-show="gpsLoading" class="text-xs text-gray-500">Mengambil lokasi...</p>
-                        <p x-show="gpsError" x-text="gpsError" class="text-xs text-red-600"></p>
+                        <p x-cloak x-show="gpsLoading" class="text-xs text-gray-500">Mengambil lokasi...</p>
+                        <p x-cloak x-show="gpsError" x-text="gpsError" class="text-xs text-red-600"></p>
 
                         <template x-if="gpsReady">
                             <div class="space-y-0.5">
-                                <p x-show="locationStatus" class="text-xs font-medium" :class="{
+                                <p x-cloak x-show="locationStatus" class="text-xs font-medium" :class="{
                                     'text-green-700': locationStatus === 'inside',
                                     'text-amber-700': locationStatus === 'tolerance',
                                     'text-red-700': locationStatus === 'outside'
                                 }">
                                     <span x-text="locationMessage"></span>
-                                    <span x-show="locationDistance !== null && locationDistance > 0" class="opacity-75">
+                                    <span x-cloak x-show="locationDistance !== null && locationDistance > 0" class="opacity-75">
                                         (<span x-text="Math.round(locationDistance)"></span> m)
                                     </span>
                                 </p>
-                                <p x-show="locationChecking" class="text-xs text-gray-500">Memeriksa lokasi...</p>
-                                <p x-show="accuracy > 500" class="text-xs text-amber-600">Akurasi rendah, tekan Refresh.</p>
+                                <p x-cloak x-show="locationChecking" class="text-xs text-gray-500">Memeriksa lokasi...</p>
+                                <p x-cloak x-show="accuracy > 500" class="text-xs text-amber-600">Akurasi rendah, tekan Refresh.</p>
                             </div>
                         </template>
-                        <p x-show="!gpsLoading && !gpsError && !gpsReady" class="text-xs text-gray-400">Lokasi belum diambil.</p>
+                        <p x-cloak x-show="!gpsLoading && !gpsError && !gpsReady" class="text-xs text-gray-400">Lokasi belum diambil.</p>
                     </div>
                 @else
                     <div class="mb-4 flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2">
@@ -151,11 +151,11 @@
 
                 <div class="overflow-hidden rounded-lg border border-gray-200 bg-white">
                     <div class="relative aspect-[3/4] w-full bg-gray-100">
-                        <img x-show="previewUrl"
+                        <img x-cloak x-show="previewUrl"
                              :src="previewUrl"
                              alt="Preview selfie"
                              class="h-full w-full object-cover">
-                        <div x-show="!previewUrl" class="flex h-full w-full items-center justify-center p-6 text-center text-sm text-gray-400">
+                        <div x-cloak x-show="!previewUrl" class="flex h-full w-full items-center justify-center p-6 text-center text-sm text-gray-400">
                             Belum ada selfie
                         </div>
                     </div>
@@ -170,10 +170,10 @@
                     </button>
 
                     <p class="text-sm" :class="canOpenSelfieModal ? 'text-green-700' : 'text-amber-700'" x-text="openDisabledMessage"></p>
-                    <p x-show="compressedSizeKb" class="text-sm text-gray-500">
+                    <p x-cloak x-show="compressedSizeKb" class="text-sm text-gray-500">
                         Ukuran foto: <span x-text="compressedSizeKb"></span> KB
                     </p>
-                    <p x-show="error" x-text="error" class="text-sm text-red-600"></p>
+                    <p x-cloak x-show="error" x-text="error" class="text-sm text-red-600"></p>
                     @error('selfie')
                         <p class="text-sm text-red-600">{{ $message }}</p>
                     @enderror
@@ -210,15 +210,16 @@
                     <div class="grid gap-6 px-4 py-3 md:grid-cols-[260px_1fr]">
                         <div class="relative aspect-[3/4] overflow-hidden rounded-xl border border-gray-200 bg-gray-100">
                             <video x-ref="video"
+                                   x-cloak
                                    x-show="cameraReady && !previewUrl"
                                    class="h-full w-full object-cover"
                                    playsinline
                                    muted></video>
-                            <img x-show="previewUrl"
+                            <img x-cloak x-show="previewUrl"
                                  :src="previewUrl"
                                  alt="Preview selfie"
                                  class="h-full w-full object-cover">
-                            <div x-show="!cameraReady && !previewUrl" class="flex h-full items-center justify-center p-4 text-center text-sm text-gray-500">
+                            <div x-cloak x-show="!cameraReady && !previewUrl" class="flex h-full items-center justify-center p-4 text-center text-sm text-gray-500">
                                 Kamera belum aktif
                             </div>
                         </div>
@@ -227,20 +228,22 @@
                             <div class="space-y-3">
                                 <p class="text-sm font-medium text-gray-700">Ambil selfie dari kamera perangkat ini.</p>
                                 <p class="text-sm text-gray-500">Foto akan dikompresi otomatis maksimal 300 KB.</p>
-                                <p x-show="compressedSizeKb" class="text-sm text-gray-500">
+                                <p x-cloak x-show="compressedSizeKb" class="text-sm text-gray-500">
                                     Ukuran foto: <span x-text="compressedSizeKb"></span> KB
                                 </p>
-                                <p x-show="error" x-text="error" class="text-sm text-red-600"></p>
+                                <p x-cloak x-show="error" x-text="error" class="text-sm text-red-600"></p>
                             </div>
 
                             <div class="flex flex-wrap gap-3">
                                 <button type="button"
+                                        x-cloak
                                         x-show="!cameraReady && !previewUrl"
                                         @click="startCamera()"
                                         class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
                                     Nyalakan Kamera
                                 </button>
                                 <button type="button"
+                                        x-cloak
                                         x-show="cameraReady"
                                         @click="captureSelfie()"
                                         :disabled="compressing"
@@ -248,6 +251,7 @@
                                     <span x-text="compressing ? 'Memproses...' : 'Ambil Selfie'"></span>
                                 </button>
                                 <button type="button"
+                                        x-cloak
                                         x-show="previewUrl"
                                         @click="resetSelfie()"
                                         class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
