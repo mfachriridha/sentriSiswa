@@ -30,26 +30,46 @@ class DashboardController extends Controller
                 'terlambat' => $todayAttendances->where('status', 'terlambat')->count(),
                 'belum_absen' => $todayAttendances->where('status', 'belum_absen')->count(),
             ];
+            $summary['homeroom_chart'] = [
+                ['label' => 'Hadir', 'value' => $todayAttendances->where('status', 'hadir')->count(), 'variant' => 'success'],
+                ['label' => 'Terlambat', 'value' => $todayAttendances->where('status', 'terlambat')->count(), 'variant' => 'warning'],
+                ['label' => 'Izin/Sakit', 'value' => $todayAttendances->whereIn('status', ['izin', 'sakit'])->count(), 'variant' => 'info'],
+                ['label' => 'Alpha', 'value' => $todayAttendances->where('status', 'alpha')->count(), 'variant' => 'error'],
+                ['label' => 'Belum Absen', 'value' => $todayAttendances->where('status', 'belum_absen')->count(), 'variant' => 'neutral'],
+            ];
         }
 
         if ($user->isCounselor()) {
             $grade = $user->teacherProfile?->grade;
             $studentIds = StudentProfile::whereHas('class', fn ($query) => $query->where('grade', $grade))->pluck('id');
+            $violations = StudentViolation::whereIn('student_profile_id', $studentIds)->get();
 
             $summary['bk'] = [
                 'grade' => $grade,
                 'students' => $studentIds->count(),
-                'pending' => StudentViolation::whereIn('student_profile_id', $studentIds)->where('status', 'pending')->count(),
-                'approved' => StudentViolation::whereIn('student_profile_id', $studentIds)->approved()->count(),
+                'pending' => $violations->where('status', 'pending')->count(),
+                'approved' => $violations->where('status', 'approved')->count(),
+            ];
+            $summary['bk_chart'] = [
+                ['label' => 'Pending', 'value' => $violations->where('status', 'pending')->count(), 'variant' => 'warning'],
+                ['label' => 'Disetujui', 'value' => $violations->where('status', 'approved')->count(), 'variant' => 'success'],
+                ['label' => 'Ditolak', 'value' => $violations->where('status', 'rejected')->count(), 'variant' => 'error'],
             ];
         }
 
         if ($user->isStudentAffairs()) {
+            $violations = StudentViolation::all();
+
             $summary['kesiswaan'] = [
                 'classes' => SchoolClass::count(),
                 'students' => StudentProfile::count(),
-                'pending' => StudentViolation::where('status', 'pending')->count(),
-                'approved' => StudentViolation::approved()->count(),
+                'pending' => $violations->where('status', 'pending')->count(),
+                'approved' => $violations->where('status', 'approved')->count(),
+            ];
+            $summary['kesiswaan_chart'] = [
+                ['label' => 'Pending', 'value' => $violations->where('status', 'pending')->count(), 'variant' => 'warning'],
+                ['label' => 'Disetujui', 'value' => $violations->where('status', 'approved')->count(), 'variant' => 'success'],
+                ['label' => 'Ditolak', 'value' => $violations->where('status', 'rejected')->count(), 'variant' => 'error'],
             ];
         }
 

@@ -45,6 +45,8 @@ class ViolationReportController extends Controller
             $violation->recordedBy?->name ?? '-',
         ])->values()->all();
 
+        $chartRows = $this->statusChartRows($violations);
+
         return Excel::download(new ArrayExport([
             'Tanggal',
             'Nama',
@@ -55,7 +57,7 @@ class ViolationReportController extends Controller
             'Poin',
             'Status',
             'Dicatat Oleh',
-        ], $rows), 'laporan-pelanggaran.xlsx');
+        ], $rows, $chartRows, 'Grafik Status Pelanggaran'), 'laporan-pelanggaran.xlsx');
     }
 
     public function exportPdf(ViolationReportFilterRequest $request): Response
@@ -67,6 +69,7 @@ class ViolationReportController extends Controller
             'title' => $title,
             'violations' => $violations,
             'filters' => $filters,
+            'chartRows' => $this->statusChartRows($violations),
             'categoryLabels' => ViolationType::categoryLabels(),
             'statusLabels' => StudentViolation::statusLabels(),
         ])->setPaper('a4', 'landscape');
@@ -102,5 +105,18 @@ class ViolationReportController extends Controller
             $filters,
             $classes,
         ];
+    }
+
+    /**
+     * @return list<array{0: string, 1: int}>
+     */
+    private function statusChartRows(iterable $violations): array
+    {
+        $collection = collect($violations);
+        $labels = StudentViolation::statusLabels();
+
+        return collect(['pending', 'approved', 'rejected'])
+            ->map(fn (string $status): array => [$labels[$status], $collection->where('status', $status)->count()])
+            ->all();
     }
 }

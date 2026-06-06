@@ -130,10 +130,22 @@ test('violation reports and attendance pdf routes render downloads for allowed r
         ->assertSuccessful()
         ->assertSee('Laporan BK');
 
+    $this->actingAs($counselor)
+        ->get(route('guru.bk.laporan.export-excel'))
+        ->assertSuccessful();
+
     $this->actingAs($studentAffairs)
         ->get(route('guru.kesiswaan.laporan.index'))
         ->assertSuccessful()
         ->assertSee('Laporan Kesiswaan');
+
+    $this->actingAs($studentAffairs)
+        ->get(route('guru.kesiswaan.laporan.export-excel'))
+        ->assertSuccessful();
+
+    $this->actingAs($homeroom)
+        ->get(route('guru.absensi.export-excel'))
+        ->assertSuccessful();
 
     $this->actingAs($homeroom)
         ->get(route('guru.absensi.export-pdf'))

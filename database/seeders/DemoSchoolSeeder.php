@@ -1,0 +1,269 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\Attendance;
+use App\Models\SchoolClass;
+use App\Models\SchoolRule;
+use App\Models\StudentBiodata;
+use App\Models\StudentProfile;
+use App\Models\StudentViolation;
+use App\Models\User;
+use App\Models\ViolationType;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+
+class DemoSchoolSeeder extends Seeder
+{
+    public function run(): void
+    {
+        $homerooms = $this->createHomeroomTeachers();
+        $this->createCounselors();
+        $this->createStudentAffairs();
+
+        $classes = $this->createClasses($homerooms);
+        $students = $this->createStudents($classes);
+
+        $this->createAttendanceRecords($students);
+        $this->createViolationRecords($students);
+        $this->createSchoolRule();
+    }
+
+    /**
+     * @return array<int, User>
+     */
+    private function createHomeroomTeachers(): array
+    {
+        $teachers = [];
+
+        foreach (['10', '11', '12'] as $grade) {
+            for ($index = 1; $index <= 2; $index++) {
+                $teacher = User::create([
+                    'name' => "Wali Kelas {$grade}-{$index}",
+                    'email' => "wali{$grade}{$index}@sentrisiswa.test",
+                    'password' => Hash::make('password'),
+                    'role' => 'teacher',
+                    'status' => 'registered',
+                ]);
+
+                $teacher->teacherProfile()->create([
+                    'nip' => "19{$grade}{$index}000000000",
+                    'phone' => "62812{$grade}{$index}00000",
+                    'teacher_type' => 'homeroom',
+                ]);
+
+                $teachers[] = $teacher;
+            }
+        }
+
+        return $teachers;
+    }
+
+    private function createCounselors(): void
+    {
+        foreach (['10', '11', '12'] as $grade) {
+            $teacher = User::create([
+                'name' => "Guru BK Tingkat {$grade}",
+                'email' => "bk{$grade}@sentrisiswa.test",
+                'password' => Hash::make('password'),
+                'role' => 'teacher',
+                'status' => 'registered',
+            ]);
+
+            $teacher->teacherProfile()->create([
+                'nip' => "19{$grade}9000000000",
+                'phone' => "62813{$grade}000000",
+                'teacher_type' => 'counselor',
+                'grade' => $grade,
+            ]);
+        }
+    }
+
+    private function createStudentAffairs(): void
+    {
+        if (DB::getDriverName() === 'sqlite') {
+            DB::statement('PRAGMA ignore_check_constraints = ON');
+        }
+
+        $teacher = User::create([
+            'name' => 'Guru Kesiswaan',
+            'email' => 'kesiswaan@sentrisiswa.test',
+            'password' => Hash::make('password'),
+            'role' => 'teacher',
+            'status' => 'registered',
+        ]);
+
+        $teacher->teacherProfile()->create([
+            'nip' => '19990000000000',
+            'phone' => '6281399000000',
+            'teacher_type' => 'student_affairs',
+        ]);
+
+        if (DB::getDriverName() === 'sqlite') {
+            DB::statement('PRAGMA ignore_check_constraints = OFF');
+        }
+    }
+
+    /**
+     * @param  array<int, User>  $homerooms
+     * @return array<int, SchoolClass>
+     */
+    private function createClasses(array $homerooms): array
+    {
+        $classes = [];
+        $teacherIndex = 0;
+
+        foreach (['10' => 'X', '11' => 'XI', '12' => 'XII'] as $grade => $roman) {
+            for ($index = 1; $index <= 2; $index++) {
+                $classes[] = SchoolClass::create([
+                    'name' => "{$roman} RPL {$index}",
+                    'grade' => (string) $grade,
+                    'homeroom_teacher_id' => $homerooms[$teacherIndex]->id,
+                ]);
+
+                $teacherIndex++;
+            }
+        }
+
+        return $classes;
+    }
+
+    /**
+     * @param  array<int, SchoolClass>  $classes
+     * @return array<int, StudentProfile>
+     */
+    private function createStudents(array $classes): array
+    {
+        $students = [];
+        $sequence = 1;
+
+        foreach ($classes as $class) {
+            for ($index = 1; $index <= 10; $index++) {
+                $isUnregistered = $index > 8;
+                $nis = sprintf('%05d', $sequence);
+
+                $user = User::create([
+                    'name' => "Siswa {$class->name} {$index}",
+                    'email' => $isUnregistered ? null : "siswa{$nis}@sentrisiswa.test",
+                    'password' => Hash::make('password'),
+                    'role' => 'student',
+                    'status' => $isUnregistered ? 'unregistered' : 'registered',
+                ]);
+
+                $profile = StudentProfile::create([
+                    'user_id' => $user->id,
+                    'nisn' => sprintf('00%08d', $sequence),
+                    'nis' => $nis,
+                    'class_id' => $class->id,
+                    'phone' => "0812{$nis}",
+                    'address' => "Alamat demo siswa {$nis}",
+                ]);
+
+                StudentBiodata::create([
+                    'student_profile_id' => $profile->id,
+                    'place_of_birth' => 'Jakarta',
+                    'date_of_birth' => now()->subYears(16)->subDays($sequence)->toDateString(),
+                    'gender' => $index % 2 === 0 ? 'P' : 'L',
+                    'religion' => 'Islam',
+                    'family_status' => 'Kandung',
+                    'child_number' => $index,
+                    'school_of_origin' => 'SMP Demo',
+                    'admission_date' => now()->subYear()->startOfMonth()->toDateString(),
+                    'father_name' => "Ayah Siswa {$nis}",
+                    'father_occupation' => 'Karyawan',
+                    'mother_name' => "Ibu Siswa {$nis}",
+                    'mother_occupation' => 'Ibu Rumah Tangga',
+                    'parent_address' => "Alamat orang tua {$nis}",
+                    'parent_phone' => "0821{$nis}",
+                ]);
+
+                $students[] = $profile;
+                $sequence++;
+            }
+        }
+
+        return $students;
+    }
+
+    /**
+     * @param  array<int, StudentProfile>  $students
+     */
+    private function createAttendanceRecords(array $students): void
+    {
+        $dates = collect(range(0, 13))
+            ->map(fn (int $daysAgo) => today()->subDays($daysAgo))
+            ->filter(fn ($date): bool => $date->isWeekday())
+            ->take(10)
+            ->values();
+
+        $statuses = ['hadir', 'hadir', 'hadir', 'terlambat', 'izin', 'sakit', 'alpha', 'belum_absen'];
+
+        foreach ($students as $studentIndex => $student) {
+            foreach ($dates as $dateIndex => $date) {
+                $status = $statuses[($studentIndex + $dateIndex) % count($statuses)];
+
+                Attendance::create([
+                    'student_profile_id' => $student->id,
+                    'date' => $date->toDateString(),
+                    'status' => $status,
+                    'check_in_time' => in_array($status, ['hadir', 'terlambat'], true)
+                        ? ($status === 'hadir' ? '06:45:00' : '07:10:00')
+                        : null,
+                ]);
+            }
+        }
+    }
+
+    /**
+     * @param  array<int, StudentProfile>  $students
+     */
+    private function createViolationRecords(array $students): void
+    {
+        $violationTypes = ViolationType::orderBy('point_deduction')->get();
+        $recorders = User::where('role', 'teacher')->pluck('id');
+
+        foreach (array_values($students) as $index => $student) {
+            if ($index % 3 !== 0) {
+                continue;
+            }
+
+            $violationType = $violationTypes[$index % $violationTypes->count()];
+            $status = match ($index % 9) {
+                0 => 'pending',
+                3 => 'rejected',
+                default => 'approved',
+            };
+
+            StudentViolation::create([
+                'student_profile_id' => $student->id,
+                'violation_type_id' => $violationType->id,
+                'recorded_by_user_id' => $recorders[$index % $recorders->count()],
+                'violation_date' => today()->subDays($index % 20)->toDateString(),
+                'violation_name' => $violationType->name,
+                'violation_category' => $violationType->category,
+                'point_deduction' => $violationType->point_deduction,
+                'notes' => 'Data demo pelanggaran.',
+                'status' => $status,
+                'approved_by_user_id' => $status === 'pending' ? null : $recorders->last(),
+                'approved_at' => $status === 'pending' ? null : now(),
+                'rejection_reason' => $status === 'rejected' ? 'Data demo ditolak.' : null,
+            ]);
+        }
+    }
+
+    private function createSchoolRule(): void
+    {
+        $path = 'school-rules/tata-tertib-demo.pdf';
+
+        Storage::disk('public')->put($path, "%PDF-1.4\n1 0 obj<<>>endobj\ntrailer<<>>\n%%EOF");
+
+        SchoolRule::create([
+            'title' => 'Tata Tertib Sekolah Demo',
+            'file_path' => $path,
+            'is_published' => true,
+            'uploaded_by_user_id' => User::whereHas('teacherProfile', fn ($query) => $query->where('teacher_type', 'student_affairs'))->value('id'),
+        ]);
+    }
+}

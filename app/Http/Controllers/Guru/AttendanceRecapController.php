@@ -93,6 +93,7 @@ class AttendanceRecapController extends Controller
             'className' => $class->name,
             'students' => $students,
             'stats' => $stats,
+            'chartRows' => $this->attendanceChartRows($stats),
             'startDate' => $startDate,
             'endDate' => $endDate,
         ])->setPaper('a4', 'portrait');
@@ -188,5 +189,20 @@ class AttendanceRecapController extends Controller
         return $students
             ->filter(fn (StudentProfile $student): bool => ($stats[$student->id][$status] ?? 0) > 0)
             ->values();
+    }
+
+    /**
+     * @param  array<int, array{hadir: int, terlambat: int, izin: int, sakit: int, alpha: int, percentage: float}>  $stats
+     * @return list<array{label: string, value: int}>
+     */
+    private function attendanceChartRows(array $stats): array
+    {
+        return [
+            ['label' => 'Hadir', 'value' => collect($stats)->sum('hadir')],
+            ['label' => 'Terlambat', 'value' => collect($stats)->sum('terlambat')],
+            ['label' => 'Izin', 'value' => collect($stats)->sum('izin')],
+            ['label' => 'Sakit', 'value' => collect($stats)->sum('sakit')],
+            ['label' => 'Alpha', 'value' => collect($stats)->sum('alpha')],
+        ];
     }
 }

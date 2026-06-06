@@ -5,6 +5,12 @@
 @section('content')
 <x-page-header title="Dashboard" :description="'Selamat datang, '.auth()->user()->name.'.'" />
 
+<div class="mb-5 grid gap-4 lg:grid-cols-3">
+    <x-dashboard-bar-chart title="Siswa per Tingkat" :items="$charts['studentsByGrade']" />
+    <x-dashboard-bar-chart title="Status Registrasi Siswa" :items="$charts['registration']" />
+    <x-dashboard-bar-chart title="Komposisi Akun" :items="$charts['roles']" />
+</div>
+
 <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
     <x-shortcut-card :href="route('admin.guru.index')" title="Data Guru" description="Kelola akun dan profil guru sekolah.">
         <x-slot:icon>

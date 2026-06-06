@@ -24,6 +24,9 @@
             <p class="mt-1 text-xl font-bold text-gray-700">{{ $summary['homeroom']['belum_absen'] }}</p>
         </div>
     </div>
+    <div class="mb-5">
+        <x-dashboard-bar-chart title="Grafik Absensi Hari Ini" :items="$summary['homeroom_chart']" />
+    </div>
 @endif
 
 @if (! empty($summary['bk']))
@@ -40,6 +43,9 @@
             <p class="text-xs font-semibold uppercase text-gray-500">Pengajuan Pending</p>
             <p class="mt-1 text-xl font-bold text-amber-600">{{ $summary['bk']['pending'] }}</p>
         </div>
+    </div>
+    <div class="mb-5">
+        <x-dashboard-bar-chart title="Grafik Pengajuan Pelanggaran BK" :items="$summary['bk_chart']" />
     </div>
 @endif
 
@@ -61,6 +67,9 @@
             <p class="text-xs font-semibold uppercase text-gray-500">Disetujui</p>
             <p class="mt-1 text-xl font-bold text-green-600">{{ $summary['kesiswaan']['approved'] }}</p>
         </div>
+    </div>
+    <div class="mb-5">
+        <x-dashboard-bar-chart title="Grafik Status Pelanggaran" :items="$summary['kesiswaan_chart']" />
     </div>
 @endif
 

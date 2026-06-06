@@ -5,6 +5,11 @@
 @section('content')
 <x-page-header title="Dashboard Siswa" :description="'Selamat datang, '.auth()->user()->name.'!'" />
 
+<div class="mb-5 grid gap-4 lg:grid-cols-2">
+    <x-dashboard-bar-chart title="Grafik Poin Disiplin" :items="$charts['points']" />
+    <x-dashboard-bar-chart title="Grafik Absensi Saya" :items="$charts['attendance']" />
+</div>
+
 <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
     <x-shortcut-card :href="route('siswa.absensi')" title="Absensi" description="Catat kehadiran harian dan lihat status hari ini.">
         <x-slot:icon>

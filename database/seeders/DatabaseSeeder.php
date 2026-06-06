@@ -17,5 +17,10 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@sentrisiswa.test',
             'status' => 'registered',
         ]);
+
+        $this->call([
+            ViolationTypeSeeder::class,
+            DemoSchoolSeeder::class,
+        ]);
     }
 }
