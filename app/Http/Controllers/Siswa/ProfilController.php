@@ -15,7 +15,7 @@ class ProfilController extends Controller
     {
         $student = Auth::user();
         $student->loadMissing(['studentProfile.studentViolations' => function ($q) {
-            $q->latest('violation_date');
+            $q->approved()->latest('violation_date');
         }]);
 
         $profile = $student->studentProfile;

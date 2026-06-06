@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnsureUserIsAdmin;
+use App\Http\Middleware\EnsureUserIsCounselor;
 use App\Http\Middleware\EnsureUserIsGuru;
 use App\Http\Middleware\EnsureUserIsHomeroom;
 use App\Http\Middleware\EnsureUserIsRegistered;
@@ -17,10 +18,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->trustProxies(at: '*');
+
         $middleware->alias([
             'admin' => EnsureUserIsAdmin::class,
             'registered' => EnsureUserIsRegistered::class,
             'guru' => EnsureUserIsGuru::class,
+            'bk' => EnsureUserIsCounselor::class,
             'kesiswaan' => EnsureUserIsStudentAffairs::class,
             'wali-kelas' => EnsureUserIsHomeroom::class,
             'siswa' => EnsureUserIsSiswa::class,

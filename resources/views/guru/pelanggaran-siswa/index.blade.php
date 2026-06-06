@@ -11,13 +11,13 @@
         'severe' => 'bg-red-50 text-red-700',
     ];
 
-    $hasActiveFilters = filled($search) || filled($filterClass) || filled($filterCategory) || filled($filterViolationType) || filled($filterDate);
+    $hasActiveFilters = filled($search) || filled($filterClass) || filled($filterCategory) || filled($filterViolationType) || filled($filterDate) || filled($filterStatus);
 @endphp
 
 <div class="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
     <div>
         <h1 class="text-2xl font-bold text-gray-900">Pelanggaran Siswa</h1>
-        <p class="mt-2 text-sm text-gray-500">Catat dan kelola pelanggaran siswa berdasarkan jenis pelanggaran sekolah.</p>
+        <p class="mt-2 text-sm text-gray-500">Catat, kelola, dan ACC pengajuan pelanggaran siswa.</p>
     </div>
     <a href="{{ route('guru.pelanggaran-siswa.create') }}"
        class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm
@@ -71,6 +71,14 @@
 
         <input type="date" name="violation_date" value="{{ $filterDate }}"
                class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-700 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors">
+
+        <select name="status"
+                class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-700 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors">
+            <option value="">Semua Status</option>
+            @foreach ($statusLabels as $value => $label)
+                <option value="{{ $value }}" {{ $filterStatus === $value ? 'selected' : '' }}>{{ $label }}</option>
+            @endforeach
+        </select>
     </div>
 
     <div class="mt-3 flex flex-wrap items-center gap-2">
@@ -99,6 +107,7 @@
                     <th class="px-4 py-3"><x-sort-link label="Pelanggaran" column="violation_name" :sort="$sort" :direction="$direction" /></th>
                     <th class="px-4 py-3"><x-sort-link label="Kategori" column="violation_category" :sort="$sort" :direction="$direction" /></th>
                     <th class="px-4 py-3"><x-sort-link label="Poin" column="point_deduction" :sort="$sort" :direction="$direction" /></th>
+                    <th class="px-4 py-3 text-gray-600 font-semibold">Status</th>
                     <th class="px-4 py-3 text-gray-600 font-semibold">Aksi</th>
                 </tr>
             </thead>
@@ -118,6 +127,7 @@
                             </span>
                         </td>
                         <td class="px-4 py-3 text-gray-700">{{ $studentViolation->point_deduction }} poin</td>
+                        <td class="px-4 py-3 text-gray-700">{{ $statusLabels[$studentViolation->status] ?? $studentViolation->status }}</td>
                         <td class="px-4 py-3">
                             <div class="flex items-center gap-2">
                                 <a href="{{ route('guru.pelanggaran-siswa.show', $studentViolation) }}"
@@ -128,6 +138,15 @@
                                    class="inline-flex items-center gap-1.5 rounded-lg border border-primary/30 px-3 py-2 text-sm font-medium text-primary hover:bg-primary/5 transition-colors">
                                     Edit
                                 </a>
+                                @if ($studentViolation->status === 'pending')
+                                    <form method="POST" action="{{ route('guru.pelanggaran-siswa.approve', $studentViolation) }}">
+                                        @csrf
+                                        @method('PUT')
+                                        <button class="inline-flex items-center gap-1.5 rounded-lg border border-green-200 px-3 py-2 text-sm font-medium text-green-700 hover:bg-green-50 transition-colors">
+                                            ACC
+                                        </button>
+                                    </form>
+                                @endif
                                 <button type="button"
                                         onclick="window.dispatchEvent(new CustomEvent('open-confirm-modal', {
                                             detail: {
@@ -148,7 +167,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="px-6 py-16 text-center text-sm text-gray-500">
+                        <td colspan="8" class="px-6 py-16 text-center text-sm text-gray-500">
                             {{ $hasActiveFilters ? 'Tidak ada pelanggaran siswa yang sesuai dengan filter.' : 'Belum ada catatan pelanggaran siswa.' }}
                         </td>
                     </tr>

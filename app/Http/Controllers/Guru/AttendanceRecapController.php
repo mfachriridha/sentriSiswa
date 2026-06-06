@@ -7,11 +7,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Guru\AttendanceRecapFilterRequest;
 use App\Models\Attendance;
 use App\Models\StudentProfile;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class AttendanceRecapController extends Controller
 {
@@ -24,10 +27,16 @@ class AttendanceRecapController extends Controller
         }
 
         [$startDate, $endDate] = $this->dateRange($request);
-        $students = $this->classStudents($class->id);
+        $validated = $request->validated();
+        $filterStudents = $this->classStudents($class->id);
+        $students = $this->classStudents($class->id, $validated['student_id'] ?? null);
         $stats = $this->calculateStats($students, $this->attendancesByStudent($students, $startDate, $endDate));
+        $statusFilter = $validated['status'] ?? '';
+        $students = $this->filterStudentsByStatus($students, $stats, $statusFilter);
+        $selectedStudent = $validated['student_id'] ?? '';
+        $selectedMonth = $validated['month'] ?? '';
 
-        return view('guru.absensi.index', compact('class', 'students', 'stats', 'startDate', 'endDate'));
+        return view('guru.absensi.index', compact('class', 'students', 'filterStudents', 'stats', 'startDate', 'endDate', 'statusFilter', 'selectedStudent', 'selectedMonth'));
     }
 
     public function exportExcel(AttendanceRecapFilterRequest $request): BinaryFileResponse
@@ -39,8 +48,10 @@ class AttendanceRecapController extends Controller
         }
 
         [$startDate, $endDate] = $this->dateRange($request);
-        $students = $this->classStudents($class->id);
+        $validated = $request->validated();
+        $students = $this->classStudents($class->id, $validated['student_id'] ?? null);
         $stats = $this->calculateStats($students, $this->attendancesByStudent($students, $startDate, $endDate));
+        $students = $this->filterStudentsByStatus($students, $stats, $validated['status'] ?? '');
 
         $rows = $students->map(function (StudentProfile $student) use ($stats): array {
             $stat = $stats[$student->id];
@@ -63,12 +74,45 @@ class AttendanceRecapController extends Controller
         );
     }
 
+    public function exportPdf(AttendanceRecapFilterRequest $request): Response
+    {
+        $class = Auth::user()->homeroomClass;
+
+        if (! $class) {
+            abort(403);
+        }
+
+        [$startDate, $endDate] = $this->dateRange($request);
+        $validated = $request->validated();
+        $students = $this->classStudents($class->id, $validated['student_id'] ?? null);
+        $stats = $this->calculateStats($students, $this->attendancesByStudent($students, $startDate, $endDate));
+        $students = $this->filterStudentsByStatus($students, $stats, $validated['status'] ?? '');
+
+        $pdf = Pdf::loadView('exports.attendance-recap-pdf', [
+            'title' => 'Rekap Absensi',
+            'className' => $class->name,
+            'students' => $students,
+            'stats' => $stats,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+        ])->setPaper('a4', 'portrait');
+
+        return $pdf->download("rekap-absensi-{$class->name}-{$startDate}-sampai-{$endDate}.pdf");
+    }
+
     /**
      * @return array{0: string, 1: string}
      */
     private function dateRange(AttendanceRecapFilterRequest $request): array
     {
         $validated = $request->validated();
+
+        if (! empty($validated['month'])) {
+            $start = Carbon::createFromFormat('Y-m', $validated['month'])->startOfMonth()->toDateString();
+            $end = Carbon::createFromFormat('Y-m', $validated['month'])->endOfMonth()->toDateString();
+
+            return [$start, $end];
+        }
 
         return [
             $validated['start_date'] ?? now()->startOfMonth()->toDateString(),
@@ -79,10 +123,11 @@ class AttendanceRecapController extends Controller
     /**
      * @return Collection<int, StudentProfile>
      */
-    private function classStudents(int $classId): Collection
+    private function classStudents(int $classId, int|string|null $studentId = null): Collection
     {
         return StudentProfile::query()
             ->where('class_id', $classId)
+            ->when($studentId, fn ($query) => $query->where('student_profiles.id', $studentId))
             ->join('users', 'student_profiles.user_id', '=', 'users.id')
             ->with('user')
             ->orderBy('users.name')
@@ -132,5 +177,16 @@ class AttendanceRecapController extends Controller
         }
 
         return $stats;
+    }
+
+    private function filterStudentsByStatus(Collection $students, array $stats, ?string $status): Collection
+    {
+        if (blank($status)) {
+            return $students;
+        }
+
+        return $students
+            ->filter(fn (StudentProfile $student): bool => ($stats[$student->id][$status] ?? 0) > 0)
+            ->values();
     }
 }

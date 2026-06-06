@@ -46,7 +46,9 @@
                             aria-label="Jam mulai absen"
                             class="block w-24 rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20">
                         @foreach(range(0, 23) as $hour)
-                            @php($value = sprintf('%02d', $hour))
+                            @php
+                                $value = sprintf('%02d', $hour);
+                            @endphp
                             <option value="{{ $value }}">{{ $value }}</option>
                         @endforeach
                     </select>
@@ -57,7 +59,9 @@
                             aria-label="Menit mulai absen"
                             class="block w-24 rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20">
                         @foreach(range(0, 59) as $minute)
-                            @php($value = sprintf('%02d', $minute))
+                            @php
+                                $value = sprintf('%02d', $minute);
+                            @endphp
                             <option value="{{ $value }}">{{ $value }}</option>
                         @endforeach
                     </select>
@@ -82,7 +86,9 @@
                             aria-label="Jam selesai absen"
                             class="block w-24 rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20">
                         @foreach(range(0, 23) as $hour)
-                            @php($value = sprintf('%02d', $hour))
+                            @php
+                                $value = sprintf('%02d', $hour);
+                            @endphp
                             <option value="{{ $value }}">{{ $value }}</option>
                         @endforeach
                     </select>
@@ -93,7 +99,9 @@
                             aria-label="Menit selesai absen"
                             class="block w-24 rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 shadow-sm transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20">
                         @foreach(range(0, 59) as $minute)
-                            @php($value = sprintf('%02d', $minute))
+                            @php
+                                $value = sprintf('%02d', $minute);
+                            @endphp
                             <option value="{{ $value }}">{{ $value }}</option>
                         @endforeach
                     </select>

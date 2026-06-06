@@ -11,16 +11,21 @@ use App\Http\Controllers\Admin\TeacherController;
 use App\Http\Controllers\Admin\TeacherImportController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Guru\AttendanceRecapController;
+use App\Http\Controllers\Guru\BkMonitoringController;
+use App\Http\Controllers\Guru\BkViolationSubmissionController;
 use App\Http\Controllers\Guru\ClassRosterController;
 use App\Http\Controllers\Guru\DashboardController as GuruDashboardController;
 use App\Http\Controllers\Guru\MonitoringController;
 use App\Http\Controllers\Guru\ProfilController as GuruProfilController;
+use App\Http\Controllers\Guru\SchoolRuleController as GuruSchoolRuleController;
 use App\Http\Controllers\Guru\StudentViolationController;
 use App\Http\Controllers\Guru\ViolationHistoryController;
+use App\Http\Controllers\Guru\ViolationReportController;
 use App\Http\Controllers\Guru\ViolationTypeController;
 use App\Http\Controllers\Siswa\AbsensiController as SiswaAbsensiController;
 use App\Http\Controllers\Siswa\DashboardController as SiswaDashboardController;
 use App\Http\Controllers\Siswa\ProfilController as SiswaProfilController;
+use App\Http\Controllers\Siswa\SchoolRuleController as SiswaSchoolRuleController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
@@ -79,19 +84,45 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
 Route::middleware(['auth', 'registered', 'guru'])->prefix('guru')->name('guru.')->group(function () {
     Route::get('/dashboard', [GuruDashboardController::class, 'index'])->name('dashboard');
+    Route::middleware('bk')->prefix('bk')->name('bk.')->group(function () {
+        Route::get('/monitoring', [BkMonitoringController::class, 'index'])->name('monitoring.index');
+        Route::get('/monitoring/{monitoring}', [BkMonitoringController::class, 'show'])->name('monitoring.show');
+        Route::get('/pelanggaran', [BkViolationSubmissionController::class, 'index'])->name('pelanggaran.index');
+        Route::get('/pelanggaran/buat', [BkViolationSubmissionController::class, 'create'])->name('pelanggaran.create');
+        Route::post('/pelanggaran', [BkViolationSubmissionController::class, 'store'])->name('pelanggaran.store');
+        Route::get('/laporan', [ViolationReportController::class, 'index'])->name('laporan.index');
+        Route::get('/laporan/export-excel', [ViolationReportController::class, 'exportExcel'])->name('laporan.export-excel');
+        Route::get('/laporan/export-pdf', [ViolationReportController::class, 'exportPdf'])->name('laporan.export-pdf');
+    });
     Route::middleware('kesiswaan')->group(function () {
         Route::get('/monitoring', [MonitoringController::class, 'index'])->name('monitoring.index');
         Route::get('/monitoring/{monitoring}', [MonitoringController::class, 'show'])->name('monitoring.show');
+        Route::put('/pelanggaran-siswa/{studentViolation}/approve', [StudentViolationController::class, 'approve'])->name('pelanggaran-siswa.approve');
+        Route::put('/pelanggaran-siswa/{studentViolation}/reject', [StudentViolationController::class, 'reject'])->name('pelanggaran-siswa.reject');
         Route::resource('pelanggaran-siswa', StudentViolationController::class)
             ->parameters(['pelanggaran-siswa' => 'studentViolation']);
         Route::resource('jenis-pelanggaran', ViolationTypeController::class)
             ->parameters(['jenis-pelanggaran' => 'violationType']);
+        Route::prefix('kesiswaan')->name('kesiswaan.')->group(function () {
+            Route::get('/monitoring', [MonitoringController::class, 'index'])->name('monitoring.index');
+            Route::get('/monitoring/{monitoring}', [MonitoringController::class, 'show'])->name('monitoring.show');
+            Route::get('/pengajuan-pelanggaran', [StudentViolationController::class, 'index'])->defaults('status', 'pending')->name('pengajuan-pelanggaran.index');
+            Route::get('/laporan', [ViolationReportController::class, 'index'])->name('laporan.index');
+            Route::get('/laporan/export-excel', [ViolationReportController::class, 'exportExcel'])->name('laporan.export-excel');
+            Route::get('/laporan/export-pdf', [ViolationReportController::class, 'exportPdf'])->name('laporan.export-pdf');
+            Route::get('/tata-tertib', [GuruSchoolRuleController::class, 'index'])->name('tata-tertib.index');
+            Route::post('/tata-tertib', [GuruSchoolRuleController::class, 'store'])->name('tata-tertib.store');
+            Route::put('/tata-tertib/{schoolRule}/publish', [GuruSchoolRuleController::class, 'publish'])->name('tata-tertib.publish');
+            Route::put('/tata-tertib/{schoolRule}/unpublish', [GuruSchoolRuleController::class, 'unpublish'])->name('tata-tertib.unpublish');
+            Route::delete('/tata-tertib/{schoolRule}', [GuruSchoolRuleController::class, 'destroy'])->name('tata-tertib.destroy');
+        });
     });
     Route::middleware('wali-kelas')->group(function () {
         Route::get('/kelas-saya', [ClassRosterController::class, 'index'])->name('kelas-saya');
         Route::put('/kelas-saya/{studentProfile}/absensi', [ClassRosterController::class, 'updateAttendance'])->name('kelas-saya.absensi.update');
         Route::get('/absensi', [AttendanceRecapController::class, 'index'])->name('absensi.index');
         Route::get('/absensi/export-excel', [AttendanceRecapController::class, 'exportExcel'])->name('absensi.export-excel');
+        Route::get('/absensi/export-pdf', [AttendanceRecapController::class, 'exportPdf'])->name('absensi.export-pdf');
         Route::get('/pelanggaran', [ViolationHistoryController::class, 'index'])->name('pelanggaran');
     });
     Route::get('/profil', [GuruProfilController::class, 'show'])->name('profil');
@@ -104,6 +135,7 @@ Route::middleware(['auth', 'registered', 'guru'])->prefix('guru')->name('guru.')
 Route::middleware(['auth', 'registered', 'siswa'])->prefix('siswa')->name('siswa.')->group(function () {
     Route::get('/dashboard', [SiswaDashboardController::class, 'index'])->name('dashboard');
     Route::get('/poin', [SiswaProfilController::class, 'poin'])->name('poin');
+    Route::get('/tata-tertib', [SiswaSchoolRuleController::class, 'index'])->name('tata-tertib.index');
     Route::get('/absensi', [SiswaAbsensiController::class, 'index'])->name('absensi');
     Route::post('/absensi/cek-lokasi', [SiswaAbsensiController::class, 'checkLocation'])->name('absensi.check-location');
     Route::post('/absensi', [SiswaAbsensiController::class, 'store'])->name('absensi.store');

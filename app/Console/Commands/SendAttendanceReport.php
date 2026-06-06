@@ -81,12 +81,16 @@ class SendAttendanceReport extends Command
                 ->keyBy('student_profile_id');
 
             $presentStudents = $studentProfiles->filter(fn ($sp) => $attendances->has($sp->id)
-                && in_array($attendances[$sp->id]->status, ['hadir', 'terlambat']));
+                && $attendances[$sp->id]->status === 'hadir');
+
+            $lateStudents = $studentProfiles->filter(fn ($sp) => $attendances->has($sp->id)
+                && $attendances[$sp->id]->status === 'terlambat');
 
             $absentStudents = $studentProfiles->reject(fn ($sp) => $attendances->has($sp->id)
                 && in_array($attendances[$sp->id]->status, ['hadir', 'terlambat']));
 
             $presentCount = $presentStudents->count();
+            $lateCount = $lateStudents->count();
             $absentCount = $absentStudents->count();
 
             $message = "Laporan Absensi Harian\n";
@@ -95,6 +99,7 @@ class SendAttendanceReport extends Command
             $message .= "Waktu: {$endTime}\n";
             $message .= "\n";
             $message .= "Hadir: {$presentCount} dari {$totalStudents}\n";
+            $message .= "Terlambat: {$lateCount}\n";
             $message .= "Tidak Absen: {$absentCount}\n";
             $message .= "\n";
 

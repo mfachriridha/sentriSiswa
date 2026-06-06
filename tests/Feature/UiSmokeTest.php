@@ -50,7 +50,20 @@ test('student affairs dashboard renders monitoring shortcuts', function () {
         ->assertSuccessful()
         ->assertSee('Monitoring Siswa')
         ->assertSee('Pelanggaran Siswa')
+        ->assertSee('Laporan Kesiswaan')
+        ->assertSee('Tata Tertib')
         ->assertSee('Profil Saya');
+});
+
+test('counselor dashboard renders bk shortcuts', function () {
+    $teacher = createDashboardTeacher('counselor', '10');
+
+    $this->actingAs($teacher)
+        ->get(route('guru.dashboard'))
+        ->assertSuccessful()
+        ->assertSee('Monitoring BK')
+        ->assertSee('Pengajuan Pelanggaran')
+        ->assertSee('Laporan BK');
 });
 
 test('student dashboard and attendance page render existing primary actions', function () {
@@ -67,6 +80,7 @@ test('student dashboard and attendance page render existing primary actions', fu
         ->assertSuccessful()
         ->assertSee('Absensi')
         ->assertSee('Poin Saya')
+        ->assertSee('Tata Tertib')
         ->assertSee('Profil Saya');
 
     $this->actingAs($student)
@@ -76,7 +90,7 @@ test('student dashboard and attendance page render existing primary actions', fu
         ->assertSee('Riwayat');
 });
 
-function createDashboardTeacher(string $teacherType): User
+function createDashboardTeacher(string $teacherType, ?string $grade = null): User
 {
     $teacher = User::factory()->homeroom()->create([
         'status' => 'registered',
@@ -85,6 +99,7 @@ function createDashboardTeacher(string $teacherType): User
     $teacher->teacherProfile()->create([
         'nip' => fake()->unique()->numerify('19################'),
         'teacher_type' => $teacherType,
+        'grade' => $grade,
     ]);
 
     return $teacher;

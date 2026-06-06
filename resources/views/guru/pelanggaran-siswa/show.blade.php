@@ -20,10 +20,21 @@
         </svg>
         Kembali
     </a>
-    <a href="{{ route('guru.pelanggaran-siswa.edit', $studentViolation) }}"
-       class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors">
-        Edit
-    </a>
+    <div class="flex flex-wrap gap-2">
+        @if ($studentViolation->status === 'pending')
+            <form method="POST" action="{{ route('guru.pelanggaran-siswa.approve', $studentViolation) }}">
+                @csrf
+                @method('PUT')
+                <button class="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-700 transition-colors">
+                    ACC
+                </button>
+            </form>
+        @endif
+        <a href="{{ route('guru.pelanggaran-siswa.edit', $studentViolation) }}"
+           class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors">
+            Edit
+        </a>
+    </div>
 </div>
 
 <div class="rounded-xl border border-gray-200 bg-white p-6">
@@ -35,6 +46,9 @@
             </span>
             <span class="inline-flex items-center rounded-full bg-red-50 px-3 py-1 text-sm font-medium text-red-700">
                 {{ $studentViolation->point_deduction }} poin
+            </span>
+            <span class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">
+                {{ $statusLabels[$studentViolation->status] ?? $studentViolation->status }}
             </span>
         </div>
     </div>
@@ -80,6 +94,34 @@
             <p class="text-sm font-medium text-gray-500">Catatan</p>
             <p class="mt-1.5 text-sm text-gray-900">{{ $studentViolation->notes ?? '-' }}</p>
         </div>
+        <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
+            <p class="text-sm font-medium text-gray-500">Disetujui/Diproses oleh</p>
+            <p class="mt-1.5 text-sm text-gray-900">{{ $studentViolation->approvedBy?->name ?? '-' }}</p>
+        </div>
+        <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
+            <p class="text-sm font-medium text-gray-500">Waktu Proses</p>
+            <p class="mt-1.5 text-sm text-gray-900">{{ $studentViolation->approved_at?->translatedFormat('d M Y H:i') ?? '-' }}</p>
+        </div>
+        @if ($studentViolation->rejection_reason)
+            <div class="rounded-lg border border-red-100 bg-red-50 p-5 md:col-span-2">
+                <p class="text-sm font-medium text-red-700">Alasan Penolakan</p>
+                <p class="mt-1.5 text-sm text-red-700">{{ $studentViolation->rejection_reason }}</p>
+            </div>
+        @endif
     </div>
 </div>
+
+@if ($studentViolation->status === 'pending')
+    <div class="mt-5 rounded-xl border border-red-200 bg-white p-6">
+        <h2 class="text-lg font-semibold text-gray-900">Tolak Pengajuan</h2>
+        <form method="POST" action="{{ route('guru.pelanggaran-siswa.reject', $studentViolation) }}" class="mt-4 space-y-3">
+            @csrf
+            @method('PUT')
+            <textarea name="rejection_reason" rows="3" placeholder="Tuliskan alasan penolakan"
+                      class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">{{ old('rejection_reason') }}</textarea>
+            @error('rejection_reason') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
+            <button class="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700">Tolak Pengajuan</button>
+        </form>
+    </div>
+@endif
 @endsection

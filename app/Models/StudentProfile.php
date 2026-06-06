@@ -50,11 +50,11 @@ class StudentProfile extends Model
         }
         // Jika relasi sudah diload semua (with)
         elseif ($this->relationLoaded('studentViolations')) {
-            $deductions = $this->studentViolations->sum('point_deduction');
+            $deductions = $this->studentViolations->where('status', 'approved')->sum('point_deduction');
         }
         // Fallback: query database langsung
         else {
-            $deductions = (int) $this->studentViolations()->sum('point_deduction');
+            $deductions = (int) $this->studentViolations()->approved()->sum('point_deduction');
         }
 
         return max(0, 100 - $deductions);

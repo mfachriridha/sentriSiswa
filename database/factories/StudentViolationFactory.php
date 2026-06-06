@@ -41,6 +41,8 @@ class StudentViolationFactory extends Factory
             'violation_category' => $violationType->category,
             'point_deduction' => $violationType->point_deduction,
             'notes' => fake()->optional()->sentence(),
+            'status' => 'approved',
+            'approved_at' => now(),
         ];
     }
 }

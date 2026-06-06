@@ -10,32 +10,54 @@
 
 <div class="rounded-xl border border-gray-200 bg-white p-6">
     <div class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <form method="GET" action="{{ route('guru.absensi.index') }}" class="flex flex-col gap-3 sm:flex-row sm:items-end">
+        <form method="GET" action="{{ route('guru.absensi.index') }}" class="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
+            <div>
+                <label for="month" class="block text-sm font-medium text-gray-700">Bulan</label>
+                <input id="month" type="month" name="month" value="{{ $selectedMonth }}"
+                       class="mt-1 w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
+            </div>
             <div>
                 <label for="start_date" class="block text-sm font-medium text-gray-700">Tanggal Mulai</label>
                 <input id="start_date" type="date" name="start_date" value="{{ $startDate }}"
-                       class="mt-1 rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
+                       class="mt-1 w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
             </div>
             <div>
                 <label for="end_date" class="block text-sm font-medium text-gray-700">Tanggal Selesai</label>
                 <input id="end_date" type="date" name="end_date" value="{{ $endDate }}"
-                       class="mt-1 rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
+                       class="mt-1 w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
             </div>
-            <button type="submit" class="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-dark">
+            <div>
+                <label for="student_id" class="block text-sm font-medium text-gray-700">Siswa</label>
+                <select id="student_id" name="student_id" class="mt-1 w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
+                    <option value="">Semua Siswa</option>
+                    @foreach ($filterStudents as $filterStudent)
+                        <option value="{{ $filterStudent->id }}" {{ $selectedStudent == $filterStudent->id ? 'selected' : '' }}>{{ $filterStudent->user?->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                <select id="status" name="status" class="mt-1 w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
+                    <option value="">Semua Status</option>
+                    @foreach (['hadir' => 'Hadir', 'terlambat' => 'Terlambat', 'izin' => 'Izin', 'sakit' => 'Sakit', 'alpha' => 'Alpha'] as $value => $label)
+                        <option value="{{ $value }}" {{ $statusFilter === $value ? 'selected' : '' }}>{{ $label }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <button type="submit" class="self-end rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-dark">
                 Terapkan
             </button>
         </form>
 
         <div class="flex flex-wrap gap-2">
-            <a href="{{ route('guru.absensi.export-excel', ['start_date' => $startDate, 'end_date' => $endDate]) }}"
+            <a href="{{ route('guru.absensi.export-excel', request()->query()) }}"
                class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
                 Export Excel
             </a>
-            <button type="button" disabled
-                    title="Export PDF akan segera tersedia"
-                    class="cursor-not-allowed rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-400">
-                Export PDF (Segera Tersedia)
-            </button>
+            <a href="{{ route('guru.absensi.export-pdf', request()->query()) }}"
+               class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                Export PDF
+            </a>
         </div>
     </div>
 
@@ -63,7 +85,9 @@
             </thead>
             <tbody class="divide-y divide-gray-200 bg-white">
                 @forelse($students as $index => $student)
-                    @php($stat = $stats[$student->id])
+                    @php
+                        $stat = $stats[$student->id];
+                    @endphp
                     <tr class="hover:bg-gray-50">
                         <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-900">{{ $index + 1 }}</td>
                         <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-500">{{ $student->nis ?? '-' }}</td>

@@ -3,17 +3,31 @@
 @section('title', 'Monitoring Siswa')
 
 @section('content')
+@php
+    $routePrefix = $routePrefix ?? 'guru.monitoring';
+    $title = $title ?? 'Monitoring Siswa';
+    $description = $description ?? 'Pantau kehadiran dan pelanggaran siswa secara keseluruhan.';
+    $statusLabels = [
+        'hadir' => ['Hadir', 'bg-green-50 text-green-700'],
+        'terlambat' => ['Terlambat', 'bg-amber-50 text-amber-700'],
+        'sakit' => ['Sakit', 'bg-blue-50 text-blue-700'],
+        'izin' => ['Izin', 'bg-indigo-50 text-indigo-700'],
+        'alpha' => ['Alpha', 'bg-red-50 text-red-700'],
+        'belum_absen' => ['Belum Absen', 'bg-gray-100 text-gray-600'],
+    ];
+@endphp
+
 <div class="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
     <div>
-        <h1 class="text-2xl font-bold text-gray-900">Monitoring Siswa</h1>
-        <p class="mt-2 text-sm text-gray-500">Pantau kehadiran dan pelanggaran siswa secara keseluruhan.</p>
+        <h1 class="text-2xl font-bold text-gray-900">{{ $title }}</h1>
+        <p class="mt-2 text-sm text-gray-500">{{ $description }}</p>
     </div>
 </div>
 
 <x-alert type="success" :message="session('success')" />
 <x-alert type="error" :message="session('error')" />
 
-<form method="GET" action="{{ route('guru.monitoring.index') }}" class="mb-4 rounded-xl border border-gray-200 bg-white p-4">
+<form method="GET" action="{{ route($routePrefix.'.index') }}" class="mb-4 rounded-xl border border-gray-200 bg-white p-4">
     <div class="grid grid-cols-1 gap-3 lg:grid-cols-6">
         <div class="relative lg:col-span-2">
             <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -36,7 +50,7 @@
                 Cari
             </button>
             @if($search || $filterClass)
-                <a href="{{ route('guru.monitoring.index') }}" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">
+                <a href="{{ route($routePrefix.'.index') }}" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors">
                     Reset
                 </a>
             @endif
@@ -70,19 +84,10 @@
                                 $todayAttendance = $student->attendances->first();
                                 $status = $todayAttendance ? $todayAttendance->status : 'none';
                             @endphp
-                            @if($status === 'present')
-                                <span class="inline-flex items-center rounded-full bg-green-50 px-3 py-1 text-sm font-medium text-green-700">Hadir</span>
-                            @elseif($status === 'late')
-                                <span class="inline-flex items-center rounded-full bg-amber-50 px-3 py-1 text-sm font-medium text-amber-700">Terlambat</span>
-                            @elseif($status === 'sick')
-                                <span class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">Sakit</span>
-                            @elseif($status === 'permission')
-                                <span class="inline-flex items-center rounded-full bg-indigo-50 px-3 py-1 text-sm font-medium text-indigo-700">Izin</span>
-                            @elseif($status === 'absent')
-                                <span class="inline-flex items-center rounded-full bg-red-50 px-3 py-1 text-sm font-medium text-red-700">Alpa</span>
-                            @else
-                                <span class="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-600">-</span>
-                            @endif
+                            @php
+                                $statusMeta = $statusLabels[$status] ?? ['-', 'bg-gray-100 text-gray-600'];
+                            @endphp
+                            <span class="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium {{ $statusMeta[1] }}">{{ $statusMeta[0] }}</span>
                         </td>
                         <td class="px-4 py-3">
                             @php
@@ -105,7 +110,7 @@
                             <span class="font-bold {{ $colorClass }}">{{ $points }}</span>
                         </td>
                         <td class="px-4 py-3">
-                            <a href="{{ route('guru.monitoring.show', $student) }}" class="font-medium text-primary hover:text-primary-dark transition-colors">Detail</a>
+                            <a href="{{ route($routePrefix.'.show', $student) }}" class="font-medium text-primary hover:text-primary-dark transition-colors">Detail</a>
                         </td>
                     </tr>
                 @empty

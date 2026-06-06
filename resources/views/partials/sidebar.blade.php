@@ -118,9 +118,9 @@
                     </li>
 
                     <li>
-                        <a href="{{ route('guru.monitoring.index') }}"
+                        <a href="{{ route('guru.kesiswaan.monitoring.index') }}"
                            class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
-                                  {{ request()->routeIs('guru.monitoring.*') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
+                                  {{ request()->routeIs('guru.monitoring.*', 'guru.kesiswaan.monitoring.*') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
                             <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -152,6 +152,63 @@
                                       d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                             </svg>
                             Jenis Pelanggaran
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('guru.kesiswaan.laporan.index') }}"
+                           class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
+                                  {{ request()->routeIs('guru.kesiswaan.laporan.*') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
+                            <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6h13M9 7h13M5 7h.01M5 17h.01"/>
+                            </svg>
+                            Laporan Kesiswaan
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('guru.kesiswaan.tata-tertib.index') }}"
+                           class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
+                                  {{ request()->routeIs('guru.kesiswaan.tata-tertib.*') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
+                            <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11V7m0 8h.01M5 21h14a2 2 0 002-2V7l-6-6H5a2 2 0 00-2 2v16a2 2 0 002 2z"/>
+                            </svg>
+                            Tata Tertib
+                        </a>
+                    </li>
+                @endif
+
+                @if(auth()->user()->isCounselor())
+                    <li class="pt-5 pb-2">
+                        <span class="px-3 text-xs font-semibold uppercase tracking-wider text-gray-400">BK</span>
+                    </li>
+
+                    <li>
+                        <a href="{{ route('guru.bk.monitoring.index') }}"
+                           class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
+                                  {{ request()->routeIs('guru.bk.monitoring.*') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
+                            <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                            Monitoring BK
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('guru.bk.pelanggaran.index') }}"
+                           class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
+                                  {{ request()->routeIs('guru.bk.pelanggaran.*') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
+                            <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.07 19h13.86a2 2 0 001.74-2.99L13.74 4a2 2 0 00-3.48 0L3.33 16.01A2 2 0 005.07 19z"/>
+                            </svg>
+                            Pengajuan Pelanggaran
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('guru.bk.laporan.index') }}"
+                           class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
+                                  {{ request()->routeIs('guru.bk.laporan.*') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
+                            <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6h13M9 7h13M5 7h.01M5 17h.01"/>
+                            </svg>
+                            Laporan BK
                         </a>
                     </li>
                 @endif
@@ -251,6 +308,16 @@
                                   d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
                         </svg>
                         Poin Saya
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('siswa.tata-tertib.index') }}"
+                       class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
+                              {{ request()->routeIs('siswa.tata-tertib.*') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
+                        <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11V7m0 8h.01M5 21h14a2 2 0 002-2V7l-6-6H5a2 2 0 00-2 2v16a2 2 0 002 2z"/>
+                        </svg>
+                        Tata Tertib
                     </a>
                 </li>
 

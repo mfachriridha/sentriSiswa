@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="mb-6">
-    <a href="{{ route('guru.monitoring.index') }}"
+    <a href="{{ $backRoute ?? route('guru.monitoring.index') }}"
        class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition-colors">
         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
@@ -21,7 +21,7 @@
         <h1 class="text-2xl font-bold text-gray-900">Detail Monitoring Siswa</h1>
         <p class="mt-2 text-sm text-gray-500">{{ $student->user->name }} · {{ $student->class->name ?? '-' }}</p>
     </div>
-    <a href="{{ route('guru.pelanggaran-siswa.create', ['student_profile_id' => $student->id]) }}" class="inline-flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700 transition-colors">
+    <a href="{{ $createViolationRoute ?? route('guru.pelanggaran-siswa.create', ['student_profile_id' => $student->id]) }}" class="inline-flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700 transition-colors">
         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
         </svg>
@@ -113,20 +113,22 @@
                             <tr class="hover:bg-gray-50/50 transition-colors">
                                 <td class="whitespace-nowrap px-4 py-3">{{ \Carbon\Carbon::parse($attendance->date)->translatedFormat('d M Y') }}</td>
                                 <td class="px-4 py-3">
-                                    @if($attendance->status === 'present')
+                                    @if($attendance->status === 'hadir')
                                         <span class="inline-flex items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-700">Hadir</span>
-                                    @elseif($attendance->status === 'late')
+                                    @elseif($attendance->status === 'terlambat')
                                         <span class="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">Terlambat</span>
-                                    @elseif($attendance->status === 'sick')
+                                    @elseif($attendance->status === 'sakit')
                                         <span class="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-medium text-blue-700">Sakit</span>
-                                    @elseif($attendance->status === 'permission')
+                                    @elseif($attendance->status === 'izin')
                                         <span class="inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-700">Izin</span>
-                                    @elseif($attendance->status === 'absent')
-                                        <span class="inline-flex items-center rounded-full bg-red-50 px-2.5 py-0.5 text-xs font-medium text-red-700">Alpa</span>
+                                    @elseif($attendance->status === 'alpha')
+                                        <span class="inline-flex items-center rounded-full bg-red-50 px-2.5 py-0.5 text-xs font-medium text-red-700">Alpha</span>
+                                    @else
+                                        <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600">Belum Absen</span>
                                     @endif
                                 </td>
                                 <td class="whitespace-nowrap px-4 py-3">
-                                    {{ $attendance->time_in ? \Carbon\Carbon::parse($attendance->time_in)->format('H:i') : '-' }}
+                                    {{ $attendance->check_in_time ? \Carbon\Carbon::parse($attendance->check_in_time)->format('H:i') : '-' }}
                                 </td>
                             </tr>
                         @empty

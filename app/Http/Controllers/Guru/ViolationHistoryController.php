@@ -20,6 +20,7 @@ class ViolationHistoryController extends Controller
 
         $violations = StudentViolation::with(['studentProfile.user', 'violationType', 'recordedBy'])
             ->whereHas('studentProfile', fn ($q) => $q->where('class_id', $class->id))
+            ->approved()
             ->when($request->student_id, fn ($q, $id) => $q->where('student_profile_id', $id))
             ->when($request->category, fn ($q, $cat) => $q->where('violation_category', $cat))
             ->when($request->date_from, fn ($q, $date) => $q->where('violation_date', '>=', $date))
