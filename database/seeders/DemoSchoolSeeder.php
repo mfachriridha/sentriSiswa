@@ -37,11 +37,20 @@ class DemoSchoolSeeder extends Seeder
     private function createHomeroomTeachers(): array
     {
         $teachers = [];
+        $teacherNames = [
+            'Raka Pradipta',
+            'Nadia Lestari',
+            'Bagas Wiratama',
+            'Maya Permatasari',
+            'Dimas Mahendra',
+            'Sinta Rahmawati',
+        ];
+        $nameIndex = 0;
 
         foreach (['10', '11', '12'] as $grade) {
             for ($index = 1; $index <= 2; $index++) {
                 $teacher = User::create([
-                    'name' => "Wali Kelas {$grade}-{$index}",
+                    'name' => $teacherNames[$nameIndex],
                     'email' => "wali{$grade}{$index}@sentrisiswa.test",
                     'password' => Hash::make('password'),
                     'role' => 'teacher',
@@ -55,6 +64,7 @@ class DemoSchoolSeeder extends Seeder
                 ]);
 
                 $teachers[] = $teacher;
+                $nameIndex++;
             }
         }
 
@@ -63,9 +73,9 @@ class DemoSchoolSeeder extends Seeder
 
     private function createCounselors(): void
     {
-        foreach (['10', '11', '12'] as $grade) {
+        foreach (['10' => 'Arif Nugroho', '11' => 'Ratna Wulandari', '12' => 'Yusuf Firmansyah'] as $grade => $name) {
             $teacher = User::create([
-                'name' => "Guru BK Tingkat {$grade}",
+                'name' => $name,
                 'email' => "bk{$grade}@sentrisiswa.test",
                 'password' => Hash::make('password'),
                 'role' => 'teacher',
@@ -88,7 +98,7 @@ class DemoSchoolSeeder extends Seeder
         }
 
         $teacher = User::create([
-            'name' => 'Guru Kesiswaan',
+            'name' => 'Hendra Saputra',
             'email' => 'kesiswaan@sentrisiswa.test',
             'password' => Hash::make('password'),
             'role' => 'teacher',
@@ -138,14 +148,16 @@ class DemoSchoolSeeder extends Seeder
     {
         $students = [];
         $sequence = 1;
+        $studentNames = $this->studentNames();
 
         foreach ($classes as $class) {
             for ($index = 1; $index <= 10; $index++) {
                 $isUnregistered = $index > 8;
                 $nis = sprintf('%05d', $sequence);
+                $studentName = $studentNames[$sequence - 1];
 
                 $user = User::create([
-                    'name' => "Siswa {$class->name} {$index}",
+                    'name' => $studentName,
                     'email' => $isUnregistered ? null : "siswa{$nis}@sentrisiswa.test",
                     'password' => Hash::make('password'),
                     'role' => 'student',
@@ -171,9 +183,9 @@ class DemoSchoolSeeder extends Seeder
                     'child_number' => $index,
                     'school_of_origin' => 'SMP Demo',
                     'admission_date' => now()->subYear()->startOfMonth()->toDateString(),
-                    'father_name' => "Ayah Siswa {$nis}",
+                    'father_name' => "Bapak {$studentName}",
                     'father_occupation' => 'Karyawan',
-                    'mother_name' => "Ibu Siswa {$nis}",
+                    'mother_name' => "Ibu {$studentName}",
                     'mother_occupation' => 'Ibu Rumah Tangga',
                     'parent_address' => "Alamat orang tua {$nis}",
                     'parent_phone' => "0821{$nis}",
@@ -185,6 +197,75 @@ class DemoSchoolSeeder extends Seeder
         }
 
         return $students;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function studentNames(): array
+    {
+        return [
+            'Aditya Pratama',
+            'Aisyah Nurhaliza',
+            'Akbar Maulana',
+            'Amelia Putri',
+            'Ananda Rizky',
+            'Andika Saputra',
+            'Aulia Rahmadani',
+            'Bagus Setiawan',
+            'Bintang Ramadhan',
+            'Cahya Maharani',
+            'Citra Anggraini',
+            'Daffa Fadillah',
+            'Dewi Kartika',
+            'Dina Maharani',
+            'Eka Purnama',
+            'Elisa Febriani',
+            'Fajar Hidayat',
+            'Farhan Maulana',
+            'Fitri Lestari',
+            'Galang Prasetyo',
+            'Gilang Ramadhan',
+            'Hana Safitri',
+            'Hanif Nugraha',
+            'Indah Permatasari',
+            'Intan Pratiwi',
+            'Iqbal Firmansyah',
+            'Jihan Azzahra',
+            'Kania Maharani',
+            'Kevin Saputra',
+            'Kurnia Sari',
+            'Laila Rahma',
+            'Lukman Hakim',
+            'Maya Salsabila',
+            'Miftah Fauzan',
+            'Nabila Khairunnisa',
+            'Nadia Amalia',
+            'Naufal Akbar',
+            'Novia Ramadhani',
+            'Putra Mahendra',
+            'Putri Azzahra',
+            'Rafi Alfarizi',
+            'Rahma Fitriana',
+            'Rangga Pratama',
+            'Reza Fahlevi',
+            'Rizki Kurniawan',
+            'Salsa Nabila',
+            'Sari Wulandari',
+            'Satria Wijaya',
+            'Tasya Amelia',
+            'Tegar Saputra',
+            'Tiara Oktaviani',
+            'Vina Lestari',
+            'Wahyu Ramadhan',
+            'Wulan Puspita',
+            'Yogi Prasetyo',
+            'Yulia Rahmawati',
+            'Zahra Aulia',
+            'Zaki Mubarak',
+            'Zidan Ardiansyah',
+            'Zulfikar Hakim',
+        ];
     }
 
     /**

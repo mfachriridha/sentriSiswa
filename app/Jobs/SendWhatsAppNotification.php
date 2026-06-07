@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\WhatsappMessage;
-use App\Services\FonnteService;
+use App\Services\WapisenderService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\Middleware\RateLimited;
@@ -19,13 +19,14 @@ class SendWhatsAppNotification implements ShouldQueue
         public WhatsappMessage $whatsappMessage,
     ) {}
 
-    public function handle(FonnteService $fonnte): void
+    public function handle(WapisenderService $wapisender): void
     {
         $this->whatsappMessage->update(['status' => 'processing']);
 
-        $result = $fonnte->send(
+        $result = $wapisender->send(
             $this->whatsappMessage->recipient_phone,
             $this->whatsappMessage->message,
+            ['is_priority' => false, 'simulate_typing' => false],
         );
 
         if ($result['success']) {

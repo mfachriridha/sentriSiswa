@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
-use App\Services\FonnteService;
 use App\Services\KmlParser;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -168,26 +167,61 @@ class SettingController extends Controller
     public function whatsapp(): View
     {
         return view('admin.settings.whatsapp', [
-            'fonnteToken' => Setting::get('fonnte_token', ''),
+            'config' => [
+                'api_key' => Setting::get('wapisender_api_key', ''),
+                'device_key' => Setting::get('wapisender_device_key', ''),
+                'timeout_seconds' => Setting::get('wapisender_timeout_seconds', '60'),
+                'delay_min_seconds' => Setting::get('wapisender_delay_min_seconds', '8'),
+                'delay_max_seconds' => Setting::get('wapisender_delay_max_seconds', '15'),
+                'is_priority' => Setting::get('wapisender_is_priority', '0'),
+                'simulate_typing' => Setting::get('wapisender_simulate_typing', '0'),
+            ],
         ]);
     }
 
     public function whatsappUpdate(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'fonnte_token' => ['nullable', 'string', 'max:255'],
+            'wapisender_api_key' => ['nullable', 'string', 'max:255'],
+            'wapisender_device_key' => ['nullable', 'string', 'max:100'],
+            'wapisender_timeout_seconds' => ['required', 'integer', 'min:30', 'max:120'],
+            'wapisender_delay_min_seconds' => ['required', 'integer', 'min:1', 'max:60'],
+            'wapisender_delay_max_seconds' => ['required', 'integer', 'min:1', 'max:120'],
+            'wapisender_is_priority' => ['nullable', 'boolean'],
+            'wapisender_simulate_typing' => ['nullable', 'boolean'],
         ], [
-            'fonnte_token.max' => 'Token tidak boleh lebih dari 255 karakter.',
+            'wapisender_api_key.max' => 'API Key tidak boleh lebih dari 255 karakter.',
+            'wapisender_device_key.max' => 'Device Key tidak boleh lebih dari 100 karakter.',
+            'wapisender_timeout_seconds.required' => 'Timeout wajib diisi.',
+            'wapisender_timeout_seconds.min' => 'Timeout minimal 30 detik.',
+            'wapisender_timeout_seconds.max' => 'Timeout maksimal 120 detik.',
+            'wapisender_delay_min_seconds.required' => 'Delay minimal wajib diisi.',
+            'wapisender_delay_max_seconds.required' => 'Delay maksimal wajib diisi.',
         ]);
 
-        Setting::set('fonnte_token', $validated['fonnte_token'] ?? '');
+        if ((int) $validated['wapisender_delay_min_seconds'] > (int) $validated['wapisender_delay_max_seconds']) {
+            return back()->withErrors([
+                'wapisender_delay_max_seconds' => 'Delay maksimal harus lebih besar atau sama dengan delay minimal.',
+            ])->withInput();
+        }
+
+        if (filled($validated['wapisender_api_key'] ?? null) || blank(Setting::get('wapisender_api_key', ''))) {
+            Setting::set('wapisender_api_key', $validated['wapisender_api_key'] ?? '');
+        }
+
+        Setting::set('wapisender_device_key', $validated['wapisender_device_key'] ?? '');
+        Setting::set('wapisender_timeout_seconds', (string) $validated['wapisender_timeout_seconds']);
+        Setting::set('wapisender_delay_min_seconds', (string) $validated['wapisender_delay_min_seconds']);
+        Setting::set('wapisender_delay_max_seconds', (string) $validated['wapisender_delay_max_seconds']);
+        Setting::set('wapisender_is_priority', $request->boolean('wapisender_is_priority') ? '1' : '0');
+        Setting::set('wapisender_simulate_typing', $request->boolean('wapisender_simulate_typing') ? '1' : '0');
 
         return redirect()->route('admin.settings.whatsapp.index')->with('success', 'Konfigurasi WhatsApp berhasil disimpan.');
     }
 
-    public function whatsappTest(Request $request, FonnteService $fonnte): JsonResponse
+    public function whatsappTest(Request $request): JsonResponse
     {
-        $validated = $request->validate([
+        $request->validate([
             'phone' => ['required', 'string', 'max:20'],
             'message' => ['required', 'string', 'max:500'],
         ], [
@@ -196,8 +230,9 @@ class SettingController extends Controller
             'message.max' => 'Pesan maksimal 500 karakter.',
         ]);
 
-        $result = $fonnte->send($validated['phone'], $validated['message']);
-
-        return response()->json($result);
+        return response()->json([
+            'success' => false,
+            'error' => 'Test kirim WhatsApp belum diaktifkan. Konfigurasi Wapisender sudah bisa disimpan.',
+        ], 409);
     }
 }

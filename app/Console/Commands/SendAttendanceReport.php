@@ -7,7 +7,7 @@ use App\Models\Attendance;
 use App\Models\SchoolClass;
 use App\Models\Setting;
 use App\Models\WhatsappMessage;
-use App\Services\FonnteService;
+use App\Services\WapisenderService;
 use Illuminate\Console\Command;
 
 class SendAttendanceReport extends Command
@@ -17,7 +17,7 @@ class SendAttendanceReport extends Command
 
     protected $description = 'Kirim laporan absensi harian ke wali kelas via WhatsApp';
 
-    public function handle(FonnteService $fonnte): int
+    public function handle(WapisenderService $wapisender): int
     {
         if (now()->isWeekend()) {
             $this->info('Hari ini bukan hari aktif absensi. Laporan tidak dikirim.');
@@ -25,8 +25,8 @@ class SendAttendanceReport extends Command
             return self::SUCCESS;
         }
 
-        if (! $fonnte->isConfigured()) {
-            $this->warn('Fonnte token belum dikonfigurasi. Lewati pengiriman laporan.');
+        if (! $wapisender->isConfigured()) {
+            $this->warn('Wapisender belum dikonfigurasi. Lewati pengiriman laporan.');
 
             return self::SUCCESS;
         }
@@ -56,6 +56,7 @@ class SendAttendanceReport extends Command
         }
 
         $sentCount = 0;
+        $delaySeconds = 0;
 
         foreach ($classes as $class) {
             $teacher = $class->homeroomTeacher;
@@ -123,9 +124,10 @@ class SendAttendanceReport extends Command
             ]);
 
             SendWhatsAppNotification::dispatch($whatsappMessage)
-                ->delay(now()->addSeconds($sentCount * 8));
+                ->delay(now()->addSeconds($delaySeconds));
 
             $sentCount++;
+            $delaySeconds += $wapisender->messageDelaySeconds();
         }
 
         $this->info("Laporan absensi dikirim ke {$sentCount} wali kelas.");

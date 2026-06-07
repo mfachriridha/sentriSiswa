@@ -45,8 +45,6 @@ class ViolationReportController extends Controller
             $violation->recordedBy?->name ?? '-',
         ])->values()->all();
 
-        $chartRows = $this->statusChartRows($violations);
-
         return Excel::download(new ArrayExport([
             'Tanggal',
             'Nama',
@@ -57,7 +55,7 @@ class ViolationReportController extends Controller
             'Poin',
             'Status',
             'Dicatat Oleh',
-        ], $rows, $chartRows, 'Grafik Status Pelanggaran'), 'laporan-pelanggaran.xlsx');
+        ], $rows), 'laporan-pelanggaran.xlsx');
     }
 
     public function exportPdf(ViolationReportFilterRequest $request): Response
