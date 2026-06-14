@@ -12,6 +12,7 @@ class WhatsappMessage extends Model
         'recipient_phone',
         'recipient_name',
         'message_type',
+        'provider_message_id',
         'message',
         'status',
         'response',

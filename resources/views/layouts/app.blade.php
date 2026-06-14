@@ -4,7 +4,7 @@
         <div x-show="sidebarOpen"
              x-cloak
              x-transition.opacity
-             class="fixed inset-0 z-40 bg-gray-900/40 lg:hidden"
+             class="fixed inset-0 z-[1000] bg-gray-900/40 lg:hidden"
              @click="sidebarOpen = false"></div>
         @include('partials.sidebar')
 

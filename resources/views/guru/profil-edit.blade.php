@@ -44,21 +44,45 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('guru.profil.update') }}" class="space-y-10" enctype="multipart/form-data" x-data="{ loading: false }" @submit="loading = true">
+    <form method="POST" action="{{ route('guru.profil.update') }}" class="space-y-10" enctype="multipart/form-data"
+          x-data="{
+              loading: false,
+              photoPreview: @js($profile?->photo ? asset('storage/'.$profile->photo) : ''),
+              deletePhoto: false,
+              onPhotoChange(event) {
+                  const file = event.target.files[0];
+                  if (!file) {
+                      return;
+                  }
+                  if (!file.type.startsWith('image/')) {
+                      event.target.value = '';
+                      return;
+                  }
+                  this.deletePhoto = false;
+                  this.photoPreview = URL.createObjectURL(file);
+              },
+              removePhoto() {
+                  this.deletePhoto = true;
+                  this.photoPreview = '';
+                  document.getElementById('photo').value = '';
+              },
+          }"
+          @submit="loading = true">
         @csrf
         @method('PUT')
 
         {{-- Foto dengan preview dan tombol hapus --}}
         <div class="flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:gap-10">
             <div class="relative">
-                @if ($profile?->photo)
-                    <img id="photo-preview" src="{{ asset('storage/'.$profile->photo) }}" alt="{{ $teacher->name }}"
-                         class="h-24 w-24 rounded-full object-cover border-4 border-gray-100">
-                @else
-                    <div id="photo-preview" class="flex h-24 w-24 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary border-4 border-gray-100">
+                <template x-if="photoPreview">
+                    <img :src="photoPreview" alt="{{ $teacher->name }}"
+                         class="h-24 w-24 rounded-full border-4 border-gray-100 object-cover">
+                </template>
+                <template x-if="!photoPreview">
+                    <div class="flex h-24 w-24 items-center justify-center rounded-full border-4 border-gray-100 bg-primary/10 text-2xl font-bold text-primary">
                         {{ strtoupper(substr($teacher->name, 0, 1)) }}
                     </div>
-                @endif
+                </template>
             </div>
 
             <div class="flex flex-col gap-4">
@@ -69,10 +93,10 @@
                         </svg>
                         Ubah Foto
                     </label>
-                    <input id="photo" type="file" name="photo" accept=".jpg,.jpeg,.png,image/jpeg,image/png" class="hidden">
+                    <input id="photo" type="file" name="photo" accept=".jpg,.jpeg,.png,image/jpeg,image/png" class="hidden" @change="onPhotoChange">
 
                     @if ($profile?->photo)
-                        <button type="button" id="remove-photo" class="text-sm text-red-600 hover:text-red-800 transition-colors">
+                        <button type="button" @click="removePhoto" class="text-sm text-red-600 hover:text-red-800 transition-colors">
                             Hapus Foto
                         </button>
                     @endif
@@ -83,7 +107,7 @@
             </div>
         </div>
 
-        <input type="hidden" name="delete_photo" id="delete_photo" value="0">
+        <input type="hidden" name="delete_photo" :value="deletePhoto ? '1' : '0'">
 
         {{-- Info singkat guru (read‑only) --}}
         <div class="mb-10 grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -157,38 +181,5 @@
         </div>
     </form>
 </div>
-
-@push('scripts')
-<script>
-    // Preview foto setelah dipilih
-    document.getElementById('photo').addEventListener('change', function (e) {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function (ev) {
-            const preview = document.getElementById('photo-preview');
-            preview.src = ev.target.result;
-            preview.classList.remove('bg-primary/10', 'text-primary', 'font-bold');
-            // Hapus avatar huruf bila ada
-            const existingLetter = preview.querySelector('span');
-            if (existingLetter) existingLetter.remove();
-        };
-        reader.readAsDataURL(file);
-    });
-
-    // Tombol hapus foto (tanda delete, tidak langsung meng‑hapus di server)
-    const removeBtn = document.getElementById('remove-photo');
-    if (removeBtn) {
-        removeBtn.addEventListener('click', function () {
-            document.getElementById('delete_photo').value = '1';
-            const preview = document.getElementById('photo-preview');
-            // Ganti menjadi avatar huruf
-            preview.src = '';
-            preview.className = 'flex h-24 w-24 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary border-4 border-gray-100';
-            preview.innerHTML = '<span>{{ strtoupper(substr($teacher->name, 0, 1)) }}</span>';
-        });
-    }
-</script>
-@endpush
 
 @endsection

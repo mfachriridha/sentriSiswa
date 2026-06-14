@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use App\Services\KmlParser;
+use App\Services\WhatsAppCloudApiService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -168,13 +170,11 @@ class SettingController extends Controller
     {
         return view('admin.settings.whatsapp', [
             'config' => [
-                'api_key' => Setting::get('wapisender_api_key', ''),
-                'device_key' => Setting::get('wapisender_device_key', ''),
-                'timeout_seconds' => Setting::get('wapisender_timeout_seconds', '60'),
-                'delay_min_seconds' => Setting::get('wapisender_delay_min_seconds', '8'),
-                'delay_max_seconds' => Setting::get('wapisender_delay_max_seconds', '15'),
-                'is_priority' => Setting::get('wapisender_is_priority', '0'),
-                'simulate_typing' => Setting::get('wapisender_simulate_typing', '0'),
+                'access_token' => Setting::get('whatsapp_cloud_access_token', ''),
+                'phone_number_id' => Setting::get('whatsapp_cloud_phone_number_id', ''),
+                'business_account_id' => Setting::get('whatsapp_cloud_business_account_id', ''),
+                'api_version' => Setting::get('whatsapp_cloud_api_version', 'v23.0'),
+                'webhook_verify_token' => Setting::get('whatsapp_webhook_verify_token', ''),
             ],
         ]);
     }
@@ -182,46 +182,57 @@ class SettingController extends Controller
     public function whatsappUpdate(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'wapisender_api_key' => ['nullable', 'string', 'max:255'],
-            'wapisender_device_key' => ['nullable', 'string', 'max:100'],
-            'wapisender_timeout_seconds' => ['required', 'integer', 'min:30', 'max:120'],
-            'wapisender_delay_min_seconds' => ['required', 'integer', 'min:1', 'max:60'],
-            'wapisender_delay_max_seconds' => ['required', 'integer', 'min:1', 'max:120'],
-            'wapisender_is_priority' => ['nullable', 'boolean'],
-            'wapisender_simulate_typing' => ['nullable', 'boolean'],
+            'whatsapp_cloud_access_token' => ['nullable', 'string', 'max:1000'],
+            'whatsapp_cloud_phone_number_id' => ['nullable', 'string', 'max:100'],
+            'whatsapp_cloud_business_account_id' => ['nullable', 'string', 'max:100'],
+            'whatsapp_cloud_api_version' => ['required', 'string', 'max:20', 'regex:/^v[0-9]+\.[0-9]+$/'],
+            'whatsapp_webhook_verify_token' => ['nullable', 'string', 'min:16', 'max:255'],
+            'clear_whatsapp_cloud_access_token' => ['nullable', 'boolean'],
+            'clear_whatsapp_cloud_phone_number_id' => ['nullable', 'boolean'],
+            'clear_whatsapp_cloud_business_account_id' => ['nullable', 'boolean'],
+            'clear_whatsapp_webhook_verify_token' => ['nullable', 'boolean'],
         ], [
-            'wapisender_api_key.max' => 'API Key tidak boleh lebih dari 255 karakter.',
-            'wapisender_device_key.max' => 'Device Key tidak boleh lebih dari 100 karakter.',
-            'wapisender_timeout_seconds.required' => 'Timeout wajib diisi.',
-            'wapisender_timeout_seconds.min' => 'Timeout minimal 30 detik.',
-            'wapisender_timeout_seconds.max' => 'Timeout maksimal 120 detik.',
-            'wapisender_delay_min_seconds.required' => 'Delay minimal wajib diisi.',
-            'wapisender_delay_max_seconds.required' => 'Delay maksimal wajib diisi.',
+            'whatsapp_cloud_access_token.max' => 'Access Token tidak boleh lebih dari 1000 karakter.',
+            'whatsapp_cloud_phone_number_id.max' => 'Phone Number ID tidak boleh lebih dari 100 karakter.',
+            'whatsapp_cloud_business_account_id.max' => 'Business Account ID tidak boleh lebih dari 100 karakter.',
+            'whatsapp_cloud_api_version.required' => 'Graph API Version wajib diisi.',
+            'whatsapp_cloud_api_version.regex' => 'Format Graph API Version harus seperti v23.0.',
+            'whatsapp_webhook_verify_token.min' => 'Verify Token minimal 16 karakter.',
+            'whatsapp_webhook_verify_token.max' => 'Verify Token tidak boleh lebih dari 255 karakter.',
         ]);
 
-        if ((int) $validated['wapisender_delay_min_seconds'] > (int) $validated['wapisender_delay_max_seconds']) {
-            return back()->withErrors([
-                'wapisender_delay_max_seconds' => 'Delay maksimal harus lebih besar atau sama dengan delay minimal.',
-            ])->withInput();
+        if ($request->boolean('clear_whatsapp_cloud_access_token')) {
+            Setting::set('whatsapp_cloud_access_token', '');
+        } elseif (filled($validated['whatsapp_cloud_access_token'] ?? null) || blank(Setting::get('whatsapp_cloud_access_token', ''))) {
+            Setting::set('whatsapp_cloud_access_token', $validated['whatsapp_cloud_access_token'] ?? '');
         }
 
-        if (filled($validated['wapisender_api_key'] ?? null) || blank(Setting::get('wapisender_api_key', ''))) {
-            Setting::set('wapisender_api_key', $validated['wapisender_api_key'] ?? '');
+        if ($request->boolean('clear_whatsapp_cloud_phone_number_id')) {
+            Setting::set('whatsapp_cloud_phone_number_id', '');
+        } elseif (filled($validated['whatsapp_cloud_phone_number_id'] ?? null) || blank(Setting::get('whatsapp_cloud_phone_number_id', ''))) {
+            Setting::set('whatsapp_cloud_phone_number_id', $validated['whatsapp_cloud_phone_number_id'] ?? '');
         }
 
-        Setting::set('wapisender_device_key', $validated['wapisender_device_key'] ?? '');
-        Setting::set('wapisender_timeout_seconds', (string) $validated['wapisender_timeout_seconds']);
-        Setting::set('wapisender_delay_min_seconds', (string) $validated['wapisender_delay_min_seconds']);
-        Setting::set('wapisender_delay_max_seconds', (string) $validated['wapisender_delay_max_seconds']);
-        Setting::set('wapisender_is_priority', $request->boolean('wapisender_is_priority') ? '1' : '0');
-        Setting::set('wapisender_simulate_typing', $request->boolean('wapisender_simulate_typing') ? '1' : '0');
+        if ($request->boolean('clear_whatsapp_cloud_business_account_id')) {
+            Setting::set('whatsapp_cloud_business_account_id', '');
+        } elseif (filled($validated['whatsapp_cloud_business_account_id'] ?? null) || blank(Setting::get('whatsapp_cloud_business_account_id', ''))) {
+            Setting::set('whatsapp_cloud_business_account_id', $validated['whatsapp_cloud_business_account_id'] ?? '');
+        }
+
+        Setting::set('whatsapp_cloud_api_version', $validated['whatsapp_cloud_api_version']);
+
+        if ($request->boolean('clear_whatsapp_webhook_verify_token')) {
+            Setting::set('whatsapp_webhook_verify_token', '');
+        } elseif (filled($validated['whatsapp_webhook_verify_token'] ?? null) || blank(Setting::get('whatsapp_webhook_verify_token', ''))) {
+            Setting::set('whatsapp_webhook_verify_token', $validated['whatsapp_webhook_verify_token'] ?? '');
+        }
 
         return redirect()->route('admin.settings.whatsapp.index')->with('success', 'Konfigurasi WhatsApp berhasil disimpan.');
     }
 
-    public function whatsappTest(Request $request): JsonResponse
+    public function whatsappTest(Request $request, WhatsAppCloudApiService $whatsapp): JsonResponse
     {
-        $request->validate([
+        $validated = $request->validate([
             'phone' => ['required', 'string', 'max:20'],
             'message' => ['required', 'string', 'max:500'],
         ], [
@@ -230,9 +241,30 @@ class SettingController extends Controller
             'message.max' => 'Pesan maksimal 500 karakter.',
         ]);
 
+        $normalizedPhone = $whatsapp->normalizePhone($validated['phone']);
+        $cooldownKey = 'whatsapp:test:cooldown:'.sha1($normalizedPhone);
+        $availableAt = Cache::get($cooldownKey);
+
+        if (is_numeric($availableAt) && now()->timestamp < (int) $availableAt) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Nomor ini baru saja dipakai untuk test. Tunggu sebelum mengirim ulang.',
+                'retry_after' => max(1, (int) $availableAt - now()->timestamp),
+            ], 429);
+        }
+
+        $availableAt = now()->addSeconds(WhatsAppCloudApiService::TEST_COOLDOWN_SECONDS)->timestamp;
+        Cache::put($cooldownKey, $availableAt, WhatsAppCloudApiService::TEST_COOLDOWN_SECONDS);
+
+        $result = $whatsapp->send($normalizedPhone, $validated['message'], [
+            'timeout' => 60,
+            'connect_timeout' => 10,
+            'retries' => 0,
+        ]);
+
         return response()->json([
-            'success' => false,
-            'error' => 'Test kirim WhatsApp belum diaktifkan. Konfigurasi Wapisender sudah bisa disimpan.',
-        ], 409);
+            ...$result,
+            'retry_after' => WhatsAppCloudApiService::TEST_COOLDOWN_SECONDS,
+        ], $result['success'] ? 200 : 422);
     }
 }

@@ -26,7 +26,31 @@ use App\Http\Controllers\Siswa\AbsensiController as SiswaAbsensiController;
 use App\Http\Controllers\Siswa\DashboardController as SiswaDashboardController;
 use App\Http\Controllers\Siswa\ProfilController as SiswaProfilController;
 use App\Http\Controllers\Siswa\SchoolRuleController as SiswaSchoolRuleController;
+use App\Http\Controllers\Webhook\WhatsAppWebhookController;
+use App\Models\StudentProfile;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
+
+Route::get('/', function () {
+    if (! auth()->check()) {
+        return view('welcome', [
+            'studentCount' => StudentProfile::count(),
+            'teacherCount' => User::where('role', 'teacher')->count(),
+        ]);
+    }
+
+    return match (auth()->user()->role) {
+        'admin' => redirect()->route('admin.dashboard'),
+        'teacher' => redirect()->route('guru.dashboard'),
+        'student' => redirect()->route('siswa.dashboard'),
+        default => redirect()->route('login'),
+    };
+})->name('home');
+
+Route::view('/privacy-policy', 'legal.privacy-policy')->name('privacy-policy');
+Route::view('/terms-of-service', 'legal.terms-of-service')->name('terms-of-service');
+Route::get('/whatsapp/webhook', [WhatsAppWebhookController::class, 'verify'])->name('whatsapp.webhook.verify');
+Route::post('/whatsapp/webhook', [WhatsAppWebhookController::class, 'handle'])->name('whatsapp.webhook.handle');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AdminLoginController::class, 'create'])->name('login');
@@ -39,14 +63,6 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AdminLoginController::class, 'destroy'])->name('logout');
-    Route::get('/', function () {
-        return match (auth()->user()->role) {
-            'admin' => redirect()->route('admin.dashboard'),
-            'teacher' => redirect()->route('guru.dashboard'),
-            'student' => redirect()->route('siswa.dashboard'),
-            default => redirect()->route('login'),
-        };
-    });
 });
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -119,6 +135,7 @@ Route::middleware(['auth', 'registered', 'guru'])->prefix('guru')->name('guru.')
     });
     Route::middleware('wali-kelas')->group(function () {
         Route::get('/kelas-saya', [ClassRosterController::class, 'index'])->name('kelas-saya');
+        Route::get('/kelas-saya/{studentProfile}', [ClassRosterController::class, 'show'])->name('kelas-saya.show');
         Route::put('/kelas-saya/{studentProfile}/absensi', [ClassRosterController::class, 'updateAttendance'])->name('kelas-saya.absensi.update');
         Route::get('/absensi', [AttendanceRecapController::class, 'index'])->name('absensi.index');
         Route::get('/absensi/export-excel', [AttendanceRecapController::class, 'exportExcel'])->name('absensi.export-excel');

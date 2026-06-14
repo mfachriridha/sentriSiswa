@@ -23,6 +23,12 @@ test('counselor can only monitor assigned grade and cannot approve violations', 
         ->assertDontSee($gradeElevenStudent->user->name);
 
     $this->actingAs($counselor)
+        ->get(route('guru.bk.monitoring.show', $gradeTenStudent))
+        ->assertSuccessful()
+        ->assertSee('Detail Siswa')
+        ->assertSee('Biodata Lengkap');
+
+    $this->actingAs($counselor)
         ->get(route('guru.bk.monitoring.show', $gradeElevenStudent))
         ->assertForbidden();
 
@@ -36,6 +42,21 @@ test('counselor can only monitor assigned grade and cannot approve violations', 
     $this->actingAs($counselor)
         ->put(route('guru.pelanggaran-siswa.approve', $violation))
         ->assertForbidden();
+});
+
+test('student affairs can view student detail across classes', function () {
+    [, $gradeTenStudent, $gradeElevenStudent] = actorWorkflowUsers();
+    $studentAffairs = createActorWorkflowTeacher('student_affairs');
+
+    $this->actingAs($studentAffairs)
+        ->get(route('guru.kesiswaan.monitoring.show', $gradeTenStudent))
+        ->assertSuccessful()
+        ->assertSee($gradeTenStudent->user->name);
+
+    $this->actingAs($studentAffairs)
+        ->get(route('guru.kesiswaan.monitoring.show', $gradeElevenStudent))
+        ->assertSuccessful()
+        ->assertSee($gradeElevenStudent->user->name);
 });
 
 test('counselor submits violation and student affairs approves it', function () {

@@ -124,7 +124,7 @@
                     <span class="inline-block h-3 w-3 rounded-sm bg-red-400/40 mr-1 align-middle"></span> Toleransi ({{ $toleranceMeters }} m)
                 @endif
             </p>
-            <div id="geofence-map" class="h-[450px] overflow-hidden rounded-xl border border-gray-200 bg-gray-100"></div>
+            <div id="geofence-map" class="relative z-0 h-[450px] overflow-hidden rounded-xl border border-gray-200 bg-gray-100"></div>
             <p class="mt-2 text-xs text-gray-400">{{ count($geofenceData['coordinates'] ?? []) }} titik koordinat terdeteksi.</p>
         </div>
     @endif

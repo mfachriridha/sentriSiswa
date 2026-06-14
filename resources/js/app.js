@@ -18,3 +18,11 @@ window.L = L;
 window.turfPolygon = turfPolygon;
 window.turfPoint = turfPoint;
 window.turfBuffer = turfBuffer;
+
+window.sentriLandingSlide = (targetId) => {
+    document.getElementById(targetId)?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'start',
+    });
+};

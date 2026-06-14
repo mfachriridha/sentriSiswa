@@ -1,4 +1,4 @@
-<aside class="fixed inset-y-0 left-0 z-50 flex w-56 shrink-0 -translate-x-full flex-col border-r border-gray-200 bg-white shadow-xl transition-transform duration-200 lg:z-10 lg:translate-x-0 lg:shadow-none"
+<aside class="fixed inset-y-0 left-0 z-[1010] flex w-56 shrink-0 -translate-x-full flex-col border-r border-gray-200 bg-white shadow-xl transition-transform duration-200 lg:z-10 lg:translate-x-0 lg:shadow-none"
        :class="{ 'translate-x-0': sidebarOpen, '-translate-x-full': ! sidebarOpen }">
     <div class="flex h-14 items-center gap-3 border-b border-gray-200 px-4">
         <img src="{{ asset('storage/assets/logo/logo-sidebar.png') }}" alt="Sentri Siswa" class="h-8 w-auto rounded-lg border border-gray-200">
@@ -363,14 +363,16 @@
                     @endif
                 </p>
             </div>
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" class="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors" title="Keluar">
-                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                    </svg>
-                </button>
-            </form>
         </div>
+        <form method="POST" action="{{ route('logout') }}" class="mt-3">
+            @csrf
+            <button type="submit"
+                    class="flex w-full items-center justify-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 transition-colors hover:bg-red-100 hover:text-red-800">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                </svg>
+                Keluar
+            </button>
+        </form>
     </div>
 </aside>

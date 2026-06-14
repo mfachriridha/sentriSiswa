@@ -89,4 +89,28 @@ class ClassRosterController extends Controller
 
         return redirect()->route('guru.kelas-saya')->with('success', 'Status absensi hari ini berhasil diperbarui.');
     }
+
+    public function show(StudentProfile $studentProfile): View
+    {
+        $class = Auth::user()->homeroomClass;
+
+        if (! $class || $studentProfile->class_id !== $class->id) {
+            abort(403);
+        }
+
+        $studentProfile->load([
+            'user',
+            'class',
+            'biodata',
+            'studentViolations' => fn ($query) => $query->approved()->latest('violation_date')->with(['recordedBy', 'violationType']),
+            'attendances' => fn ($query) => $query->latest('date')->take(30),
+        ]);
+
+        return view('guru.monitoring.show', [
+            'student' => $studentProfile,
+            'backRoute' => route('guru.kelas-saya'),
+            'backLabel' => 'Kembali ke Kelas Saya',
+            'createViolationRoute' => null,
+        ]);
+    }
 }

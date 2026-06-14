@@ -19,6 +19,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->trustProxies(at: '*');
+        $middleware->preventRequestForgery(except: [
+            'whatsapp/webhook',
+        ]);
 
         $middleware->alias([
             'admin' => EnsureUserIsAdmin::class,

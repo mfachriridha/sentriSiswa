@@ -74,6 +74,8 @@ class DemoSchoolSeeder extends Seeder
     private function createCounselors(): void
     {
         foreach (['10' => 'Arif Nugroho', '11' => 'Ratna Wulandari', '12' => 'Yusuf Firmansyah'] as $grade => $name) {
+            $grade = (string) $grade;
+
             $teacher = User::create([
                 'name' => $name,
                 'email' => "bk{$grade}@sentrisiswa.test",
@@ -148,13 +150,17 @@ class DemoSchoolSeeder extends Seeder
     {
         $students = [];
         $sequence = 1;
-        $studentNames = $this->studentNames();
+        $studentNames = collect($this->studentNames())->shuffle()->values()->all();
+        $birthPlaces = ['Jakarta', 'Bandung', 'Bogor', 'Depok', 'Bekasi', 'Tangerang'];
+        $streets = ['Jalan Melati Raya', 'Jalan Kenanga Indah', 'Jalan Cempaka Putih', 'Jalan Mawar Asri', 'Jalan Anggrek Timur', 'Jalan Flamboyan'];
+        $occupations = ['Karyawan', 'Wiraswasta', 'Guru', 'Perawat', 'Pedagang', 'Pegawai Negeri'];
 
         foreach ($classes as $class) {
-            for ($index = 1; $index <= 10; $index++) {
-                $isUnregistered = $index > 8;
+            for ($index = 1; $index <= 3; $index++) {
+                $isUnregistered = $index === 3;
                 $nis = sprintf('%05d', $sequence);
                 $studentName = $studentNames[$sequence - 1];
+                $street = $streets[($sequence - 1) % count($streets)];
 
                 $user = User::create([
                     'name' => $studentName,
@@ -170,25 +176,29 @@ class DemoSchoolSeeder extends Seeder
                     'nis' => $nis,
                     'class_id' => $class->id,
                     'phone' => "0812{$nis}",
-                    'address' => "Alamat demo siswa {$nis}",
+                    'address' => $street.', Kelurahan Sentri',
                 ]);
 
                 StudentBiodata::create([
                     'student_profile_id' => $profile->id,
-                    'place_of_birth' => 'Jakarta',
+                    'place_of_birth' => $birthPlaces[($sequence - 1) % count($birthPlaces)],
                     'date_of_birth' => now()->subYears(16)->subDays($sequence)->toDateString(),
                     'gender' => $index % 2 === 0 ? 'P' : 'L',
                     'religion' => 'Islam',
                     'family_status' => 'Kandung',
                     'child_number' => $index,
-                    'school_of_origin' => 'SMP Demo',
+                    'school_of_origin' => 'SMP Nusantara',
                     'admission_date' => now()->subYear()->startOfMonth()->toDateString(),
                     'father_name' => "Bapak {$studentName}",
-                    'father_occupation' => 'Karyawan',
+                    'father_occupation' => $occupations[($sequence - 1) % count($occupations)],
                     'mother_name' => "Ibu {$studentName}",
                     'mother_occupation' => 'Ibu Rumah Tangga',
-                    'parent_address' => "Alamat orang tua {$nis}",
+                    'parent_address' => $street.', Kelurahan Sentri',
                     'parent_phone' => "0821{$nis}",
+                    'guardian_name' => "Wali {$studentName}",
+                    'guardian_occupation' => $occupations[$sequence % count($occupations)],
+                    'guardian_address' => $street.', Kelurahan Sentri',
+                    'guardian_phone' => "0831{$nis}",
                 ]);
 
                 $students[] = $profile;

@@ -7,7 +7,7 @@ use App\Models\Attendance;
 use App\Models\SchoolClass;
 use App\Models\Setting;
 use App\Models\WhatsappMessage;
-use App\Services\WapisenderService;
+use App\Services\WhatsAppCloudApiService;
 use Illuminate\Console\Command;
 
 class SendAttendanceReport extends Command
@@ -17,7 +17,7 @@ class SendAttendanceReport extends Command
 
     protected $description = 'Kirim laporan absensi harian ke wali kelas via WhatsApp';
 
-    public function handle(WapisenderService $wapisender): int
+    public function handle(WhatsAppCloudApiService $whatsapp): int
     {
         if (now()->isWeekend()) {
             $this->info('Hari ini bukan hari aktif absensi. Laporan tidak dikirim.');
@@ -25,8 +25,8 @@ class SendAttendanceReport extends Command
             return self::SUCCESS;
         }
 
-        if (! $wapisender->isConfigured()) {
-            $this->warn('Wapisender belum dikonfigurasi. Lewati pengiriman laporan.');
+        if (! $whatsapp->isConfigured()) {
+            $this->warn('WhatsApp Cloud API belum dikonfigurasi. Lewati pengiriman laporan.');
 
             return self::SUCCESS;
         }
@@ -127,7 +127,7 @@ class SendAttendanceReport extends Command
                 ->delay(now()->addSeconds($delaySeconds));
 
             $sentCount++;
-            $delaySeconds += $wapisender->messageDelaySeconds();
+            $delaySeconds += $whatsapp->messageDelaySeconds();
         }
 
         $this->info("Laporan absensi dikirim ke {$sentCount} wali kelas.");

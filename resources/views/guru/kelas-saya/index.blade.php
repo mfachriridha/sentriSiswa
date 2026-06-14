@@ -121,6 +121,9 @@
                                 @endif
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 text-sm">
+                                <a href="{{ route('guru.kelas-saya.show', $student) }}" class="mr-3 font-medium text-primary hover:text-primary-dark">
+                                    Detail
+                                </a>
                                 @if($isWeekday)
                                     <button type="button"
                                             data-update-url="{{ route('guru.kelas-saya.absensi.update', $student) }}"

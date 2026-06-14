@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\WhatsappMessage;
-use App\Services\WapisenderService;
+use App\Services\WhatsAppCloudApiService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\Middleware\RateLimited;
@@ -19,19 +19,19 @@ class SendWhatsAppNotification implements ShouldQueue
         public WhatsappMessage $whatsappMessage,
     ) {}
 
-    public function handle(WapisenderService $wapisender): void
+    public function handle(WhatsAppCloudApiService $whatsapp): void
     {
         $this->whatsappMessage->update(['status' => 'processing']);
 
-        $result = $wapisender->send(
+        $result = $whatsapp->send(
             $this->whatsappMessage->recipient_phone,
             $this->whatsappMessage->message,
-            ['is_priority' => false, 'simulate_typing' => false],
         );
 
         if ($result['success']) {
             $this->whatsappMessage->update([
                 'status' => 'sent',
+                'provider_message_id' => data_get($result, 'response.messages.0.id'),
                 'response' => json_encode($result['response']),
                 'sent_at' => now(),
             ]);

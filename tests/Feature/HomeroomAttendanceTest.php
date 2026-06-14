@@ -107,6 +107,24 @@ test('homeroom teacher cannot update student from another class', function () {
         ->assertForbidden();
 });
 
+test('homeroom teacher can view own student detail but not another class detail', function () {
+    [$teacher, $class] = createHomeroomTeacherWithClass();
+    $student = createStudentInClass($class, 'Ayu', '10001')->load('user');
+    [, $otherClass] = createHomeroomTeacherWithClass('X IPA 2');
+    $otherStudent = createStudentInClass($otherClass, 'Citra', '10003');
+
+    $this->actingAs($teacher)
+        ->get(route('guru.kelas-saya.show', $student))
+        ->assertSuccessful()
+        ->assertSee('Detail Siswa')
+        ->assertSee('Biodata Lengkap')
+        ->assertSee($student->user->name);
+
+    $this->actingAs($teacher)
+        ->get(route('guru.kelas-saya.show', $otherStudent))
+        ->assertForbidden();
+});
+
 test('recap summarizes final weekday records and ignores weekend and belum absen records', function () {
     Carbon::setTestNow('2026-06-08 08:00:00');
 
