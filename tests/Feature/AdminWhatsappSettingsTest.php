@@ -14,22 +14,24 @@ test('admin can save whatsapp cloud api configuration without sending a message'
     $this->actingAs($admin)
         ->get(route('admin.settings.whatsapp.index'))
         ->assertSuccessful()
-        ->assertSee('WhatsApp Cloud API')
+        ->assertSee('WhatsApp API')
+        ->assertSee('API Token')
+        ->assertSee('Phone Number ID')
+        ->assertSee('Webhook Meta')
+        ->assertSee('Generate')
+        ->assertSee('Copy')
         ->assertSee('Belum tersimpan');
 
     $this->actingAs($admin)
         ->put(route('admin.settings.whatsapp.update'), [
             'whatsapp_cloud_access_token' => 'test-access-token',
             'whatsapp_cloud_phone_number_id' => '1234567890',
-            'whatsapp_cloud_business_account_id' => '9876543210',
-            'whatsapp_cloud_api_version' => 'v23.0',
             'whatsapp_webhook_verify_token' => 'sentri-webhook-token',
         ])
         ->assertRedirect(route('admin.settings.whatsapp.index'));
 
     expect(Setting::get('whatsapp_cloud_access_token'))->toBe('test-access-token');
     expect(Setting::get('whatsapp_cloud_phone_number_id'))->toBe('1234567890');
-    expect(Setting::get('whatsapp_cloud_business_account_id'))->toBe('9876543210');
     expect(Setting::get('whatsapp_cloud_api_version'))->toBe('v23.0');
     expect(Setting::get('whatsapp_webhook_verify_token'))->toBe('sentri-webhook-token');
 
@@ -44,14 +46,12 @@ test('admin can clear stored whatsapp cloud api credentials', function () {
     $admin = User::factory()->admin()->create(['status' => 'registered']);
     Setting::set('whatsapp_cloud_access_token', 'test-access-token');
     Setting::set('whatsapp_cloud_phone_number_id', '1234567890');
-    Setting::set('whatsapp_cloud_business_account_id', '9876543210');
     Setting::set('whatsapp_webhook_verify_token', 'sentri-webhook-token');
 
     $this->actingAs($admin)
         ->put(route('admin.settings.whatsapp.update'), [
             'clear_whatsapp_cloud_access_token' => '1',
             'clear_whatsapp_cloud_phone_number_id' => '1',
-            'clear_whatsapp_cloud_business_account_id' => '1',
             'clear_whatsapp_webhook_verify_token' => '1',
             'whatsapp_cloud_api_version' => 'v23.0',
         ])
@@ -59,7 +59,6 @@ test('admin can clear stored whatsapp cloud api credentials', function () {
 
     expect(Setting::get('whatsapp_cloud_access_token'))->toBe('');
     expect(Setting::get('whatsapp_cloud_phone_number_id'))->toBe('');
-    expect(Setting::get('whatsapp_cloud_business_account_id'))->toBe('');
     expect(Setting::get('whatsapp_webhook_verify_token'))->toBe('');
 });
 

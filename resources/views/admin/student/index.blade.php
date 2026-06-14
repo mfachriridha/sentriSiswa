@@ -56,6 +56,7 @@
     placeholder="Cari nama, NISN, atau NIS..."
     :filters="[
         ['name' => 'grade', 'label' => 'Tingkat', 'value' => $filterGrade, 'options' => ['' => 'Semua Tingkat', '10' => '10', '11' => '11', '12' => '12']],
+        ['name' => 'status', 'label' => 'Status', 'value' => $filterStatus, 'options' => ['' => 'Semua Status', 'registered' => 'Terdaftar', 'unregistered' => 'Belum Terdaftar']],
     ]"
     :sort="$sort"
     :direction="$direction"
@@ -181,7 +182,7 @@
             @empty
                 <tr>
                     <td colspan="5" class="px-6 py-16 text-center text-sm text-gray-500">
-                    {{ $search || $filterGrade ? 'Tidak ada siswa yang sesuai dengan pencarian.' : 'Belum ada data siswa.' }}
+                    {{ $search || $filterGrade || $filterStatus ? 'Tidak ada siswa yang sesuai dengan pencarian.' : 'Belum ada data siswa.' }}
                 </td>
                 </tr>
             @endforelse

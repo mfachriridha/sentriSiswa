@@ -21,6 +21,7 @@ class TeacherController extends Controller
         $search = $request->get('search', '');
         $filterType = $request->get('teacher_type', '');
         $filterGrade = $request->get('grade', '');
+        $filterStatus = $request->get('status', '');
         $sort = $request->get('sort', 'created_at');
         $direction = $request->get('direction', 'desc');
         $allowed = ['name', 'email', 'created_at', 'nip', 'teacher_type', 'phone', 'class_name'];
@@ -48,6 +49,10 @@ class TeacherController extends Controller
             });
         }
 
+        if (in_array($filterStatus, ['registered', 'unregistered'], true)) {
+            $teachers->where('status', $filterStatus);
+        }
+
         if ($sort === 'class_name') {
             $teachers = $teachers->orderBy(
                 SchoolClass::select('name')
@@ -70,11 +75,12 @@ class TeacherController extends Controller
             'search' => $search,
             'teacher_type' => $filterType,
             'grade' => $filterGrade,
+            'status' => $filterStatus,
             'sort' => $sort,
             'direction' => $direction,
         ]);
 
-        return view('admin.teacher.index', compact('teachers', 'sort', 'direction', 'search', 'filterType', 'filterGrade'));
+        return view('admin.teacher.index', compact('teachers', 'sort', 'direction', 'search', 'filterType', 'filterGrade', 'filterStatus'));
     }
 
     public function create(): View

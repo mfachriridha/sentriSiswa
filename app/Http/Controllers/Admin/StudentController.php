@@ -20,6 +20,7 @@ class StudentController extends Controller
     {
         $search = $request->get('search', '');
         $filterGrade = $request->get('grade', '');
+        $filterStatus = $request->get('status', '');
         $sort = $request->get('sort', 'created_at');
         $direction = $request->get('direction', 'desc');
         $allowed = ['name', 'email', 'created_at', 'nisn', 'nis', 'class_name'];
@@ -40,6 +41,10 @@ class StudentController extends Controller
 
         if ($filterGrade) {
             $students->whereHas('studentProfile.class', fn ($q) => $q->where('grade', $filterGrade));
+        }
+
+        if (in_array($filterStatus, ['registered', 'unregistered'], true)) {
+            $students->where('status', $filterStatus);
         }
 
         if ($sort === 'class_name') {
@@ -63,11 +68,12 @@ class StudentController extends Controller
         $students = $students->paginate(25)->appends([
             'search' => $search,
             'grade' => $filterGrade,
+            'status' => $filterStatus,
             'sort' => $sort,
             'direction' => $direction,
         ]);
 
-        return view('admin.student.index', compact('students', 'sort', 'direction', 'search', 'filterGrade'));
+        return view('admin.student.index', compact('students', 'sort', 'direction', 'search', 'filterGrade', 'filterStatus'));
     }
 
     public function create(): View

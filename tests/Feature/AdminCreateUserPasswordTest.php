@@ -190,3 +190,63 @@ test('unregistered teachers are blocked from guru dashboard by the registered mi
 
     $this->assertGuest();
 });
+
+test('admin can filter students by registration status', function () {
+    $admin = User::factory()->admin()->create();
+    $registeredStudent = User::factory()->student()->create([
+        'name' => 'Siswa Terdaftar',
+        'status' => 'registered',
+    ]);
+    $unregisteredStudent = User::factory()->student()->create([
+        'name' => 'Siswa Belum Daftar',
+        'status' => 'unregistered',
+    ]);
+
+    StudentProfile::factory()->create(['user_id' => $registeredStudent->id]);
+    StudentProfile::factory()->create(['user_id' => $unregisteredStudent->id]);
+
+    $this->actingAs($admin)
+        ->get(route('admin.siswa.index', ['status' => 'registered']))
+        ->assertSuccessful()
+        ->assertSee('Siswa Terdaftar')
+        ->assertDontSee('Siswa Belum Daftar');
+
+    $this->actingAs($admin)
+        ->get(route('admin.siswa.index', ['status' => 'unregistered']))
+        ->assertSuccessful()
+        ->assertSee('Siswa Belum Daftar')
+        ->assertDontSee('Siswa Terdaftar');
+});
+
+test('admin can filter teachers by registration status', function () {
+    $admin = User::factory()->admin()->create();
+    $registeredTeacher = User::factory()->homeroom()->create([
+        'name' => 'Guru Terdaftar',
+        'status' => 'registered',
+    ]);
+    $unregisteredTeacher = User::factory()->homeroom()->create([
+        'name' => 'Guru Belum Daftar',
+        'status' => 'unregistered',
+    ]);
+
+    TeacherProfile::factory()->create([
+        'user_id' => $registeredTeacher->id,
+        'teacher_type' => 'homeroom',
+    ]);
+    TeacherProfile::factory()->create([
+        'user_id' => $unregisteredTeacher->id,
+        'teacher_type' => 'homeroom',
+    ]);
+
+    $this->actingAs($admin)
+        ->get(route('admin.guru.index', ['status' => 'registered']))
+        ->assertSuccessful()
+        ->assertSee('Guru Terdaftar')
+        ->assertDontSee('Guru Belum Daftar');
+
+    $this->actingAs($admin)
+        ->get(route('admin.guru.index', ['status' => 'unregistered']))
+        ->assertSuccessful()
+        ->assertSee('Guru Belum Daftar')
+        ->assertDontSee('Guru Terdaftar');
+});

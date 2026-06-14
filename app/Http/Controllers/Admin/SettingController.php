@@ -172,7 +172,6 @@ class SettingController extends Controller
             'config' => [
                 'access_token' => Setting::get('whatsapp_cloud_access_token', ''),
                 'phone_number_id' => Setting::get('whatsapp_cloud_phone_number_id', ''),
-                'business_account_id' => Setting::get('whatsapp_cloud_business_account_id', ''),
                 'api_version' => Setting::get('whatsapp_cloud_api_version', 'v23.0'),
                 'webhook_verify_token' => Setting::get('whatsapp_webhook_verify_token', ''),
             ],
@@ -184,18 +183,14 @@ class SettingController extends Controller
         $validated = $request->validate([
             'whatsapp_cloud_access_token' => ['nullable', 'string', 'max:1000'],
             'whatsapp_cloud_phone_number_id' => ['nullable', 'string', 'max:100'],
-            'whatsapp_cloud_business_account_id' => ['nullable', 'string', 'max:100'],
-            'whatsapp_cloud_api_version' => ['required', 'string', 'max:20', 'regex:/^v[0-9]+\.[0-9]+$/'],
+            'whatsapp_cloud_api_version' => ['nullable', 'string', 'max:20', 'regex:/^v[0-9]+\.[0-9]+$/'],
             'whatsapp_webhook_verify_token' => ['nullable', 'string', 'min:16', 'max:255'],
             'clear_whatsapp_cloud_access_token' => ['nullable', 'boolean'],
             'clear_whatsapp_cloud_phone_number_id' => ['nullable', 'boolean'],
-            'clear_whatsapp_cloud_business_account_id' => ['nullable', 'boolean'],
             'clear_whatsapp_webhook_verify_token' => ['nullable', 'boolean'],
         ], [
             'whatsapp_cloud_access_token.max' => 'Access Token tidak boleh lebih dari 1000 karakter.',
             'whatsapp_cloud_phone_number_id.max' => 'Phone Number ID tidak boleh lebih dari 100 karakter.',
-            'whatsapp_cloud_business_account_id.max' => 'Business Account ID tidak boleh lebih dari 100 karakter.',
-            'whatsapp_cloud_api_version.required' => 'Graph API Version wajib diisi.',
             'whatsapp_cloud_api_version.regex' => 'Format Graph API Version harus seperti v23.0.',
             'whatsapp_webhook_verify_token.min' => 'Verify Token minimal 16 karakter.',
             'whatsapp_webhook_verify_token.max' => 'Verify Token tidak boleh lebih dari 255 karakter.',
@@ -213,13 +208,7 @@ class SettingController extends Controller
             Setting::set('whatsapp_cloud_phone_number_id', $validated['whatsapp_cloud_phone_number_id'] ?? '');
         }
 
-        if ($request->boolean('clear_whatsapp_cloud_business_account_id')) {
-            Setting::set('whatsapp_cloud_business_account_id', '');
-        } elseif (filled($validated['whatsapp_cloud_business_account_id'] ?? null) || blank(Setting::get('whatsapp_cloud_business_account_id', ''))) {
-            Setting::set('whatsapp_cloud_business_account_id', $validated['whatsapp_cloud_business_account_id'] ?? '');
-        }
-
-        Setting::set('whatsapp_cloud_api_version', $validated['whatsapp_cloud_api_version']);
+        Setting::set('whatsapp_cloud_api_version', $validated['whatsapp_cloud_api_version'] ?? Setting::get('whatsapp_cloud_api_version', 'v23.0'));
 
         if ($request->boolean('clear_whatsapp_webhook_verify_token')) {
             Setting::set('whatsapp_webhook_verify_token', '');

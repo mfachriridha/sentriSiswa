@@ -57,6 +57,7 @@
     :filters="[
         ['name' => 'teacher_type', 'label' => 'Tipe', 'value' => $filterType, 'options' => ['' => 'Semua Tipe', 'homeroom' => 'Wali Kelas', 'counselor' => 'BK', 'student_affairs' => 'Kesiswaan']],
         ['name' => 'grade', 'label' => 'Tingkat', 'value' => $filterGrade, 'options' => ['' => 'Semua Tingkat', '10' => '10', '11' => '11', '12' => '12']],
+        ['name' => 'status', 'label' => 'Status', 'value' => $filterStatus, 'options' => ['' => 'Semua Status', 'registered' => 'Terdaftar', 'unregistered' => 'Belum Terdaftar']],
     ]"
     :sort="$sort"
     :direction="$direction"
@@ -183,7 +184,7 @@
             @empty
                 <tr>
                     <td colspan="7" class="px-6 py-16 text-center text-sm text-gray-500">
-                    {{ $search || $filterType || $filterGrade ? 'Tidak ada guru yang sesuai dengan pencarian.' : 'Belum ada data guru.' }}
+                    {{ $search || $filterType || $filterGrade || $filterStatus ? 'Tidak ada guru yang sesuai dengan pencarian.' : 'Belum ada data guru.' }}
                 </td>
                 </tr>
             @endforelse
