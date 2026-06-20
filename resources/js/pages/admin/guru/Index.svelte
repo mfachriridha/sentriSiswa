@@ -6,7 +6,7 @@
 
 <script lang="ts">
     import { Link, router } from '@inertiajs/svelte';
-    import { Plus, Users } from '@lucide/svelte';
+    import { Plus, Upload, Users } from '@lucide/svelte';
     import AppHead from '@/components/AppHead.svelte';
     import Heading from '@/components/Heading.svelte';
     import { Button } from '@/components/ui/button';
@@ -79,6 +79,10 @@
         description="Kelola data guru (Wali Kelas, BK, Kesiswaan)"
     >
         {#snippet actions()}
+            <Button variant="outline" size="sm" href="/admin/guru/impor">
+                <Upload class="size-4" />
+                Impor
+            </Button>
             <Button size="sm" asChild>
                 {#snippet children(props)}
                     <Link href="/admin/guru/create" class={props.class}>
