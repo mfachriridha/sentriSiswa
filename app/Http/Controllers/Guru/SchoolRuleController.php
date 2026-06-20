@@ -18,7 +18,7 @@ class SchoolRuleController extends Controller
             ->latest()
             ->paginate(15);
 
-        return view('guru.kesiswaan.tata-tertib.index', compact('schoolRules'));
+        return view('kesiswaan.tata-tertib.index', compact('schoolRules'));
     }
 
     public function store(StoreSchoolRuleRequest $request): RedirectResponse
@@ -34,7 +34,7 @@ class SchoolRuleController extends Controller
             'uploaded_by_user_id' => Auth::id(),
         ]);
 
-        return redirect()->route('guru.kesiswaan.tata-tertib.index')->with('success', 'Tata tertib berhasil diunggah.');
+        return redirect()->route('kesiswaan.tata-tertib.index')->with('success', 'Tata tertib berhasil diunggah.');
     }
 
     public function publish(SchoolRule $schoolRule): RedirectResponse
@@ -42,14 +42,14 @@ class SchoolRuleController extends Controller
         SchoolRule::query()->where('id', '!=', $schoolRule->id)->update(['is_published' => false]);
         $schoolRule->update(['is_published' => true]);
 
-        return redirect()->route('guru.kesiswaan.tata-tertib.index')->with('success', 'Tata tertib berhasil dipublikasikan.');
+        return redirect()->route('kesiswaan.tata-tertib.index')->with('success', 'Tata tertib berhasil dipublikasikan.');
     }
 
     public function unpublish(SchoolRule $schoolRule): RedirectResponse
     {
         $schoolRule->update(['is_published' => false]);
 
-        return redirect()->route('guru.kesiswaan.tata-tertib.index')->with('success', 'Tata tertib berhasil dinonaktifkan.');
+        return redirect()->route('kesiswaan.tata-tertib.index')->with('success', 'Tata tertib berhasil dinonaktifkan.');
     }
 
     public function destroy(SchoolRule $schoolRule): RedirectResponse
@@ -57,6 +57,6 @@ class SchoolRuleController extends Controller
         Storage::disk('public')->delete($schoolRule->file_path);
         $schoolRule->delete();
 
-        return redirect()->route('guru.kesiswaan.tata-tertib.index')->with('success', 'Tata tertib berhasil dihapus.');
+        return redirect()->route('kesiswaan.tata-tertib.index')->with('success', 'Tata tertib berhasil dihapus.');
     }
 }

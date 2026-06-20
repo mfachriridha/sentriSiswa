@@ -23,7 +23,7 @@ class AttendanceRecapController extends Controller
         $class = Auth::user()->homeroomClass;
 
         if (! $class) {
-            return view('guru.absensi.empty');
+            return view('wali-kelas.absensi.empty');
         }
 
         [$startDate, $endDate] = $this->dateRange($request);
@@ -36,7 +36,7 @@ class AttendanceRecapController extends Controller
         $selectedStudent = $validated['student_id'] ?? '';
         $selectedMonth = $validated['month'] ?? '';
 
-        return view('guru.absensi.index', compact('class', 'students', 'filterStudents', 'stats', 'startDate', 'endDate', 'statusFilter', 'selectedStudent', 'selectedMonth'));
+        return view('wali-kelas.absensi.index', compact('class', 'students', 'filterStudents', 'stats', 'startDate', 'endDate', 'statusFilter', 'selectedStudent', 'selectedMonth'));
     }
 
     public function exportExcel(AttendanceRecapFilterRequest $request): BinaryFileResponse

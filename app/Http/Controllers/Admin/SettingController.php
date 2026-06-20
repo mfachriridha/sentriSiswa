@@ -20,15 +20,17 @@ class SettingController extends Controller
         $startTime = Setting::get('attendance_start_time', '06:30');
         $endTime = Setting::get('attendance_end_time', '07:00');
         $lateToleranceMinutes = Setting::get('attendance_late_tolerance_minutes');
+        $updatedAt = Setting::get('attendance_time_updated_at');
 
         if (! is_numeric($lateToleranceMinutes)) {
             $lateToleranceMinutes = max(0, $this->minutesFromTime($endTime) - $this->minutesFromTime(Setting::get('attendance_late_time', '07:00')));
         }
 
-        return view('admin.settings.attendance-time', [
+        return view('admin.pengaturan.attendance-time', [
             'startTime' => $startTime,
             'endTime' => $endTime,
             'lateToleranceMinutes' => (int) $lateToleranceMinutes,
+            'updatedAt' => $updatedAt,
         ]);
     }
 
@@ -70,6 +72,7 @@ class SettingController extends Controller
         Setting::set('attendance_end_time', $endTime);
         Setting::set('attendance_late_tolerance_minutes', (string) $lateToleranceMinutes);
         Setting::set('attendance_late_time', $this->formatMinutesAsTime($this->minutesFromTime($endTime) - $lateToleranceMinutes));
+        Setting::set('attendance_time_updated_at', now()->toDateTimeString());
 
         return redirect()->route('admin.settings.attendance-time.index')->with('success', 'Konfigurasi waktu absen berhasil disimpan.');
     }
@@ -109,7 +112,7 @@ class SettingController extends Controller
             $geofenceData = null;
         }
 
-        return view('admin.settings.attendance-location', [
+        return view('admin.pengaturan.attendance-location', [
             'geofenceData' => $geofenceData,
             'toleranceMeters' => (int) $toleranceMeters,
         ]);
@@ -168,7 +171,7 @@ class SettingController extends Controller
 
     public function whatsapp(): View
     {
-        return view('admin.settings.whatsapp', [
+        return view('admin.pengaturan.whatsapp', [
             'config' => [
                 'access_token' => Setting::get('whatsapp_cloud_access_token', ''),
                 'phone_number_id' => Setting::get('whatsapp_cloud_phone_number_id', ''),

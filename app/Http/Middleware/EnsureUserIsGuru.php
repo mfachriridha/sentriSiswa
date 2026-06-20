@@ -10,7 +10,7 @@ class EnsureUserIsGuru
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (! $request->user() || ! $request->user()->isTeacher()) {
+        if (! $request->user() || ! $request->user()->isGuru()) {
             abort(403);
         }
 

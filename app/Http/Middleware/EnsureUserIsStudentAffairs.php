@@ -10,7 +10,7 @@ class EnsureUserIsStudentAffairs
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (! $request->user() || ! $request->user()->isStudentAffairs()) {
+        if (! $request->user() || ! $request->user()->isKesiswaan()) {
             abort(403);
         }
 

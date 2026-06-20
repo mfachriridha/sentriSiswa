@@ -27,7 +27,7 @@ class StudentController extends Controller
         $sort = in_array($sort, $allowed) ? $sort : 'created_at';
         $direction = in_array($direction, ['asc', 'desc']) ? $direction : 'desc';
 
-        $students = User::where('role', 'student')
+        $students = User::where('role', 'siswa')
             ->with('studentProfile.class');
 
         if ($search) {
@@ -73,14 +73,14 @@ class StudentController extends Controller
             'direction' => $direction,
         ]);
 
-        return view('admin.student.index', compact('students', 'sort', 'direction', 'search', 'filterGrade', 'filterStatus'));
+        return view('admin.siswa.index', compact('students', 'sort', 'direction', 'search', 'filterGrade', 'filterStatus'));
     }
 
     public function create(): View
     {
         $classes = SchoolClass::orderBy('grade')->orderBy('name')->get();
 
-        return view('admin.student.create', compact('classes'));
+        return view('admin.siswa.create', compact('classes'));
     }
 
     public function store(StoreStudentRequest $request): RedirectResponse
@@ -89,7 +89,7 @@ class StudentController extends Controller
             $data = [
                 'name' => $request->name,
                 'email' => $request->email,
-                'role' => 'student',
+                'role' => 'siswa',
                 'status' => 'unregistered',
                 'password' => Hash::make($request->filled('password') ? $request->password : 'password'),
             ];
@@ -112,7 +112,7 @@ class StudentController extends Controller
     {
         $student->load('studentProfile.class');
 
-        return view('admin.student.show', compact('student'));
+        return view('admin.siswa.show', compact('student'));
     }
 
     public function edit(User $student): View
@@ -120,7 +120,7 @@ class StudentController extends Controller
         $student->load('studentProfile');
         $classes = SchoolClass::orderBy('grade')->orderBy('name')->get();
 
-        return view('admin.student.edit', compact('student', 'classes'));
+        return view('admin.siswa.edit', compact('student', 'classes'));
     }
 
     public function update(UpdateStudentRequest $request, User $student): RedirectResponse
@@ -159,8 +159,8 @@ class StudentController extends Controller
 
     public function deleteAll(): RedirectResponse
     {
-        StudentProfile::whereHas('user', fn ($q) => $q->where('role', 'student'))->delete();
-        User::where('role', 'student')->delete();
+        StudentProfile::whereHas('user', fn ($q) => $q->where('role', 'siswa'))->delete();
+        User::where('role', 'siswa')->delete();
 
         return redirect()->route('admin.siswa.index')->with('success', 'Semua siswa berhasil dihapus.');
     }

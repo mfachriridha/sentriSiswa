@@ -15,7 +15,7 @@ class ViolationHistoryController extends Controller
         $class = Auth::user()->homeroomClass;
 
         if (! $class) {
-            return view('guru.pelanggaran.empty');
+            return view('wali-kelas.pelanggaran.empty');
         }
 
         $violations = StudentViolation::with(['studentProfile.user', 'violationType', 'recordedBy'])
@@ -36,6 +36,6 @@ class ViolationHistoryController extends Controller
             ->select('student_profiles.*')
             ->get();
 
-        return view('guru.pelanggaran.index', compact('class', 'violations', 'students'));
+        return view('wali-kelas.pelanggaran.index', compact('class', 'violations', 'students'));
     }
 }

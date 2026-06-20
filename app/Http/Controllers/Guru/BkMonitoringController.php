@@ -5,13 +5,14 @@ namespace App\Http\Controllers\Guru;
 use App\Http\Controllers\Controller;
 use App\Models\SchoolClass;
 use App\Models\StudentProfile;
+use App\Services\AbsenceWarningService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class BkMonitoringController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request, AbsenceWarningService $absenceWarning): View
     {
         $grade = Auth::user()->teacherProfile?->grade;
         $search = $request->get('search', '');
@@ -38,14 +39,16 @@ class BkMonitoringController extends Controller
 
         $students = $query->paginate(25)->withQueryString();
         $classes = SchoolClass::where('grade', $grade)->orderBy('name')->get();
-        $routePrefix = 'guru.bk.monitoring';
+        $routePrefix = 'bk.monitoring';
         $title = 'Monitoring BK';
         $description = 'Pantau absensi dan pelanggaran siswa tingkat '.$grade.'.';
+        $alphaWarnings = $absenceWarning->alphaCountsForStudentIds($students->getCollection()->pluck('id'));
+        $warningThreshold = AbsenceWarningService::Threshold;
 
-        return view('guru.monitoring.index', compact('students', 'classes', 'search', 'filterClass', 'routePrefix', 'title', 'description'));
+        return view('kesiswaan.monitoring.index', compact('students', 'classes', 'search', 'filterClass', 'routePrefix', 'title', 'description', 'alphaWarnings', 'warningThreshold'));
     }
 
-    public function show(StudentProfile $monitoring): View
+    public function show(StudentProfile $monitoring, AbsenceWarningService $absenceWarning): View
     {
         $grade = Auth::user()->teacherProfile?->grade;
 
@@ -59,10 +62,12 @@ class BkMonitoringController extends Controller
             'attendances' => fn ($query) => $query->latest('date')->take(30),
         ]);
 
-        return view('guru.monitoring.show', [
+        return view('kesiswaan.monitoring.show', [
             'student' => $monitoring,
-            'backRoute' => route('guru.bk.monitoring.index'),
-            'createViolationRoute' => route('guru.bk.pelanggaran.create', ['student_profile_id' => $monitoring->id]),
+            'backRoute' => route('bk.monitoring.index'),
+            'createViolationRoute' => route('bk.pelanggaran.create', ['student_profile_id' => $monitoring->id]),
+            'alphaWarningCount' => $absenceWarning->alphaCountForStudentId($monitoring->id),
+            'warningThreshold' => AbsenceWarningService::Threshold,
         ]);
     }
 }

@@ -67,7 +67,7 @@ class TeacherImport implements ToCollection, WithChunkReading, WithHeadingRow
 
             $newUsers[] = [
                 'name' => $parsed['name'],
-                'role' => 'teacher',
+                'role' => $parsed['role'],
                 'status' => 'unregistered',
                 'password' => $this->defaultPassword,
                 'email' => null,
@@ -78,7 +78,7 @@ class TeacherImport implements ToCollection, WithChunkReading, WithHeadingRow
             $profileRows[] = [
                 'name' => $parsed['name'],
                 'nip' => $parsed['nip'],
-                'teacher_type' => $parsed['teacherType'],
+                'role' => $parsed['role'],
                 'className' => $parsed['className'],
                 'grade' => $parsed['grade'],
             ];
@@ -119,7 +119,7 @@ class TeacherImport implements ToCollection, WithChunkReading, WithHeadingRow
             $this->teachersExisting += $existingCount;
 
             if (count($freshUsers) > 0) {
-                $firstId = User::where('role', 'teacher')->latest('id')->first()->id;
+                $firstId = User::whereIn('role', ['wali_kelas', 'bk', 'kesiswaan'])->latest('id')->first()->id;
                 $newUserOffset = $firstId - count($freshUsers) + 1;
             } else {
                 $newUserOffset = 0;
@@ -148,20 +148,19 @@ class TeacherImport implements ToCollection, WithChunkReading, WithHeadingRow
                 $inserts[] = [
                     'user_id' => $userId,
                     'nip' => $nip,
-                    'teacher_type' => $profile['teacher_type'],
                     'grade' => $profile['grade'],
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];
 
-                if ($profile['teacher_type'] === 'homeroom' && $className && isset($this->classCache[$className]) && $userId) {
+                if ($profile['role'] === 'wali_kelas' && $className && isset($this->classCache[$className]) && $userId) {
                     SchoolClass::where('id', $this->classCache[$className])
                         ->update(['homeroom_teacher_id' => $userId]);
                 }
             }
 
             foreach (array_chunk($inserts, 500) as $chunk) {
-                TeacherProfile::upsert($chunk, ['user_id'], ['nip', 'teacher_type', 'grade', 'updated_at']);
+                TeacherProfile::upsert($chunk, ['user_id'], ['nip', 'grade', 'updated_at']);
             }
         });
     }
@@ -183,7 +182,7 @@ class TeacherImport implements ToCollection, WithChunkReading, WithHeadingRow
             return [
                 'name' => $name,
                 'nip' => $nip,
-                'teacherType' => 'homeroom',
+                'role' => 'wali_kelas',
                 'className' => $className,
                 'grade' => $grade,
             ];
@@ -195,11 +194,11 @@ class TeacherImport implements ToCollection, WithChunkReading, WithHeadingRow
         $className = trim((string) ($row['kelas'] ?? ''));
 
         $typeRaw = trim((string) ($row['tipe'] ?? ''));
-        $teacherType = in_array(strtolower($typeRaw), ['bk', 'guru bk']) ? 'counselor'
-            : (in_array(strtolower($typeRaw), ['kesiswaan', 'student_affairs']) ? 'student_affairs' : 'homeroom');
+        $role = in_array(strtolower($typeRaw), ['bk', 'guru bk'], true) ? 'bk'
+            : (in_array(strtolower($typeRaw), ['kesiswaan', 'student_affairs'], true) ? 'kesiswaan' : 'wali_kelas');
 
         $grade = null;
-        if ($teacherType === 'counselor' && ! empty($typeRaw)) {
+        if ($role === 'bk' && ! empty($typeRaw)) {
             $gradeNum = (int) strtok($className ? $className : '0', ' .-');
             $grade = in_array($gradeNum, [10, 11, 12]) ? (string) $gradeNum : null;
         }
@@ -207,7 +206,7 @@ class TeacherImport implements ToCollection, WithChunkReading, WithHeadingRow
         return [
             'name' => $name,
             'nip' => $nip,
-            'teacherType' => $teacherType,
+            'role' => $role,
             'className' => $className,
             'grade' => $grade,
         ];

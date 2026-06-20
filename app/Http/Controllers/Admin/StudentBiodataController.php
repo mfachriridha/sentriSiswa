@@ -19,7 +19,7 @@ class StudentBiodataController extends Controller
     {
         $student->load('studentProfile.biodata');
 
-        return view('admin.student.biodata', compact('student'));
+        return view('admin.siswa.biodata', compact('student'));
     }
 
     public function update(UpdateStudentBiodataRequest $request, User $student): RedirectResponse

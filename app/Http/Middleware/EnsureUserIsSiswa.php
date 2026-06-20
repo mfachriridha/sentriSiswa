@@ -10,7 +10,7 @@ class EnsureUserIsSiswa
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (! $request->user() || ! $request->user()->isStudent()) {
+        if (! $request->user() || ! $request->user()->isSiswa()) {
             abort(403);
         }
 

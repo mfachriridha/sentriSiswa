@@ -20,6 +20,12 @@
                             <li>{{ $error }}</li>
                         @endforeach
                     </ul>
+                    @if (session('admin_whatsapp_url'))
+                        <a href="{{ session('admin_whatsapp_url') }}" target="_blank" rel="noopener"
+                           class="mt-3 inline-flex items-center justify-center rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700">
+                            Hubungi Admin
+                        </a>
+                    @endif
                 </div>
             @endif
 
@@ -54,6 +60,7 @@
                 <div>
                     <label for="identity" class="block text-sm font-medium text-gray-700" id="identity-label">NIP / NISN / NIS</label>
                     <input id="identity" type="text" name="identity" value="{{ old('identity') }}" required
+                           inputmode="numeric" pattern="[0-9]*" autocomplete="off"
                            class="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm
                                   placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20
                                   transition-colors"
@@ -107,6 +114,9 @@
     }
 
     radios.forEach(r => r.addEventListener('change', updateRoleUI));
+    identityInput.addEventListener('input', () => {
+        identityInput.value = identityInput.value.replace(/\D/g, '');
+    });
     updateRoleUI();
 </script>
 @endpush

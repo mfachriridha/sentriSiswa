@@ -24,7 +24,7 @@ class TeacherImportController extends Controller
 
     public function create(): View
     {
-        return view('admin.teacher.import');
+        return view('admin.guru.import');
     }
 
     public function upload(Request $request): RedirectResponse
@@ -97,7 +97,7 @@ class TeacherImportController extends Controller
             ['path' => route('admin.guru.impor.pratinjau')],
         );
 
-        return view('admin.teacher.import-preview', [
+        return view('admin.guru.import-preview', [
             'previewRows' => $paginated,
             'totalRows' => $total,
             'filePath' => $path,

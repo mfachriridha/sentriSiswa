@@ -8,7 +8,7 @@ class RejectStudentViolationRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->isStudentAffairs() === true;
+        return $this->user()?->isKesiswaan() === true;
     }
 
     /**

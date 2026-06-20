@@ -15,7 +15,7 @@ class VerifyIdentityRequest extends FormRequest
     {
         return [
             'role' => ['required', 'in:teacher,student'],
-            'identity' => ['required', 'string'],
+            'identity' => ['required', 'string', 'regex:/^[0-9]+$/'],
         ];
     }
 
@@ -26,6 +26,7 @@ class VerifyIdentityRequest extends FormRequest
             'role.in' => 'Peran tidak valid.',
             'identity.required' => 'Masukkan NIP atau NISN/NIS.',
             'identity.string' => 'Format tidak valid.',
+            'identity.regex' => 'NIP, NISN, atau NIS hanya boleh berisi angka.',
         ];
     }
 }

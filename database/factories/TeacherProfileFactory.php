@@ -15,7 +15,7 @@ class TeacherProfileFactory extends Factory
         return [
             'nip' => null,
             'phone' => null,
-            'teacher_type' => null,
+            'grade' => null,
         ];
     }
 
@@ -24,7 +24,7 @@ class TeacherProfileFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'nip' => fake()->unique()->numerify('19##########'),
             'phone' => fake()->numerify('08##########'),
-            'teacher_type' => 'homeroom',
+            'grade' => null,
         ]);
     }
 
@@ -33,7 +33,7 @@ class TeacherProfileFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'nip' => fake()->unique()->numerify('19##########'),
             'phone' => fake()->numerify('08##########'),
-            'teacher_type' => 'counselor',
+            'grade' => fake()->randomElement(['10', '11', '12']),
         ]);
     }
 }

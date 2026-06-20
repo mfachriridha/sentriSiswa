@@ -30,7 +30,7 @@ class BkViolationSubmissionController extends Controller
 
         $statusLabels = StudentViolation::statusLabels();
 
-        return view('guru.bk.pelanggaran.index', compact('studentViolations', 'status', 'statusLabels', 'grade'));
+        return view('bk.pelanggaran.index', compact('studentViolations', 'status', 'statusLabels', 'grade'));
     }
 
     public function create(Request $request): View
@@ -43,7 +43,7 @@ class BkViolationSubmissionController extends Controller
         $categoryLabels = ViolationType::categoryLabels();
         $selectedStudentId = $request->get('student_profile_id', '');
 
-        return view('guru.bk.pelanggaran.create', compact('students', 'violationTypes', 'categoryLabels', 'selectedStudentId'));
+        return view('bk.pelanggaran.create', compact('students', 'violationTypes', 'categoryLabels', 'selectedStudentId'));
     }
 
     public function store(StoreStudentViolationRequest $request): RedirectResponse
@@ -66,7 +66,7 @@ class BkViolationSubmissionController extends Controller
             'status' => 'pending',
         ]);
 
-        return redirect()->route('guru.bk.pelanggaran.index')->with('success', 'Pengajuan pelanggaran berhasil dikirim ke kesiswaan.');
+        return redirect()->route('bk.pelanggaran.index')->with('success', 'Pengajuan pelanggaran berhasil dikirim ke kesiswaan.');
     }
 
     /**
@@ -78,7 +78,7 @@ class BkViolationSubmissionController extends Controller
 
         return StudentProfile::with(['user', 'class'])
             ->whereHas('class', fn ($query) => $query->where('grade', $grade))
-            ->whereHas('user', fn ($query) => $query->where('role', 'student'))
+            ->whereHas('user', fn ($query) => $query->where('role', 'siswa'))
             ->get()
             ->sortBy(fn (StudentProfile $studentProfile) => $studentProfile->user?->name ?? '')
             ->values();

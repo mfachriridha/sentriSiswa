@@ -71,7 +71,7 @@ class ProfilController extends Controller
         // Update phone (still separate)
         $profile->update(['phone' => $data['phone'] ?? null]);
 
-        return redirect()->route('guru.profil')->with('success', 'Profil berhasil diperbarui.');
+        return redirect()->route($teacher->profilRouteName())->with('success', 'Profil berhasil diperbarui.');
     }
 
     public function uploadPhoto(): RedirectResponse
@@ -91,7 +91,7 @@ class ProfilController extends Controller
 
         $profile->update(['photo' => $path]);
 
-        return redirect()->route('guru.profil')->with('success', 'Foto berhasil diunggah.');
+        return redirect()->route($teacher->profilRouteName())->with('success', 'Foto berhasil diunggah.');
     }
 
     public function deletePhoto(): RedirectResponse
@@ -104,6 +104,6 @@ class ProfilController extends Controller
             $profile->update(['photo' => null]);
         }
 
-        return redirect()->route('guru.profil')->with('success', 'Foto berhasil dihapus.');
+        return redirect()->route($teacher->profilRouteName())->with('success', 'Foto berhasil dihapus.');
     }
 }

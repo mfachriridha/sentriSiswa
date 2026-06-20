@@ -53,7 +53,7 @@
                 @forelse ($violations as $violation)
                     <tr class="hover:bg-gray-50 transition-colors">
                         <td class="whitespace-nowrap px-4 py-3 text-gray-700">
-                            {{ Carbon\Carbon::parse($violation->violation_date)->translatedFormat('d M Y') }}
+                            {{ Carbon\Carbon::parse($violation->violation_date)->translatedFormat('d F Y') }}
                         </td>
                         <td class="px-4 py-3 font-medium text-gray-900">{{ $violation->violation_name }}</td>
                         <td class="hidden px-4 py-3 md:table-cell">

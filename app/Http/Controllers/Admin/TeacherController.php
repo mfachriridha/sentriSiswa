@@ -19,16 +19,16 @@ class TeacherController extends Controller
     public function index(Request $request): View
     {
         $search = $request->get('search', '');
-        $filterType = $request->get('teacher_type', '');
+        $filterRole = $request->get('role', '');
         $filterGrade = $request->get('grade', '');
         $filterStatus = $request->get('status', '');
         $sort = $request->get('sort', 'created_at');
         $direction = $request->get('direction', 'desc');
-        $allowed = ['name', 'email', 'created_at', 'nip', 'teacher_type', 'phone', 'class_name'];
+        $allowed = ['name', 'email', 'created_at', 'nip', 'role', 'phone', 'class_name'];
         $sort = in_array($sort, $allowed) ? $sort : 'created_at';
         $direction = in_array($direction, ['asc', 'desc']) ? $direction : 'desc';
 
-        $teachers = User::where('role', 'teacher')
+        $teachers = User::whereIn('role', ['wali_kelas', 'bk', 'kesiswaan'])
             ->with(['teacherProfile', 'homeroomClass']);
 
         if ($search) {
@@ -38,8 +38,8 @@ class TeacherController extends Controller
             });
         }
 
-        if ($filterType) {
-            $teachers->whereHas('teacherProfile', fn ($q) => $q->where('teacher_type', $filterType));
+        if (in_array($filterRole, ['wali_kelas', 'bk', 'kesiswaan'], true)) {
+            $teachers->where('role', $filterRole);
         }
 
         if ($filterGrade) {
@@ -60,7 +60,7 @@ class TeacherController extends Controller
                     ->limit(1),
                 $direction,
             );
-        } elseif (in_array($sort, ['nip', 'teacher_type', 'phone'])) {
+        } elseif (in_array($sort, ['nip', 'phone'])) {
             $teachers = $teachers->orderBy(
                 TeacherProfile::select($sort)
                     ->whereColumn('teacher_profiles.user_id', 'users.id')
@@ -73,19 +73,19 @@ class TeacherController extends Controller
 
         $teachers = $teachers->paginate(25)->appends([
             'search' => $search,
-            'teacher_type' => $filterType,
+            'role' => $filterRole,
             'grade' => $filterGrade,
             'status' => $filterStatus,
             'sort' => $sort,
             'direction' => $direction,
         ]);
 
-        return view('admin.teacher.index', compact('teachers', 'sort', 'direction', 'search', 'filterType', 'filterGrade', 'filterStatus'));
+        return view('admin.guru.index', compact('teachers', 'sort', 'direction', 'search', 'filterRole', 'filterGrade', 'filterStatus'));
     }
 
     public function create(): View
     {
-        return view('admin.teacher.create');
+        return view('admin.guru.create');
     }
 
     public function store(StoreTeacherRequest $request): RedirectResponse
@@ -94,7 +94,7 @@ class TeacherController extends Controller
             $data = [
                 'name' => $request->name,
                 'email' => $request->email,
-                'role' => 'teacher',
+                'role' => $request->role,
                 'status' => 'unregistered',
                 'password' => Hash::make($request->filled('password') ? $request->password : 'password'),
             ];
@@ -104,8 +104,7 @@ class TeacherController extends Controller
             $user->teacherProfile()->create([
                 'nip' => $request->nip,
                 'phone' => $request->phone,
-                'teacher_type' => $request->teacher_type,
-                'grade' => $request->teacher_type === 'counselor' ? $request->grade : null,
+                'grade' => $request->role === 'bk' ? $request->grade : null,
             ]);
         });
 
@@ -116,14 +115,14 @@ class TeacherController extends Controller
     {
         $teacher->load(['teacherProfile', 'homeroomClass']);
 
-        return view('admin.teacher.show', compact('teacher'));
+        return view('admin.guru.show', compact('teacher'));
     }
 
     public function edit(User $teacher): View
     {
         $teacher->load('teacherProfile');
 
-        return view('admin.teacher.edit', compact('teacher'));
+        return view('admin.guru.edit', compact('teacher'));
     }
 
     public function update(UpdateTeacherRequest $request, User $teacher): RedirectResponse
@@ -132,6 +131,7 @@ class TeacherController extends Controller
             $teacher->update([
                 'name' => $request->name,
                 'email' => $request->email,
+                'role' => $request->role,
             ]);
 
             if ($request->filled('password')) {
@@ -143,8 +143,7 @@ class TeacherController extends Controller
                 [
                     'nip' => $request->nip,
                     'phone' => $request->phone,
-                    'teacher_type' => $request->teacher_type,
-                    'grade' => $request->teacher_type === 'counselor' ? $request->grade : null,
+                    'grade' => $request->role === 'bk' ? $request->grade : null,
                 ],
             );
         });
@@ -161,8 +160,8 @@ class TeacherController extends Controller
 
     public function deleteAll(): RedirectResponse
     {
-        TeacherProfile::whereHas('user', fn ($q) => $q->where('role', 'teacher'))->delete();
-        User::where('role', 'teacher')->delete();
+        TeacherProfile::whereHas('user', fn ($q) => $q->whereIn('role', ['wali_kelas', 'bk', 'kesiswaan']))->delete();
+        User::whereIn('role', ['wali_kelas', 'bk', 'kesiswaan'])->delete();
 
         return redirect()->route('admin.guru.index')->with('success', 'Semua guru berhasil dihapus.');
     }

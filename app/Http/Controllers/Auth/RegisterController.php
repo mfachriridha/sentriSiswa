@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
 
 class RegisterController extends Controller
@@ -28,7 +29,10 @@ class RegisterController extends Controller
         if ($role === 'teacher') {
             $profile = TeacherProfile::where('nip', $identity)->first();
             if (! $profile) {
-                return back()->withErrors(['identity' => 'NIP tidak ditemukan.'])->onlyInput('identity', 'role');
+                return back()
+                    ->withErrors(['identity' => 'NIP tidak ditemukan.'])
+                    ->with('admin_whatsapp_url', $this->adminWhatsAppUrl())
+                    ->onlyInput('identity', 'role');
             }
 
             if ($profile->user && $profile->user->isRegistered()) {
@@ -40,7 +44,10 @@ class RegisterController extends Controller
                 ->first();
 
             if (! $profile) {
-                return back()->withErrors(['identity' => 'NISN/NIS tidak ditemukan.'])->onlyInput('identity', 'role');
+                return back()
+                    ->withErrors(['identity' => 'NISN/NIS tidak ditemukan.'])
+                    ->with('admin_whatsapp_url', $this->adminWhatsAppUrl())
+                    ->onlyInput('identity', 'role');
             }
 
             if ($profile->user && $profile->user->isRegistered()) {
@@ -104,11 +111,31 @@ class RegisterController extends Controller
 
         Auth::login($user);
 
-        return match ($user->role) {
-            'admin' => redirect()->route('admin.dashboard'),
-            'teacher' => redirect()->route('guru.dashboard'),
-            'student' => redirect()->route('siswa.dashboard'),
-            default => redirect()->route('login'),
-        };
+        return redirect()->route($user->dashboardRouteName());
+    }
+
+    private function adminWhatsAppUrl(): ?string
+    {
+        if (! Schema::hasColumn('users', 'whatsapp_number')) {
+            return null;
+        }
+
+        $number = User::where('role', 'admin')
+            ->whereNotNull('whatsapp_number')
+            ->value('whatsapp_number');
+
+        if (! $number) {
+            return null;
+        }
+
+        $normalized = preg_replace('/[^0-9+]/', '', $number);
+
+        if (str_starts_with($normalized, '+62')) {
+            $normalized = substr($normalized, 1);
+        } elseif (str_starts_with($normalized, '0')) {
+            $normalized = '62'.substr($normalized, 1);
+        }
+
+        return 'https://wa.me/'.ltrim($normalized, '+');
     }
 }

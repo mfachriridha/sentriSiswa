@@ -3,17 +3,20 @@
 namespace App\Http\Controllers\Siswa;
 
 use App\Http\Controllers\Controller;
+use App\Services\AbsenceWarningService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    public function index(): View
+    public function index(AbsenceWarningService $absenceWarning): View
     {
         $student = Auth::user()->loadMissing('studentProfile.attendances', 'studentProfile.studentViolations');
         $profile = $student->studentProfile;
         $points = $profile?->points ?? 100;
         $attendances = $profile?->attendances ?? collect();
+        $alphaWarningCount = $profile ? $absenceWarning->alphaCountForStudentId($profile->id) : 0;
+        $warningThreshold = AbsenceWarningService::Threshold;
 
         $charts = [
             'points' => [
@@ -28,6 +31,6 @@ class DashboardController extends Controller
             ],
         ];
 
-        return view('siswa.dashboard', compact('charts'));
+        return view('siswa.dashboard', compact('charts', 'alphaWarningCount', 'warningThreshold'));
     }
 }

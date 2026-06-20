@@ -70,7 +70,7 @@ class StudentImport implements ToCollection, WithChunkReading, WithHeadingRow
 
             $newUsers[] = [
                 'name' => $name,
-                'role' => 'student',
+                'role' => 'siswa',
                 'status' => 'unregistered',
                 'password' => $this->defaultPassword,
                 'email' => null,
@@ -145,7 +145,7 @@ class StudentImport implements ToCollection, WithChunkReading, WithHeadingRow
             $this->studentsExisting += $existingCount;
 
             if (count($freshUsers) > 0) {
-                $firstId = User::where('role', 'student')->latest('id')->first()->id;
+                $firstId = User::where('role', 'siswa')->latest('id')->first()->id;
                 $newUserOffset = $firstId - count($freshUsers) + 1;
             } else {
                 $newUserOffset = 0;

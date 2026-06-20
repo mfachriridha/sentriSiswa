@@ -5,12 +5,13 @@ namespace App\Http\Controllers\Guru;
 use App\Http\Controllers\Controller;
 use App\Models\SchoolClass;
 use App\Models\StudentProfile;
+use App\Services\AbsenceWarningService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class MonitoringController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request, AbsenceWarningService $absenceWarning): View
     {
         $search = $request->get('search', '');
         $filterClass = $request->get('class_id', '');
@@ -39,14 +40,16 @@ class MonitoringController extends Controller
         ]);
 
         $classes = SchoolClass::orderBy('grade')->orderBy('name')->get();
-        $routePrefix = 'guru.monitoring';
+        $routePrefix = 'kesiswaan.monitoring';
         $title = 'Monitoring Siswa';
         $description = 'Pantau kehadiran dan pelanggaran siswa secara keseluruhan.';
+        $alphaWarnings = $absenceWarning->alphaCountsForStudentIds($students->getCollection()->pluck('id'));
+        $warningThreshold = AbsenceWarningService::Threshold;
 
-        return view('guru.monitoring.index', compact('students', 'classes', 'search', 'filterClass', 'routePrefix', 'title', 'description'));
+        return view('kesiswaan.monitoring.index', compact('students', 'classes', 'search', 'filterClass', 'routePrefix', 'title', 'description', 'alphaWarnings', 'warningThreshold'));
     }
 
-    public function show(StudentProfile $monitoring): View
+    public function show(StudentProfile $monitoring, AbsenceWarningService $absenceWarning): View
     {
         // Load relasi yang diperlukan untuk detail
         $monitoring->load([
@@ -57,10 +60,12 @@ class MonitoringController extends Controller
             'attendances' => fn ($q) => $q->latest('date')->take(30),
         ]);
 
-        return view('guru.monitoring.show', [
+        return view('kesiswaan.monitoring.show', [
             'student' => $monitoring,
-            'backRoute' => route('guru.monitoring.index'),
-            'createViolationRoute' => route('guru.pelanggaran-siswa.create', ['student_profile_id' => $monitoring->id]),
+            'backRoute' => route('kesiswaan.monitoring.index'),
+            'createViolationRoute' => route('kesiswaan.pelanggaran-siswa.create', ['student_profile_id' => $monitoring->id]),
+            'alphaWarningCount' => $absenceWarning->alphaCountForStudentId($monitoring->id),
+            'warningThreshold' => AbsenceWarningService::Threshold,
         ]);
     }
 }

@@ -27,7 +27,7 @@ class UserFactory extends Factory
         return [
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
-            'role' => 'student',
+            'role' => 'siswa',
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
@@ -54,21 +54,28 @@ class UserFactory extends Factory
     public function homeroom(): static
     {
         return $this->state(fn (array $attributes) => [
-            'role' => 'teacher',
+            'role' => 'wali_kelas',
         ]);
     }
 
     public function counselor(): static
     {
         return $this->state(fn (array $attributes) => [
-            'role' => 'teacher',
+            'role' => 'bk',
+        ]);
+    }
+
+    public function studentAffairs(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'kesiswaan',
         ]);
     }
 
     public function student(): static
     {
         return $this->state(fn (array $attributes) => [
-            'role' => 'student',
+            'role' => 'siswa',
         ]);
     }
 }

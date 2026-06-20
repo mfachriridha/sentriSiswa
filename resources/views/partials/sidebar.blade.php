@@ -99,11 +99,27 @@
                             WhatsApp API
                         </a>
                     </li>
-            @elseif(auth()->user()->isTeacher())
+
+                <li class="pt-5 pb-2">
+                    <span class="px-3 text-xs font-semibold uppercase tracking-wider text-gray-400">Akun</span>
+                </li>
+
                 <li>
-                    <a href="{{ route('guru.dashboard') }}"
+                    <a href="{{ route('admin.profil') }}"
                        class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
-                              {{ request()->routeIs('guru.dashboard') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
+                              {{ request()->routeIs('admin.profil', 'admin.profil.*') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
+                        <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                        Profil Admin
+                    </a>
+                </li>
+            @elseif(auth()->user()->isGuru())
+                <li>
+                    <a href="{{ route(auth()->user()->dashboardRouteName()) }}"
+                       class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
+                              {{ request()->routeIs('wali-kelas.dashboard', 'bk.dashboard', 'kesiswaan.dashboard') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
                         <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                   d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3"/>
@@ -112,15 +128,15 @@
                     </a>
                 </li>
 
-                @if(auth()->user()->isStudentAffairs())
+                @if(auth()->user()->isKesiswaan())
                     <li class="pt-5 pb-2">
                         <span class="px-3 text-xs font-semibold uppercase tracking-wider text-gray-400">Kesiswaan</span>
                     </li>
 
                     <li>
-                        <a href="{{ route('guru.kesiswaan.monitoring.index') }}"
+                        <a href="{{ route('kesiswaan.monitoring.index') }}"
                            class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
-                                  {{ request()->routeIs('guru.monitoring.*', 'guru.kesiswaan.monitoring.*') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
+                                  {{ request()->routeIs('kesiswaan.monitoring.*') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
                             <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -132,9 +148,9 @@
                     </li>
 
                     <li>
-                        <a href="{{ route('guru.pelanggaran-siswa.index') }}"
+                        <a href="{{ route('kesiswaan.pelanggaran-siswa.index') }}"
                            class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
-                                  {{ request()->routeIs('guru.pelanggaran-siswa.*') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
+                                  {{ request()->routeIs('kesiswaan.pelanggaran-siswa.*') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
                             <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M12 9v2m0 4h.01M5.07 19h13.86a2 2 0 001.74-2.99L13.74 4a2 2 0 00-3.48 0L3.33 16.01A2 2 0 005.07 19z"/>
@@ -144,9 +160,9 @@
                     </li>
 
                     <li>
-                        <a href="{{ route('guru.jenis-pelanggaran.index') }}"
+                        <a href="{{ route('kesiswaan.jenis-pelanggaran.index') }}"
                            class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
-                                  {{ request()->routeIs('guru.jenis-pelanggaran.*') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
+                                  {{ request()->routeIs('kesiswaan.jenis-pelanggaran.*') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
                             <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -155,9 +171,9 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('guru.kesiswaan.laporan.index') }}"
+                        <a href="{{ route('kesiswaan.laporan.index') }}"
                            class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
-                                  {{ request()->routeIs('guru.kesiswaan.laporan.*') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
+                                  {{ request()->routeIs('kesiswaan.laporan.*') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
                             <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6h13M9 7h13M5 7h.01M5 17h.01"/>
                             </svg>
@@ -165,9 +181,9 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('guru.kesiswaan.tata-tertib.index') }}"
+                        <a href="{{ route('kesiswaan.tata-tertib.index') }}"
                            class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
-                                  {{ request()->routeIs('guru.kesiswaan.tata-tertib.*') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
+                                  {{ request()->routeIs('kesiswaan.tata-tertib.*') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
                             <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11V7m0 8h.01M5 21h14a2 2 0 002-2V7l-6-6H5a2 2 0 00-2 2v16a2 2 0 002 2z"/>
                             </svg>
@@ -176,15 +192,15 @@
                     </li>
                 @endif
 
-                @if(auth()->user()->isCounselor())
+                @if(auth()->user()->isBk())
                     <li class="pt-5 pb-2">
                         <span class="px-3 text-xs font-semibold uppercase tracking-wider text-gray-400">BK</span>
                     </li>
 
                     <li>
-                        <a href="{{ route('guru.bk.monitoring.index') }}"
+                        <a href="{{ route('bk.monitoring.index') }}"
                            class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
-                                  {{ request()->routeIs('guru.bk.monitoring.*') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
+                                  {{ request()->routeIs('bk.monitoring.*') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
                             <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                             </svg>
@@ -192,9 +208,9 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('guru.bk.pelanggaran.index') }}"
+                        <a href="{{ route('bk.pelanggaran.index') }}"
                            class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
-                                  {{ request()->routeIs('guru.bk.pelanggaran.*') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
+                                  {{ request()->routeIs('bk.pelanggaran.*') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
                             <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.07 19h13.86a2 2 0 001.74-2.99L13.74 4a2 2 0 00-3.48 0L3.33 16.01A2 2 0 005.07 19z"/>
                             </svg>
@@ -202,9 +218,9 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('guru.bk.laporan.index') }}"
+                        <a href="{{ route('bk.laporan.index') }}"
                            class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
-                                  {{ request()->routeIs('guru.bk.laporan.*') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
+                                  {{ request()->routeIs('bk.laporan.*') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
                             <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6h13M9 7h13M5 7h.01M5 17h.01"/>
                             </svg>
@@ -213,15 +229,15 @@
                     </li>
                 @endif
 
-                @if(auth()->user()->isHomeroom())
+                @if(auth()->user()->isWaliKelas())
                     <li class="pt-5 pb-2">
                         <span class="px-3 text-xs font-semibold uppercase tracking-wider text-gray-400">Wali Kelas</span>
                     </li>
 
                     <li>
-                        <a href="{{ route('guru.kelas-saya') }}"
+                        <a href="{{ route('wali-kelas.kelas-saya') }}"
                            class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
-                                  {{ request()->routeIs('guru.kelas-saya') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
+                                  {{ request()->routeIs('wali-kelas.kelas-saya', 'wali-kelas.kelas-saya.*') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
                             <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
@@ -231,9 +247,9 @@
                     </li>
 
                     <li>
-                        <a href="{{ route('guru.absensi.index') }}"
+                        <a href="{{ route('wali-kelas.absensi.index') }}"
                            class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
-                                  {{ request()->routeIs('guru.absensi.*') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
+                                  {{ request()->routeIs('wali-kelas.absensi.*') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
                             <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
@@ -243,9 +259,9 @@
                     </li>
 
                     <li>
-                        <a href="{{ route('guru.pelanggaran') }}"
+                        <a href="{{ route('wali-kelas.pelanggaran') }}"
                            class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
-                                  {{ request()->routeIs('guru.pelanggaran') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
+                                  {{ request()->routeIs('wali-kelas.pelanggaran') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
                             <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -260,9 +276,9 @@
                 </li>
 
                 <li>
-                    <a href="{{ route('guru.profil') }}"
+                    <a href="{{ route(auth()->user()->profilRouteName()) }}"
                        class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
-                              {{ request()->routeIs('guru.profil', 'guru.profil.*') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
+                              {{ request()->routeIs('wali-kelas.profil', 'wali-kelas.profil.*', 'bk.profil', 'bk.profil.*', 'kesiswaan.profil', 'kesiswaan.profil.*') ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100' }}">
                         <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                   d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
@@ -270,7 +286,7 @@
                         Profil Saya
                     </a>
                 </li>
-            @elseif(auth()->user()->isStudent())
+            @elseif(auth()->user()->isSiswa())
                 <li>
                     <a href="{{ route('siswa.dashboard') }}"
                        class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
@@ -342,21 +358,25 @@
 
     <div class="border-t border-gray-200 px-4 py-4">
         <div class="flex items-center gap-3 px-2">
-            <div class="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
-                {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-            </div>
+            @if(auth()->user()->photo)
+                <img src="{{ asset('storage/'.auth()->user()->photo) }}" alt="{{ auth()->user()->name }}" class="h-9 w-9 rounded-full object-cover">
+            @else
+                <div class="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
+                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                </div>
+            @endif
             <div class="min-w-0 flex-1">
                 <p class="truncate text-sm font-medium text-gray-900">{{ auth()->user()->name }}</p>
                 <p class="truncate text-xs text-gray-500">
                     @if(auth()->user()->isAdmin())
                         Admin
-                    @elseif(auth()->user()->isHomeroom())
+                    @elseif(auth()->user()->isWaliKelas())
                         Wali Kelas
-                    @elseif(auth()->user()->isCounselor())
+                    @elseif(auth()->user()->isBk())
                         BK
-                    @elseif(auth()->user()->isStudentAffairs())
+                    @elseif(auth()->user()->isKesiswaan())
                         Kesiswaan
-                    @elseif(auth()->user()->isStudent())
+                    @elseif(auth()->user()->isSiswa())
                         Siswa
                     @else
                         Guru

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Guru\UpdateDailyAttendanceRequest;
 use App\Models\Attendance;
 use App\Models\StudentProfile;
+use App\Services\AbsenceWarningService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,12 +14,12 @@ use Illuminate\View\View;
 
 class ClassRosterController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request, AbsenceWarningService $absenceWarning): View
     {
         $class = Auth::user()->homeroomClass;
 
         if (! $class) {
-            return view('guru.kelas-saya.empty');
+            return view('wali-kelas.kelas-saya.empty');
         }
 
         $today = now()->toDateString();
@@ -57,7 +58,10 @@ class ClassRosterController extends Controller
             $stats[$status]++;
         }
 
-        return view('guru.kelas-saya.index', compact('class', 'students', 'attendances', 'stats', 'isWeekday'));
+        $alphaWarnings = $absenceWarning->alphaCountsForStudentIds($students->pluck('id'));
+        $warningThreshold = AbsenceWarningService::Threshold;
+
+        return view('wali-kelas.kelas-saya.index', compact('class', 'students', 'attendances', 'stats', 'isWeekday', 'alphaWarnings', 'warningThreshold'));
     }
 
     public function updateAttendance(UpdateDailyAttendanceRequest $request, StudentProfile $studentProfile): RedirectResponse
@@ -69,7 +73,7 @@ class ClassRosterController extends Controller
         }
 
         if (now()->isWeekend()) {
-            return redirect()->route('guru.kelas-saya')->with('error', 'Absensi hanya tersedia pada hari Senin sampai Jumat.');
+            return redirect()->route('wali-kelas.kelas-saya')->with('error', 'Absensi hanya tersedia pada hari Senin sampai Jumat.');
         }
 
         $attendance = Attendance::query()
@@ -87,10 +91,10 @@ class ClassRosterController extends Controller
         $attendance->status = $request->validated('status');
         $attendance->save();
 
-        return redirect()->route('guru.kelas-saya')->with('success', 'Status absensi hari ini berhasil diperbarui.');
+        return redirect()->route('wali-kelas.kelas-saya')->with('success', 'Status absensi hari ini berhasil diperbarui.');
     }
 
-    public function show(StudentProfile $studentProfile): View
+    public function show(StudentProfile $studentProfile, AbsenceWarningService $absenceWarning): View
     {
         $class = Auth::user()->homeroomClass;
 
@@ -106,11 +110,13 @@ class ClassRosterController extends Controller
             'attendances' => fn ($query) => $query->latest('date')->take(30),
         ]);
 
-        return view('guru.monitoring.show', [
+        return view('kesiswaan.monitoring.show', [
             'student' => $studentProfile,
-            'backRoute' => route('guru.kelas-saya'),
+            'backRoute' => route('wali-kelas.kelas-saya'),
             'backLabel' => 'Kembali ke Kelas Saya',
             'createViolationRoute' => null,
+            'alphaWarningCount' => $absenceWarning->alphaCountForStudentId($studentProfile->id),
+            'warningThreshold' => AbsenceWarningService::Threshold,
         ]);
     }
 }

@@ -107,7 +107,7 @@
             </div>
             <div class="rounded-lg border border-gray-100 bg-gray-50 p-4">
                 <p class="text-sm font-medium text-gray-500">Tanggal Lahir</p>
-                <p class="mt-1 text-sm text-gray-900">{{ $biodata->date_of_birth?->format('d/m/Y') ?? '-' }}</p>
+                <p class="mt-1 text-sm text-gray-900">{{ $biodata->date_of_birth?->translatedFormat('d F Y') ?? '-' }}</p>
             </div>
             <div class="rounded-lg border border-gray-100 bg-gray-50 p-4">
                 <p class="text-sm font-medium text-gray-500">Jenis Kelamin</p>
@@ -131,7 +131,7 @@
             </div>
             <div class="rounded-lg border border-gray-100 bg-gray-50 p-4">
                 <p class="text-sm font-medium text-gray-500">Tanggal Diterima</p>
-                <p class="mt-1 text-sm text-gray-900">{{ $biodata->admission_date?->format('d/m/Y') ?? '-' }}</p>
+                <p class="mt-1 text-sm text-gray-900">{{ $biodata->admission_date?->translatedFormat('d F Y') ?? '-' }}</p>
             </div>
         </div>
 

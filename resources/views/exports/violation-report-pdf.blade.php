@@ -54,7 +54,7 @@
         <tbody>
             @forelse ($violations as $violation)
                 <tr>
-                    <td>{{ $violation->violation_date->format('Y-m-d') }}</td>
+                    <td>{{ $violation->violation_date->translatedFormat('d F Y') }}</td>
                     <td>{{ $violation->studentProfile?->user?->name ?? '-' }}</td>
                     <td>{{ $violation->studentProfile?->class?->name ?? '-' }}</td>
                     <td>{{ $violation->violation_name }}</td>

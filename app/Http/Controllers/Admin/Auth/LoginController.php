@@ -47,11 +47,6 @@ class LoginController extends Controller
 
     private function redirectByRole($user): RedirectResponse
     {
-        return match ($user->role) {
-            'admin' => redirect()->intended(route('admin.dashboard')),
-            'teacher' => redirect()->intended(route('guru.dashboard')),
-            'student' => redirect()->intended(route('siswa.dashboard')),
-            default => redirect()->route('login'),
-        };
+        return redirect()->intended(route($user->dashboardRouteName()));
     }
 }

@@ -9,7 +9,7 @@ class ViolationReportFilterRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->isCounselor() === true || $this->user()?->isStudentAffairs() === true;
+        return $this->user()?->isBk() === true || $this->user()?->isKesiswaan() === true;
     }
 
     /**

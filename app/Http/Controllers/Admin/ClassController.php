@@ -50,16 +50,15 @@ class ClassController extends Controller
             'direction' => $direction,
         ]);
 
-        return view('admin.class.index', compact('classes', 'sort', 'direction', 'search', 'filterGrade'));
+        return view('admin.kelas.index', compact('classes', 'sort', 'direction', 'search', 'filterGrade'));
     }
 
     public function create(): View
     {
-        $homeroomTeachers = User::where('role', 'teacher')
-            ->whereHas('teacherProfile', fn ($q) => $q->where('teacher_type', 'homeroom'))
+        $homeroomTeachers = User::where('role', 'wali_kelas')
             ->get();
 
-        return view('admin.class.create', compact('homeroomTeachers'));
+        return view('admin.kelas.create', compact('homeroomTeachers'));
     }
 
     public function store(StoreClassRequest $request): RedirectResponse
@@ -78,18 +77,17 @@ class ClassController extends Controller
         $class->load(['homeroomTeacher']);
         $class->loadCount('students');
 
-        return view('admin.class.show', compact('class'));
+        return view('admin.kelas.show', compact('class'));
     }
 
     public function edit(SchoolClass $class): View
     {
         $class->load('homeroomTeacher');
         $identifier = trim((string) str_replace($class->grade, '', $class->name));
-        $homeroomTeachers = User::where('role', 'teacher')
-            ->whereHas('teacherProfile', fn ($q) => $q->where('teacher_type', 'homeroom'))
+        $homeroomTeachers = User::where('role', 'wali_kelas')
             ->get();
 
-        return view('admin.class.edit', compact('class', 'identifier', 'homeroomTeachers'));
+        return view('admin.kelas.edit', compact('class', 'identifier', 'homeroomTeachers'));
     }
 
     public function update(UpdateClassRequest $request, SchoolClass $class): RedirectResponse

@@ -53,14 +53,13 @@ class DemoSchoolSeeder extends Seeder
                     'name' => $teacherNames[$nameIndex],
                     'email' => "wali{$grade}{$index}@sentrisiswa.test",
                     'password' => Hash::make('password'),
-                    'role' => 'teacher',
+                    'role' => 'wali_kelas',
                     'status' => 'registered',
                 ]);
 
                 $teacher->teacherProfile()->create([
                     'nip' => "19{$grade}{$index}000000000",
                     'phone' => "62812{$grade}{$index}00000",
-                    'teacher_type' => 'homeroom',
                 ]);
 
                 $teachers[] = $teacher;
@@ -80,14 +79,13 @@ class DemoSchoolSeeder extends Seeder
                 'name' => $name,
                 'email' => "bk{$grade}@sentrisiswa.test",
                 'password' => Hash::make('password'),
-                'role' => 'teacher',
+                'role' => 'bk',
                 'status' => 'registered',
             ]);
 
             $teacher->teacherProfile()->create([
                 'nip' => "19{$grade}9000000000",
                 'phone' => "62813{$grade}000000",
-                'teacher_type' => 'counselor',
                 'grade' => $grade,
             ]);
         }
@@ -103,14 +101,13 @@ class DemoSchoolSeeder extends Seeder
             'name' => 'Hendra Saputra',
             'email' => 'kesiswaan@sentrisiswa.test',
             'password' => Hash::make('password'),
-            'role' => 'teacher',
+            'role' => 'kesiswaan',
             'status' => 'registered',
         ]);
 
         $teacher->teacherProfile()->create([
             'nip' => '19990000000000',
             'phone' => '6281399000000',
-            'teacher_type' => 'student_affairs',
         ]);
 
         if (DB::getDriverName() === 'sqlite') {
@@ -166,7 +163,7 @@ class DemoSchoolSeeder extends Seeder
                     'name' => $studentName,
                     'email' => $isUnregistered ? null : "siswa{$nis}@sentrisiswa.test",
                     'password' => Hash::make('password'),
-                    'role' => 'student',
+                    'role' => 'siswa',
                     'status' => $isUnregistered ? 'unregistered' : 'registered',
                 ]);
 
@@ -313,7 +310,7 @@ class DemoSchoolSeeder extends Seeder
     private function createViolationRecords(array $students): void
     {
         $violationTypes = ViolationType::orderBy('point_deduction')->get();
-        $recorders = User::where('role', 'teacher')->pluck('id');
+        $recorders = User::whereIn('role', ['wali_kelas', 'bk', 'kesiswaan'])->pluck('id');
 
         foreach (array_values($students) as $index => $student) {
             if ($index % 3 !== 0) {
@@ -354,7 +351,7 @@ class DemoSchoolSeeder extends Seeder
             'title' => 'Tata Tertib Sekolah Demo',
             'file_path' => $path,
             'is_published' => true,
-            'uploaded_by_user_id' => User::whereHas('teacherProfile', fn ($query) => $query->where('teacher_type', 'student_affairs'))->value('id'),
+            'uploaded_by_user_id' => User::where('role', 'kesiswaan')->value('id'),
         ]);
     }
 }

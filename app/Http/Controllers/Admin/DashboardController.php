@@ -25,12 +25,12 @@ class DashboardController extends Controller
                 'variant' => 'primary',
             ])->all(),
             'registration' => [
-                ['label' => 'Registered', 'value' => User::where('role', 'student')->where('status', 'registered')->count(), 'variant' => 'success'],
-                ['label' => 'Belum Register', 'value' => User::where('role', 'student')->where('status', 'unregistered')->count(), 'variant' => 'warning'],
+                ['label' => 'Terdaftar', 'value' => User::where('role', 'siswa')->where('status', 'registered')->count(), 'variant' => 'success'],
+                ['label' => 'Belum Daftar', 'value' => User::where('role', 'siswa')->where('status', 'unregistered')->count(), 'variant' => 'warning'],
             ],
             'roles' => [
                 ['label' => 'Admin', 'value' => User::where('role', 'admin')->count(), 'variant' => 'neutral'],
-                ['label' => 'Guru', 'value' => User::where('role', 'teacher')->count(), 'variant' => 'info'],
+                ['label' => 'Guru', 'value' => User::whereIn('role', ['wali_kelas', 'bk', 'kesiswaan'])->count(), 'variant' => 'info'],
                 ['label' => 'Siswa', 'value' => StudentProfile::count(), 'variant' => 'primary'],
             ],
         ];

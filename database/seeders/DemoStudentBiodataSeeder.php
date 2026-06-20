@@ -18,7 +18,7 @@ class DemoStudentBiodataSeeder extends Seeder
             'name' => 'Siti Nurhaliza',
             'email' => 'siti.demo@sentrisiswa.test',
             'password' => bcrypt('password'),
-            'role' => 'student',
+            'role' => 'siswa',
         ]);
 
         $profile = StudentProfile::create([

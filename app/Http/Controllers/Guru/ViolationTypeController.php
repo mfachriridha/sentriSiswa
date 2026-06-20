@@ -61,7 +61,7 @@ class ViolationTypeController extends Controller
 
         $categoryLabels = ViolationType::categoryLabels();
 
-        return view('guru.jenis-pelanggaran.index', compact('violationTypes', 'categoryLabels', 'sort', 'direction', 'search', 'filterCategory', 'filterStatus'));
+        return view('kesiswaan.jenis-pelanggaran.index', compact('violationTypes', 'categoryLabels', 'sort', 'direction', 'search', 'filterCategory', 'filterStatus'));
     }
 
     public function create(): View
@@ -69,21 +69,21 @@ class ViolationTypeController extends Controller
         $categoryLabels = ViolationType::categoryLabels();
         $categoryRanges = ViolationType::categoryRanges();
 
-        return view('guru.jenis-pelanggaran.create', compact('categoryLabels', 'categoryRanges'));
+        return view('kesiswaan.jenis-pelanggaran.create', compact('categoryLabels', 'categoryRanges'));
     }
 
     public function store(StoreViolationTypeRequest $request): RedirectResponse
     {
         ViolationType::create($request->validated());
 
-        return redirect()->route('guru.jenis-pelanggaran.index')->with('success', 'Jenis pelanggaran berhasil ditambahkan.');
+        return redirect()->route('kesiswaan.jenis-pelanggaran.index')->with('success', 'Jenis pelanggaran berhasil ditambahkan.');
     }
 
     public function show(ViolationType $violationType): View
     {
         $categoryLabels = ViolationType::categoryLabels();
 
-        return view('guru.jenis-pelanggaran.show', compact('violationType', 'categoryLabels'));
+        return view('kesiswaan.jenis-pelanggaran.show', compact('violationType', 'categoryLabels'));
     }
 
     public function edit(ViolationType $violationType): View
@@ -91,24 +91,24 @@ class ViolationTypeController extends Controller
         $categoryLabels = ViolationType::categoryLabels();
         $categoryRanges = ViolationType::categoryRanges();
 
-        return view('guru.jenis-pelanggaran.edit', compact('violationType', 'categoryLabels', 'categoryRanges'));
+        return view('kesiswaan.jenis-pelanggaran.edit', compact('violationType', 'categoryLabels', 'categoryRanges'));
     }
 
     public function update(UpdateViolationTypeRequest $request, ViolationType $violationType): RedirectResponse
     {
         $violationType->update($request->validated());
 
-        return redirect()->route('guru.jenis-pelanggaran.index')->with('success', 'Jenis pelanggaran berhasil diperbarui.');
+        return redirect()->route('kesiswaan.jenis-pelanggaran.index')->with('success', 'Jenis pelanggaran berhasil diperbarui.');
     }
 
     public function destroy(ViolationType $violationType): RedirectResponse
     {
         if ($violationType->studentViolations()->exists()) {
-            return redirect()->route('guru.jenis-pelanggaran.index')->with('error', 'Jenis pelanggaran sudah dipakai pada data pelanggaran siswa. Nonaktifkan jika tidak ingin digunakan lagi.');
+            return redirect()->route('kesiswaan.jenis-pelanggaran.index')->with('error', 'Jenis pelanggaran sudah dipakai pada data pelanggaran siswa. Nonaktifkan jika tidak ingin digunakan lagi.');
         }
 
         $violationType->delete();
 
-        return redirect()->route('guru.jenis-pelanggaran.index')->with('success', 'Jenis pelanggaran berhasil dihapus.');
+        return redirect()->route('kesiswaan.jenis-pelanggaran.index')->with('success', 'Jenis pelanggaran berhasil dihapus.');
     }
 }

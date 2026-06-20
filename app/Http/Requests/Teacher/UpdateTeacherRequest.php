@@ -21,8 +21,8 @@ class UpdateTeacherRequest extends FormRequest
             'password' => ['nullable', 'string', 'min:8', 'regex:/[a-z]/i', 'regex:/[0-9]/'],
             'nip' => ['nullable', 'string', 'max:30', "unique:teacher_profiles,nip,{$user->teacherProfile?->id}"],
             'phone' => ['nullable', 'string', 'min:10', 'max:20', 'regex:/^[0-9+\-\s()]*$/'],
-            'teacher_type' => ['required', 'in:homeroom,counselor,student_affairs'],
-            'grade' => ['nullable', 'required_if:teacher_type,counselor', 'in:10,11,12'],
+            'role' => ['required', 'in:wali_kelas,bk,kesiswaan'],
+            'grade' => ['nullable', 'required_if:role,bk', 'in:10,11,12'],
         ];
     }
 }

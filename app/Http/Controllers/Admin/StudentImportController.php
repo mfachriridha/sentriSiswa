@@ -24,7 +24,7 @@ class StudentImportController extends Controller
 
     public function create(): View
     {
-        return view('admin.student.import');
+        return view('admin.siswa.import');
     }
 
     public function upload(Request $request): RedirectResponse
@@ -67,7 +67,7 @@ class StudentImportController extends Controller
             ['path' => route('admin.siswa.impor.pratinjau')],
         );
 
-        return view('admin.student.import-preview', [
+        return view('admin.siswa.import-preview', [
             'previewRows' => $paginated,
             'totalRows' => $total,
             'filePath' => $path,

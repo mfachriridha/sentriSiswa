@@ -89,7 +89,7 @@ class StudentViolationController extends Controller
         $categoryLabels = ViolationType::categoryLabels();
         $statusLabels = StudentViolation::statusLabels();
 
-        return view('guru.pelanggaran-siswa.index', compact('studentViolations', 'classes', 'violationTypes', 'categoryLabels', 'statusLabels', 'sort', 'direction', 'search', 'filterClass', 'filterCategory', 'filterViolationType', 'filterDate', 'filterStatus'));
+        return view('kesiswaan.pelanggaran-siswa.index', compact('studentViolations', 'classes', 'violationTypes', 'categoryLabels', 'statusLabels', 'sort', 'direction', 'search', 'filterClass', 'filterCategory', 'filterViolationType', 'filterDate', 'filterStatus'));
     }
 
     public function create(): View
@@ -98,7 +98,7 @@ class StudentViolationController extends Controller
         $violationTypes = $this->violationTypes(activeOnly: true);
         $categoryLabels = ViolationType::categoryLabels();
 
-        return view('guru.pelanggaran-siswa.create', compact('students', 'violationTypes', 'categoryLabels'));
+        return view('kesiswaan.pelanggaran-siswa.create', compact('students', 'violationTypes', 'categoryLabels'));
     }
 
     public function store(StoreStudentViolationRequest $request): RedirectResponse
@@ -108,7 +108,7 @@ class StudentViolationController extends Controller
 
         StudentViolation::create($this->violationData($data, $violationType, includeRecorder: true, approved: true));
 
-        return redirect()->route('guru.pelanggaran-siswa.index')->with('success', 'Pelanggaran siswa berhasil dicatat.');
+        return redirect()->route('kesiswaan.pelanggaran-siswa.index')->with('success', 'Pelanggaran siswa berhasil dicatat.');
     }
 
     public function show(StudentViolation $studentViolation): View
@@ -117,7 +117,7 @@ class StudentViolationController extends Controller
         $categoryLabels = ViolationType::categoryLabels();
         $statusLabels = StudentViolation::statusLabels();
 
-        return view('guru.pelanggaran-siswa.show', compact('studentViolation', 'categoryLabels', 'statusLabels'));
+        return view('kesiswaan.pelanggaran-siswa.show', compact('studentViolation', 'categoryLabels', 'statusLabels'));
     }
 
     public function edit(StudentViolation $studentViolation): View
@@ -127,7 +127,7 @@ class StudentViolationController extends Controller
         $violationTypes = $this->violationTypes(activeOnly: true, currentViolationType: $studentViolation->violationType);
         $categoryLabels = ViolationType::categoryLabels();
 
-        return view('guru.pelanggaran-siswa.edit', compact('studentViolation', 'students', 'violationTypes', 'categoryLabels'));
+        return view('kesiswaan.pelanggaran-siswa.edit', compact('studentViolation', 'students', 'violationTypes', 'categoryLabels'));
     }
 
     public function update(UpdateStudentViolationRequest $request, StudentViolation $studentViolation): RedirectResponse
@@ -137,7 +137,7 @@ class StudentViolationController extends Controller
 
         $studentViolation->update($this->violationData($data, $violationType));
 
-        return redirect()->route('guru.pelanggaran-siswa.index')->with('success', 'Pelanggaran siswa berhasil diperbarui.');
+        return redirect()->route('kesiswaan.pelanggaran-siswa.index')->with('success', 'Pelanggaran siswa berhasil diperbarui.');
     }
 
     public function approve(StudentViolation $studentViolation): RedirectResponse
@@ -151,7 +151,7 @@ class StudentViolationController extends Controller
             'rejection_reason' => null,
         ]);
 
-        return redirect()->route('guru.pelanggaran-siswa.show', $studentViolation)->with('success', 'Pengajuan pelanggaran berhasil disetujui.');
+        return redirect()->route('kesiswaan.pelanggaran-siswa.show', $studentViolation)->with('success', 'Pengajuan pelanggaran berhasil disetujui.');
     }
 
     public function reject(RejectStudentViolationRequest $request, StudentViolation $studentViolation): RedirectResponse
@@ -165,20 +165,20 @@ class StudentViolationController extends Controller
             'rejection_reason' => $request->validated()['rejection_reason'],
         ]);
 
-        return redirect()->route('guru.pelanggaran-siswa.show', $studentViolation)->with('success', 'Pengajuan pelanggaran berhasil ditolak.');
+        return redirect()->route('kesiswaan.pelanggaran-siswa.show', $studentViolation)->with('success', 'Pengajuan pelanggaran berhasil ditolak.');
     }
 
     public function destroy(StudentViolation $studentViolation): RedirectResponse
     {
         $studentViolation->delete();
 
-        return redirect()->route('guru.pelanggaran-siswa.index')->with('success', 'Pelanggaran siswa berhasil dihapus.');
+        return redirect()->route('kesiswaan.pelanggaran-siswa.index')->with('success', 'Pelanggaran siswa berhasil dihapus.');
     }
 
     private function students(): Collection
     {
         return StudentProfile::with(['user', 'class'])
-            ->whereHas('user', fn ($query) => $query->where('role', 'student'))
+            ->whereHas('user', fn ($query) => $query->where('role', 'siswa'))
             ->get()
             ->sortBy(fn (StudentProfile $studentProfile) => $studentProfile->user?->name ?? '')
             ->values();

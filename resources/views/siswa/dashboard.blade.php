@@ -5,6 +5,13 @@
 @section('content')
 <x-page-header title="Dashboard Siswa" :description="'Selamat datang, '.auth()->user()->name.'!'" />
 
+@if($alphaWarningCount >= $warningThreshold)
+    <div class="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <span class="font-semibold">Peringatan absensi:</span>
+        kamu sudah alpha {{ $alphaWarningCount }} kali pada semester berjalan.
+    </div>
+@endif
+
 <div class="mb-5 grid gap-4 lg:grid-cols-2">
     <x-dashboard-bar-chart title="Grafik Poin Disiplin" :items="$charts['points']" />
     <x-dashboard-bar-chart title="Grafik Absensi Saya" :items="$charts['attendance']" />

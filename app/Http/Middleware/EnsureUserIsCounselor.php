@@ -10,7 +10,7 @@ class EnsureUserIsCounselor
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (! $request->user() || ! $request->user()->isCounselor()) {
+        if (! $request->user() || ! $request->user()->isBk()) {
             abort(403);
         }
 

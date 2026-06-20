@@ -10,7 +10,7 @@ class EnsureUserIsHomeroom
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (! $request->user() || ! $request->user()->isHomeroom()) {
+        if (! $request->user() || ! $request->user()->isWaliKelas()) {
             abort(403);
         }
 

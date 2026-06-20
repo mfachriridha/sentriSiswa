@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['nip', 'phone', 'photo', 'teacher_type', 'grade'])]
+#[Fillable(['nip', 'phone', 'photo', 'grade'])]
 class TeacherProfile extends Model
 {
     /** @use HasFactory<TeacherProfileFactory> */

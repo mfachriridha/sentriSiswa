@@ -1,0 +1,5 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+class GuruController extends TeacherController {}

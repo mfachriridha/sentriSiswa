@@ -23,10 +23,10 @@ class ViolationReportController extends Controller
         [$violations, $filters, $classes] = $this->reportData($request);
         $categoryLabels = ViolationType::categoryLabels();
         $statusLabels = StudentViolation::statusLabels();
-        $routeName = Auth::user()->isCounselor() ? 'guru.bk.laporan' : 'guru.kesiswaan.laporan';
-        $title = Auth::user()->isCounselor() ? 'Laporan BK' : 'Laporan Kesiswaan';
+        $routeName = Auth::user()->isBk() ? 'bk.laporan' : 'kesiswaan.laporan';
+        $title = Auth::user()->isBk() ? 'Laporan BK' : 'Laporan Kesiswaan';
 
-        return view('guru.laporan-pelanggaran.index', compact('violations', 'filters', 'classes', 'categoryLabels', 'statusLabels', 'routeName', 'title'));
+        return view('kesiswaan.laporan-pelanggaran.index', compact('violations', 'filters', 'classes', 'categoryLabels', 'statusLabels', 'routeName', 'title'));
     }
 
     public function exportExcel(ViolationReportFilterRequest $request): BinaryFileResponse
@@ -61,7 +61,7 @@ class ViolationReportController extends Controller
     public function exportPdf(ViolationReportFilterRequest $request): Response
     {
         [$violations, $filters] = $this->reportData($request, paginated: false);
-        $title = Auth::user()->isCounselor() ? 'Laporan BK' : 'Laporan Kesiswaan';
+        $title = Auth::user()->isBk() ? 'Laporan BK' : 'Laporan Kesiswaan';
 
         $pdf = Pdf::loadView('exports.violation-report-pdf', [
             'title' => $title,
@@ -88,7 +88,7 @@ class ViolationReportController extends Controller
             ->when($filters['category'] ?? null, fn ($query, $category) => $query->where('violation_category', $category))
             ->when($filters['status'] ?? null, fn ($query, $status) => $query->where('status', $status));
 
-        if ($user->isCounselor()) {
+        if ($user->isBk()) {
             $query->whereHas('studentProfile.class', fn (Builder $classQuery) => $classQuery->where('grade', $user->teacherProfile?->grade));
             $classes = SchoolClass::where('grade', $user->teacherProfile?->grade)->orderBy('name')->get();
             $filters['grade'] = $user->teacherProfile?->grade;

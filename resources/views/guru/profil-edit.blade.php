@@ -5,16 +5,10 @@
 @section('content')
 @php
     $profile = $teacher->teacherProfile;
-    $teacherTypeLabels = [
-        'homeroom' => 'Wali Kelas',
-        'counselor' => 'BK',
-        'student_affairs' => 'Kesiswaan',
-    ];
-
-    $teacherScope = match ($profile?->teacher_type) {
-        'homeroom' => $teacher->homeroomClass?->name,
-        'counselor' => $profile?->grade ? 'Tingkat '.$profile->grade : null,
-        'student_affairs' => 'Seluruh sekolah',
+    $teacherScope = match ($teacher->role) {
+        'wali_kelas' => $teacher->homeroomClass?->name,
+        'bk' => $profile?->grade ? 'Tingkat '.$profile->grade : null,
+        'kesiswaan' => 'Seluruh sekolah',
         default => null,
     };
 @endphp
@@ -44,7 +38,7 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('guru.profil.update') }}" class="space-y-10" enctype="multipart/form-data"
+    <form method="POST" action="{{ route(auth()->user()->profilRouteName('update')) }}" class="space-y-10" enctype="multipart/form-data"
           x-data="{
               loading: false,
               photoPreview: @js($profile?->photo ? asset('storage/'.$profile->photo) : ''),
@@ -116,8 +110,8 @@
                 <p class="mt-1.5 text-sm text-gray-900">{{ $profile?->nip ?? '-' }}</p>
             </div>
             <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
-                <p class="text-sm font-medium text-gray-500">Tipe Guru</p>
-                <p class="mt-1.5 text-sm text-gray-900">{{ $teacherTypeLabels[$profile?->teacher_type] ?? '-' }}</p>
+                <p class="text-sm font-medium text-gray-500">Role</p>
+                <p class="mt-1.5 text-sm text-gray-900">{{ $teacher->roleLabel() }}</p>
             </div>
             <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
                 <p class="text-sm font-medium text-gray-500">Tingkat/Kelas Binaan</p>
@@ -175,7 +169,7 @@
                 </span>
                 Simpan
             </button>
-            <a href="{{ route('guru.profil') }}" class="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+            <a href="{{ route(auth()->user()->profilRouteName()) }}" class="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
                 Batal
             </a>
         </div>
