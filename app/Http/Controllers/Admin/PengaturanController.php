@@ -24,15 +24,47 @@ class PengaturanController extends Controller
 
     public function waktuAbsenSimpan(WaktuAbsenRequest $request): RedirectResponse
     {
-        if ($request->jam_selesai <= $request->jam_mulai) {
+        $waktuMulai = $this->formatWaktu($request->jam_mulai, $request->menit_mulai);
+        $waktuSelesai = $this->formatWaktu($request->jam_selesai, $request->menit_selesai);
+        $toleransiTerlambat = (int) $request->toleransi_terlambat;
+
+        $durasiAbsenMenit = $this->menitDariWaktu($waktuSelesai) - $this->menitDariWaktu($waktuMulai);
+
+        if ($waktuSelesai <= $waktuMulai) {
             return back()->withErrors(['jam_selesai' => 'Jam selesai harus setelah jam mulai.'])->withInput();
         }
 
-        Pengaturan::simpan('waktu_mulai', $request->jam_mulai);
-        Pengaturan::simpan('waktu_selesai', $request->jam_selesai);
-        Pengaturan::simpan('toleransi_terlambat', (string) $request->toleransi_terlambat);
+        if ($toleransiTerlambat > $durasiAbsenMenit) {
+            return back()->withErrors(['toleransi_terlambat' => 'Toleransi terlambat tidak boleh lebih besar dari durasi absen.'])->withInput();
+        }
+
+        $waktuTerlambat = $this->formatMenitSebagaiWaktu($this->menitDariWaktu($waktuSelesai) - $toleransiTerlambat);
+
+        Pengaturan::simpan('waktu_mulai', $waktuMulai);
+        Pengaturan::simpan('waktu_selesai', $waktuSelesai);
+        Pengaturan::simpan('toleransi_terlambat', (string) $toleransiTerlambat);
+        Pengaturan::simpan('waktu_terlambat', $waktuTerlambat);
 
         return redirect()->route('admin.pengaturan.waktu-absen')->with('toast', ['type' => 'success', 'message' => 'Konfigurasi waktu absen berhasil disimpan.']);
+    }
+
+    private function formatWaktu(string $jam, string $menit): string
+    {
+        return sprintf('%02d:%02d', (int) $jam, (int) $menit);
+    }
+
+    private function menitDariWaktu(string $waktu): int
+    {
+        [$jam, $menit] = array_map('intval', explode(':', $waktu));
+
+        return ($jam * 60) + $menit;
+    }
+
+    private function formatMenitSebagaiWaktu(int $menit): string
+    {
+        $menit %= 1440;
+
+        return sprintf('%02d:%02d', intdiv($menit, 60), $menit % 60);
     }
 
     public function lokasiAbsen(): Response
