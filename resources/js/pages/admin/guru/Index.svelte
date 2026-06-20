@@ -79,9 +79,13 @@
         description="Kelola data guru (Wali Kelas, BK, Kesiswaan)"
     >
         {#snippet actions()}
-            <Button variant="outline" size="sm" href="/admin/guru/impor">
-                <Upload class="size-4" />
-                Impor
+            <Button variant="outline" size="sm" asChild>
+                {#snippet children(props)}
+                    <Link href="/admin/guru/impor" class={props.class}>
+                        <Upload class="size-4" />
+                        Impor
+                    </Link>
+                {/snippet}
             </Button>
             <Button size="sm" asChild>
                 {#snippet children(props)}

@@ -36,8 +36,12 @@
 
 <Card class="border-border shadow-sm">
     <CardHeader class="space-y-1 text-center">
-        <CardTitle class="text-2xl font-bold tracking-tight">Ganti Kata Sandi</CardTitle>
-        <CardDescription>Masukkan kata sandi baru untuk akun Anda</CardDescription>
+        <CardTitle class="text-2xl font-bold tracking-tight"
+            >Ganti Kata Sandi</CardTitle
+        >
+        <CardDescription
+            >Masukkan kata sandi baru untuk akun Anda</CardDescription
+        >
     </CardHeader>
     <CardContent>
         <form onsubmit={handleSubmit} class="space-y-4">
@@ -64,7 +68,10 @@
                     autocomplete="new-password"
                     placeholder="Ulangi kata sandi"
                 />
-                <InputError message={form.errors.password_confirmation} class="mt-1" />
+                <InputError
+                    message={form.errors.password_confirmation}
+                    class="mt-1"
+                />
             </div>
 
             <Button type="submit" class="w-full" disabled={form.processing}>

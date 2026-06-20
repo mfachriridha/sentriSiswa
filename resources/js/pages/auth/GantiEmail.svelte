@@ -35,7 +35,9 @@
 
 <Card class="border-border shadow-sm">
     <CardHeader class="space-y-1 text-center">
-        <CardTitle class="text-2xl font-bold tracking-tight">Ganti Email</CardTitle>
+        <CardTitle class="text-2xl font-bold tracking-tight"
+            >Ganti Email</CardTitle
+        >
         <CardDescription>Masukkan email baru untuk akun Anda</CardDescription>
     </CardHeader>
     <CardContent>

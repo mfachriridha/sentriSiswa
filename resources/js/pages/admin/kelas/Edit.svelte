@@ -8,13 +8,15 @@
 </script>
 
 <script lang="ts">
-    import { router } from '@inertiajs/svelte';
+    import { useForm, router } from '@inertiajs/svelte';
     import AppHead from '@/components/AppHead.svelte';
     import Heading from '@/components/Heading.svelte';
     import { Button } from '@/components/ui/button';
     import { Card, CardContent } from '@/components/ui/card';
     import { Input } from '@/components/ui/input';
     import { Label } from '@/components/ui/label';
+    import InputError from '@/components/InputError.svelte';
+    import { Spinner } from '@/components/ui/spinner';
 
     let {
         kelas,
@@ -28,6 +30,18 @@
         };
         waliKelas: Array<{ id: number; nama: string }>;
     } = $props();
+
+    let form = useForm({
+        nama: kelas.nama,
+        tingkat: kelas.tingkat,
+        wali_kelas_id:
+            kelas.wali_kelas_id !== null ? String(kelas.wali_kelas_id) : '',
+    });
+
+    function handleSubmit(e: SubmitEvent) {
+        e.preventDefault();
+        form.put(`/admin/kelas/${kelas.id}`);
+    }
 </script>
 
 <AppHead title="Edit Kelas" />
@@ -37,52 +51,48 @@
 
     <Card>
         <CardContent class="pt-6">
-            <form
-                method="post"
-                action={`/admin/kelas/${kelas.id}`}
-                onsubmit={(e) => {
-                    e.preventDefault();
-                    const form = e.target as HTMLFormElement;
-                    const data = new FormData(form);
-                    data.append('_method', 'PUT');
-                    router.post(`/admin/kelas/${kelas.id}`, data);
-                }}
-                class="space-y-6"
-            >
+            <form onsubmit={handleSubmit} class="space-y-6">
                 <div class="grid gap-4 sm:grid-cols-2">
                     <div class="grid gap-2">
-                        <Label for="nama"
-                            >Nama Kelas <span class="text-destructive">*</span
-                            ></Label
-                        >
+                        <Label for="nama">
+                            Nama Kelas <span class="text-destructive">*</span>
+                        </Label>
                         <Input
                             id="nama"
                             name="nama"
                             required
-                            value={kelas.nama}
+                            bind:value={form.nama}
                         />
+                        <InputError message={form.errors.nama} class="mt-1" />
                     </div>
                     <div class="grid gap-2">
-                        <Label for="tingkat"
-                            >Tingkat <span class="text-destructive">*</span
-                            ></Label
-                        >
+                        <Label for="tingkat">
+                            Tingkat <span class="text-destructive">*</span>
+                        </Label>
                         <select
                             id="tingkat"
                             name="tingkat"
                             required
-                            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm"
+                            bind:value={form.tingkat}
+                            class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                         >
-                            <option value="10" selected={kelas.tingkat === '10'}
-                                >10</option
+                            <option
+                                value="10"
+                                class="bg-background text-foreground">10</option
                             >
-                            <option value="11" selected={kelas.tingkat === '11'}
-                                >11</option
+                            <option
+                                value="11"
+                                class="bg-background text-foreground">11</option
                             >
-                            <option value="12" selected={kelas.tingkat === '12'}
-                                >12</option
+                            <option
+                                value="12"
+                                class="bg-background text-foreground">12</option
                             >
                         </select>
+                        <InputError
+                            message={form.errors.tingkat}
+                            class="mt-1"
+                        />
                     </div>
                 </div>
 
@@ -91,17 +101,24 @@
                     <select
                         id="wali_kelas_id"
                         name="wali_kelas_id"
-                        class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm"
+                        bind:value={form.wali_kelas_id}
+                        class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                     >
-                        <option value="">Pilih wali kelas...</option>
+                        <option value="" class="bg-background text-foreground"
+                            >Pilih wali kelas...</option
+                        >
                         {#each waliKelas as w (w.id)}
                             <option
-                                value={w.id}
-                                selected={kelas.wali_kelas_id === w.id}
+                                value={String(w.id)}
+                                class="bg-background text-foreground"
                                 >{w.nama}</option
                             >
                         {/each}
                     </select>
+                    <InputError
+                        message={form.errors.wali_kelas_id}
+                        class="mt-1"
+                    />
                 </div>
 
                 <div
@@ -110,9 +127,17 @@
                     <Button
                         type="button"
                         variant="outline"
-                        onclick={() => router.back()}>Batal</Button
+                        onclick={() => router.back()}
+                        disabled={form.processing}
                     >
-                    <Button type="submit">Simpan Perubahan</Button>
+                        Batal
+                    </Button>
+                    <Button type="submit" disabled={form.processing}>
+                        {#if form.processing}
+                            <Spinner class="mr-2 size-4 animate-spin" />
+                        {/if}
+                        Simpan Perubahan
+                    </Button>
                 </div>
             </form>
         </CardContent>

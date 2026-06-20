@@ -8,7 +8,7 @@
 </script>
 
 <script lang="ts">
-    import { router } from '@inertiajs/svelte';
+    import { router, useForm } from '@inertiajs/svelte';
     import { MapPin, Upload, Trash2 } from '@lucide/svelte';
     import AppHead from '@/components/AppHead.svelte';
     import Heading from '@/components/Heading.svelte';
@@ -22,6 +22,8 @@
     } from '@/components/ui/card';
     import { Input } from '@/components/ui/input';
     import { Label } from '@/components/ui/label';
+    import InputError from '@/components/InputError.svelte';
+    import { Spinner } from '@/components/ui/spinner';
 
     let {
         geofenceData = null,
@@ -32,6 +34,33 @@
         } | null;
         toleransiMeter?: number;
     } = $props();
+
+    let uploadForm = useForm({
+        kml_file: null as File | null,
+    });
+
+    let toleransiForm = useForm({
+        toleransi_meter: String(toleransiMeter),
+    });
+
+    function handleFileChange(e: Event) {
+        const input = e.target as HTMLInputElement;
+        if (input.files && input.files[0]) {
+            uploadForm.kml_file = input.files[0];
+        }
+    }
+
+    function handleUploadSubmit(e: SubmitEvent) {
+        e.preventDefault();
+        uploadForm.post('/admin/pengaturan/lokasi-absen', {
+            forceFormData: true,
+        });
+    }
+
+    function handleToleransiSubmit(e: SubmitEvent) {
+        e.preventDefault();
+        toleransiForm.put('/admin/pengaturan/lokasi-absen/toleransi');
+    }
 </script>
 
 <AppHead title="Pengaturan Lokasi Absen" />
@@ -52,23 +81,7 @@
                     >
                 </CardHeader>
                 <CardContent>
-                    <form
-                        method="post"
-                        action="/admin/pengaturan/lokasi-absen"
-                        enctype="multipart/form-data"
-                        onsubmit={(e) => {
-                            e.preventDefault();
-                            const form = e.target as HTMLFormElement;
-                            router.post(
-                                '/admin/pengaturan/lokasi-absen',
-                                new FormData(form),
-                                {
-                                    forceFormData: true,
-                                },
-                            );
-                        }}
-                        class="space-y-4"
-                    >
+                    <form onsubmit={handleUploadSubmit} class="space-y-4">
                         <div class="grid gap-2">
                             <Label for="kml_file">File KML</Label>
                             <Input
@@ -76,11 +89,23 @@
                                 name="kml_file"
                                 type="file"
                                 accept=".kml,.xml"
+                                onchange={handleFileChange}
                                 required
+                            />
+                            <InputError
+                                message={uploadForm.errors.kml_file}
+                                class="mt-1"
                             />
                         </div>
                         <div class="flex justify-end">
-                            <Button type="submit">
+                            <Button
+                                type="submit"
+                                disabled={uploadForm.processing ||
+                                    !uploadForm.kml_file}
+                            >
+                                {#if uploadForm.processing}
+                                    <Spinner class="mr-2 size-4 animate-spin" />
+                                {/if}
                                 <Upload class="size-4" />
                                 Unggah
                             </Button>
@@ -97,21 +122,7 @@
                     >
                 </CardHeader>
                 <CardContent>
-                    <form
-                        method="post"
-                        action="/admin/pengaturan/lokasi-absen/toleransi"
-                        onsubmit={(e) => {
-                            e.preventDefault();
-                            const form = e.target as HTMLFormElement;
-                            const data = new FormData(form);
-                            data.append('_method', 'PUT');
-                            router.post(
-                                '/admin/pengaturan/lokasi-absen/toleransi',
-                                data,
-                            );
-                        }}
-                        class="space-y-4"
-                    >
+                    <form onsubmit={handleToleransiSubmit} class="space-y-4">
                         <div class="grid gap-2">
                             <Label for="toleransi_meter"
                                 >Toleransi (meter)</Label
@@ -122,12 +133,24 @@
                                 type="number"
                                 min="0"
                                 max="500"
-                                value={toleransiMeter}
+                                bind:value={toleransiForm.toleransi_meter}
                                 required
+                            />
+                            <InputError
+                                message={toleransiForm.errors.toleransi_meter}
+                                class="mt-1"
                             />
                         </div>
                         <div class="flex justify-end">
-                            <Button type="submit">Simpan Toleransi</Button>
+                            <Button
+                                type="submit"
+                                disabled={toleransiForm.processing}
+                            >
+                                {#if toleransiForm.processing}
+                                    <Spinner class="mr-2 size-4 animate-spin" />
+                                {/if}
+                                Simpan Toleransi
+                            </Button>
                         </div>
                     </form>
                 </CardContent>

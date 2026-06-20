@@ -38,11 +38,11 @@
     function handleOtpInput(index: number, e: Event) {
         const input = e.target as HTMLInputElement;
         const value = input.value;
-        
+
         if (value.length === 1 && index < 3) {
             otpInputs[index + 1]?.focus();
         }
-        
+
         updateOtpValue();
     }
 
@@ -56,7 +56,7 @@
         e.preventDefault();
         const pastedData = e.clipboardData?.getData('text') || '';
         const digits = pastedData.replace(/\D/g, '').slice(0, 4);
-        
+
         if (digits.length === 4) {
             form.otp = digits;
             digits.split('').forEach((digit, i) => {
@@ -69,7 +69,7 @@
     }
 
     function updateOtpValue() {
-        form.otp = otpInputs.map(input => input.value).join('');
+        form.otp = otpInputs.map((input) => input.value).join('');
     }
 
     function handleSubmit(e: SubmitEvent) {
@@ -77,14 +77,17 @@
         form.post('/otp/verifikasi');
     }
 
-    const tujuanLabel = tujuan === 'ganti_email' ? 'pergantian email' : 'pergantian kata sandi';
+    const tujuanLabel =
+        tujuan === 'ganti_email' ? 'pergantian email' : 'pergantian kata sandi';
 </script>
 
 <AppHead title="Verifikasi OTP" />
 
 <Card class="border-border shadow-sm">
     <CardHeader class="space-y-1 text-center">
-        <CardTitle class="text-2xl font-bold tracking-tight">Verifikasi OTP</CardTitle>
+        <CardTitle class="text-2xl font-bold tracking-tight"
+            >Verifikasi OTP</CardTitle
+        >
         <CardDescription>
             Masukkan kode 4 digit yang dikirim ke email Anda untuk {tujuanLabel}
         </CardDescription>
@@ -109,7 +112,10 @@
                         />
                     {/each}
                 </div>
-                <InputError message={form.errors.otp} class="mt-2 text-center" />
+                <InputError
+                    message={form.errors.otp}
+                    class="mt-2 text-center"
+                />
             </div>
 
             {#if sisaPercobaan < 3}

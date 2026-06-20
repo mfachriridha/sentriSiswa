@@ -8,12 +8,14 @@
 </script>
 
 <script lang="ts">
-    import { router } from '@inertiajs/svelte';
+    import { useForm, router } from '@inertiajs/svelte';
     import AppHead from '@/components/AppHead.svelte';
     import Heading from '@/components/Heading.svelte';
     import { Button } from '@/components/ui/button';
     import { Card, CardContent } from '@/components/ui/card';
     import { Label } from '@/components/ui/label';
+    import InputError from '@/components/InputError.svelte';
+    import { Spinner } from '@/components/ui/spinner';
 
     let {
         waktuMulai = '06:30',
@@ -37,6 +39,19 @@
         String(i).padStart(2, '0'),
     );
     const toleransiOptions = [0, 5, 10, 15, 20, 30, 45, 60, 90, 120];
+
+    let form = useForm({
+        jam_mulai: jamMulai,
+        menit_mulai: menitMulai,
+        jam_selesai: jamSelesai,
+        menit_selesai: menitSelesai,
+        toleransi_terlambat: String(toleransiTerlambat),
+    });
+
+    function handleSubmit(e: SubmitEvent) {
+        e.preventDefault();
+        form.put('/admin/pengaturan/waktu-absen');
+    }
 </script>
 
 <AppHead title="Pengaturan Waktu Absen" />
@@ -49,30 +64,20 @@
 
     <Card>
         <CardContent class="pt-6">
-            <form
-                method="post"
-                action="/admin/pengaturan/waktu-absen"
-                onsubmit={(e) => {
-                    e.preventDefault();
-                    const form = e.target as HTMLFormElement;
-                    const data = new FormData(form);
-                    data.append('_method', 'PUT');
-                    router.post('/admin/pengaturan/waktu-absen', data);
-                }}
-                class="space-y-6"
-            >
+            <form onsubmit={handleSubmit} class="space-y-6">
                 <div class="grid gap-4 sm:grid-cols-2">
                     <div class="grid gap-2">
                         <Label>Jam Mulai</Label>
                         <div class="flex gap-2">
                             <select
                                 name="jam_mulai"
-                                class="flex h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm"
+                                bind:value={form.jam_mulai}
+                                class="flex h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                             >
                                 {#each jamOptions as jam (jam)}
                                     <option
                                         value={jam}
-                                        selected={jam === jamMulai}
+                                        class="bg-background text-foreground"
                                         >{jam}</option
                                     >
                                 {/each}
@@ -80,29 +85,36 @@
                             <span class="self-center">:</span>
                             <select
                                 name="menit_mulai"
-                                class="flex h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm"
+                                bind:value={form.menit_mulai}
+                                class="flex h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                             >
                                 {#each menitOptions as menit (menit)}
                                     <option
                                         value={menit}
-                                        selected={menit === menitMulai}
+                                        class="bg-background text-foreground"
                                         >{menit}</option
                                     >
                                 {/each}
                             </select>
                         </div>
+                        <InputError
+                            message={form.errors.jam_mulai ||
+                                form.errors.menit_mulai}
+                            class="mt-1"
+                        />
                     </div>
                     <div class="grid gap-2">
                         <Label>Jam Selesai</Label>
                         <div class="flex gap-2">
                             <select
                                 name="jam_selesai"
-                                class="flex h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm"
+                                bind:value={form.jam_selesai}
+                                class="flex h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                             >
                                 {#each jamOptions as jam (jam)}
                                     <option
                                         value={jam}
-                                        selected={jam === jamSelesai}
+                                        class="bg-background text-foreground"
                                         >{jam}</option
                                     >
                                 {/each}
@@ -110,17 +122,23 @@
                             <span class="self-center">:</span>
                             <select
                                 name="menit_selesai"
-                                class="flex h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm"
+                                bind:value={form.menit_selesai}
+                                class="flex h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                             >
                                 {#each menitOptions as menit (menit)}
                                     <option
                                         value={menit}
-                                        selected={menit === menitSelesai}
+                                        class="bg-background text-foreground"
                                         >{menit}</option
                                     >
                                 {/each}
                             </select>
                         </div>
+                        <InputError
+                            message={form.errors.jam_selesai ||
+                                form.errors.menit_selesai}
+                            class="mt-1"
+                        />
                     </div>
                 </div>
 
@@ -131,16 +149,21 @@
                     <select
                         id="toleransi_terlambat"
                         name="toleransi_terlambat"
-                        class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm"
+                        bind:value={form.toleransi_terlambat}
+                        class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                     >
                         {#each toleransiOptions as t (t)}
                             <option
-                                value={t}
-                                selected={t === toleransiTerlambat}
+                                value={String(t)}
+                                class="bg-background text-foreground"
                                 >{t} menit</option
                             >
                         {/each}
                     </select>
+                    <InputError
+                        message={form.errors.toleransi_terlambat}
+                        class="mt-1"
+                    />
                 </div>
 
                 <div
@@ -149,9 +172,17 @@
                     <Button
                         type="button"
                         variant="outline"
-                        onclick={() => router.back()}>Kembali</Button
+                        onclick={() => router.back()}
+                        disabled={form.processing}
                     >
-                    <Button type="submit">Simpan</Button>
+                        Kembali
+                    </Button>
+                    <Button type="submit" disabled={form.processing}>
+                        {#if form.processing}
+                            <Spinner class="mr-2 size-4 animate-spin" />
+                        {/if}
+                        Simpan
+                    </Button>
                 </div>
             </form>
         </CardContent>

@@ -8,7 +8,7 @@
 </script>
 
 <script lang="ts">
-    import { router } from '@inertiajs/svelte';
+    import { router, Link } from '@inertiajs/svelte';
     import { Download, Upload, Users } from '@lucide/svelte';
     import AppHead from '@/components/AppHead.svelte';
     import Heading from '@/components/Heading.svelte';
@@ -43,7 +43,7 @@
 
     function handleUpload() {
         if (!selectedFile) return;
-        
+
         const formData = new FormData();
         formData.append('file', selectedFile);
         router.post('/admin/guru/impor/unggah', formData);
@@ -51,7 +51,7 @@
 
     function handleImport() {
         if (!pathFile) return;
-        
+
         const formData = new FormData();
         formData.append('file_path', pathFile);
         router.post('/admin/guru/impor', formData);
@@ -64,8 +64,11 @@
 
 <AppHead title="Impor Guru" />
 
-<div class="mx-auto max-w-4xl space-y-6">
-    <Heading title="Impor Data Guru" description="Import data guru dari file Excel">
+<div class="w-full space-y-6">
+    <Heading
+        title="Impor Data Guru"
+        description="Import data guru dari file Excel"
+    >
         {#snippet actions()}
             <Button variant="outline" size="sm" onclick={downloadTemplate}>
                 <Download class="size-4" />
@@ -124,7 +127,10 @@
                                 <tr>
                                     {#if pratinjau.data.length > 0}
                                         {#each Object.keys(pratinjau.data[0]) as key}
-                                            <th class="px-4 py-2 text-left font-medium">{key}</th>
+                                            <th
+                                                class="px-4 py-2 text-left font-medium"
+                                                >{key}</th
+                                            >
                                         {/each}
                                     {/if}
                                 </tr>
@@ -133,7 +139,9 @@
                                 {#each pratinjau.data as row}
                                     <tr class="border-t">
                                         {#each Object.values(row) as value}
-                                            <td class="px-4 py-2">{value ?? '-'}</td>
+                                            <td class="px-4 py-2"
+                                                >{value ?? '-'}</td
+                                            >
                                         {/each}
                                     </tr>
                                 {/each}
@@ -148,14 +156,28 @@
                             </p>
                             <div class="flex gap-2">
                                 {#if pratinjau.current_page > 1}
-                                    <a href="?page={pratinjau.current_page - 1}">
-                                        <Button variant="outline" size="sm">Sebelumnya</Button>
-                                    </a>
+                                    <Button variant="outline" size="sm" asChild>
+                                        {#snippet children(props)}
+                                            <Link
+                                                href="?page={pratinjau.current_page -
+                                                    1}"
+                                                class={props.class}
+                                                >Sebelumnya</Link
+                                            >
+                                        {/snippet}
+                                    </Button>
                                 {/if}
                                 {#if pratinjau.current_page < pratinjau.last_page}
-                                    <a href="?page={pratinjau.current_page + 1}">
-                                        <Button variant="outline" size="sm">Selanjutnya</Button>
-                                    </a>
+                                    <Button variant="outline" size="sm" asChild>
+                                        {#snippet children(props)}
+                                            <Link
+                                                href="?page={pratinjau.current_page +
+                                                    1}"
+                                                class={props.class}
+                                                >Selanjutnya</Link
+                                            >
+                                        {/snippet}
+                                    </Button>
                                 {/if}
                             </div>
                         </div>

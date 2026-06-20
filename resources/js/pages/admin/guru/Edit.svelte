@@ -8,19 +8,35 @@
 </script>
 
 <script lang="ts">
-    import { router } from '@inertiajs/svelte';
+    import { useForm, router } from '@inertiajs/svelte';
     import AppHead from '@/components/AppHead.svelte';
     import Heading from '@/components/Heading.svelte';
     import { Button } from '@/components/ui/button';
     import { Card, CardContent } from '@/components/ui/card';
     import { Input } from '@/components/ui/input';
     import { Label } from '@/components/ui/label';
+    import InputError from '@/components/InputError.svelte';
+    import { Spinner } from '@/components/ui/spinner';
 
     let {
         guru,
     }: {
         guru: { id: number; nama: string; email: string | null; peran: string };
     } = $props();
+
+    let form = useForm({
+        nama: guru.nama,
+        email: guru.email ?? '',
+        peran: guru.peran,
+        password: '',
+    });
+
+    function handleSubmit(e: SubmitEvent) {
+        e.preventDefault();
+        // Since we are using PUT, we can use Inertia put method or POST method with _method=PUT.
+        // useForm.put() handles putting data directly.
+        form.put(`/admin/guru/${guru.id}`);
+    }
 </script>
 
 <AppHead title="Edit Guru" />
@@ -30,24 +46,18 @@
 
     <Card>
         <CardContent class="pt-6">
-            <form
-                method="post"
-                action={`/admin/guru/${guru.id}`}
-                onsubmit={(e) => {
-                    e.preventDefault();
-                    const form = e.target as HTMLFormElement;
-                    const data = new FormData(form);
-                    data.append('_method', 'PUT');
-                    router.post(`/admin/guru/${guru.id}`, data);
-                }}
-                class="space-y-6"
-            >
+            <form onsubmit={handleSubmit} class="space-y-6">
                 <div class="grid gap-2">
-                    <Label for="nama"
-                        >Nama Lengkap <span class="text-destructive">*</span
-                        ></Label
-                    >
-                    <Input id="nama" name="nama" required value={guru.nama} />
+                    <Label for="nama">
+                        Nama Lengkap <span class="text-destructive">*</span>
+                    </Label>
+                    <Input
+                        id="nama"
+                        name="nama"
+                        required
+                        bind:value={form.nama}
+                    />
+                    <InputError message={form.errors.nama} class="mt-1" />
                 </div>
 
                 <div class="grid gap-2">
@@ -56,34 +66,37 @@
                         id="email"
                         name="email"
                         type="email"
-                        value={guru.email ?? ''}
+                        bind:value={form.email}
                     />
+                    <InputError message={form.errors.email} class="mt-1" />
                 </div>
 
                 <div class="grid gap-2">
-                    <Label for="peran"
-                        >Peran <span class="text-destructive">*</span></Label
-                    >
+                    <Label for="peran">
+                        Peran <span class="text-destructive">*</span>
+                    </Label>
                     <select
                         id="peran"
                         name="peran"
                         required
-                        class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm"
+                        bind:value={form.peran}
+                        class="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
                     >
                         <option
                             value="wali_kelas"
-                            selected={guru.peran === 'wali_kelas'}
+                            class="bg-background text-foreground"
                             >Wali Kelas</option
                         >
-                        <option value="bk" selected={guru.peran === 'bk'}
+                        <option value="bk" class="bg-background text-foreground"
                             >BK (Bimbingan Konseling)</option
                         >
                         <option
                             value="kesiswaan"
-                            selected={guru.peran === 'kesiswaan'}
+                            class="bg-background text-foreground"
                             >Kesiswaan</option
                         >
                     </select>
+                    <InputError message={form.errors.peran} class="mt-1" />
                 </div>
 
                 <div class="grid gap-2">
@@ -93,7 +106,9 @@
                         name="password"
                         type="password"
                         placeholder="Kosongkan jika tidak diubah"
+                        bind:value={form.password}
                     />
+                    <InputError message={form.errors.password} class="mt-1" />
                 </div>
 
                 <div
@@ -102,9 +117,17 @@
                     <Button
                         type="button"
                         variant="outline"
-                        onclick={() => router.back()}>Batal</Button
+                        onclick={() => router.back()}
+                        disabled={form.processing}
                     >
-                    <Button type="submit">Simpan Perubahan</Button>
+                        Batal
+                    </Button>
+                    <Button type="submit" disabled={form.processing}>
+                        {#if form.processing}
+                            <Spinner class="mr-2 size-4 animate-spin" />
+                        {/if}
+                        Simpan Perubahan
+                    </Button>
                 </div>
             </form>
         </CardContent>
