@@ -32,6 +32,7 @@ use App\Http\Controllers\WaliKelas\DashboardController as WaliKelasDashboardCont
 use App\Http\Controllers\WaliKelas\KelasSayaController;
 use App\Http\Controllers\WaliKelas\ProfilController as WaliKelasProfilController;
 use App\Http\Controllers\WaliKelas\RiwayatPelanggaranController;
+use App\Models\SchoolClass;
 use App\Models\StudentProfile;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
@@ -41,6 +42,7 @@ Route::get('/', function () {
         return view('welcome', [
             'studentCount' => StudentProfile::count(),
             'teacherCount' => User::whereIn('role', ['wali_kelas', 'bk', 'kesiswaan'])->count(),
+            'classCount' => SchoolClass::count(),
         ]);
     }
 
