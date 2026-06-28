@@ -32,7 +32,6 @@ use App\Http\Controllers\WaliKelas\DashboardController as WaliKelasDashboardCont
 use App\Http\Controllers\WaliKelas\KelasSayaController;
 use App\Http\Controllers\WaliKelas\ProfilController as WaliKelasProfilController;
 use App\Http\Controllers\WaliKelas\RiwayatPelanggaranController;
-use App\Http\Controllers\Webhook\WhatsAppWebhookController;
 use App\Models\StudentProfile;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
@@ -50,8 +49,6 @@ Route::get('/', function () {
 
 Route::view('/privacy-policy', 'legal.privacy-policy')->name('privacy-policy');
 Route::view('/terms-of-service', 'legal.terms-of-service')->name('terms-of-service');
-Route::get('/whatsapp/webhook', [WhatsAppWebhookController::class, 'verify'])->name('whatsapp.webhook.verify');
-Route::post('/whatsapp/webhook', [WhatsAppWebhookController::class, 'handle'])->name('whatsapp.webhook.handle');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AdminLoginController::class, 'create'])->name('login');
