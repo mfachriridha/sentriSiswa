@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Services\FonnteService;
 use App\Services\KmlParser;
-use App\Services\WhatsAppCloudApiService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -173,10 +173,7 @@ class SettingController extends Controller
     {
         return view('admin.pengaturan.whatsapp', [
             'config' => [
-                'access_token' => Setting::get('whatsapp_cloud_access_token', ''),
-                'phone_number_id' => Setting::get('whatsapp_cloud_phone_number_id', ''),
-                'api_version' => Setting::get('whatsapp_cloud_api_version', 'v23.0'),
-                'webhook_verify_token' => Setting::get('whatsapp_webhook_verify_token', ''),
+                'token' => Setting::get('fonnte_token', ''),
             ],
         ]);
     }
@@ -184,45 +181,22 @@ class SettingController extends Controller
     public function whatsappUpdate(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'whatsapp_cloud_access_token' => ['nullable', 'string', 'max:1000'],
-            'whatsapp_cloud_phone_number_id' => ['nullable', 'string', 'max:100'],
-            'whatsapp_cloud_api_version' => ['nullable', 'string', 'max:20', 'regex:/^v[0-9]+\.[0-9]+$/'],
-            'whatsapp_webhook_verify_token' => ['nullable', 'string', 'min:16', 'max:255'],
-            'clear_whatsapp_cloud_access_token' => ['nullable', 'boolean'],
-            'clear_whatsapp_cloud_phone_number_id' => ['nullable', 'boolean'],
-            'clear_whatsapp_webhook_verify_token' => ['nullable', 'boolean'],
+            'fonnte_token' => ['nullable', 'string', 'max:255'],
+            'clear_fonnte_token' => ['nullable', 'boolean'],
         ], [
-            'whatsapp_cloud_access_token.max' => 'Access Token tidak boleh lebih dari 1000 karakter.',
-            'whatsapp_cloud_phone_number_id.max' => 'Phone Number ID tidak boleh lebih dari 100 karakter.',
-            'whatsapp_cloud_api_version.regex' => 'Format Graph API Version harus seperti v23.0.',
-            'whatsapp_webhook_verify_token.min' => 'Verify Token minimal 16 karakter.',
-            'whatsapp_webhook_verify_token.max' => 'Verify Token tidak boleh lebih dari 255 karakter.',
+            'fonnte_token.max' => 'Token Fonnte tidak boleh lebih dari 255 karakter.',
         ]);
 
-        if ($request->boolean('clear_whatsapp_cloud_access_token')) {
-            Setting::set('whatsapp_cloud_access_token', '');
-        } elseif (filled($validated['whatsapp_cloud_access_token'] ?? null) || blank(Setting::get('whatsapp_cloud_access_token', ''))) {
-            Setting::set('whatsapp_cloud_access_token', $validated['whatsapp_cloud_access_token'] ?? '');
-        }
-
-        if ($request->boolean('clear_whatsapp_cloud_phone_number_id')) {
-            Setting::set('whatsapp_cloud_phone_number_id', '');
-        } elseif (filled($validated['whatsapp_cloud_phone_number_id'] ?? null) || blank(Setting::get('whatsapp_cloud_phone_number_id', ''))) {
-            Setting::set('whatsapp_cloud_phone_number_id', $validated['whatsapp_cloud_phone_number_id'] ?? '');
-        }
-
-        Setting::set('whatsapp_cloud_api_version', $validated['whatsapp_cloud_api_version'] ?? Setting::get('whatsapp_cloud_api_version', 'v23.0'));
-
-        if ($request->boolean('clear_whatsapp_webhook_verify_token')) {
-            Setting::set('whatsapp_webhook_verify_token', '');
-        } elseif (filled($validated['whatsapp_webhook_verify_token'] ?? null) || blank(Setting::get('whatsapp_webhook_verify_token', ''))) {
-            Setting::set('whatsapp_webhook_verify_token', $validated['whatsapp_webhook_verify_token'] ?? '');
+        if ($request->boolean('clear_fonnte_token')) {
+            Setting::set('fonnte_token', '');
+        } elseif (filled($validated['fonnte_token'] ?? null) || blank(Setting::get('fonnte_token', ''))) {
+            Setting::set('fonnte_token', $validated['fonnte_token'] ?? '');
         }
 
         return redirect()->route('admin.settings.whatsapp.index')->with('success', 'Konfigurasi WhatsApp berhasil disimpan.');
     }
 
-    public function whatsappTest(Request $request, WhatsAppCloudApiService $whatsapp): JsonResponse
+    public function whatsappTest(Request $request, FonnteService $whatsapp): JsonResponse
     {
         $validated = $request->validate([
             'phone' => ['required', 'string', 'max:20'],
@@ -245,8 +219,8 @@ class SettingController extends Controller
             ], 429);
         }
 
-        $availableAt = now()->addSeconds(WhatsAppCloudApiService::TEST_COOLDOWN_SECONDS)->timestamp;
-        Cache::put($cooldownKey, $availableAt, WhatsAppCloudApiService::TEST_COOLDOWN_SECONDS);
+        $availableAt = now()->addSeconds(FonnteService::TEST_COOLDOWN_SECONDS)->timestamp;
+        Cache::put($cooldownKey, $availableAt, FonnteService::TEST_COOLDOWN_SECONDS);
 
         $result = $whatsapp->send($normalizedPhone, $validated['message'], [
             'timeout' => 60,
@@ -256,7 +230,7 @@ class SettingController extends Controller
 
         return response()->json([
             ...$result,
-            'retry_after' => WhatsAppCloudApiService::TEST_COOLDOWN_SECONDS,
+            'retry_after' => FonnteService::TEST_COOLDOWN_SECONDS,
         ], $result['success'] ? 200 : 422);
     }
 }
