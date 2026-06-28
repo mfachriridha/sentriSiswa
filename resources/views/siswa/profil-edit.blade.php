@@ -76,6 +76,12 @@
         @csrf
         @method('PUT')
 
+        <div class="rounded-lg bg-blue-50 border border-blue-200 p-4">
+            <p class="text-sm text-blue-700">
+                💡 <strong>Informasi Keamanan:</strong> Mengubah email atau kata sandi memerlukan verifikasi kode OTP yang dikirimkan ke email Anda saat ini.
+            </p>
+        </div>
+
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
                 <label class="block text-sm font-medium text-gray-500">Nama</label>
@@ -123,6 +129,19 @@
                           class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                                  placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">{{ old('address', $student->studentProfile?->address) }}</textarea>
                 @error('address')
+                    <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="md:col-span-2">
+                @if(!$student->hasPassword())
+                    <label for="password" class="block text-sm font-medium text-gray-700">Tambah Kata Sandi Baru</label>
+                @else
+                    <label for="password" class="block text-sm font-medium text-gray-700">Kata Sandi Baru <span class="text-sm font-normal text-gray-400">(kosongkan jika tidak diubah)</span></label>
+                @endif
+                <input id="password" type="password" name="password"
+                       class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
+                @error('password')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>

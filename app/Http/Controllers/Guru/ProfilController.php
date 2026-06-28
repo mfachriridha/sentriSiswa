@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Guru;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Guru\UpdateProfilRequest;
+use App\Services\OtpService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
@@ -33,17 +33,10 @@ class ProfilController extends Controller
         $teacher = Auth::user();
         $data = $request->validated();
 
-        // Update user fields
+        // Update user name
         $teacher->update([
             'name' => $data['name'],
-            'email' => $data['email'] ?? null,
         ]);
-
-        if ($request->filled('password')) {
-            $teacher->update([
-                'password' => Hash::make($data['password']),
-            ]);
-        }
 
         // Handle profile photo
         $profile = $teacher->teacherProfile;
@@ -70,6 +63,32 @@ class ProfilController extends Controller
 
         // Update phone (still separate)
         $profile->update(['phone' => $data['phone'] ?? null]);
+
+        // Intercept critical changes
+        $emailChanged = isset($data['email']) && $data['email'] !== $teacher->email;
+        $passwordChanged = $request->filled('password');
+
+        if ($emailChanged || $passwordChanged) {
+            $otpType = $emailChanged ? 'email_change' : 'password_change';
+
+            $pending = [];
+            if ($emailChanged) {
+                $pending['new_email'] = $data['email'];
+            }
+            if ($passwordChanged) {
+                $pending['new_password'] = $data['password'];
+            }
+
+            session([
+                'otp_type' => $otpType,
+                'otp_pending' => $pending,
+            ]);
+
+            app(OtpService::class)->generate($teacher, $otpType, $pending);
+
+            return redirect()->route('otp.show')
+                ->with('success', 'Kode OTP telah dikirim ke email Anda saat ini untuk memverifikasi perubahan.');
+        }
 
         return redirect()->route($teacher->profilRouteName())->with('success', 'Profil berhasil diperbarui.');
     }

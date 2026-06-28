@@ -20,6 +20,7 @@ class UpdateSiswaProfilRequest extends FormRequest
             'email' => ['nullable', 'email', 'max:255', "unique:users,email,{$userId}"],
             'phone' => ['nullable', 'string', 'min:10', 'max:20', 'regex:/^[0-9+\-\s()]*$/'],
             'address' => ['nullable', 'string'],
+            'password' => ['nullable', 'string', 'min:8', 'regex:/[a-z]/i', 'regex:/[0-9]/'],
         ];
     }
 
@@ -32,6 +33,8 @@ class UpdateSiswaProfilRequest extends FormRequest
             'phone.min' => 'Nomor telepon minimal 10 digit.',
             'phone.max' => 'Nomor telepon maksimal 20 digit.',
             'phone.regex' => 'Format nomor telepon tidak valid.',
+            'password.min' => 'Kata sandi minimal 8 karakter.',
+            'password.regex' => 'Kata sandi harus memuat huruf dan angka.',
         ];
     }
 }

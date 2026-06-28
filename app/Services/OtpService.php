@@ -75,23 +75,13 @@ class OtpService
 
         $updates = [];
 
-        if ($token->type === 'email_change' && $token->new_email) {
+        if ($token->new_email) {
             $updates['email'] = $token->new_email;
             $updates['email_verified_at'] = now();
         }
 
-        if ($token->type === 'password_change' && $token->new_password) {
+        if ($token->new_password) {
             $updates['password'] = $token->new_password;
-        }
-
-        if ($token->type === 'admin_setup') {
-            if ($token->new_email) {
-                $updates['email'] = $token->new_email;
-            }
-            if ($token->new_password) {
-                $updates['password'] = $token->new_password;
-            }
-            $updates['email_verified_at'] = now();
         }
 
         if (! empty($updates)) {

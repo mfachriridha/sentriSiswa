@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Siswa;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Siswa\UpdateSiswaProfilRequest;
+use App\Services\OtpService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -46,14 +47,37 @@ class ProfilController extends Controller
     {
         $student = Auth::user();
 
-        $student->update([
-            'email' => $request->email,
-        ]);
-
+        // Update non-critical fields
         $student->studentProfile->update([
             'phone' => $request->phone,
             'address' => $request->address,
         ]);
+
+        // Intercept critical changes
+        $emailChanged = $request->email !== $student->email;
+        $passwordChanged = $request->filled('password');
+
+        if ($emailChanged || $passwordChanged) {
+            $otpType = $emailChanged ? 'email_change' : 'password_change';
+
+            $pending = [];
+            if ($emailChanged) {
+                $pending['new_email'] = $request->email;
+            }
+            if ($passwordChanged) {
+                $pending['new_password'] = $request->password;
+            }
+
+            session([
+                'otp_type' => $otpType,
+                'otp_pending' => $pending,
+            ]);
+
+            app(OtpService::class)->generate($student, $otpType, $pending);
+
+            return redirect()->route('otp.show')
+                ->with('success', 'Kode OTP telah dikirim ke email Anda saat ini untuk memverifikasi perubahan.');
+        }
 
         return redirect()->route('siswa.profil')->with('success', 'Profil berhasil diperbarui.');
     }

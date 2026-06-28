@@ -43,6 +43,12 @@
             </div>
         </div>
 
+        <div class="rounded-lg bg-blue-50 border border-blue-200 p-4 mb-4">
+            <p class="text-sm text-blue-700">
+                💡 <strong>Informasi Keamanan:</strong> Mengubah email atau kata sandi memerlukan verifikasi kode OTP yang dikirimkan ke email Anda saat ini.
+            </p>
+        </div>
+
         <div class="grid gap-5 md:grid-cols-2">
             <div>
                 <label for="email" class="block text-sm font-medium text-gray-700">Email <span class="text-red-500">*</span></label>
