@@ -9,7 +9,6 @@ use App\Models\StudentProfile;
 use App\Models\TeacherProfile;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
@@ -109,9 +108,9 @@ class RegisterController extends Controller
 
         session()->forget(['register_role', 'register_user_id', 'register_identity', 'register_name']);
 
-        Auth::login($user);
-
-        return redirect()->route($user->dashboardRouteName());
+        return redirect()
+            ->route('login')
+            ->with('success', 'Pendaftaran berhasil. Silakan masuk dengan akun Anda.');
     }
 
     private function adminWhatsAppUrl(): ?string
