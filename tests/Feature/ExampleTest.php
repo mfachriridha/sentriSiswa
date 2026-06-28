@@ -40,10 +40,10 @@ test('guests can see public legal pages', function () {
     $this->get(route('privacy-policy'))
         ->assertSuccessful()
         ->assertSee('Kebijakan Privasi')
-        ->assertSee('WhatsApp Cloud API');
+        ->assertSee('Notifikasi WhatsApp');
 
     $this->get(route('terms-of-service'))
         ->assertSuccessful()
         ->assertSee('Ketentuan Layanan')
-        ->assertSee('WhatsApp Business Platform');
+        ->assertSee('Notifikasi WhatsApp');
 });
