@@ -70,12 +70,17 @@ test('admin can send fonnte test message and repeated target is rate limited', f
         ]);
 
     Http::assertSent(function ($request): bool {
-        $payload = $request->data();
+        $body = $request->body();
 
-        return $request->hasHeader('Authorization', 'fonnte-test-token')
-            && $payload['target'] === '628123456789'
-            && $payload['message'] === 'Test pesan'
-            && $payload['countryCode'] === '62';
+        return $request->url() === 'https://api.fonnte.com/send'
+            && $request->method() === 'POST'
+            && $request->hasHeader('Authorization', 'fonnte-test-token')
+            && str_contains($body, 'name="target"')
+            && str_contains($body, '628123456789')
+            && str_contains($body, 'name="message"')
+            && str_contains($body, 'Test pesan')
+            && str_contains($body, 'name="countryCode"')
+            && str_contains($body, '62');
     });
 
     $this->actingAs($admin)
