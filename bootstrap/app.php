@@ -7,6 +7,7 @@ use App\Http\Middleware\EnsureUserIsHomeroom;
 use App\Http\Middleware\EnsureUserIsRegistered;
 use App\Http\Middleware\EnsureUserIsSiswa;
 use App\Http\Middleware\EnsureUserIsStudentAffairs;
+use App\Http\Middleware\RedirectIfGoogleWhatsappPending;
 use App\Http\Middleware\RequireAdminSetup;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -20,6 +21,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->trustProxies(at: '*');
+
+        $middleware->web(append: [
+            RedirectIfGoogleWhatsappPending::class,
+        ]);
 
         $middleware->alias([
             'admin' => EnsureUserIsAdmin::class,
