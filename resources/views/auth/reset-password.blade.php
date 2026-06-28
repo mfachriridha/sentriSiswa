@@ -12,7 +12,7 @@
                         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                     </svg>
                 </div>
-                <h2 class="mt-6 text-2xl font-extrabold text-white tracking-tight">Sandi Baru</h2>
+                <h2 class="mt-6 text-2xl font-extrabold text-white tracking-tight">Buat Kata Sandi Baru</h2>
                 <p class="mt-2 text-xs font-medium text-slate-400">Masukkan kata sandi baru Anda</p>
             </div>
 

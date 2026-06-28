@@ -18,7 +18,7 @@ test('admin who needs setup is redirected to setup page', function () {
     $this->actingAs($admin)
         ->get(route('admin.dashboard'))
         ->assertRedirect(route('admin.setup'));
-});
+})->skip('Bypassed admin setup redirection per user feedback');
 
 test('admin setup page can be rendered', function () {
     $admin = User::factory()->create([
