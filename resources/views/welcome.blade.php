@@ -59,14 +59,14 @@
     </header>
 
     <main>
-        <section class="relative isolate overflow-hidden min-h-[640px] lg:min-h-[720px]">
-            <div class="absolute inset-0 -z-10" aria-hidden="true">
+        <section class="hero-section">
+            <div class="hero-bg" aria-hidden="true">
                 @foreach ($heroImages as $index => $image)
-                    <div class="hero-slide absolute inset-0 bg-cover bg-center"
+                    <div class="hero-slide"
                          style="background-image: url('{{ $image['src'] }}'); animation-delay: {{ $index * 5 }}s;"></div>
                 @endforeach
-                <div class="absolute inset-0 bg-slate-950/55"></div>
-                <div class="absolute inset-0 bg-gradient-to-br from-primary/30 via-transparent to-teal-900/40"></div>
+                <div class="hero-overlay"></div>
+                <div class="hero-gradient"></div>
             </div>
 
             <div class="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">

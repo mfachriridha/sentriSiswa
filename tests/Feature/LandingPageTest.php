@@ -35,7 +35,7 @@ test('landing page does not render carousel card or broken navigation buttons', 
 test('landing page hero has dark overlay for text readability', function () {
     $response = $this->get(route('home'))->assertSuccessful();
 
-    $response->assertSee('bg-slate-950/55', false);
+    $response->assertSee('hero-overlay', false);
     $response->assertSee('aria-hidden="true"', false);
 });
 

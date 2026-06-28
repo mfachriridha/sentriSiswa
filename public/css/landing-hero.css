@@ -1,17 +1,70 @@
 /*
  * Hero cross-fade for the landing page.
  *
- * This file lives in /public on purpose: the Vite/Tailwind
- * build of resources/css/app.css is currently failing on
- * this branch with a generic "Missing opening {" parser
- * error, and the .hero-slide utility added there would never
- * make it into the production bundle. Serving this small
- * stylesheet directly from /public avoids the broken build
- * pipeline while keeping the animation logic in version
- * control. If the upstream Vite build is repaired later, this
- * file can be folded back into app.css and the <link> in
- * welcome.blade.php can be removed.
+ * This file lives in /public on purpose and provides raw
+ * (non-Tailwind) CSS for the hero structure so the landing
+ * page works regardless of the Vite/Tailwind build state:
+ *
+ * 1. The Vite build of resources/css/app.css currently fails
+ *    on this branch with a generic "Missing opening {" parser
+ *    error, and the pre-existing public/build/ assets are
+ *    stale (they do not contain the new utilities the hero
+ *    section relies on, e.g. .bg-cover, .bg-center,
+ *    .min-h-[640px], .text-white).
+ *
+ * 2. Running `php artisan serve` without `pnpm run dev` also
+ *    means Tailwind utilities are not regenerated, so the
+ *    hero would render as a flat page with no visible image.
+ *
+ * Until the upstream build is repaired and rebuilt, this
+ * stylesheet owns the full hero presentation: positioning,
+ * background image sizing, overlay, and cross-fade. If the
+ * Vite build is repaired later, this file can be folded back
+ * into app.css and the <link> in welcome.blade.php can be
+ * removed.
  */
+
+.hero-section {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    min-height: 640px;
+}
+
+@media (min-width: 1024px) {
+    .hero-section {
+        min-height: 720px;
+    }
+}
+
+.hero-bg {
+    position: absolute;
+    inset: 0;
+    z-index: -10;
+}
+
+.hero-slide {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0;
+    animation: heroCrossfade 15s infinite;
+    will-change: opacity;
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(2, 6, 23, 0.55);
+}
+
+.hero-gradient {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom right, rgba(28, 104, 128, 0.3), transparent, rgba(17, 94, 89, 0.4));
+}
 
 @keyframes heroCrossfade {
     0%   { opacity: 0; }
@@ -19,12 +72,6 @@
     33%  { opacity: 1; }
     37%  { opacity: 0; }
     100% { opacity: 0; }
-}
-
-.hero-slide {
-    opacity: 0;
-    animation: heroCrossfade 15s infinite;
-    will-change: opacity;
 }
 
 @media (prefers-reduced-motion: reduce) {
