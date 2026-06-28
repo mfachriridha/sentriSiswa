@@ -19,7 +19,9 @@ return new class extends Migration
             }
         });
 
-        DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('admin', 'teacher', 'student', 'siswa', 'wali_kelas', 'bk', 'kesiswaan') NOT NULL DEFAULT 'siswa'");
+        if (DB::connection()->getDriverName() === 'mysql') {
+            DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('admin', 'teacher', 'student', 'siswa', 'wali_kelas', 'bk', 'kesiswaan') NOT NULL DEFAULT 'siswa'");
+        }
 
         DB::table('users')
             ->join('teacher_profiles', 'users.id', '=', 'teacher_profiles.user_id')
@@ -47,12 +49,16 @@ return new class extends Migration
             ->where('role', 'student')
             ->update(['role' => 'siswa']);
 
-        DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('admin', 'siswa', 'wali_kelas', 'bk', 'kesiswaan') NOT NULL DEFAULT 'siswa'");
+        if (DB::connection()->getDriverName() === 'mysql') {
+            DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('admin', 'siswa', 'wali_kelas', 'bk', 'kesiswaan') NOT NULL DEFAULT 'siswa'");
+        }
     }
 
     public function down(): void
     {
-        DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('admin', 'teacher', 'student', 'siswa', 'wali_kelas', 'bk', 'kesiswaan') NOT NULL DEFAULT 'student'");
+        if (DB::connection()->getDriverName() === 'mysql') {
+            DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('admin', 'teacher', 'student', 'siswa', 'wali_kelas', 'bk', 'kesiswaan') NOT NULL DEFAULT 'student'");
+        }
 
         DB::table('users')
             ->whereIn('role', ['wali_kelas', 'bk', 'kesiswaan'])
@@ -62,7 +68,9 @@ return new class extends Migration
             ->where('role', 'siswa')
             ->update(['role' => 'student']);
 
-        DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('admin', 'teacher', 'student') NOT NULL DEFAULT 'student'");
+        if (DB::connection()->getDriverName() === 'mysql') {
+            DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('admin', 'teacher', 'student') NOT NULL DEFAULT 'student'");
+        }
 
         Schema::table('users', function (Blueprint $table) {
             if (Schema::hasColumn('users', 'photo')) {
