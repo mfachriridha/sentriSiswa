@@ -25,8 +25,8 @@
             </section>
 
             <section>
-                <h2 class="text-lg font-semibold text-gray-950">3. Integrasi WhatsApp</h2>
-                <p class="mt-2">Jika fitur WhatsApp diaktifkan, nomor telepon guru dapat digunakan untuk menerima laporan absensi melalui WhatsApp Cloud API. Pesan yang dikirim terbatas pada kebutuhan operasional sekolah.</p>
+                <h2 class="text-lg font-semibold text-gray-950">3. Notifikasi WhatsApp</h2>
+                <p class="mt-2">Jika fitur notifikasi WhatsApp diaktifkan oleh admin, nomor telepon guru dapat digunakan untuk menerima laporan absensi melalui layanan gateway WhatsApp. Pesan yang dikirim terbatas pada kebutuhan operasional sekolah.</p>
             </section>
 
             <section>
@@ -36,7 +36,7 @@
 
             <section>
                 <h2 class="text-lg font-semibold text-gray-950">5. Pembagian Data</h2>
-                <p class="mt-2">Data tidak dijual kepada pihak ketiga. Data hanya digunakan untuk kebutuhan internal sekolah dan layanan pendukung yang diperlukan untuk menjalankan aplikasi, termasuk layanan pengiriman pesan WhatsApp jika dikonfigurasi.</p>
+                <p class="mt-2">Data tidak dijual kepada pihak ketiga. Data hanya digunakan untuk kebutuhan internal sekolah dan layanan pendukung yang diperlukan untuk menjalankan aplikasi, termasuk layanan pengiriman pesan WhatsApp jika fitur notifikasi diaktifkan.</p>
             </section>
 
             <section>

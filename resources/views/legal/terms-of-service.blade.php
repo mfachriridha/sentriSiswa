@@ -31,7 +31,7 @@
 
             <section>
                 <h2 class="text-lg font-semibold text-gray-950">4. Notifikasi WhatsApp</h2>
-                <p class="mt-2">Jika fitur WhatsApp aktif, sistem dapat mengirim pesan laporan absensi kepada guru atau pihak sekolah yang ditentukan. Penggunaan fitur ini mengikuti kebijakan WhatsApp Business Platform.</p>
+                <p class="mt-2">Jika fitur notifikasi WhatsApp diaktifkan, sistem dapat mengirim pesan laporan absensi kepada guru atau pihak sekolah yang ditentukan. Fitur ini menggunakan layanan gateway WhatsApp dan tunduk pada kebijakan penggunaan masing-masing penyedia.</p>
             </section>
 
             <section>
