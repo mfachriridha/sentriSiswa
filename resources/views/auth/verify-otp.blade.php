@@ -5,24 +5,24 @@
 @section('content')
 <div class="flex items-center justify-center min-h-[80vh]">
     <div class="w-full max-w-md mx-auto">
-        <div class="bg-slate-800/40 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-700/60 p-8 sm:p-10 transition-all duration-300">
+        <div class="bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 p-8 sm:p-10 transition-all duration-300">
             <div class="mb-8 text-center">
-                <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 shadow-lg border border-primary/20">
+                <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 shadow-md border border-primary/20">
                     <svg class="h-8 w-8 text-primary animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
                         <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
                     </svg>
                 </div>
-                <h2 class="mt-6 text-2xl font-extrabold text-white tracking-tight">Verifikasi OTP</h2>
-                <p class="mt-2 text-xs font-medium text-slate-400">
+                <h2 class="mt-6 text-2xl font-extrabold text-slate-800 tracking-tight">Verifikasi OTP</h2>
+                <p class="mt-2 text-xs font-semibold text-slate-500">
                     Kode verifikasi 6 digit telah dikirim ke<br>
-                    <strong class="text-white text-sm tracking-wide">{{ $maskedEmail }}</strong>
+                    <strong class="text-slate-800 text-sm tracking-wide">{{ $maskedEmail }}</strong>
                 </p>
             </div>
 
             @if ($errors->any())
-                <div class="mb-6 rounded-xl border border-red-900/50 bg-red-950/40 backdrop-blur px-4 py-3.5">
-                    <ul class="list-disc pl-4 text-xs font-medium text-red-400 space-y-1">
+                <div class="mb-6 rounded-xl border border-red-100 bg-red-50 px-4 py-3.5">
+                    <ul class="list-disc pl-4 text-xs font-semibold text-red-600 space-y-1">
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
@@ -31,7 +31,7 @@
             @endif
 
             @if (session('success'))
-                <div class="mb-6 rounded-xl border border-green-900/50 bg-green-950/40 backdrop-blur px-4 py-3.5 text-xs font-medium text-green-400">
+                <div class="mb-6 rounded-xl border border-green-100 bg-green-50 px-4 py-3.5 text-xs font-semibold text-green-700">
                     {{ session('success') }}
                 </div>
             @endif
@@ -39,11 +39,11 @@
             <form method="POST" action="{{ route('otp.verify') }}" class="space-y-6" id="otp-form">
                 @csrf
                 <div>
-                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-4 text-center">Masukkan 6 Digit OTP</label>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-4 text-center">Masukkan 6 Digit OTP</label>
                     <div class="flex justify-between gap-2" id="otp-inputs">
                         @for ($i = 0; $i < 6; $i++)
                             <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]"
-                                   class="otp-digit h-12 w-12 sm:h-14 sm:w-14 rounded-xl border-2 border-slate-700 bg-slate-900/50 text-center text-xl font-extrabold text-white shadow-inner transition-all duration-300 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/20"
+                                   class="otp-digit h-12 w-12 sm:h-14 sm:w-14 rounded-xl border-2 border-slate-200 bg-slate-50/50 text-slate-800 text-center text-xl font-extrabold shadow-inner transition-all duration-300 focus:bg-white focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/20"
                                    autocomplete="off">
                         @endfor
                     </div>
@@ -57,7 +57,7 @@
             </form>
 
             <div class="mt-6 text-center" x-data="otpTimer()" x-init="start()">
-                <p class="text-xs text-slate-500 font-semibold">
+                <p class="text-xs text-slate-400 font-bold">
                     <span x-show="timeLeft > 0">
                         Kirim ulang dalam <span class="font-bold text-primary" x-text="formatTime(timeLeft)"></span>
                     </span>
