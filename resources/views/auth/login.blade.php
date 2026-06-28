@@ -3,19 +3,19 @@
 @section('title', 'Masuk - Sentri Siswa')
 
 @section('content')
-<div class="flex min-h-screen items-center justify-center px-4">
-    <div class="w-full max-w-md">
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div class="mb-6 text-center">
+<div class="flex items-center justify-center min-h-[80vh]">
+    <div class="w-full max-w-md mx-auto">
+        <div class="bg-slate-800/40 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-700/60 p-8 sm:p-10 transition-all duration-300">
+            <div class="mb-8 text-center">
                 <img src="{{ asset('storage/assets/logo/logo-website.png') }}" alt="Sentri Siswa"
-                     class="mx-auto h-24 w-auto rounded-xl border-4 border-white shadow-lg">
-                <h2 class="mt-6 text-2xl font-bold text-gray-900">Sentri Siswa</h2>
-                <p class="mt-2 text-sm text-gray-500">Sistem Pengawasan Absensi</p>
+                     class="mx-auto h-20 w-auto rounded-2xl border-4 border-slate-700/50 shadow-xl">
+                <h2 class="mt-6 text-2xl font-extrabold tracking-tight text-white">Sentri Siswa</h2>
+                <p class="mt-2 text-xs font-medium text-slate-400">Sistem Pengawasan Kehadiran & Tata Tertib Siswa</p>
             </div>
 
             @if ($errors->any())
-                <div class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
-                    <ul class="list-disc pl-4 text-sm text-red-600">
+                <div class="mb-6 rounded-xl border border-red-900/50 bg-red-950/40 backdrop-blur px-4 py-3.5">
+                    <ul class="list-disc pl-4 text-xs font-medium text-red-400 space-y-1">
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
@@ -24,52 +24,54 @@
             @endif
 
             @if (session('error'))
-                <div class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
-                    <p class="text-sm text-red-600">{{ session('error') }}</p>
+                <div class="mb-6 rounded-xl border border-red-900/50 bg-red-950/40 backdrop-blur px-4 py-3.5">
+                    <p class="text-xs font-medium text-red-400">{{ session('error') }}</p>
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('login') }}" class="space-y-5">
+            @if (session('success'))
+                <div class="mb-6 rounded-xl border border-green-900/50 bg-green-950/40 backdrop-blur px-4 py-3.5">
+                    <p class="text-xs font-medium text-green-400">{{ session('success') }}</p>
+                </div>
+            @endif
+
+            <form method="POST" action="{{ route('login') }}" class="space-y-6">
                 @csrf
 
                 <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                    <label for="email" class="block text-xs font-bold text-slate-300 uppercase tracking-wider">Email</label>
                     <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus
-                           class="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm
-                                  placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20
-                                  transition-colors">
+                           class="mt-2 block w-full rounded-xl border border-slate-700 bg-slate-900/50 px-4 py-3 text-sm text-white placeholder:text-slate-500 shadow-inner focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/20 transition-all duration-300"
+                           placeholder="nama@sekolah.sch.id">
                 </div>
 
                 <div>
                     <div class="flex items-center justify-between">
-                        <label for="password" class="block text-sm font-medium text-gray-700">Kata Sandi</label>
-                        <a href="{{ route('password.request') }}" class="text-xs font-medium text-primary hover:underline">Lupa kata sandi?</a>
+                        <label for="password" class="block text-xs font-bold text-slate-300 uppercase tracking-wider">Kata Sandi</label>
+                        <a href="{{ route('password.request') }}" class="text-xs font-semibold text-primary hover:text-primary-dark transition-colors">Lupa kata sandi?</a>
                     </div>
                     <input id="password" type="password" name="password" required
-                           class="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm
-                                  placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20
-                                  transition-colors">
+                           class="mt-2 block w-full rounded-xl border border-slate-700 bg-slate-900/50 px-4 py-3 text-sm text-white placeholder:text-slate-500 shadow-inner focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/20 transition-all duration-300"
+                           placeholder="••••••••">
                 </div>
 
                 <button type="submit"
-                        class="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm
-                               hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50
-                               transition-colors">
+                        class="w-full rounded-xl bg-primary px-4 py-3 text-sm font-bold text-white shadow-lg shadow-primary/20 hover:bg-primary-dark active:scale-[0.98] transition-all duration-300 cursor-pointer">
                     Masuk
                 </button>
             </form>
 
             {{-- Separator --}}
-            <div class="my-5 flex items-center gap-3">
-                <div class="flex-1 border-t border-gray-200"></div>
-                <span class="text-xs text-gray-400 font-medium">atau</span>
-                <div class="flex-1 border-t border-gray-200"></div>
+            <div class="my-6 flex items-center gap-3">
+                <div class="flex-1 border-t border-slate-700/60"></div>
+                <span class="text-[10px] uppercase font-bold tracking-wider text-slate-500">atau</span>
+                <div class="flex-1 border-t border-slate-700/60"></div>
             </div>
 
             {{-- Google Login --}}
             <a href="{{ route('google.redirect', ['mode' => 'login']) }}"
-               class="flex w-full items-center justify-center gap-3 rounded-lg border-2 border-gray-200 bg-white px-4 py-2.5
-                      text-sm font-semibold text-gray-700 shadow-sm transition-all hover:border-gray-300 hover:bg-gray-50 active:scale-95">
+               class="flex w-full items-center justify-center gap-3 rounded-xl border border-slate-700 bg-slate-900/40 px-4 py-3
+                      text-sm font-bold text-slate-300 hover:text-white hover:border-slate-600 hover:bg-slate-900/80 active:scale-[0.98] transition-all duration-300 cursor-pointer">
                 <svg class="h-5 w-5" viewBox="0 0 24 24">
                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                     <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -79,8 +81,8 @@
                 Masuk dengan Google
             </a>
 
-            <p class="mt-6 text-center text-sm text-gray-500">
-                Belum terdaftar? <a href="{{ route('register') }}" class="font-medium text-primary hover:underline">Daftar di sini</a>
+            <p class="mt-8 text-center text-xs font-semibold text-slate-500">
+                Belum terdaftar? <a href="{{ route('register') }}" class="text-primary hover:text-primary-dark hover:underline transition-colors">Daftar di sini</a>
             </p>
         </div>
     </div>

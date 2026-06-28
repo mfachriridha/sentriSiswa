@@ -3,83 +3,74 @@
 @section('title', 'Daftar - Sentri Siswa')
 
 @section('content')
-<div class="flex min-h-screen items-center justify-center px-4">
-    <div class="w-full max-w-md">
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div class="mb-6 text-center">
+<div class="flex items-center justify-center min-h-[80vh]">
+    <div class="w-full max-w-md mx-auto">
+        <div class="bg-slate-800/40 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-700/60 p-8 sm:p-10 transition-all duration-300">
+            <div class="mb-8 text-center">
                 <img src="{{ asset('storage/assets/logo/logo-website.png') }}" alt="Sentri Siswa"
-                     class="mx-auto h-24 w-auto rounded-xl border-4 border-white shadow-lg">
-                <h2 class="mt-6 text-2xl font-bold text-gray-900">Daftar Akun</h2>
-                <p class="mt-2 text-sm text-gray-500">Verifikasi identitas Anda untuk membuat akun</p>
+                     class="mx-auto h-20 w-auto rounded-2xl border-4 border-slate-700/50 shadow-xl">
+                <h2 class="mt-6 text-2xl font-extrabold tracking-tight text-white">Daftar Akun</h2>
+                <p class="mt-2 text-xs font-medium text-slate-400">Verifikasi identitas Anda terlebih dahulu</p>
             </div>
 
             @if ($errors->any())
-                <div class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
-                    <ul class="list-disc pl-4 text-sm text-red-600">
+                <div class="mb-6 rounded-xl border border-red-900/50 bg-red-950/40 backdrop-blur px-4 py-3.5 flex flex-col items-start gap-3">
+                    <ul class="list-disc pl-4 text-xs font-medium text-red-400 space-y-1">
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
                     </ul>
                     @if (session('admin_whatsapp_url'))
                         <a href="{{ session('admin_whatsapp_url') }}" target="_blank" rel="noopener"
-                           class="mt-3 inline-flex items-center justify-center rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700">
+                           class="inline-flex items-center justify-center rounded-xl bg-green-600 px-4 py-2 text-xs font-bold text-white hover:bg-green-700 transition-all cursor-pointer">
                             Hubungi Admin
                         </a>
                     @endif
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('register.verify') }}" class="space-y-5">
+            <form method="POST" action="{{ route('register.verify') }}" class="space-y-6">
                 @csrf
-
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Saya adalah</label>
+                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-3">Saya adalah</label>
                     <div class="flex gap-4">
-                        <label class="flex-1 flex items-center justify-center gap-2 rounded-lg border-2 px-4 py-3 cursor-pointer transition-colors
-                                      {{ old('role') === 'teacher' ? 'border-primary bg-primary/5 text-primary' : 'border-gray-200 text-gray-600 hover:border-gray-300' }}">
+                        <label class="flex-1 flex flex-col items-center justify-center gap-2.5 rounded-xl border-2 p-4 cursor-pointer transition-all duration-300 relative group
+                                      {{ old('role') === 'teacher' ? 'border-primary bg-primary/10 text-white' : 'border-slate-700 bg-slate-900/20 text-slate-400 hover:border-slate-600 hover:text-slate-300' }}">
                             <input type="radio" name="role" value="teacher" {{ old('role') === 'teacher' ? 'checked' : '' }} class="sr-only">
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            <svg class="h-6 w-6 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
                             </svg>
-                            <span class="text-sm font-medium">Guru</span>
+                            <span class="text-xs font-bold">Guru</span>
                         </label>
-                        <label class="flex-1 flex items-center justify-center gap-2 rounded-lg border-2 px-4 py-3 cursor-pointer transition-colors
-                                      {{ old('role') === 'student' ? 'border-primary bg-primary/5 text-primary' : 'border-gray-200 text-gray-600 hover:border-gray-300' }}">
-                            <input type="radio" name="role" value="student" {{ old('role') === 'student' ? 'checked' : '' }} class="sr-only">
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        <label class="flex-1 flex flex-col items-center justify-center gap-2.5 rounded-xl border-2 p-4 cursor-pointer transition-all duration-300 relative group
+                                      {{ old('role') !== 'teacher' ? 'border-primary bg-primary/10 text-white' : 'border-slate-700 bg-slate-900/20 text-slate-400 hover:border-slate-600 hover:text-slate-300' }}">
+                            <input type="radio" name="role" value="student" {{ old('role') !== 'teacher' ? 'checked' : '' }} class="sr-only">
+                            <svg class="h-6 w-6 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                             </svg>
-                            <span class="text-sm font-medium">Siswa</span>
+                            <span class="text-xs font-bold">Siswa</span>
                         </label>
                     </div>
-                    @error('role')
-                        <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
+                    @error('role')<p class="mt-1.5 text-xs text-red-400">{{ $message }}</p>@enderror
                 </div>
 
                 <div>
-                    <label for="identity" class="block text-sm font-medium text-gray-700" id="identity-label">NIP / NISN / NIS</label>
+                    <label for="identity" class="block text-xs font-bold text-slate-300 uppercase tracking-wider" id="identity-label">Nomor Identitas</label>
                     <input id="identity" type="text" name="identity" value="{{ old('identity') }}" required
                            inputmode="numeric" pattern="[0-9]*" autocomplete="off"
-                           class="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm
-                                  placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20
-                                  transition-colors"
+                           class="mt-2 block w-full rounded-xl border border-slate-700 bg-slate-900/50 px-4 py-3 text-sm text-white placeholder:text-slate-500 shadow-inner focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/20 transition-all duration-300"
                            placeholder="Masukkan NIP atau NISN/NIS">
-                    @error('identity')
-                        <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
+                    @error('identity')<p class="mt-1.5 text-xs text-red-400">{{ $message }}</p>@enderror
                 </div>
 
-                <button type="submit"
-                        class="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm
-                               hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50
-                               transition-colors">
-                    Verifikasi
+                <button type="submit" class="w-full rounded-xl bg-primary px-4 py-3 text-sm font-bold text-white shadow-lg shadow-primary/20 hover:bg-primary-dark active:scale-[0.98] transition-all duration-300 cursor-pointer">
+                    Verifikasi Identitas
                 </button>
             </form>
 
-            <p class="mt-6 text-center text-sm text-gray-500">
-                Sudah punya akun? <a href="{{ route('login') }}" class="font-medium text-primary hover:underline">Masuk di sini</a>
+            <p class="mt-8 text-center text-xs font-semibold text-slate-500">
+                Sudah punya akun? <a href="{{ route('login') }}" class="text-primary hover:text-primary-dark hover:underline transition-colors">Masuk di sini</a>
             </p>
         </div>
     </div>
@@ -87,37 +78,44 @@
 
 @push('scripts')
 <script>
-    const radios = document.querySelectorAll('input[name="role"]');
-    const labels = document.querySelectorAll('label:has(input[name="role"])');
-    const identityInput = document.getElementById('identity');
-    const identityLabel = document.getElementById('identity-label');
-    const identityPlaceholder = {
-        teacher: { label: 'NIP', placeholder: 'Masukkan NIP Anda' },
-        student: { label: 'NISN / NIS', placeholder: 'Masukkan NISN atau NIS Anda' },
-    };
+    document.addEventListener('DOMContentLoaded', () => {
+        const roles = document.querySelectorAll('input[name="role"]');
+        const identityLabel = document.getElementById('identity-label');
+        const identityInput = document.getElementById('identity');
 
-    function updateRoleUI() {
-        const selected = document.querySelector('input[name="role"]:checked')?.value;
-        labels.forEach((label, i) => {
-            if (radios[i].value === selected) {
-                label.classList.remove('border-gray-200', 'text-gray-600');
-                label.classList.add('border-primary', 'bg-primary/5', 'text-primary');
+        function updateLabels() {
+            const activeRole = document.querySelector('input[name="role"]:checked').value;
+            const labels = document.querySelectorAll('input[name="role"]');
+            
+            labels.forEach(input => {
+                const parent = input.closest('label');
+                if (input.checked) {
+                    parent.className = 'flex-1 flex flex-col items-center justify-center gap-2.5 rounded-xl border-2 p-4 cursor-pointer transition-all duration-300 relative group border-primary bg-primary/10 text-white';
+                } else {
+                    parent.className = 'flex-1 flex flex-col items-center justify-center gap-2.5 rounded-xl border-2 p-4 cursor-pointer transition-all duration-300 relative group border-slate-700 bg-slate-900/20 text-slate-400 hover:border-slate-600 hover:text-slate-300';
+                }
+            });
+
+            if (activeRole === 'teacher') {
+                identityLabel.textContent = 'NIP (Nomor Induk Pegawai)';
+                identityInput.placeholder = 'Masukkan 18 digit NIP Anda';
             } else {
-                label.classList.remove('border-primary', 'bg-primary/5', 'text-primary');
-                label.classList.add('border-gray-200', 'text-gray-600');
+                identityLabel.textContent = 'NISN / NIS';
+                identityInput.placeholder = 'Masukkan NISN atau NIS Anda';
             }
-        });
-        if (selected && identityPlaceholder[selected]) {
-            identityLabel.textContent = identityPlaceholder[selected].label;
-            identityInput.placeholder = identityPlaceholder[selected].placeholder;
         }
-    }
 
-    radios.forEach(r => r.addEventListener('change', updateRoleUI));
-    identityInput.addEventListener('input', () => {
-        identityInput.value = identityInput.value.replace(/\D/g, '');
+        roles.forEach(role => {
+            role.addEventListener('change', updateLabels);
+        });
+
+        // Strip non-digits from input
+        identityInput.addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+        });
+
+        updateLabels();
     });
-    updateRoleUI();
 </script>
 @endpush
 @endsection
