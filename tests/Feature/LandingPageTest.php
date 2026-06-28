@@ -49,3 +49,9 @@ test('landing page still shows call-to-action and stats on top of hero backgroun
         ->assertSee('Guru')
         ->assertSee('Sistem kedisiplinan dan absensi sekolah');
 });
+
+test('landing page links the static hero stylesheet that drives the cross-fade', function () {
+    $this->get(route('home'))
+        ->assertSuccessful()
+        ->assertSee('href="'.asset('css/landing-hero.css').'"', false);
+});
