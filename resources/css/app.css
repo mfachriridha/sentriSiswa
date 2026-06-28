@@ -68,3 +68,31 @@
         @apply inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50;
     }
 }
+
+@layer utilities {
+    @keyframes heroCrossfade {
+        0%   { opacity: 0; }
+        4%   { opacity: 1; }
+        33%  { opacity: 1; }
+        37%  { opacity: 0; }
+        100% { opacity: 0; }
+    }
+
+    .hero-slide {
+        opacity: 0;
+        animation: heroCrossfade 15s infinite;
+        will-change: opacity;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .hero-slide {
+            animation: none;
+            opacity: 0;
+        }
+
+        .hero-slide:first-child {
+            opacity: 1;
+        }
+    }
+}
+}
