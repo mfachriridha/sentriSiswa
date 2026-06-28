@@ -52,10 +52,6 @@
                 <a href="#sekolah" class="hover:text-primary transition-colors py-1.5 px-3 rounded-lg hover:bg-slate-50">Sekolah</a>
                 <a href="#kontak" class="hover:text-primary transition-colors py-1.5 px-3 rounded-lg hover:bg-slate-50">Kontak</a>
             </nav>
-
-            <div class="flex items-center gap-3">
-                <a href="{{ route('login') }}" class="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-700 shadow-sm transition-all duration-300 hover:bg-slate-50 active:scale-95">Masuk</a>
-            </div>
         </div>
     </header>
 
