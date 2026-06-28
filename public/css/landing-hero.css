@@ -1,0 +1,39 @@
+/*
+ * Hero cross-fade for the landing page.
+ *
+ * This file lives in /public on purpose: the Vite/Tailwind
+ * build of resources/css/app.css is currently failing on
+ * this branch with a generic "Missing opening {" parser
+ * error, and the .hero-slide utility added there would never
+ * make it into the production bundle. Serving this small
+ * stylesheet directly from /public avoids the broken build
+ * pipeline while keeping the animation logic in version
+ * control. If the upstream Vite build is repaired later, this
+ * file can be folded back into app.css and the <link> in
+ * welcome.blade.php can be removed.
+ */
+
+@keyframes heroCrossfade {
+    0%   { opacity: 0; }
+    4%   { opacity: 1; }
+    33%  { opacity: 1; }
+    37%  { opacity: 0; }
+    100% { opacity: 0; }
+}
+
+.hero-slide {
+    opacity: 0;
+    animation: heroCrossfade 15s infinite;
+    will-change: opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hero-slide {
+        animation: none;
+        opacity: 0;
+    }
+
+    .hero-slide:first-child {
+        opacity: 1;
+    }
+}
