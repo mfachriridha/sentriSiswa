@@ -9,8 +9,14 @@ use App\Http\Controllers\Admin\ImporSiswaController;
 use App\Http\Controllers\Admin\KelasController;
 use App\Http\Controllers\Admin\PengaturanController;
 use App\Http\Controllers\Admin\ProfilController as AdminProfilController;
+use App\Http\Controllers\Admin\SetupController;
 use App\Http\Controllers\Admin\SiswaController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\GoogleController;
+use App\Http\Controllers\Auth\GoogleWhatsappController;
+use App\Http\Controllers\Auth\OtpController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Bk\DashboardController as BkDashboardController;
 use App\Http\Controllers\Bk\LaporanController as BkLaporanController;
 use App\Http\Controllers\Bk\MonitoringController as BkMonitoringController;
@@ -59,13 +65,39 @@ Route::middleware('guest')->group(function () {
     Route::post('/daftar/verifikasi', [RegisterController::class, 'verify'])->name('register.verify');
     Route::get('/daftar/lengkapi', [RegisterController::class, 'showForm'])->name('register.step2');
     Route::post('/daftar/lengkapi', [RegisterController::class, 'store'])->name('register.store');
+
+    // Lupa & reset kata sandi
+    Route::get('/lupa-sandi', [ForgotPasswordController::class, 'create'])->name('password.request');
+    Route::post('/lupa-sandi', [ForgotPasswordController::class, 'store'])->name('password.email');
+    Route::get('/reset-sandi/{token}', [ResetPasswordController::class, 'create'])->name('password.reset');
+    Route::post('/reset-sandi', [ResetPasswordController::class, 'store'])->name('password.update');
+
+    // Google OAuth
+    Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('google.redirect');
+    Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('google.callback');
 });
 
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AdminLoginController::class, 'destroy'])->name('logout');
+
+    // OTP verifikasi (shared semua role)
+    Route::get('/otp/verifikasi', [OtpController::class, 'show'])->name('otp.show');
+    Route::post('/otp/verifikasi', [OtpController::class, 'verify'])->name('otp.verify');
+    Route::post('/otp/kirim-ulang', [OtpController::class, 'resend'])->name('otp.resend');
+
+    // Google WhatsApp step (guru setelah Google OAuth)
+    Route::get('/auth/google/whatsapp', [GoogleWhatsappController::class, 'create'])->name('google.whatsapp');
+    Route::post('/auth/google/whatsapp', [GoogleWhatsappController::class, 'store'])->name('google.whatsapp.store');
 });
 
-Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'admin', 'admin-setup'])->prefix('admin')->name('admin.')->group(function () {
+    // Setup awal (hanya untuk admin yang belum setup — dikecualikan dari admin-setup middleware via RouteIs)
+    Route::get('/setup', [SetupController::class, 'create'])->name('setup');
+    Route::post('/setup', [SetupController::class, 'store'])->name('setup.store');
+    Route::get('/setup/verifikasi', [SetupController::class, 'verifyOtp'])->name('setup.verify');
+    Route::post('/setup/verifikasi', [SetupController::class, 'confirmOtp'])->name('setup.verify.store');
+    Route::post('/setup/kirim-ulang', [SetupController::class, 'resendOtp'])->name('setup.resend');
+
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/profil', [AdminProfilController::class, 'show'])->name('profil');
     Route::get('/profil/edit', [AdminProfilController::class, 'edit'])->name('profil.edit');

@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password', 'role', 'status', 'photo', 'whatsapp_number'])]
+#[Fillable(['name', 'email', 'password', 'role', 'status', 'photo', 'whatsapp_number', 'google_id'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -35,6 +35,21 @@ class User extends Authenticatable
     public function isRegistered(): bool
     {
         return $this->status === 'registered';
+    }
+
+    public function hasGoogleLinked(): bool
+    {
+        return $this->google_id !== null;
+    }
+
+    public function hasPassword(): bool
+    {
+        return $this->password !== null;
+    }
+
+    public function needsAdminSetup(): bool
+    {
+        return $this->isAdmin() && $this->email_verified_at === null;
     }
 
     public function teacherProfile(): HasOne

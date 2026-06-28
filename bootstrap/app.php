@@ -7,6 +7,7 @@ use App\Http\Middleware\EnsureUserIsHomeroom;
 use App\Http\Middleware\EnsureUserIsRegistered;
 use App\Http\Middleware\EnsureUserIsSiswa;
 use App\Http\Middleware\EnsureUserIsStudentAffairs;
+use App\Http\Middleware\RequireAdminSetup;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -28,6 +29,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'kesiswaan' => EnsureUserIsStudentAffairs::class,
             'wali-kelas' => EnsureUserIsHomeroom::class,
             'siswa' => EnsureUserIsSiswa::class,
+            'admin-setup' => RequireAdminSetup::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
