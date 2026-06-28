@@ -3,26 +3,26 @@
 @section('title', 'Verifikasi Kode OTP - Sentri Siswa')
 
 @section('content')
-<div class="flex min-h-screen items-center justify-center px-4">
-    <div class="w-full max-w-md">
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-            <div class="mb-6 text-center">
-                <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
-                    <svg class="h-7 w-7 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+<div class="flex items-center justify-center min-h-[80vh]">
+    <div class="w-full max-w-md mx-auto">
+        <div class="bg-slate-800/40 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-700/60 p-8 sm:p-10 transition-all duration-300">
+            <div class="mb-8 text-center">
+                <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 shadow-lg border border-primary/20">
+                    <svg class="h-8 w-8 text-primary animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
                         <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
                     </svg>
                 </div>
-                <h2 class="mt-4 text-xl font-bold text-gray-900">Verifikasi Kode OTP</h2>
-                <p class="mt-1.5 text-sm text-gray-500">
+                <h2 class="mt-6 text-2xl font-extrabold text-white tracking-tight">Verifikasi OTP</h2>
+                <p class="mt-2 text-xs font-medium text-slate-400">
                     Kode verifikasi 6 digit telah dikirim ke<br>
-                    <strong class="text-gray-700">{{ $maskedEmail }}</strong>
+                    <strong class="text-white text-sm tracking-wide">{{ $maskedEmail }}</strong>
                 </p>
             </div>
 
             @if ($errors->any())
-                <div class="mb-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
-                    <ul class="list-disc pl-4 text-sm text-red-600">
+                <div class="mb-6 rounded-xl border border-red-900/50 bg-red-950/40 backdrop-blur px-4 py-3.5">
+                    <ul class="list-disc pl-4 text-xs font-medium text-red-400 space-y-1">
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
@@ -31,19 +31,19 @@
             @endif
 
             @if (session('success'))
-                <div class="mb-5 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+                <div class="mb-6 rounded-xl border border-green-900/50 bg-green-950/40 backdrop-blur px-4 py-3.5 text-xs font-medium text-green-400">
                     {{ session('success') }}
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('otp.verify') }}" class="space-y-5" id="otp-form">
+            <form method="POST" action="{{ route('otp.verify') }}" class="space-y-6" id="otp-form">
                 @csrf
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-3 text-center">Masukkan Kode OTP</label>
-                    <div class="flex justify-center gap-2" id="otp-inputs">
+                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-4 text-center">Masukkan 6 Digit OTP</label>
+                    <div class="flex justify-between gap-2" id="otp-inputs">
                         @for ($i = 0; $i < 6; $i++)
                             <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]"
-                                   class="otp-digit h-12 w-12 rounded-xl border-2 border-gray-200 text-center text-lg font-bold text-gray-900 shadow-sm transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                   class="otp-digit h-12 w-12 sm:h-14 sm:w-14 rounded-xl border-2 border-slate-700 bg-slate-900/50 text-center text-xl font-extrabold text-white shadow-inner transition-all duration-300 focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/20"
                                    autocomplete="off">
                         @endfor
                     </div>
@@ -51,31 +51,25 @@
                 </div>
 
                 <button type="submit"
-                        class="w-full rounded-xl bg-primary px-4 py-3 text-sm font-bold text-white shadow-sm transition-all hover:bg-primary-dark active:scale-95">
-                    Verifikasi
+                        class="w-full rounded-xl bg-primary px-4 py-3 text-sm font-bold text-white shadow-lg shadow-primary/20 hover:bg-primary-dark active:scale-[0.98] transition-all duration-300 cursor-pointer">
+                    Verifikasi Kode
                 </button>
             </form>
 
-            <div class="mt-5 text-center" x-data="otpTimer()" x-init="start()">
-                <p class="text-sm text-gray-500">
+            <div class="mt-6 text-center" x-data="otpTimer()" x-init="start()">
+                <p class="text-xs text-slate-500 font-semibold">
                     <span x-show="timeLeft > 0">
-                        Kirim ulang dalam <span class="font-semibold text-primary" x-text="formatTime(timeLeft)"></span>
+                        Kirim ulang dalam <span class="font-bold text-primary" x-text="formatTime(timeLeft)"></span>
                     </span>
                     <span x-show="timeLeft === 0" x-cloak>
                         <form method="POST" action="{{ route('otp.resend') }}" class="inline">
                             @csrf
-                            <button type="submit" class="font-semibold text-primary hover:underline">
+                            <button type="submit" class="font-bold text-primary hover:text-primary-dark hover:underline transition-colors cursor-pointer">
                                 Kirim Ulang Kode
                             </button>
                         </form>
                     </span>
                 </p>
-            </div>
-
-            <div class="mt-4 text-center">
-                <a href="{{ url()->previous() }}" class="text-xs text-gray-400 hover:text-gray-600 transition-colors">
-                    ← Kembali
-                </a>
             </div>
         </div>
     </div>
@@ -84,7 +78,6 @@
 
 @push('scripts')
 <script>
-    // Auto-focus next digit on input
     const digits = document.querySelectorAll('.otp-digit');
     const hiddenInput = document.getElementById('otp-hidden');
     const form = document.getElementById('otp-form');
@@ -128,10 +121,9 @@
         }
     });
 
-    // OTP countdown timer (Alpine)
     function otpTimer() {
         return {
-            timeLeft: 600, // 10 minutes
+            timeLeft: 600,
             interval: null,
             start() {
                 this.interval = setInterval(() => {
