@@ -73,19 +73,15 @@ class OtpService
     {
         $token->update(['used_at' => now()]);
 
-        $updates = [];
-
         if ($token->new_email) {
-            $updates['email'] = $token->new_email;
-            $updates['email_verified_at'] = now();
+            $user->email = $token->new_email;
+            $user->email_verified_at = now();
         }
 
         if ($token->new_password) {
-            $updates['password'] = $token->new_password;
+            $user->password = $token->new_password;
         }
 
-        if (! empty($updates)) {
-            $user->update($updates);
-        }
+        $user->save();
     }
 }
