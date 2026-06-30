@@ -28,7 +28,7 @@
     <div class="mb-6">
         <h2 class="mb-4 text-lg font-semibold text-gray-900">Pas Foto 3×4</h2>
         <div class="flex items-start gap-6"
-             x-data="{ photoUrl: '{{ $student->studentProfile?->photo ? asset('storage/'.$student->studentProfile->photo) : '' }}', uploading: false }">
+             x-data="{ photoUrl: '{{ $student->studentProfile?->photo ? asset('storage/'.$student->studentProfile->photo) : '' }}', uploading: false, uploadError: '' }">
             <div class="relative h-40 w-30 overflow-hidden rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 flex items-center justify-center"
                  style="aspect-ratio: 3/4;">
                 <template x-if="photoUrl">
@@ -48,7 +48,7 @@
                     <span x-text="uploading ? 'Mengunggah...' : 'Pilih Foto'"></span>
                     <input type="file" accept="image/jpeg,image/png,image/webp" class="hidden"
                            :disabled="uploading"
-                           @change="uploading = true; let formData = new FormData(); formData.append('photo', $event.target.files[0]); fetch('{{ route('admin.siswa.foto', $student) }}', {method: 'POST', headers: {'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content, 'Accept': 'application/json'}, body: formData}).then(r => r.json()).then(data => { photoUrl = data.url; uploading = false; }).catch(() => { uploading = false; })">
+                           @change="uploading = true; uploadError = ''; let formData = new FormData(); formData.append('photo', $event.target.files[0]); fetch('{{ route('admin.siswa.foto', $student) }}', {method: 'POST', headers: {'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content, 'Accept': 'application/json'}, body: formData}).then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(data => { if (data.url) { photoUrl = data.url; } else { uploadError = data.message || 'Upload gagal. Coba lagi.'; } uploading = false; }).catch(() => { uploading = false; uploadError = 'Upload gagal. Periksa ukuran file (maks 2MB) dan coba lagi.'; })">
                 </label>
                 <template x-if="photoUrl">
                     <button type="button"
@@ -61,6 +61,7 @@
                     </button>
                 </template>
                 <p class="text-sm text-gray-400">Format: JPG/PNG, maks 2MB. Akan di-resize ke 3:4.</p>
+                <p x-cloak x-show="uploadError" x-text="uploadError" class="text-sm text-red-600 font-medium"></p>
             </div>
         </div>
     </div>
