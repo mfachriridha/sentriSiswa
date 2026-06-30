@@ -1,0 +1,445 @@
+@startuml SentriSiswa Class Diagram
+
+skinparam classAttributeIconSize 0
+skinparam classFontSize 13
+skinparam linetype ortho
+hide empty members
+
+' ============================================================
+' USER (isolated)
+' ============================================================
+
+class User {
+    + id : int
+    + name : string
+    + email : string
+    + password : string
+    + role : string
+    + status : string
+    + photo : string|null
+    + whatsapp_number : string|null
+    + google_id : string|null
+    --
+    + isAdmin() : bool
+    + isGuru() : bool
+    + isWaliKelas() : bool
+    + isBk() : bool
+    + isKesiswaan() : bool
+    + isSiswa() : bool
+    + isTeacher() : bool
+    + isHomeroom() : bool
+    + isCounselor() : bool
+    + isStudentAffairs() : bool
+    + isStudent() : bool
+    + hasGoogleLinked() : bool
+    + hasPassword() : bool
+    + needsAdminSetup() : bool
+    + isRegistered() : bool
+    + dashboardRouteName() : string
+    + roleLabel() : string
+    + profilRouteName(action) : string
+    + teacherProfile() : HasOne
+    + studentProfile() : HasOne
+    + homeroomClass() : HasOne
+}
+
+' ============================================================
+' CORE DOMAIN MODELS
+' ============================================================
+
+class TeacherProfile {
+    + id : int
+    + user_id : int
+    + nip : string|null
+    + phone : string|null
+    + photo : string|null
+    + grade : string|null
+    --
+    + user() : BelongsTo
+}
+
+class StudentProfile {
+    + id : int
+    + user_id : int
+    + nisn : string|null
+    + nis : string|null
+    + class_id : int|null
+    + phone : string|null
+    + address : string|null
+    + photo : string|null
+    + points : int <<computed>>
+    --
+    + user() : BelongsTo
+    + class() : BelongsTo
+    + biodata() : HasOne
+    + attendances() : HasMany
+    + studentViolations() : HasMany
+    + getPointsAttribute() : int
+}
+
+class SchoolClass {
+    + id : int
+    + name : string
+    + grade : string
+    + homeroom_teacher_id : int|null
+    --
+    + homeroomTeacher() : BelongsTo
+    + students() : HasMany
+}
+
+class Attendance {
+    + id : int
+    + student_profile_id : int
+    + date : date
+    + status : string
+    + check_in_time : time|null
+    + selfie_path : string|null
+    + latitude : decimal|null
+    + longitude : decimal|null
+    + accuracy : float|null
+    + distance_meters : float|null
+    --
+    + studentProfile() : BelongsTo
+}
+
+class StudentViolation {
+    + id : int
+    + student_profile_id : int
+    + violation_type_id : int
+    + recorded_by_user_id : int
+    + approved_by_user_id : int|null
+    + violation_date : date
+    + violation_name : string
+    + violation_category : string
+    + point_deduction : int
+    + notes : string|null
+    + status : string
+    + approved_at : datetime|null
+    + rejection_reason : string|null
+    --
+    + studentProfile() : BelongsTo
+    + violationType() : BelongsTo
+    + recordedBy() : BelongsTo
+    + approvedBy() : BelongsTo
+    + scopeApproved(query) : Builder
+    + statusLabels() : array
+}
+
+class ViolationType {
+    + id : int
+    + name : string
+    + category : string
+    + point_deduction : int
+    + description : string|null
+    + is_active : bool
+    + CATEGORY_LIGHT = 'light'
+    + CATEGORY_MEDIUM = 'medium'
+    + CATEGORY_HEAVY = 'heavy'
+    + CATEGORY_SEVERE = 'severe'
+    --
+    + studentViolations() : HasMany
+    + categoryLabels() : array
+    + categoryRanges() : array
+}
+
+class StudentBiodata {
+    + id : int
+    + student_profile_id : int
+    + place_of_birth : string|null
+    + date_of_birth : date|null
+    + gender : string|null
+    + religion : string|null
+    + family_status : string|null
+    + child_number : int|null
+    + school_of_origin : string|null
+    + admission_date : date|null
+    + father_name : string|null
+    + father_occupation : string|null
+    + mother_name : string|null
+    + mother_occupation : string|null
+    + parent_address : string|null
+    + parent_phone : string|null
+    + guardian_name : string|null
+    + guardian_occupation : string|null
+    + guardian_address : string|null
+    + guardian_phone : string|null
+    --
+    + studentProfile() : BelongsTo
+    + isComplete() : bool
+}
+
+class SchoolRule {
+    + id : int
+    + title : string
+    + file_path : string
+    + is_published : bool
+    + uploaded_by_user_id : int
+    --
+    + uploadedBy() : BelongsTo
+}
+
+class WhatsappMessage {
+    + id : int
+    + school_class_id : int|null
+    + recipient_phone : string
+    + recipient_name : string
+    + message_type : string
+    + provider_message_id : string|null
+    + message : text
+    + status : string
+    + response : json|null
+    + sent_at : datetime|null
+    --
+    + schoolClass() : BelongsTo
+}
+
+class Setting {
+    + id : int
+    + key : string
+    + value : text|null
+    --
+    + get(key, default) : mixed
+    + set(key, value) : void
+}
+
+class EmailOtpToken {
+    + id : int
+    + user_id : int
+    + otp : string
+    + type : string
+    + new_email : string|null
+    + new_password : string|null
+    + expires_at : datetime
+    + used_at : datetime|null
+    --
+    + user() : BelongsTo
+    + scopeValid(query) : Builder
+    + isExpired() : bool
+    + isUsed() : bool
+}
+
+class TokenAksesAbsensi {
+    + id : int
+    + token : string
+    + class_id : int
+    + tanggal : date
+    + expires_at : datetime
+    --
+    + kelas() : BelongsTo
+    + sudahExpired() : bool
+    + buatAtauPerbarui(classId, tanggal) : self
+}
+
+' ============================================================
+' SERVICES
+' ============================================================
+
+class FonnteService {
+    - ENDPOINT : string
+    - TIMEOUT_SECONDS : int
+    + TEST_COOLDOWN_SECONDS : int
+    --
+    + isConfigured() : bool
+    + send(target, message, options) : array
+    - token() : string|null
+}
+
+class OtpService {
+    + EXPIRY_MINUTES : int
+    --
+    + generate(user, type, pending) : void
+    + verify(user, otp, type) : bool
+    + resend(user, type) : void
+    - storePending(user, type, data) : void
+    - getPending(user, type) : array|null
+}
+
+class AbsenceWarningService {
+    + Threshold : int
+    --
+    + currentSemesterRange() : array
+    + alphaCountForStudents(studentIds, start, end) : Collection
+    + warningStudents(studentIds, start, end) : Collection
+}
+
+class GeofenceValidator {
+    --
+    + validate(lat, lng) : bool
+    + distanceMeters(lat, lng) : float
+}
+
+' ============================================================
+' CONTROLLERS
+' ============================================================
+
+class DashboardController {
+    + index(absenceWarning) : View
+}
+
+class ProfilController {
+    + show() : View
+    + edit() : View
+    + update(request) : RedirectResponse
+    + uploadPhoto() : RedirectResponse
+    + deletePhoto() : RedirectResponse
+}
+
+class AttendanceRecapController {
+    + index(request) : View
+    + exportExcel(request) : BinaryFileResponse
+    + exportPdf(request) : Response
+    - dateRange(request) : array
+    - classStudents(classId, studentId) : Collection
+    - attendancesByStudent(students, start, end) : Collection
+    - calculateStats(students, attendances) : array
+    - filterStudentsByStatus(students, stats, status) : Collection
+    - attendanceChartRows(stats) : array
+}
+
+class BkAbsensiRecapController {
+    + index(request) : View
+    + exportExcel(request) : BinaryFileResponse
+    + exportPdf(request) : Response
+    - gradeStudents(classIds) : Collection
+    - attendancesByStudent() : Collection
+    - calculateStats() : array
+    - filterStudentsByStatus() : Collection
+    - attendanceChartRows() : array
+}
+
+class StudentViolationController {
+    + index(request) : View
+    + create() : View
+    + store(request) : RedirectResponse
+    + show(studentViolation) : View
+    + edit(studentViolation) : View
+    + update(request, studentViolation) : RedirectResponse
+    + approve(studentViolation) : RedirectResponse
+    + reject(request, studentViolation) : RedirectResponse
+    + destroy(studentViolation) : RedirectResponse
+    + pendingCount() : JsonResponse
+    - students() : Collection
+    - violationTypes(activeOnly, current) : Collection
+    - violationData(data, type, includeRecorder, approved) : array
+}
+
+class BkViolationSubmissionController {
+    + index(request) : View
+    + create(request) : View
+    + store(request) : RedirectResponse
+    - students() : Collection
+    - authorizeStudentGrade(student) : void
+}
+
+class MonitoringController {
+    + index(request, absenceWarning) : View
+    + show(monitoring, absenceWarning) : View
+}
+
+class ClassRosterController {
+    + index(request, absenceWarning) : View
+    + statusAbsensi() : JsonResponse
+    + updateAttendance(request, studentProfile) : RedirectResponse
+    + show(studentProfile, absenceWarning) : View
+}
+
+class SiswaAbsensiController {
+    + index() : View
+    + store(request) : JsonResponse
+    + history() : View
+}
+
+class AbsensiPublikController {
+    + show(token) : View
+    + store(request, token) : JsonResponse
+}
+
+class SchoolRuleController {
+    + index() : View
+    + store(request) : RedirectResponse
+    + publish(schoolRule) : RedirectResponse
+    + unpublish(schoolRule) : RedirectResponse
+    + destroy(schoolRule) : RedirectResponse
+}
+
+class ViolationTypeController {
+    + index(request) : View
+    + create() : View
+    + store(request) : RedirectResponse
+    + show(violationType) : View
+    + edit(violationType) : View
+    + update(request, violationType) : RedirectResponse
+    + destroy(violationType) : RedirectResponse
+}
+
+class ViolationReportController {
+    + index(request) : View
+    + exportExcel(request) : BinaryFileResponse
+    + exportPdf(request) : Response
+    - reportData(request, paginated) : array
+    - statusChartRows(violations) : array
+}
+
+class SettingController {
+    + index() : View
+    + update(request) : RedirectResponse
+    + whatsappTest(request) : RedirectResponse
+    + riwayatPesan() : View
+}
+
+' ============================================================
+' ASSOCIATIONS
+' ============================================================
+
+' User ↔ profiles
+User "1" -- "0..1" TeacherProfile : has
+User "1" -- "0..1" StudentProfile : has
+User "1" -- "0..1" SchoolClass : homeroom of
+
+' StudentProfile associations
+StudentProfile "many" -- "1" SchoolClass : enrolled in
+StudentProfile "1" -- "0..1" StudentBiodata : has
+StudentProfile "1" -- "many" Attendance : records
+StudentProfile "1" -- "many" StudentViolation : subject of
+
+' ViolationType
+StudentViolation "many" -- "1" ViolationType : categorized by
+
+' StudentViolation → User (recorder/approver)
+StudentViolation "many" -- "1" User : recorded by
+StudentViolation "many" -- "0..1" User : approved by
+
+' SchoolRule
+SchoolRule "many" -- "1" User : uploaded by
+
+' WhatsappMessage
+WhatsappMessage "many" -- "0..1" SchoolClass : sent to
+
+' OTP
+EmailOtpToken "many" -- "1" User : belongs to
+
+' TokenAksesAbsensi
+TokenAksesAbsensi "many" -- "1" SchoolClass : for
+
+' Controllers use services
+DashboardController ..> AbsenceWarningService : uses
+AttendanceRecapController ..> Attendance : queries
+BkAbsensiRecapController ..> Attendance : queries
+BkAbsensiRecapController ..> TeacherProfile : scoped by grade
+ClassRosterController ..> AbsenceWarningService : uses
+MonitoringController ..> AbsenceWarningService : uses
+SiswaAbsensiController ..> Attendance : creates
+SiswaAbsensiController ..> GeofenceValidator : validates
+AbsensiPublikController ..> TokenAksesAbsensi : validates
+AbsensiPublikController ..> Attendance : creates
+StudentViolationController ..> StudentViolation : manages
+BkViolationSubmissionController ..> StudentViolation : submits
+ViolationTypeController ..> ViolationType : manages
+SchoolRuleController ..> SchoolRule : manages
+ViolationReportController ..> StudentViolation : reports
+SettingController ..> FonnteService : uses
+SettingController ..> WhatsappMessage : logs
+ProfilController ..> OtpService : triggers
+SendWhatsAppNotification ..> FonnteService : sends via
+
+@enduml
