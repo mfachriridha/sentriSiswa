@@ -40,7 +40,7 @@ class ViolationReportController extends Controller
             $violation->studentProfile?->class?->name ?? '-',
             $violation->violation_name,
             ViolationType::categoryLabels()[$violation->violation_category] ?? $violation->violation_category,
-            $violation->point_deduction,
+            '-'.$violation->point_deduction,
             StudentViolation::statusLabels()[$violation->status] ?? $violation->status,
             $violation->recordedBy?->name ?? '-',
         ])->values()->all();

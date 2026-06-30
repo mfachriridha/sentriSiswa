@@ -172,6 +172,7 @@ Route::middleware(['auth', 'registered', 'kesiswaan'])->prefix('kesiswaan')->nam
     Route::get('/monitoring', [KesiswaanMonitoringController::class, 'index'])->name('monitoring.index');
     Route::get('/monitoring/{monitoring}', [KesiswaanMonitoringController::class, 'show'])->name('monitoring.show');
     Route::get('/pelanggaran-siswa/pending-count', [PelanggaranSiswaController::class, 'pendingCount'])->name('pelanggaran-siswa.pending-count');
+    Route::get('/pelanggaran-siswa/persetujuan', [PelanggaranSiswaController::class, 'persetujuan'])->name('pelanggaran-siswa.persetujuan');
     Route::put('/pelanggaran-siswa/{studentViolation}/approve', [PelanggaranSiswaController::class, 'approve'])->name('pelanggaran-siswa.approve');
     Route::put('/pelanggaran-siswa/{studentViolation}/reject', [PelanggaranSiswaController::class, 'reject'])->name('pelanggaran-siswa.reject');
     Route::resource('pelanggaran-siswa', PelanggaranSiswaController::class)

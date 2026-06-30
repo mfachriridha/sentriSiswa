@@ -19,7 +19,7 @@
 </head>
 <body>
     <h1>{{ $title }}</h1>
-    <p>Dicetak {{ now()->translatedFormat('d F Y H:i') }}</p>
+    <p>Dicetak {{ now()->locale('id')->translatedFormat('d F Y H:i') }}</p>
 
     @php
         $maxChartValue = max(1, collect($chartRows)->max(fn (array $row): int => $row[1]) ?? 1);
@@ -54,12 +54,12 @@
         <tbody>
             @forelse ($violations as $violation)
                 <tr>
-                    <td>{{ $violation->violation_date->translatedFormat('d F Y') }}</td>
+                    <td>{{ $violation->violation_date->locale('id')->translatedFormat('d F Y') }}</td>
                     <td>{{ $violation->studentProfile?->user?->name ?? '-' }}</td>
                     <td>{{ $violation->studentProfile?->class?->name ?? '-' }}</td>
                     <td>{{ $violation->violation_name }}</td>
                     <td>{{ $categoryLabels[$violation->violation_category] ?? $violation->violation_category }}</td>
-                    <td>{{ $violation->point_deduction }}</td>
+                    <td>-{{ $violation->point_deduction }}</td>
                     <td>{{ $statusLabels[$violation->status] ?? $violation->status }}</td>
                     <td>{{ $violation->recordedBy?->name ?? '-' }}</td>
                 </tr>

@@ -14,19 +14,36 @@
     $hasActiveFilters = filled($search) || filled($filterClass) || filled($filterCategory) || filled($filterViolationType) || filled($filterDate) || filled($filterStatus);
 @endphp
 
+@php
+    $pendingCount = \App\Models\StudentViolation::where('status', 'pending')->count();
+@endphp
 <div class="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
     <div>
         <h1 class="text-2xl font-bold text-gray-900">Pelanggaran Siswa</h1>
-        <p class="mt-2 text-sm text-gray-500">Catat, kelola, dan ACC pengajuan pelanggaran siswa.</p>
+        <p class="mt-2 text-sm text-gray-500">Catat dan kelola pelanggaran siswa.</p>
     </div>
-    <a href="{{ route('kesiswaan.pelanggaran-siswa.create') }}"
-       class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm
-              hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors">
-        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-        </svg>
-        Catat Pelanggaran
-    </a>
+    <div class="flex items-center gap-2 flex-wrap">
+        <a href="{{ route('kesiswaan.pelanggaran-siswa.persetujuan') }}"
+           class="relative inline-flex items-center gap-2 rounded-lg border border-amber-300 bg-amber-50 px-4 py-2.5 text-sm font-semibold text-amber-700 hover:bg-amber-100 transition-colors">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            Antrean Persetujuan
+            @if($pendingCount > 0)
+                <span class="inline-flex items-center justify-center rounded-full bg-red-500 px-2 py-0.5 text-xs font-bold text-white leading-none">
+                    {{ $pendingCount }}
+                </span>
+            @endif
+        </a>
+        <a href="{{ route('kesiswaan.pelanggaran-siswa.create') }}"
+           class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm
+                  hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Catat Pelanggaran
+        </a>
+    </div>
 </div>
 
 <x-alert type="success" :message="session('success')" />
@@ -139,13 +156,10 @@
                                     Edit
                                 </a>
                                 @if ($studentViolation->status === 'pending')
-                                    <form method="POST" action="{{ route('kesiswaan.pelanggaran-siswa.approve', $studentViolation) }}">
-                                        @csrf
-                                        @method('PUT')
-                                        <button class="inline-flex items-center gap-1.5 rounded-lg border border-green-200 px-3 py-2 text-sm font-medium text-green-700 hover:bg-green-50 transition-colors">
-                                            ACC
-                                        </button>
-                                    </form>
+                                    <a href="{{ route('kesiswaan.pelanggaran-siswa.persetujuan') }}"
+                                       class="inline-flex items-center gap-1.5 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-700 hover:bg-amber-100 transition-colors">
+                                        Tunggu ACC
+                                    </a>
                                 @endif
                                 <button type="button"
                                         onclick="window.dispatchEvent(new CustomEvent('open-confirm-modal', {
