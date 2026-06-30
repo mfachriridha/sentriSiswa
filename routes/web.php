@@ -37,6 +37,7 @@ use App\Http\Controllers\WaliKelas\DashboardController as WaliKelasDashboardCont
 use App\Http\Controllers\WaliKelas\KelasSayaController;
 use App\Http\Controllers\WaliKelas\ProfilController as WaliKelasProfilController;
 use App\Http\Controllers\WaliKelas\RiwayatPelanggaranController;
+use App\Http\Controllers\AbsensiPublikController;
 use App\Models\SchoolClass;
 use App\Models\StudentProfile;
 use App\Models\User;
@@ -56,6 +57,10 @@ Route::get('/', function () {
 
 Route::view('/privacy-policy', 'legal.privacy-policy')->name('privacy-policy');
 Route::view('/terms-of-service', 'legal.terms-of-service')->name('terms-of-service');
+
+// Akses publik absensi (link dari WhatsApp, expires end of day)
+Route::get('/absensi/publik/{token}', [AbsensiPublikController::class, 'show'])->name('absensi.publik');
+Route::post('/absensi/publik/{token}/cek', [AbsensiPublikController::class, 'cek'])->name('absensi.publik.cek');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AdminLoginController::class, 'create'])->name('login');

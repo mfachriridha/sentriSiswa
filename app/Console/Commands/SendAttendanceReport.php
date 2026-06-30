@@ -6,6 +6,7 @@ use App\Jobs\SendWhatsAppNotification;
 use App\Models\Attendance;
 use App\Models\SchoolClass;
 use App\Models\Setting;
+use App\Models\TokenAksesAbsensi;
 use App\Models\WhatsappMessage;
 use App\Services\FonnteService;
 use Illuminate\Console\Command;
@@ -45,7 +46,7 @@ class SendAttendanceReport extends Command
         }
 
         $today = now()->toDateString();
-        $classes = SchoolClass::with(['homeroomTeacher.teacherProfile', 'students.user', 'students.biodata'])
+        $classes = SchoolClass::with(['homeroomTeacher.teacherProfile', 'students.user'])
             ->whereNotNull('homeroom_teacher_id')
             ->get();
 
@@ -81,38 +82,44 @@ class SendAttendanceReport extends Command
                 ->get()
                 ->keyBy('student_profile_id');
 
-            $presentStudents = $studentProfiles->filter(fn ($sp) => $attendances->has($sp->id)
-                && $attendances[$sp->id]->status === 'hadir');
+            $sudahAbsen = $studentProfiles->filter(fn ($sp) => $attendances->has($sp->id)
+                && in_array($attendances[$sp->id]->status, ['hadir', 'terlambat', 'izin', 'sakit']));
 
-            $lateStudents = $studentProfiles->filter(fn ($sp) => $attendances->has($sp->id)
-                && $attendances[$sp->id]->status === 'terlambat');
+            $belumAbsen = $studentProfiles->reject(fn ($sp) => $attendances->has($sp->id)
+                && in_array($attendances[$sp->id]->status, ['hadir', 'terlambat', 'izin', 'sakit']));
 
-            $absentStudents = $studentProfiles->reject(fn ($sp) => $attendances->has($sp->id)
-                && in_array($attendances[$sp->id]->status, ['hadir', 'terlambat']));
+            $sudahCount = $sudahAbsen->count();
+            $belumCount = $belumAbsen->count();
 
-            $presentCount = $presentStudents->count();
-            $lateCount = $lateStudents->count();
-            $absentCount = $absentStudents->count();
+            // Generate atau perbarui token akses publik untuk kelas ini hari ini
+            $aksesToken = TokenAksesAbsensi::buatAtauPerbarui($class->id, $today);
+            $linkAbsensi = route('absensi.publik', $aksesToken->token);
 
-            $message = "Laporan Absensi Harian\n";
+            $hari = now()->locale('id')->translatedFormat('l');
+            $tanggal = now()->locale('id')->translatedFormat('d F Y');
+            $waktu = now()->format('H:i') . ' WIB';
+
+            $message = "{$hari}, {$tanggal}\n";
+            $message .= "{$waktu}\n";
+            $message .= "=================\n";
+            $message .= "Wali Kelas: {$teacher->name}\n";
             $message .= "Kelas: {$class->name}\n";
-            $message .= 'Tanggal: '.now()->locale('id')->translatedFormat('l, d F Y')."\n";
-            $message .= "Waktu: {$endTime}\n";
             $message .= "\n";
-            $message .= "Hadir: {$presentCount} dari {$totalStudents}\n";
-            $message .= "Terlambat: {$lateCount}\n";
-            $message .= "Tidak Absen: {$absentCount}\n";
+            $message .= "Yang sudah absen : {$sudahCount}\n";
+            $message .= "Yang belum absen : {$belumCount}\n";
             $message .= "\n";
+            $message .= "Ket:\n";
 
-            if ($absentCount > 0) {
-                $message .= "Siswa Tidak Absen:\n";
-                foreach ($absentStudents as $sp) {
-                    $studentName = $sp->user?->name ?? 'Siswa #'.$sp->id;
-                    $message .= "- {$studentName}\n";
-                }
+            if ($belumCount === 0) {
+                $message .= "Seluruh siswa telah melakukan absensi hari ini.\n";
             } else {
-                $message .= "Absen semua.\n";
+                foreach ($belumAbsen as $sp) {
+                    $message .= '- '.($sp->user?->name ?? 'Siswa #'.$sp->id)."\n";
+                }
             }
+
+            $message .= "\n==================\n";
+            $message .= "Cek absensi siswa:\n{$linkAbsensi}";
 
             $whatsappMessage = WhatsappMessage::create([
                 'school_class_id' => $class->id,
