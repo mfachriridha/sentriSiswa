@@ -25,10 +25,10 @@
 <div class="rounded-xl border border-gray-200 bg-white p-6">
     <div class="mb-6 flex items-center gap-5">
         <div class="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary">
-            {{ strtoupper(substr($teacher->name, 0, 1)) }}
+            {{ strtoupper(substr($teacher->nama, 0, 1)) }}
         </div>
         <div>
-            <h1 class="text-2xl font-bold text-gray-900">{{ $teacher->name }}</h1>
+            <h1 class="text-2xl font-bold text-gray-900">{{ $teacher->nama }}</h1>
             <p class="mt-1 text-sm text-gray-500">
                 @if ($teacher->isWaliKelas())
                     Wali Kelas
@@ -51,7 +51,7 @@
 
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">NIP</p>
-            <p class="mt-1.5 text-sm text-gray-900">{{ $teacher->teacherProfile?->nip ?? '-' }}</p>
+            <p class="mt-1.5 text-sm text-gray-900">{{ $teacher->profilGuru?->nip ?? '-' }}</p>
         </div>
 
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
@@ -71,19 +71,19 @@
 
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">Telepon</p>
-            <p class="mt-1.5 text-sm text-gray-900">{{ $teacher->teacherProfile?->phone ?? '-' }}</p>
+            <p class="mt-1.5 text-sm text-gray-900">{{ $teacher->profilGuru?->telepon ?? '-' }}</p>
         </div>
 
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">Kelas yang Diampu</p>
             <p class="mt-1.5 text-sm">
-                @if ($teacher->homeroomClass)
-                    <a href="{{ route('admin.kelas.show', $teacher->homeroomClass) }}" class="text-primary hover:underline">
-                        {{ $teacher->homeroomClass->name }}
+                @if ($teacher->kelasWali)
+                    <a href="{{ route('admin.kelas.show', $teacher->kelasWali) }}" class="text-primary hover:underline">
+                        {{ $teacher->kelasWali->nama }}
                     </a>
-                @elseif ($teacher->teacherProfile?->grade)
+                @elseif ($teacher->profilGuru?->tingkat)
                     <span class="inline-flex items-center gap-1 rounded-full bg-teal-50 px-3 py-1 text-sm font-medium text-teal-700">
-                        Tingkat {{ $teacher->teacherProfile->grade }}
+                        Tingkat {{ $teacher->profilGuru->tingkat }}
                     </span>
                 @else
                     <span class="text-gray-400">-</span>

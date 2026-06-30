@@ -5,7 +5,7 @@
 @section('content')
 <div class="mb-6">
     <h1 class="text-2xl font-bold text-gray-900">Riwayat Pelanggaran</h1>
-    <p class="mt-1 text-sm text-gray-500">Riwayat pelanggaran siswa kelas {{ $class->name }}</p>
+    <p class="mt-1 text-sm text-gray-500">Riwayat pelanggaran siswa kelas {{ $class->nama }}</p>
 </div>
 
 <div class="rounded-xl border border-gray-200 bg-white p-6">
@@ -17,7 +17,7 @@
                 <option value="">Semua Siswa</option>
                 @foreach($students as $student)
                     <option value="{{ $student->id }}" {{ request('student_id') == $student->id ? 'selected' : '' }}>
-                        {{ $student->user->name }}
+                        {{ $student->pengguna->nama }}
                     </option>
                 @endforeach
             </select>
@@ -81,13 +81,13 @@
                     @foreach($violations as $violation)
                         <tr class="hover:bg-gray-50">
                             <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-900">
-                                {{ $violation->violation_date->translatedFormat('d F Y') }}
+                                {{ $violation->tanggal_pelanggaran->translatedFormat('d F Y') }}
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 text-sm font-medium text-gray-900">
-                                {{ $violation->studentProfile->user->name }}
+                                {{ $violation->profilSiswa->pengguna->nama }}
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-500">
-                                {{ $violation->violation_name }}
+                                {{ $violation->nama_pelanggaran }}
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 text-sm">
                                 @php
@@ -97,20 +97,20 @@
                                         'heavy' => ['bg-orange-100 text-orange-800', 'Berat'],
                                         'severe' => ['bg-red-100 text-red-800', 'Sangat Berat'],
                                     ];
-                                    [$badgeClass, $categoryLabel] = $categoryConfig[$violation->violation_category] ?? ['bg-gray-100 text-gray-800', $violation->violation_category];
+                                    [$badgeClass, $categoryLabel] = $categoryConfig[$violation->kategori_pelanggaran] ?? ['bg-gray-100 text-gray-800', $violation->kategori_pelanggaran];
                                 @endphp
                                 <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {{ $badgeClass }}">
                                     {{ $categoryLabel }}
                                 </span>
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 text-sm font-medium text-red-600">
-                                -{{ $violation->point_deduction }}
+                                -{{ $violation->pengurangan_poin }}
                             </td>
                             <td class="px-4 py-3 text-sm text-gray-500">
-                                {{ $violation->notes ?? '-' }}
+                                {{ $violation->catatan ?? '-' }}
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-500">
-                                {{ $violation->recordedBy?->name ?? '-' }}
+                                {{ $violation->dicatatOleh?->nama ?? '-' }}
                             </td>
                         </tr>
                     @endforeach

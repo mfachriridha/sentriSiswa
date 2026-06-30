@@ -31,54 +31,54 @@
 
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div class="md:col-span-2">
-                <label for="name" class="block text-sm font-medium text-gray-700">Nama Pelanggaran <span class="text-red-500">*</span></label>
-                <input id="name" type="text" name="name" value="{{ old('name') }}" required
+                <label for="nama" class="block text-sm font-medium text-gray-700">Nama Pelanggaran <span class="text-red-500">*</span></label>
+                <input id="nama" type="text" name="nama" value="{{ old('nama') }}" required
                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                               placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
-                @error('name')
+                @error('nama')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
 
             <div>
-                <label for="category" class="block text-sm font-medium text-gray-700">Kategori <span class="text-red-500">*</span></label>
-                <select id="category" name="category" required
+                <label for="kategori" class="block text-sm font-medium text-gray-700">Kategori <span class="text-red-500">*</span></label>
+                <select id="kategori" name="kategori" required
                         class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                                focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                     <option value="">Pilih kategori</option>
                     @foreach ($categoryLabels as $category => $label)
-                        <option value="{{ $category }}" {{ old('category') === $category ? 'selected' : '' }}>{{ $label }}</option>
+                        <option value="{{ $category }}" {{ old('kategori') === $category ? 'selected' : '' }}>{{ $label }}</option>
                     @endforeach
                 </select>
-                @error('category')
+                @error('kategori')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
 
             <div>
-                <label for="point_deduction" class="block text-sm font-medium text-gray-700">Poin Pelanggaran <span class="text-red-500">*</span></label>
-                <input id="point_deduction" type="number" name="point_deduction" min="5" max="100" value="{{ old('point_deduction') }}" required
+                <label for="pengurangan_poin" class="block text-sm font-medium text-gray-700">Poin Pelanggaran <span class="text-red-500">*</span></label>
+                <input id="pengurangan_poin" type="number" name="pengurangan_poin" min="5" max="100" value="{{ old('pengurangan_poin') }}" required
                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                               placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
-                @error('point_deduction')
+                @error('pengurangan_poin')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
 
             <div class="md:col-span-2">
-                <label for="description" class="block text-sm font-medium text-gray-700">Keterangan <span class="text-sm font-normal text-gray-400">(opsional)</span></label>
-                <textarea id="description" name="description" rows="3"
+                <label for="keterangan" class="block text-sm font-medium text-gray-700">Keterangan <span class="text-sm font-normal text-gray-400">(opsional)</span></label>
+                <textarea id="keterangan" name="keterangan" rows="3"
                           class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
-                                 placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">{{ old('description') }}</textarea>
-                @error('description')
+                                 placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">{{ old('keterangan') }}</textarea>
+                @error('keterangan')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
 
             <div class="md:col-span-2">
-                <input type="hidden" name="is_active" value="0">
+                <input type="hidden" name="aktif" value="0">
                 <label class="inline-flex items-center gap-3 rounded-lg border border-gray-200 px-4 py-3 text-sm text-gray-700">
-                    <input type="checkbox" name="is_active" value="1" @checked((string) old('is_active', '1') === '1')
+                    <input type="checkbox" name="aktif" value="1" @checked((string) old('aktif', '1') === '1')
                            class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary/30">
                     Aktif digunakan
                 </label>

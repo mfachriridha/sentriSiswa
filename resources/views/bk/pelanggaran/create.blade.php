@@ -13,7 +13,7 @@
             <select id="student_profile_id" name="student_profile_id" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
                 <option value="">Pilih siswa</option>
                 @foreach ($students as $student)
-                    <option value="{{ $student->id }}" {{ old('student_profile_id', $selectedStudentId) == $student->id ? 'selected' : '' }}>{{ $student->user?->name }} - {{ $student->class?->name }}</option>
+                    <option value="{{ $student->id }}" {{ old('student_profile_id', $selectedStudentId) == $student->id ? 'selected' : '' }}>{{ $student->pengguna?->nama }} - {{ $student->kelas?->nama }}</option>
                 @endforeach
             </select>
             @error('student_profile_id') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
@@ -23,19 +23,19 @@
             <select id="violation_type_id" name="violation_type_id" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
                 <option value="">Pilih pelanggaran</option>
                 @foreach ($violationTypes as $type)
-                    <option value="{{ $type->id }}" {{ old('violation_type_id') == $type->id ? 'selected' : '' }}>{{ $type->name }} - {{ $categoryLabels[$type->category] ?? $type->category }} (-{{ $type->point_deduction }})</option>
+                    <option value="{{ $type->id }}" {{ old('violation_type_id') == $type->id ? 'selected' : '' }}>{{ $type->nama }} - {{ $categoryLabels[$type->kategori] ?? $type->kategori }} (-{{ $type->pengurangan_poin }})</option>
                 @endforeach
             </select>
             @error('violation_type_id') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
         </div>
         <div>
             <label for="violation_date" class="block text-sm font-medium text-gray-700">Tanggal</label>
-            <input id="violation_date" name="violation_date" type="date" value="{{ old('violation_date', now()->toDateString()) }}" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
-            @error('violation_date') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+            <input id="violation_date" name="tanggal_pelanggaran" type="date" value="{{ old('tanggal_pelanggaran', now()->toDateString()) }}" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
+            @error('tanggal_pelanggaran') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
         </div>
         <div>
             <label for="notes" class="block text-sm font-medium text-gray-700">Catatan</label>
-            <textarea id="notes" name="notes" rows="4" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">{{ old('notes') }}</textarea>
+            <textarea id="notes" name="catatan" rows="4" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">{{ old('catatan') }}</textarea>
         </div>
         <div class="flex justify-end gap-2">
             <a href="{{ route('bk.pelanggaran.index') }}" class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700">Batal</a>

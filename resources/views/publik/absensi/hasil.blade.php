@@ -11,21 +11,21 @@
             <div class="bg-primary px-8 py-6 text-white">
                 <p class="text-primary-content/70 text-xs font-medium uppercase tracking-wider mb-1">Laporan Absensi</p>
                 <h1 class="text-xl font-bold">{{ $aksesToken->tanggal->translatedFormat('l, d F Y') }}</h1>
-                <p class="text-primary-content/80 text-sm mt-1">{{ $siswa->class->name ?? '-' }}</p>
+                <p class="text-primary-content/80 text-sm mt-1">{{ $siswa->kelas->nama ?? '-' }}</p>
             </div>
 
             <div class="p-8">
                 <!-- Siswa info -->
                 <div class="flex items-center gap-4 mb-6 pb-6 border-b border-slate-100">
-                    @if ($siswa->photo)
-                        <img src="{{ asset('storage/' . $siswa->photo) }}" class="w-14 h-14 rounded-full object-cover border-2 border-slate-100">
+                    @if ($siswa->foto)
+                        <img src="{{ asset('storage/' . $siswa->foto) }}" class="w-14 h-14 rounded-full object-cover border-2 border-slate-100">
                     @else
                         <div class="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xl">
-                            {{ strtoupper(substr($siswa->user->name, 0, 1)) }}
+                            {{ strtoupper(substr($siswa->pengguna->nama, 0, 1)) }}
                         </div>
                     @endif
                     <div>
-                        <p class="font-bold text-slate-800">{{ $siswa->user->name }}</p>
+                        <p class="font-bold text-slate-800">{{ $siswa->pengguna->nama }}</p>
                         <p class="text-slate-500 text-sm">NIS: {{ $siswa->nis }} | NISN: {{ $siswa->nisn }}</p>
                     </div>
                 </div>
@@ -52,13 +52,13 @@
                         <div class="flex justify-between py-2 border-b border-slate-50">
                             <span class="text-slate-500">Jam Check-in</span>
                             <span class="font-semibold text-slate-800">
-                                {{ $absensi->check_in_time ? \Carbon\Carbon::parse($absensi->check_in_time)->format('H:i') . ' WIB' : '-' }}
+                                {{ $absensi->waktu_masuk ? \Carbon\Carbon::parse($absensi->waktu_masuk)->format('H:i') . ' WIB' : '-' }}
                             </span>
                         </div>
-                        @if ($absensi->selfie_path)
+                        @if ($absensi->path_selfie)
                         <div class="pt-2">
                             <p class="text-slate-500 mb-2">Foto Absensi</p>
-                            <img src="{{ asset('storage/' . $absensi->selfie_path) }}"
+                            <img src="{{ asset('storage/' . $absensi->path_selfie) }}"
                                  class="w-full rounded-xl object-cover max-h-64 border border-slate-100">
                         </div>
                         @endif

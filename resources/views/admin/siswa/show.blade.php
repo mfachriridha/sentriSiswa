@@ -35,20 +35,20 @@
 
 <div class="rounded-xl border border-gray-200 bg-white p-6">
     <div class="mb-6 flex items-center gap-5">
-        @if ($student->studentProfile?->photo)
-            <img src="{{ asset('storage/'.$student->studentProfile->photo) }}" alt="{{ $student->name }}"
+        @if ($student->profilSiswa?->foto)
+            <img src="{{ asset('storage/'.$student->profilSiswa->foto) }}" alt="{{ $student->nama }}"
                  class="h-20 w-20 rounded-full object-cover border-2 border-gray-200">
         @else
             <div class="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary">
-                {{ strtoupper(substr($student->name, 0, 1)) }}
+                {{ strtoupper(substr($student->nama, 0, 1)) }}
             </div>
         @endif
         <div>
-            <h1 class="text-2xl font-bold text-gray-900">{{ $student->name }}</h1>
+            <h1 class="text-2xl font-bold text-gray-900">{{ $student->nama }}</h1>
             <p class="mt-1 text-sm text-gray-500">
-                @if ($student->studentProfile?->class)
-                    <a href="{{ route('admin.kelas.show', $student->studentProfile->class) }}" class="text-primary hover:underline">
-                        {{ $student->studentProfile->class->name }}
+                @if ($student->profilSiswa?->kelas)
+                    <a href="{{ route('admin.kelas.show', $student->profilSiswa->kelas) }}" class="text-primary hover:underline">
+                        {{ $student->profilSiswa->kelas->nama }}
                     </a>
                 @else
                     Belum ada kelas
@@ -65,20 +65,20 @@
 
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">NISN</p>
-            <p class="mt-1.5 text-sm text-gray-900">{{ $student->studentProfile?->nisn ?? '-' }}</p>
+            <p class="mt-1.5 text-sm text-gray-900">{{ $student->profilSiswa?->nisn ?? '-' }}</p>
         </div>
 
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">NIS</p>
-            <p class="mt-1.5 text-sm text-gray-900">{{ $student->studentProfile?->nis ?? '-' }}</p>
+            <p class="mt-1.5 text-sm text-gray-900">{{ $student->profilSiswa?->nis ?? '-' }}</p>
         </div>
 
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">Kelas</p>
             <p class="mt-1.5 text-sm">
-                @if ($student->studentProfile?->class)
-                    <a href="{{ route('admin.kelas.show', $student->studentProfile->class) }}" class="text-primary hover:underline">
-                        {{ $student->studentProfile->class->name }}
+                @if ($student->profilSiswa?->kelas)
+                    <a href="{{ route('admin.kelas.show', $student->profilSiswa->kelas) }}" class="text-primary hover:underline">
+                        {{ $student->profilSiswa->kelas->nama }}
                     </a>
                 @else
                     <span class="text-gray-400">-</span>
@@ -88,12 +88,12 @@
 
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">Telepon</p>
-            <p class="mt-1.5 text-sm text-gray-900">{{ $student->studentProfile?->phone ?? '-' }}</p>
+            <p class="mt-1.5 text-sm text-gray-900">{{ $student->profilSiswa?->telepon ?? '-' }}</p>
         </div>
 
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">Alamat</p>
-            <p class="mt-1.5 text-sm text-gray-900">{{ $student->studentProfile?->address ?? '-' }}</p>
+            <p class="mt-1.5 text-sm text-gray-900">{{ $student->profilSiswa?->alamat ?? '-' }}</p>
         </div>
     </div>
 </div>
@@ -102,7 +102,7 @@
 <div class="mt-6 rounded-xl border border-gray-200 bg-white p-6">
     <div class="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
         <h2 class="text-xl font-bold text-gray-900">Biodata</h2>
-        @php $biodata = $student->studentProfile?->biodata; @endphp
+        @php $biodata = $student->profilSiswa?->biodata; @endphp
         @if ($biodata && $biodata->isComplete())
             <span class="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-3 py-1 text-sm font-medium text-green-700">
                 ✓ Lengkap
@@ -118,42 +118,42 @@
         <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
             <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
                 <p class="text-sm font-medium text-gray-500">Tempat Lahir</p>
-                <p class="mt-1.5 text-sm text-gray-900">{{ $biodata->place_of_birth ?? '-' }}</p>
+                <p class="mt-1.5 text-sm text-gray-900">{{ $biodata->tempat_lahir ?? '-' }}</p>
             </div>
 
             <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
                 <p class="text-sm font-medium text-gray-500">Tanggal Lahir</p>
-                <p class="mt-1.5 text-sm text-gray-900">{{ $biodata->date_of_birth?->translatedFormat('d F Y') ?? '-' }}</p>
+                <p class="mt-1.5 text-sm text-gray-900">{{ $biodata->tanggal_lahir?->translatedFormat('d F Y') ?? '-' }}</p>
             </div>
 
             <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
                 <p class="text-sm font-medium text-gray-500">Jenis Kelamin</p>
-                <p class="mt-1.5 text-sm text-gray-900">{{ $biodata->gender === 'L' ? 'Laki-laki' : ($biodata->gender === 'P' ? 'Perempuan' : '-') }}</p>
+                <p class="mt-1.5 text-sm text-gray-900">{{ $biodata->jenis_kelamin === 'L' ? 'Laki-laki' : ($biodata->jenis_kelamin === 'P' ? 'Perempuan' : '-') }}</p>
             </div>
 
             <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
                 <p class="text-sm font-medium text-gray-500">Agama</p>
-                <p class="mt-1.5 text-sm text-gray-900">{{ $biodata->religion ?? '-' }}</p>
+                <p class="mt-1.5 text-sm text-gray-900">{{ $biodata->agama ?? '-' }}</p>
             </div>
 
             <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
                 <p class="text-sm font-medium text-gray-500">Status dalam Keluarga</p>
-                <p class="mt-1.5 text-sm text-gray-900">{{ $biodata->family_status ?? '-' }}</p>
+                <p class="mt-1.5 text-sm text-gray-900">{{ $biodata->status_keluarga ?? '-' }}</p>
             </div>
 
             <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
                 <p class="text-sm font-medium text-gray-500">Anak Ke</p>
-                <p class="mt-1.5 text-sm text-gray-900">{{ $biodata->child_number ?? '-' }}</p>
+                <p class="mt-1.5 text-sm text-gray-900">{{ $biodata->anak_ke ?? '-' }}</p>
             </div>
 
             <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
                 <p class="text-sm font-medium text-gray-500">Sekolah Asal</p>
-                <p class="mt-1.5 text-sm text-gray-900">{{ $biodata->school_of_origin ?? '-' }}</p>
+                <p class="mt-1.5 text-sm text-gray-900">{{ $biodata->asal_sekolah ?? '-' }}</p>
             </div>
 
             <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
                 <p class="text-sm font-medium text-gray-500">Tanggal Diterima</p>
-                <p class="mt-1.5 text-sm text-gray-900">{{ $biodata->admission_date?->translatedFormat('d F Y') ?? '-' }}</p>
+                <p class="mt-1.5 text-sm text-gray-900">{{ $biodata->tanggal_masuk?->translatedFormat('d F Y') ?? '-' }}</p>
             </div>
         </div>
 
@@ -161,56 +161,56 @@
         <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
             <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
                 <p class="text-sm font-medium text-gray-500">Nama Ayah</p>
-                <p class="mt-1.5 text-sm text-gray-900">{{ $biodata->father_name ?? '-' }}</p>
+                <p class="mt-1.5 text-sm text-gray-900">{{ $biodata->nama_ayah ?? '-' }}</p>
             </div>
 
             <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
                 <p class="text-sm font-medium text-gray-500">Pekerjaan Ayah</p>
-                <p class="mt-1.5 text-sm text-gray-900">{{ $biodata->father_occupation ?? '-' }}</p>
+                <p class="mt-1.5 text-sm text-gray-900">{{ $biodata->pekerjaan_ayah ?? '-' }}</p>
             </div>
 
             <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
                 <p class="text-sm font-medium text-gray-500">Nama Ibu</p>
-                <p class="mt-1.5 text-sm text-gray-900">{{ $biodata->mother_name ?? '-' }}</p>
+                <p class="mt-1.5 text-sm text-gray-900">{{ $biodata->nama_ibu ?? '-' }}</p>
             </div>
 
             <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
                 <p class="text-sm font-medium text-gray-500">Pekerjaan Ibu</p>
-                <p class="mt-1.5 text-sm text-gray-900">{{ $biodata->mother_occupation ?? '-' }}</p>
+                <p class="mt-1.5 text-sm text-gray-900">{{ $biodata->pekerjaan_ibu ?? '-' }}</p>
             </div>
 
             <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
                 <p class="text-sm font-medium text-gray-500">Alamat Orang Tua</p>
-                <p class="mt-1.5 text-sm text-gray-900">{{ $biodata->parent_address ?? '-' }}</p>
+                <p class="mt-1.5 text-sm text-gray-900">{{ $biodata->alamat_ortu ?? '-' }}</p>
             </div>
 
             <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
                 <p class="text-sm font-medium text-gray-500">Telepon Orang Tua</p>
-                <p class="mt-1.5 text-sm text-gray-900">{{ $biodata->parent_phone ?? '-' }}</p>
+                <p class="mt-1.5 text-sm text-gray-900">{{ $biodata->telepon_ortu ?? '-' }}</p>
             </div>
         </div>
 
-        @if ($biodata->guardian_name || $biodata->guardian_phone)
+        @if ($biodata->nama_wali || $biodata->telepon_wali)
             <h3 class="mb-4 mt-8 text-lg font-semibold text-gray-900 border-b border-gray-200 pb-2">Data Wali</h3>
             <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
                 <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
                     <p class="text-sm font-medium text-gray-500">Nama Wali</p>
-                    <p class="mt-1.5 text-sm text-gray-900">{{ $biodata->guardian_name ?? '-' }}</p>
+                    <p class="mt-1.5 text-sm text-gray-900">{{ $biodata->nama_wali ?? '-' }}</p>
                 </div>
 
                 <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
                     <p class="text-sm font-medium text-gray-500">Pekerjaan Wali</p>
-                    <p class="mt-1.5 text-sm text-gray-900">{{ $biodata->guardian_occupation ?? '-' }}</p>
+                    <p class="mt-1.5 text-sm text-gray-900">{{ $biodata->pekerjaan_wali ?? '-' }}</p>
                 </div>
 
                 <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
                     <p class="text-sm font-medium text-gray-500">Alamat Wali</p>
-                    <p class="mt-1.5 text-sm text-gray-900">{{ $biodata->guardian_address ?? '-' }}</p>
+                    <p class="mt-1.5 text-sm text-gray-900">{{ $biodata->alamat_wali ?? '-' }}</p>
                 </div>
 
                 <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
                     <p class="text-sm font-medium text-gray-500">Telepon Wali</p>
-                    <p class="mt-1.5 text-sm text-gray-900">{{ $biodata->guardian_phone ?? '-' }}</p>
+                    <p class="mt-1.5 text-sm text-gray-900">{{ $biodata->telepon_wali ?? '-' }}</p>
                 </div>
             </div>
         @endif

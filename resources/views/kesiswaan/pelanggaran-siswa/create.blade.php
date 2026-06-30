@@ -21,55 +21,55 @@
 
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
-                <label for="student_profile_id" class="block text-sm font-medium text-gray-700">Siswa <span class="text-red-500">*</span></label>
-                <select id="student_profile_id" name="student_profile_id" required
+                <label for="profil_siswa_id" class="block text-sm font-medium text-gray-700">Siswa <span class="text-red-500">*</span></label>
+                <select id="profil_siswa_id" name="profil_siswa_id" required
                         class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                     <option value="">Pilih siswa</option>
                     @foreach ($students as $student)
-                        <option value="{{ $student->id }}" {{ (string) old('student_profile_id', request('student_profile_id')) === (string) $student->id ? 'selected' : '' }}>
-                            {{ $student->user?->name }} - {{ $student->class?->name ?? 'Tanpa kelas' }} - NISN {{ $student->nisn ?? '-' }}
+                        <option value="{{ $student->id }}" {{ (string) old('profil_siswa_id', request('profil_siswa_id')) === (string) $student->id ? 'selected' : '' }}>
+                            {{ $student->pengguna?->nama }} - {{ $student->kelas?->nama ?? 'Tanpa kelas' }} - NISN {{ $student->nisn ?? '-' }}
                         </option>
                     @endforeach
                 </select>
-                @error('student_profile_id')
+                @error('profil_siswa_id')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
 
             <div>
-                <label for="violation_date" class="block text-sm font-medium text-gray-700">Tanggal Pelanggaran <span class="text-red-500">*</span></label>
-                <input id="violation_date" type="date" name="violation_date" value="{{ old('violation_date', now()->toDateString()) }}" max="{{ now()->toDateString() }}" required
+                <label for="tanggal_pelanggaran" class="block text-sm font-medium text-gray-700">Tanggal Pelanggaran <span class="text-red-500">*</span></label>
+                <input id="tanggal_pelanggaran" type="date" name="tanggal_pelanggaran" value="{{ old('tanggal_pelanggaran', now()->toDateString()) }}" max="{{ now()->toDateString() }}" required
                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
-                @error('violation_date')
+                @error('tanggal_pelanggaran')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
 
             <div class="md:col-span-2">
-                <label for="violation_type_id" class="block text-sm font-medium text-gray-700">Jenis Pelanggaran <span class="text-red-500">*</span></label>
-                <select id="violation_type_id" name="violation_type_id" required
+                <label for="jenis_pelanggaran_id" class="block text-sm font-medium text-gray-700">Jenis Pelanggaran <span class="text-red-500">*</span></label>
+                <select id="jenis_pelanggaran_id" name="jenis_pelanggaran_id" required
                         class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                     <option value="">Pilih jenis pelanggaran</option>
-                    @foreach ($violationTypes->groupBy('category') as $category => $groupedViolationTypes)
+                    @foreach ($violationTypes->groupBy('kategori') as $category => $groupedViolationTypes)
                         <optgroup label="{{ $categoryLabels[$category] ?? 'Kategori' }}">
                             @foreach ($groupedViolationTypes as $violationType)
-                                <option value="{{ $violationType->id }}" {{ (string) old('violation_type_id') === (string) $violationType->id ? 'selected' : '' }}>
-                                    {{ $violationType->name }} ({{ $violationType->point_deduction }} poin)
+                                <option value="{{ $violationType->id }}" {{ (string) old('jenis_pelanggaran_id') === (string) $violationType->id ? 'selected' : '' }}>
+                                    {{ $violationType->nama }} ({{ $violationType->pengurangan_poin }} poin)
                                 </option>
                             @endforeach
                         </optgroup>
                     @endforeach
                 </select>
-                @error('violation_type_id')
+                @error('jenis_pelanggaran_id')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
 
             <div class="md:col-span-2">
-                <label for="notes" class="block text-sm font-medium text-gray-700">Catatan <span class="text-sm font-normal text-gray-400">(opsional)</span></label>
-                <textarea id="notes" name="notes" rows="4"
-                          class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">{{ old('notes') }}</textarea>
-                @error('notes')
+                <label for="catatan" class="block text-sm font-medium text-gray-700">Catatan <span class="text-sm font-normal text-gray-400">(opsional)</span></label>
+                <textarea id="catatan" name="catatan" rows="4"
+                          class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">{{ old('catatan') }}</textarea>
+                @error('catatan')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>

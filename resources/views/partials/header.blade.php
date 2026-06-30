@@ -11,6 +11,6 @@
             </button>
             <h1 class="truncate text-base font-semibold text-gray-800">@yield('title', 'Sentri Siswa')</h1>
         </div>
-        <span class="max-w-40 truncate text-sm text-gray-500 sm:max-w-64">{{ auth()->user()->name }}</span>
+        <span class="max-w-40 truncate text-sm text-gray-500 sm:max-w-64">{{ auth()->user()->nama }}</span>
     </div>
 </header>

@@ -55,7 +55,7 @@
     :search="$search"
     placeholder="Cari nama, NISN, atau NIS..."
     :filters="[
-        ['name' => 'grade', 'label' => 'Tingkat', 'value' => $filterGrade, 'options' => ['' => 'Semua Tingkat', '10' => '10', '11' => '11', '12' => '12']],
+        ['name' => 'tingkat', 'label' => 'Tingkat', 'value' => $filterGrade, 'options' => ['' => 'Semua Tingkat', '10' => '10', '11' => '11', '12' => '12']],
         ['name' => 'status', 'label' => 'Status', 'value' => $filterStatus, 'options' => ['' => 'Semua Status', 'registered' => 'Terdaftar', 'unregistered' => 'Belum Terdaftar']],
     ]"
     :sort="$sort"
@@ -118,13 +118,13 @@
         <tbody class="divide-y divide-gray-100">
             @forelse ($students as $student)
                 <tr class="hover:bg-gray-50">
-                    <td class="hidden px-4 py-3 text-gray-700 md:table-cell">{{ $student->studentProfile?->nisn ?? '-' }}</td>
-                    <td class="px-4 py-3 text-gray-700">{{ $student->studentProfile?->nis ?? '-' }}</td>
-                    <td class="px-4 py-3 font-medium text-gray-900">{{ $student->name }}</td>
+                    <td class="hidden px-4 py-3 text-gray-700 md:table-cell">{{ $student->profilSiswa?->nisn ?? '-' }}</td>
+                    <td class="px-4 py-3 text-gray-700">{{ $student->profilSiswa?->nis ?? '-' }}</td>
+                    <td class="px-4 py-3 font-medium text-gray-900">{{ $student->nama }}</td>
                     <td class="px-4 py-3 text-gray-700">
-                        @if ($student->studentProfile?->class)
-                            <a href="{{ route('admin.kelas.show', $student->studentProfile->class) }}" class="text-primary hover:underline">
-                                {{ $student->studentProfile->class->name }}
+                        @if ($student->profilSiswa?->kelas)
+                            <a href="{{ route('admin.kelas.show', $student->profilSiswa->kelas) }}" class="text-primary hover:underline">
+                                {{ $student->profilSiswa->kelas->nama }}
                             </a>
                         @else
                             -
@@ -161,7 +161,7 @@
                                     onclick="window.dispatchEvent(new CustomEvent('open-confirm-modal', {
                                         detail: {
                                             title: 'Hapus Siswa',
-                                            message: 'Yakin ingin menghapus siswa {{ $student->name }}?',
+                                            message: 'Yakin ingin menghapus siswa {{ $student->nama }}?',
                                             formId: 'delete-student-{{ $student->id }}'
                                         }
                                     }))"

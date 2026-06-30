@@ -41,7 +41,7 @@
                 class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-700 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors">
             <option value="">Semua Kelas</option>
             @foreach ($classes as $class)
-                <option value="{{ $class->id }}" {{ $filterClass == $class->id ? 'selected' : '' }}>{{ $class->name }}</option>
+                <option value="{{ $class->id }}" {{ $filterClass == $class->id ? 'selected' : '' }}>{{ $class->nama }}</option>
             @endforeach
         </select>
 
@@ -78,7 +78,7 @@
                     @endphp
                     <tr class="hover:bg-gray-50 transition-colors">
                         <td class="px-4 py-3">
-                            <div class="font-medium text-gray-900">{{ $student->user->name }}</div>
+                            <div class="font-medium text-gray-900">{{ $student->pengguna->nama }}</div>
                             <div class="mt-1 text-sm text-gray-500">{{ $student->nisn }} / {{ $student->nis }}</div>
                             @if($alphaCount >= $warningThreshold)
                                 <span class="mt-2 inline-flex items-center rounded-full bg-red-50 px-2.5 py-0.5 text-xs font-medium text-red-700">
@@ -86,7 +86,7 @@
                                 </span>
                             @endif
                         </td>
-                        <td class="px-4 py-3 text-gray-700">{{ $student->class->name ?? '-' }}</td>
+                        <td class="px-4 py-3 text-gray-700">{{ $student->kelas->nama ?? '-' }}</td>
                         <td class="px-4 py-3">
                             @php
                                 $todayAttendance = $student->attendances->first();

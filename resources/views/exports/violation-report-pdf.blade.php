@@ -54,14 +54,14 @@
         <tbody>
             @forelse ($violations as $violation)
                 <tr>
-                    <td>{{ $violation->violation_date->locale('id')->translatedFormat('d F Y') }}</td>
-                    <td>{{ $violation->studentProfile?->user?->name ?? '-' }}</td>
-                    <td>{{ $violation->studentProfile?->class?->name ?? '-' }}</td>
-                    <td>{{ $violation->violation_name }}</td>
-                    <td>{{ $categoryLabels[$violation->violation_category] ?? $violation->violation_category }}</td>
-                    <td>-{{ $violation->point_deduction }}</td>
+                    <td>{{ $violation->tanggal_pelanggaran->locale('id')->translatedFormat('d F Y') }}</td>
+                    <td>{{ $violation->profilSiswa?->pengguna?->nama ?? '-' }}</td>
+                    <td>{{ $violation->profilSiswa?->kelas?->nama ?? '-' }}</td>
+                    <td>{{ $violation->nama_pelanggaran }}</td>
+                    <td>{{ $categoryLabels[$violation->kategori_pelanggaran] ?? $violation->kategori_pelanggaran }}</td>
+                    <td>-{{ $violation->pengurangan_poin }}</td>
                     <td>{{ $statusLabels[$violation->status] ?? $violation->status }}</td>
-                    <td>{{ $violation->recordedBy?->name ?? '-' }}</td>
+                    <td>{{ $violation->dicatatOleh?->nama ?? '-' }}</td>
                 </tr>
             @empty
                 <tr>

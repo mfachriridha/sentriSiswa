@@ -16,10 +16,10 @@
 <div class="rounded-xl border border-gray-200 bg-white p-6">
     <div class="mb-6 flex items-center gap-5">
         <div class="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary">
-            {{ strtoupper(substr($student->name, 0, 1)) }}
+            {{ strtoupper(substr($student->nama, 0, 1)) }}
         </div>
         <div>
-            <h1 class="text-2xl font-bold text-gray-900">Biodata {{ $student->name }}</h1>
+            <h1 class="text-2xl font-bold text-gray-900">Biodata {{ $student->nama }}</h1>
             <p class="mt-1 text-sm text-gray-500">Lengkapi data pribadi siswa</p>
         </div>
     </div>
@@ -28,7 +28,7 @@
     <div class="mb-6">
         <h2 class="mb-4 text-lg font-semibold text-gray-900">Pas Foto 3×4</h2>
         <div class="flex items-start gap-6"
-             x-data="{ photoUrl: '{{ $student->studentProfile?->photo ? asset('storage/'.$student->studentProfile->photo) : '' }}', uploading: false, uploadError: '' }">
+             x-data="{ photoUrl: '{{ $student->profilSiswa?->foto ? asset('storage/'.$student->profilSiswa->foto) : '' }}', uploading: false, uploadError: '' }">
             <div class="relative h-40 w-30 overflow-hidden rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 flex items-center justify-center"
                  style="aspect-ratio: 3/4;">
                 <template x-if="photoUrl">
@@ -77,20 +77,20 @@
             <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
                     <label for="place_of_birth" class="block text-sm font-medium text-gray-700">Tempat Lahir</label>
-                    <input id="place_of_birth" type="text" name="place_of_birth" value="{{ old('place_of_birth', $student->studentProfile?->biodata?->place_of_birth) }}"
+                    <input id="place_of_birth" type="text" name="tempat_lahir" value="{{ old('tempat_lahir', $student->profilSiswa?->biodata?->tempat_lahir) }}"
                            class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                                   placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
-                    @error('place_of_birth')
+                    @error('tempat_lahir')
                         <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <div>
                     <label for="date_of_birth" class="block text-sm font-medium text-gray-700">Tanggal Lahir</label>
-                    <input id="date_of_birth" type="date" name="date_of_birth" value="{{ old('date_of_birth', $student->studentProfile?->biodata?->date_of_birth?->format('Y-m-d')) }}"
+                    <input id="date_of_birth" type="date" name="tanggal_lahir" value="{{ old('tanggal_lahir', $student->profilSiswa?->biodata?->tanggal_lahir?->format('Y-m-d')) }}"
                            class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                                   focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
-                    @error('date_of_birth')
+                    @error('tanggal_lahir')
                         <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
@@ -99,72 +99,72 @@
                     <label class="block text-sm font-medium text-gray-700 mb-2">Jenis Kelamin</label>
                     <div class="flex items-center gap-6 mt-1">
                         <label class="inline-flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="gender" value="L" {{ old('gender', $student->studentProfile?->biodata?->gender) === 'L' ? 'checked' : '' }}
+                            <input type="radio" name="jenis_kelamin" value="L" {{ old('jenis_kelamin', $student->profilSiswa?->biodata?->jenis_kelamin) === 'L' ? 'checked' : '' }}
                                    class="h-4 w-4 text-primary border-gray-300 focus:ring-primary">
                             <span class="text-sm text-gray-700">Laki-laki</span>
                         </label>
                         <label class="inline-flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="gender" value="P" {{ old('gender', $student->studentProfile?->biodata?->gender) === 'P' ? 'checked' : '' }}
+                            <input type="radio" name="jenis_kelamin" value="P" {{ old('jenis_kelamin', $student->profilSiswa?->biodata?->jenis_kelamin) === 'P' ? 'checked' : '' }}
                                    class="h-4 w-4 text-primary border-gray-300 focus:ring-primary">
                             <span class="text-sm text-gray-700">Perempuan</span>
                         </label>
                     </div>
-                    @error('gender')
+                    @error('jenis_kelamin')
                         <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <div>
                     <label for="religion" class="block text-sm font-medium text-gray-700">Agama</label>
-                    <input id="religion" type="text" name="religion" value="{{ old('religion', $student->studentProfile?->biodata?->religion) }}"
+                    <input id="religion" type="text" name="agama" value="{{ old('agama', $student->profilSiswa?->biodata?->agama) }}"
                            class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                                   placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
-                    @error('religion')
+                    @error('agama')
                         <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <div>
                     <label for="family_status" class="block text-sm font-medium text-gray-700">Status dalam Keluarga</label>
-                    <select id="family_status" name="family_status"
+                    <select id="family_status" name="status_keluarga"
                             class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                                    focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                         <option value="">Pilih status</option>
-                        <option value="Kandung" {{ old('family_status', $student->studentProfile?->biodata?->family_status) === 'Kandung' ? 'selected' : '' }}>Kandung</option>
-                        <option value="Angkat" {{ old('family_status', $student->studentProfile?->biodata?->family_status) === 'Angkat' ? 'selected' : '' }}>Angkat</option>
-                        <option value="Tiri" {{ old('family_status', $student->studentProfile?->biodata?->family_status) === 'Tiri' ? 'selected' : '' }}>Tiri</option>
+                        <option value="Kandung" {{ old('status_keluarga', $student->profilSiswa?->biodata?->status_keluarga) === 'Kandung' ? 'selected' : '' }}>Kandung</option>
+                        <option value="Angkat" {{ old('status_keluarga', $student->profilSiswa?->biodata?->status_keluarga) === 'Angkat' ? 'selected' : '' }}>Angkat</option>
+                        <option value="Tiri" {{ old('status_keluarga', $student->profilSiswa?->biodata?->status_keluarga) === 'Tiri' ? 'selected' : '' }}>Tiri</option>
                     </select>
-                    @error('family_status')
+                    @error('status_keluarga')
                         <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <div>
                     <label for="child_number" class="block text-sm font-medium text-gray-700">Anak Ke</label>
-                    <input id="child_number" type="number" name="child_number" min="1" value="{{ old('child_number', $student->studentProfile?->biodata?->child_number) }}"
+                    <input id="child_number" type="number" name="anak_ke" min="1" value="{{ old('anak_ke', $student->profilSiswa?->biodata?->anak_ke) }}"
                            class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                                   focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
-                    @error('child_number')
+                    @error('anak_ke')
                         <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <div>
                     <label for="school_of_origin" class="block text-sm font-medium text-gray-700">Sekolah Asal</label>
-                    <input id="school_of_origin" type="text" name="school_of_origin" value="{{ old('school_of_origin', $student->studentProfile?->biodata?->school_of_origin) }}"
+                    <input id="school_of_origin" type="text" name="asal_sekolah" value="{{ old('asal_sekolah', $student->profilSiswa?->biodata?->asal_sekolah) }}"
                            class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                                   placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
-                    @error('school_of_origin')
+                    @error('asal_sekolah')
                         <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <div>
                     <label for="admission_date" class="block text-sm font-medium text-gray-700">Tanggal Diterima</label>
-                    <input id="admission_date" type="date" name="admission_date" value="{{ old('admission_date', $student->studentProfile?->biodata?->admission_date?->format('Y-m-d')) }}"
+                    <input id="admission_date" type="date" name="tanggal_masuk" value="{{ old('tanggal_masuk', $student->profilSiswa?->biodata?->tanggal_masuk?->format('Y-m-d')) }}"
                            class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                                   focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
-                    @error('admission_date')
+                    @error('tanggal_masuk')
                         <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
@@ -177,60 +177,60 @@
             <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
                     <label for="father_name" class="block text-sm font-medium text-gray-700">Nama Ayah</label>
-                    <input id="father_name" type="text" name="father_name" value="{{ old('father_name', $student->studentProfile?->biodata?->father_name) }}"
+                    <input id="father_name" type="text" name="nama_ayah" value="{{ old('nama_ayah', $student->profilSiswa?->biodata?->nama_ayah) }}"
                            class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                                   placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
-                    @error('father_name')
+                    @error('nama_ayah')
                         <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <div>
                     <label for="father_occupation" class="block text-sm font-medium text-gray-700">Pekerjaan Ayah</label>
-                    <input id="father_occupation" type="text" name="father_occupation" value="{{ old('father_occupation', $student->studentProfile?->biodata?->father_occupation) }}"
+                    <input id="father_occupation" type="text" name="pekerjaan_ayah" value="{{ old('pekerjaan_ayah', $student->profilSiswa?->biodata?->pekerjaan_ayah) }}"
                            class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                                   placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
-                    @error('father_occupation')
+                    @error('pekerjaan_ayah')
                         <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <div>
                     <label for="mother_name" class="block text-sm font-medium text-gray-700">Nama Ibu</label>
-                    <input id="mother_name" type="text" name="mother_name" value="{{ old('mother_name', $student->studentProfile?->biodata?->mother_name) }}"
+                    <input id="mother_name" type="text" name="nama_ibu" value="{{ old('nama_ibu', $student->profilSiswa?->biodata?->nama_ibu) }}"
                            class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                                   placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
-                    @error('mother_name')
+                    @error('nama_ibu')
                         <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <div>
                     <label for="mother_occupation" class="block text-sm font-medium text-gray-700">Pekerjaan Ibu</label>
-                    <input id="mother_occupation" type="text" name="mother_occupation" value="{{ old('mother_occupation', $student->studentProfile?->biodata?->mother_occupation) }}"
+                    <input id="mother_occupation" type="text" name="pekerjaan_ibu" value="{{ old('pekerjaan_ibu', $student->profilSiswa?->biodata?->pekerjaan_ibu) }}"
                            class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                                   placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
-                    @error('mother_occupation')
+                    @error('pekerjaan_ibu')
                         <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <div class="md:col-span-2">
                     <label for="parent_address" class="block text-sm font-medium text-gray-700">Alamat Orang Tua</label>
-                    <textarea id="parent_address" name="parent_address" rows="2"
+                    <textarea id="parent_address" name="alamat_ortu" rows="2"
                               class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
-                                     placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">{{ old('parent_address', $student->studentProfile?->biodata?->parent_address) }}</textarea>
-                    @error('parent_address')
+                                     placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">{{ old('alamat_ortu', $student->profilSiswa?->biodata?->alamat_ortu) }}</textarea>
+                    @error('alamat_ortu')
                         <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <div>
                     <label for="parent_phone" class="block text-sm font-medium text-gray-700">Telepon Orang Tua</label>
-                    <input id="parent_phone" type="text" name="parent_phone" value="{{ old('parent_phone', $student->studentProfile?->biodata?->parent_phone) }}"
+                    <input id="parent_phone" type="text" name="telepon_ortu" value="{{ old('telepon_ortu', $student->profilSiswa?->biodata?->telepon_ortu) }}"
                            class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                                   placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
-                    @error('parent_phone')
+                    @error('telepon_ortu')
                         <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
@@ -243,40 +243,40 @@
             <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div>
                     <label for="guardian_name" class="block text-sm font-medium text-gray-700">Nama Wali</label>
-                    <input id="guardian_name" type="text" name="guardian_name" value="{{ old('guardian_name', $student->studentProfile?->biodata?->guardian_name) }}"
+                    <input id="guardian_name" type="text" name="nama_wali" value="{{ old('nama_wali', $student->profilSiswa?->biodata?->nama_wali) }}"
                            class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                                   placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
-                    @error('guardian_name')
+                    @error('nama_wali')
                         <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <div>
                     <label for="guardian_occupation" class="block text-sm font-medium text-gray-700">Pekerjaan Wali</label>
-                    <input id="guardian_occupation" type="text" name="guardian_occupation" value="{{ old('guardian_occupation', $student->studentProfile?->biodata?->guardian_occupation) }}"
+                    <input id="guardian_occupation" type="text" name="pekerjaan_wali" value="{{ old('pekerjaan_wali', $student->profilSiswa?->biodata?->pekerjaan_wali) }}"
                            class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                                   placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
-                    @error('guardian_occupation')
+                    @error('pekerjaan_wali')
                         <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <div class="md:col-span-2">
                     <label for="guardian_address" class="block text-sm font-medium text-gray-700">Alamat Wali</label>
-                    <textarea id="guardian_address" name="guardian_address" rows="2"
+                    <textarea id="guardian_address" name="alamat_wali" rows="2"
                               class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
-                                     placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">{{ old('guardian_address', $student->studentProfile?->biodata?->guardian_address) }}</textarea>
-                    @error('guardian_address')
+                                     placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">{{ old('alamat_wali', $student->profilSiswa?->biodata?->alamat_wali) }}</textarea>
+                    @error('alamat_wali')
                         <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <div>
                     <label for="guardian_phone" class="block text-sm font-medium text-gray-700">Telepon Wali</label>
-                    <input id="guardian_phone" type="text" name="guardian_phone" value="{{ old('guardian_phone', $student->studentProfile?->biodata?->guardian_phone) }}"
+                    <input id="guardian_phone" type="text" name="telepon_wali" value="{{ old('telepon_wali', $student->profilSiswa?->biodata?->telepon_wali) }}"
                            class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                                   placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
-                    @error('guardian_phone')
+                    @error('telepon_wali')
                         <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>

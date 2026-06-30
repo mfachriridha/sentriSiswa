@@ -24,45 +24,45 @@
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
                 <label for="grade" class="block text-sm font-medium text-gray-700">Tingkat <span class="text-red-500">*</span></label>
-                <select id="grade" name="grade" required
+                <select id="grade" name="tingkat" required
                         class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                                focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                     <option value="">Pilih tingkat</option>
-                    <option value="10" {{ old('grade', $class->grade) === '10' ? 'selected' : '' }}>10</option>
-                    <option value="11" {{ old('grade', $class->grade) === '11' ? 'selected' : '' }}>11</option>
-                    <option value="12" {{ old('grade', $class->grade) === '12' ? 'selected' : '' }}>12</option>
+                    <option value="10" {{ old('tingkat', $class->tingkat) === '10' ? 'selected' : '' }}>10</option>
+                    <option value="11" {{ old('tingkat', $class->tingkat) === '11' ? 'selected' : '' }}>11</option>
+                    <option value="12" {{ old('tingkat', $class->tingkat) === '12' ? 'selected' : '' }}>12</option>
                 </select>
-                @error('grade')
+                @error('tingkat')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
 
             <div>
                 <label for="identifier" class="block text-sm font-medium text-gray-700">Nama Kelas <span class="text-red-500">*</span></label>
-                <input id="identifier" type="text" name="identifier" value="{{ old('identifier', $identifier) }}" required
+                <input id="identifier" type="text" name="nama" value="{{ old('nama', $identifier) }}" required
                        placeholder="contoh: 1, IPA 1, SAINS 1"
                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                               placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20
                               transition-colors">
-                @error('identifier')
+                @error('nama')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
 
             <div>
                 <label for="homeroom_teacher_id" class="block text-sm font-medium text-gray-700">Wali Kelas</label>
-                <select id="homeroom_teacher_id" name="homeroom_teacher_id"
+                <select id="homeroom_teacher_id" name="wali_kelas_id"
                         class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                                focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                     <option value="">Pilih wali kelas</option>
                     @foreach ($homeroomTeachers as $teacher)
                         <option value="{{ $teacher->id }}"
-                            {{ old('homeroom_teacher_id', $class->homeroom_teacher_id) == $teacher->id ? 'selected' : '' }}>
-                            {{ $teacher->name }}
+                            {{ old('wali_kelas_id', $class->wali_kelas_id) == $teacher->id ? 'selected' : '' }}>
+                            {{ $teacher->nama }}
                         </option>
                     @endforeach
                 </select>
-                @error('homeroom_teacher_id')
+                @error('wali_kelas_id')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>

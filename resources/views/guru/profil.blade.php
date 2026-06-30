@@ -4,10 +4,10 @@
 
 @section('content')
 @php
-    $profile = $teacher->teacherProfile;
-    $teacherScope = match ($teacher->role) {
-        'wali_kelas' => $teacher->homeroomClass?->name,
-        'bk' => $profile?->grade ? 'Tingkat '.$profile->grade : null,
+    $profile = $teacher->profilGuru;
+    $teacherScope = match ($teacher->peran) {
+        'wali_kelas' => $teacher->kelasWali?->nama,
+        'bk' => $profile?->tingkat ? 'Tingkat '.$profile->tingkat : null,
         'kesiswaan' => 'Seluruh sekolah',
         default => null,
     };
@@ -31,16 +31,16 @@
 
 <div class="rounded-xl border border-gray-200 bg-white p-6">
     <div class="mb-6 flex items-center gap-5">
-        @if ($profile?->photo)
-            <img src="{{ asset('storage/'.$profile->photo) }}" alt="{{ $teacher->name }}"
+        @if ($profile?->foto)
+            <img src="{{ asset('storage/'.$profile->foto) }}" alt="{{ $teacher->nama }}"
                  class="h-20 w-20 rounded-full object-cover border-2 border-gray-200">
         @else
             <div class="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary">
-                {{ strtoupper(substr($teacher->name, 0, 1)) }}
+                {{ strtoupper(substr($teacher->nama, 0, 1)) }}
             </div>
         @endif
         <div>
-            <h2 class="text-2xl font-bold text-gray-900">{{ $teacher->name }}</h2>
+            <h2 class="text-2xl font-bold text-gray-900">{{ $teacher->nama }}</h2>
             <p class="mt-1 text-sm text-gray-500">{{ $teacher->roleLabel() }}</p>
         </div>
     </div>
@@ -48,7 +48,7 @@
     <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">Nama</p>
-            <p class="mt-1.5 text-sm text-gray-900">{{ $teacher->name }}</p>
+            <p class="mt-1.5 text-sm text-gray-900">{{ $teacher->nama }}</p>
         </div>
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">NIP</p>
@@ -68,7 +68,7 @@
         </div>
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">Nomor HP</p>
-            <p class="mt-1.5 text-sm text-gray-900">{{ $profile?->phone ?? '-' }}</p>
+            <p class="mt-1.5 text-sm text-gray-900">{{ $profile?->telepon ?? '-' }}</p>
         </div>
     </div>
 </div>

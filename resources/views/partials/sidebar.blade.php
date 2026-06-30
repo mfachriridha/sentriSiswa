@@ -366,23 +366,23 @@
         <div class="flex items-center gap-3 px-2">
             @php
                 $sidebarPhotoUrl = null;
-                if (auth()->user()->photo) {
-                    $sidebarPhotoUrl = asset('storage/'.auth()->user()->photo);
-                } elseif (auth()->user()->isGuru() && auth()->user()->teacherProfile?->photo) {
-                    $sidebarPhotoUrl = asset('storage/'.auth()->user()->teacherProfile->photo);
-                } elseif (auth()->user()->isSiswa() && auth()->user()->studentProfile?->photo) {
-                    $sidebarPhotoUrl = asset('storage/'.auth()->user()->studentProfile->photo);
+                if (auth()->user()->foto) {
+                    $sidebarPhotoUrl = asset('storage/'.auth()->user()->foto);
+                } elseif (auth()->user()->isGuru() && auth()->user()->profilGuru?->foto) {
+                    $sidebarPhotoUrl = asset('storage/'.auth()->user()->profilGuru->foto);
+                } elseif (auth()->user()->isSiswa() && auth()->user()->profilSiswa?->foto) {
+                    $sidebarPhotoUrl = asset('storage/'.auth()->user()->profilSiswa->foto);
                 }
             @endphp
             @if($sidebarPhotoUrl)
-                <img src="{{ $sidebarPhotoUrl }}" alt="{{ auth()->user()->name }}" class="h-9 w-9 rounded-full object-cover">
+                <img src="{{ $sidebarPhotoUrl }}" alt="{{ auth()->user()->nama }}" class="h-9 w-9 rounded-full object-cover">
             @else
                 <div class="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
-                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                    {{ strtoupper(substr(auth()->user()->nama, 0, 1)) }}
                 </div>
             @endif
             <div class="min-w-0 flex-1">
-                <p class="truncate text-sm font-medium text-gray-900">{{ auth()->user()->name }}</p>
+                <p class="truncate text-sm font-medium text-gray-900">{{ auth()->user()->nama }}</p>
                 <p class="truncate text-xs text-gray-500">
                     @if(auth()->user()->isAdmin())
                         Admin

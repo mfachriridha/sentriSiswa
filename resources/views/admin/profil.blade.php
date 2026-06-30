@@ -23,15 +23,15 @@
     <div class="flex flex-col md:flex-row items-center md:items-start gap-8">
         <!-- Profile Picture Column -->
         <div class="flex flex-col items-center text-center">
-            @if ($admin->photo)
-                <img src="{{ asset('storage/'.$admin->photo) }}" alt="{{ $admin->name }}"
+            @if ($admin->foto)
+                <img src="{{ asset('storage/'.$admin->foto) }}" alt="{{ $admin->nama }}"
                      class="h-32 w-32 rounded-full border-4 border-slate-50 shadow-xl object-cover">
             @else
                 <div class="flex h-32 w-32 items-center justify-center rounded-full border-4 border-slate-50 bg-primary/10 text-4xl font-extrabold text-primary shadow-inner">
-                    {{ strtoupper(substr($admin->name, 0, 1)) }}
+                    {{ strtoupper(substr($admin->nama, 0, 1)) }}
                 </div>
             @endif
-            <h2 class="text-xl font-extrabold text-slate-900 mt-4">{{ $admin->name }}</h2>
+            <h2 class="text-xl font-extrabold text-slate-900 mt-4">{{ $admin->nama }}</h2>
             <span class="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 mt-2 text-xs font-bold text-primary">
                 <span class="h-1.5 w-1.5 rounded-full bg-primary animate-pulse"></span>
                 {{ $admin->roleLabel() }}

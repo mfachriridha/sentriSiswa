@@ -3,7 +3,7 @@
 @section('title', 'Dashboard')
 
 @section('content')
-<x-page-header title="Dashboard" :description="'Selamat datang, '.auth()->user()->name.'.'" />
+<x-page-header title="Dashboard" :description="'Selamat datang, '.auth()->user()->nama.'.'" />
 
 <!-- SaaS Metrics Bar -->
 <div class="mb-6 grid gap-4 sm:grid-cols-3">

@@ -16,7 +16,7 @@
     {{-- Isi Pesan --}}
     <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
         <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">Isi Pesan</h2>
-        <pre class="whitespace-pre-wrap text-sm text-gray-800 leading-relaxed font-sans">{{ $pesanWhatsapp->message }}</pre>
+        <pre class="whitespace-pre-wrap text-sm text-gray-800 leading-relaxed font-sans">{{ $pesanWhatsapp->isi_pesan }}</pre>
     </div>
 
     {{-- Info & Status --}}
@@ -26,19 +26,19 @@
             <dl class="space-y-3 text-sm">
                 <div class="flex justify-between gap-4">
                     <dt class="text-gray-500">Kelas</dt>
-                    <dd class="font-medium text-gray-800 text-right">{{ $pesanWhatsapp->schoolClass?->name ?? '-' }}</dd>
+                    <dd class="font-medium text-gray-800 text-right">{{ $pesanWhatsapp->kelas?->nama ?? '-' }}</dd>
                 </div>
                 <div class="flex justify-between gap-4">
                     <dt class="text-gray-500">Penerima</dt>
-                    <dd class="font-medium text-gray-800 text-right">{{ $pesanWhatsapp->recipient_name ?? '-' }}</dd>
+                    <dd class="font-medium text-gray-800 text-right">{{ $pesanWhatsapp->nama_penerima ?? '-' }}</dd>
                 </div>
                 <div class="flex justify-between gap-4">
                     <dt class="text-gray-500">Nomor HP</dt>
-                    <dd class="font-medium text-gray-800 text-right">{{ $pesanWhatsapp->recipient_phone }}</dd>
+                    <dd class="font-medium text-gray-800 text-right">{{ $pesanWhatsapp->telepon_penerima }}</dd>
                 </div>
                 <div class="flex justify-between gap-4">
                     <dt class="text-gray-500">Tipe Pesan</dt>
-                    <dd class="text-gray-700 text-right">{{ $pesanWhatsapp->message_type }}</dd>
+                    <dd class="text-gray-700 text-right">{{ $pesanWhatsapp->tipe_pesan }}</dd>
                 </div>
                 <div class="flex justify-between gap-4 border-t border-gray-100 pt-3">
                     <dt class="text-gray-500">Status</dt>
@@ -63,31 +63,31 @@
                 </div>
                 <div class="flex justify-between gap-4">
                     <dt class="text-gray-500">Waktu Kirim</dt>
-                    <dd class="text-gray-700 text-right">{{ $pesanWhatsapp->sent_at?->format('d/m/Y H:i:s') ?? '-' }}</dd>
+                    <dd class="text-gray-700 text-right">{{ $pesanWhatsapp->dikirim_pada?->format('d/m/Y H:i:s') ?? '-' }}</dd>
                 </div>
                 <div class="flex justify-between gap-4">
                     <dt class="text-gray-500">Dibuat</dt>
                     <dd class="text-gray-700 text-right">{{ $pesanWhatsapp->created_at->format('d/m/Y H:i:s') }}</dd>
                 </div>
-                @if ($pesanWhatsapp->provider_message_id)
+                @if ($pesanWhatsapp->id_pesan_provider)
                 <div class="flex justify-between gap-4 border-t border-gray-100 pt-3">
                     <dt class="text-gray-500">Fonnte Message ID</dt>
-                    <dd class="text-gray-700 text-right font-mono text-xs">{{ $pesanWhatsapp->provider_message_id }}</dd>
+                    <dd class="text-gray-700 text-right font-mono text-xs">{{ $pesanWhatsapp->id_pesan_provider }}</dd>
                 </div>
                 @endif
             </dl>
         </div>
 
-        @if ($pesanWhatsapp->response)
+        @if ($pesanWhatsapp->respons)
         <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
             <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">Response API Fonnte</h2>
             @php
-                $decoded = json_decode($pesanWhatsapp->response, true);
+                $decoded = json_decode($pesanWhatsapp->respons, true);
             @endphp
             @if ($decoded)
                 <pre class="whitespace-pre-wrap text-xs text-gray-700 bg-gray-50 rounded-lg p-4 overflow-auto">{{ json_encode($decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
             @else
-                <p class="text-sm text-gray-700 bg-gray-50 rounded-lg p-4">{{ $pesanWhatsapp->response }}</p>
+                <p class="text-sm text-gray-700 bg-gray-50 rounded-lg p-4">{{ $pesanWhatsapp->respons }}</p>
             @endif
         </div>
         @endif

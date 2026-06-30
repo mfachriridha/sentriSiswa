@@ -35,10 +35,10 @@
             <tbody class="divide-y divide-gray-100">
                 @forelse ($studentViolations as $violation)
                     <tr>
-                        <td class="px-4 py-3">{{ $violation->violation_date->translatedFormat('d F Y') }}</td>
-                        <td class="px-4 py-3">{{ $violation->studentProfile?->user?->name ?? '-' }}<div class="text-xs text-gray-500">{{ $violation->studentProfile?->class?->name ?? '-' }}</div></td>
-                        <td class="px-4 py-3">{{ $violation->violation_name }}</td>
-                        <td class="px-4 py-3 font-semibold text-red-600">-{{ $violation->point_deduction }}</td>
+                        <td class="px-4 py-3">{{ $violation->tanggal_pelanggaran->translatedFormat('d F Y') }}</td>
+                        <td class="px-4 py-3">{{ $violation->profilSiswa?->pengguna?->nama ?? '-' }}<div class="text-xs text-gray-500">{{ $violation->profilSiswa?->kelas?->nama ?? '-' }}</div></td>
+                        <td class="px-4 py-3">{{ $violation->nama_pelanggaran }}</td>
+                        <td class="px-4 py-3 font-semibold text-red-600">-{{ $violation->pengurangan_poin }}</td>
                         <td class="px-4 py-3">{{ $statusLabels[$violation->status] ?? $violation->status }}</td>
                     </tr>
                 @empty

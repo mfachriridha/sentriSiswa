@@ -14,7 +14,7 @@
                 </div>
                 <h2 class="mt-6 text-2xl font-extrabold text-slate-800 tracking-tight">Nomor WhatsApp</h2>
                 <p class="mt-2 text-xs font-semibold text-slate-500">
-                    Satu langkah terakhir untuk akun Guru <strong>{{ $teacher->name }}</strong>
+                    Satu langkah terakhir untuk akun Guru <strong>{{ $teacher->nama }}</strong>
                 </p>
             </div>
 
@@ -38,12 +38,12 @@
                 @csrf
 
                 <div>
-                    <label for="phone" class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Nomor WhatsApp</label>
+                    <label for="telepon" class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Nomor WhatsApp</label>
                     <div class="mt-2 flex rounded-xl overflow-hidden border border-slate-200 bg-slate-50/50 focus-within:bg-white focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/20 transition-all duration-300">
                         <span class="inline-flex items-center border-r border-slate-200 bg-slate-100 px-4 text-sm font-bold text-slate-500">
                             🇮🇩 +62
                         </span>
-                        <input id="phone" type="tel" name="phone" value="{{ old('phone') }}" required autofocus
+                        <input id="telepon" type="tel" name="telepon" value="{{ old('telepon') }}" required autofocus
                                class="block w-full border-0 bg-transparent px-4 py-3 text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-0"
                                placeholder="8xxxxxxxxxx">
                     </div>

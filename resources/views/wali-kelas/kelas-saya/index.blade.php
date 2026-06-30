@@ -6,7 +6,7 @@
 <div class="mb-6 flex items-start justify-between gap-4 flex-wrap">
     <div>
         <h1 class="text-2xl font-bold text-gray-900">Kelas Saya</h1>
-        <p class="mt-1 text-sm text-gray-500">Pantau absensi hari ini untuk kelas {{ $class->name }}</p>
+        <p class="mt-1 text-sm text-gray-500">Pantau absensi hari ini untuk kelas {{ $class->nama }}</p>
     </div>
     @if($isWeekday && $stats['belum_absen'] > 0)
     <span class="inline-flex items-center gap-1.5 text-xs text-green-600 font-medium mt-1">
@@ -51,7 +51,7 @@
 <div class="rounded-xl border border-gray-200 bg-white p-6">
     <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-            <h2 class="text-lg font-semibold text-gray-900">{{ $class->name }}</h2>
+            <h2 class="text-lg font-semibold text-gray-900">{{ $class->nama }}</h2>
             <p class="mt-1 text-sm text-gray-500">
                 {{ now()->locale('id')->translatedFormat('l, d F Y') }} • {{ $students->count() }} siswa
             </p>
@@ -110,7 +110,7 @@
                             <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-500">{{ $student->nis ?? '-' }}</td>
                             <td class="whitespace-nowrap px-4 py-3 text-sm font-medium text-gray-900">
                                 <div class="flex flex-col gap-1">
-                                    <span>{{ $student->user->name }}</span>
+                                    <span>{{ $student->pengguna->nama }}</span>
                                     @if($alphaCount >= $warningThreshold)
                                         <span class="inline-flex w-fit items-center rounded-full bg-red-50 px-2 py-0.5 text-xs font-medium text-red-700">
                                             Peringatan alpha {{ $alphaCount }}x
@@ -124,17 +124,17 @@
                                 </span>
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-500">
-                                {{ $attendance?->check_in_time?->format('H:i') ?? '-' }}
+                                {{ $attendance?->waktu_masuk?->format('H:i') ?? '-' }}
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 text-sm">
-                                @if($attendance?->selfie_path)
+                                @if($attendance?->path_selfie)
                                     <button type="button"
-                                            data-selfie-url="{{ asset('storage/'.$attendance->selfie_path) }}"
-                                            data-student-name="{{ $student->user->name }}"
+                                            data-selfie-url="{{ asset('storage/'.$attendance->path_selfie) }}"
+                                            data-student-name="{{ $student->pengguna->nama }}"
                                             onclick="openSelfieModal(this.dataset.selfieUrl, this.dataset.studentName)"
                                             class="block overflow-hidden rounded-lg border border-gray-200 transition hover:border-primary">
-                                        <img src="{{ asset('storage/'.$attendance->selfie_path) }}"
-                                             alt="Selfie {{ $student->user->name }}"
+                                        <img src="{{ asset('storage/'.$attendance->path_selfie) }}"
+                                             alt="Selfie {{ $student->pengguna->nama }}"
                                              class="h-14 w-12 object-cover">
                                     </button>
                                 @else
@@ -149,7 +149,7 @@
                                     <button type="button"
                                             data-update-url="{{ route('wali-kelas.kelas-saya.absensi.update', $student) }}"
                                             data-current-status="{{ $status === 'belum_absen' ? 'hadir' : $status }}"
-                                            data-student-name="{{ $student->user->name }}"
+                                            data-student-name="{{ $student->pengguna->nama }}"
                                             onclick="openEditModal(this.dataset.updateUrl, this.dataset.currentStatus, this.dataset.studentName)"
                                             class="font-medium text-primary hover:text-primary-dark">
                                         Edit

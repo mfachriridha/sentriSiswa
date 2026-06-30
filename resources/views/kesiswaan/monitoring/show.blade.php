@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Detail Siswa: ' . $student->user->name)
+@section('title', 'Detail Siswa: ' . $student->pengguna->nama)
 
 @section('content')
 @php
@@ -15,24 +15,24 @@
         'belum_absen' => ['Belum Absen', 'bg-gray-100 text-gray-600'],
     ];
     $biodataRows = [
-        ['Tempat Lahir', $biodata?->place_of_birth],
-        ['Tanggal Lahir', $biodata?->date_of_birth?->translatedFormat('d F Y')],
-        ['Jenis Kelamin', $biodata?->gender === 'L' ? 'Laki-laki' : ($biodata?->gender === 'P' ? 'Perempuan' : null)],
-        ['Agama', $biodata?->religion],
-        ['Status Keluarga', $biodata?->family_status],
-        ['Anak Ke', $biodata?->child_number],
-        ['Asal Sekolah', $biodata?->school_of_origin],
-        ['Tanggal Masuk', $biodata?->admission_date?->translatedFormat('d F Y')],
-        ['Ayah', $biodata?->father_name],
-        ['Pekerjaan Ayah', $biodata?->father_occupation],
-        ['Ibu', $biodata?->mother_name],
-        ['Pekerjaan Ibu', $biodata?->mother_occupation],
-        ['Alamat Orang Tua', $biodata?->parent_address],
-        ['Telepon Orang Tua', $biodata?->parent_phone],
-        ['Wali', $biodata?->guardian_name],
-        ['Pekerjaan Wali', $biodata?->guardian_occupation],
-        ['Alamat Wali', $biodata?->guardian_address],
-        ['Telepon Wali', $biodata?->guardian_phone],
+        ['Tempat Lahir', $biodata?->tempat_lahir],
+        ['Tanggal Lahir', $biodata?->tanggal_lahir?->translatedFormat('d F Y')],
+        ['Jenis Kelamin', $biodata?->jenis_kelamin === 'L' ? 'Laki-laki' : ($biodata?->jenis_kelamin === 'P' ? 'Perempuan' : null)],
+        ['Agama', $biodata?->agama],
+        ['Status Keluarga', $biodata?->status_keluarga],
+        ['Anak Ke', $biodata?->anak_ke],
+        ['Asal Sekolah', $biodata?->asal_sekolah],
+        ['Tanggal Masuk', $biodata?->tanggal_masuk?->translatedFormat('d F Y')],
+        ['Ayah', $biodata?->nama_ayah],
+        ['Pekerjaan Ayah', $biodata?->pekerjaan_ayah],
+        ['Ibu', $biodata?->nama_ibu],
+        ['Pekerjaan Ibu', $biodata?->pekerjaan_ibu],
+        ['Alamat Orang Tua', $biodata?->alamat_ortu],
+        ['Telepon Orang Tua', $biodata?->telepon_ortu],
+        ['Wali', $biodata?->nama_wali],
+        ['Pekerjaan Wali', $biodata?->pekerjaan_wali],
+        ['Alamat Wali', $biodata?->alamat_wali],
+        ['Telepon Wali', $biodata?->telepon_wali],
     ];
 @endphp
 
@@ -52,7 +52,7 @@
 <div class="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
     <div>
         <h1 class="text-2xl font-bold text-gray-900">Detail Siswa</h1>
-        <p class="mt-2 text-sm text-gray-500">{{ $student->user->name }} · {{ $student->class->name ?? '-' }}</p>
+        <p class="mt-2 text-sm text-gray-500">{{ $student->pengguna->nama }} · {{ $student->kelas->nama ?? '-' }}</p>
         @if(($alphaWarningCount ?? 0) >= ($warningThreshold ?? 3))
             <p class="mt-2 inline-flex items-center rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-700">
                 Peringatan alpha {{ $alphaWarningCount }} kali pada semester berjalan
@@ -72,18 +72,18 @@
 <div class="space-y-6">
     <div class="rounded-xl border border-gray-200 bg-white p-6">
         <div class="flex flex-col gap-6 md:flex-row md:items-center">
-            @if ($student->photo)
-                <img src="{{ asset('storage/'.$student->photo) }}" alt="{{ $student->user->name }}" class="h-24 w-24 rounded-full border border-gray-200 object-cover">
+            @if ($student->foto)
+                <img src="{{ asset('storage/'.$student->foto) }}" alt="{{ $student->pengguna->nama }}" class="h-24 w-24 rounded-full border border-gray-200 object-cover">
             @else
                 <div class="flex h-24 w-24 shrink-0 items-center justify-center rounded-full bg-primary/10 text-3xl font-bold text-primary">
-                    {{ strtoupper(substr($student->user->name, 0, 1)) }}
+                    {{ strtoupper(substr($student->pengguna->nama, 0, 1)) }}
                 </div>
             @endif
 
             <div class="grid flex-1 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <div>
                     <span class="block text-sm font-medium text-gray-500">Nama Lengkap</span>
-                    <span class="mt-1 block text-sm font-medium text-gray-900">{{ $student->user->name }}</span>
+                    <span class="mt-1 block text-sm font-medium text-gray-900">{{ $student->pengguna->nama }}</span>
                 </div>
                 <div>
                     <span class="block text-sm font-medium text-gray-500">NISN / NIS</span>
@@ -91,7 +91,7 @@
                 </div>
                 <div>
                     <span class="block text-sm font-medium text-gray-500">Kelas</span>
-                    <span class="mt-1 block text-sm font-medium text-gray-900">{{ $student->class->name ?? '-' }}</span>
+                    <span class="mt-1 block text-sm font-medium text-gray-900">{{ $student->kelas->nama ?? '-' }}</span>
                 </div>
                 <div>
                     <span class="block text-sm font-medium text-gray-500">Sisa Poin</span>
@@ -100,11 +100,11 @@
                 </div>
                 <div>
                     <span class="block text-sm font-medium text-gray-500">Telepon</span>
-                    <span class="mt-1 block text-sm text-gray-900">{{ $student->phone ?? '-' }}</span>
+                    <span class="mt-1 block text-sm text-gray-900">{{ $student->telepon ?? '-' }}</span>
                 </div>
                 <div class="sm:col-span-2 lg:col-span-3">
                     <span class="block text-sm font-medium text-gray-500">Alamat</span>
-                    <span class="mt-1 block text-sm text-gray-900">{{ $student->address ?? '-' }}</span>
+                    <span class="mt-1 block text-sm text-gray-900">{{ $student->alamat ?? '-' }}</span>
                 </div>
             </div>
         </div>
@@ -137,16 +137,16 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
-                        @forelse ($student->studentViolations as $violation)
+                        @forelse ($student->pelanggaranSiswa as $violation)
                             <tr>
-                                <td class="whitespace-nowrap px-4 py-3">{{ $violation->violation_date->translatedFormat('d F Y') }}</td>
+                                <td class="whitespace-nowrap px-4 py-3">{{ $violation->tanggal_pelanggaran->translatedFormat('d F Y') }}</td>
                                 <td class="px-4 py-3">
-                                    <div class="font-medium text-gray-900">{{ $violation->violation_name }}</div>
-                                    @if($violation->notes)
-                                        <div class="mt-1 text-xs text-gray-500">{{ $violation->notes }}</div>
+                                    <div class="font-medium text-gray-900">{{ $violation->nama_pelanggaran }}</div>
+                                    @if($violation->catatan)
+                                        <div class="mt-1 text-xs text-gray-500">{{ $violation->catatan }}</div>
                                     @endif
                                 </td>
-                                <td class="px-4 py-3 text-center font-bold text-red-600">-{{ $violation->point_deduction }}</td>
+                                <td class="px-4 py-3 text-center font-bold text-red-600">-{{ $violation->pengurangan_poin }}</td>
                             </tr>
                         @empty
                             <tr>
@@ -175,12 +175,12 @@
                         @forelse ($student->attendances as $attendance)
                             @php $statusMeta = $statusLabels[$attendance->status] ?? ['-', 'bg-gray-100 text-gray-600']; @endphp
                             <tr>
-                                <td class="whitespace-nowrap px-4 py-3">{{ $attendance->date->translatedFormat('d F Y') }}</td>
+                                <td class="whitespace-nowrap px-4 py-3">{{ $attendance->tanggal->translatedFormat('d F Y') }}</td>
                                 <td class="px-4 py-3">
                                     <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {{ $statusMeta[1] }}">{{ $statusMeta[0] }}</span>
                                 </td>
                                 <td class="whitespace-nowrap px-4 py-3">
-                                    {{ $attendance->check_in_time ? $attendance->check_in_time->format('H:i') : '-' }}
+                                    {{ $attendance->waktu_masuk ? $attendance->waktu_masuk->format('H:i') : '-' }}
                                 </td>
                             </tr>
                         @empty

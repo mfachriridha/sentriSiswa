@@ -61,7 +61,7 @@
                 <tr>
                     <td>{{ $index + 1 }}</td>
                     <td>{{ $student->nis ?? '-' }}</td>
-                    <td>{{ $student->user->name }}</td>
+                    <td>{{ $student->pengguna->nama }}</td>
                     <td class="center">{{ $stat['hadir'] }}</td>
                     <td class="center">{{ $stat['terlambat'] }}</td>
                     <td class="center">{{ $stat['izin'] }}</td>

@@ -24,11 +24,11 @@
 
 <div class="rounded-xl border border-gray-200 bg-white p-6">
     <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-900">{{ $class->name }}</h1>
+        <h1 class="text-2xl font-bold text-gray-900">{{ $class->nama }}</h1>
         <p class="mt-1 text-sm text-gray-500">
-            @if ($class->grade === '10')
+            @if ($class->tingkat === '10')
                 <span class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">Tingkat 10</span>
-            @elseif ($class->grade === '11')
+            @elseif ($class->tingkat === '11')
                 <span class="inline-flex items-center rounded-full bg-green-50 px-3 py-1 text-sm font-medium text-green-700">Tingkat 11</span>
             @else
                 <span class="inline-flex items-center rounded-full bg-purple-50 px-3 py-1 text-sm font-medium text-purple-700">Tingkat 12</span>
@@ -40,9 +40,9 @@
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">Tingkat</p>
             <p class="mt-1.5">
-                @if ($class->grade === '10')
+                @if ($class->tingkat === '10')
                     <span class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">Tingkat 10</span>
-                @elseif ($class->grade === '11')
+                @elseif ($class->tingkat === '11')
                     <span class="inline-flex items-center rounded-full bg-green-50 px-3 py-1 text-sm font-medium text-green-700">Tingkat 11</span>
                 @else
                     <span class="inline-flex items-center rounded-full bg-purple-50 px-3 py-1 text-sm font-medium text-purple-700">Tingkat 12</span>
@@ -53,10 +53,10 @@
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">Wali Kelas</p>
             <p class="mt-1.5 text-sm text-gray-900">
-                @if ($class->homeroomTeacher)
-                    <a href="{{ route('admin.guru.show', $class->homeroomTeacher) }}"
+                @if ($class->waliKelas)
+                    <a href="{{ route('admin.guru.show', $class->waliKelas) }}"
                        class="text-primary hover:underline">
-                        {{ $class->homeroomTeacher->name }}
+                        {{ $class->waliKelas->nama }}
                     </a>
                 @else
                     -

@@ -32,12 +32,12 @@
 
 <div class="rounded-xl border border-gray-200 bg-white p-6">
     <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-900">{{ $violationType->name }}</h1>
+        <h1 class="text-2xl font-bold text-gray-900">{{ $violationType->nama }}</h1>
         <div class="mt-3 flex flex-wrap items-center gap-2">
-            <span class="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium {{ $categoryBadgeClasses[$violationType->category] ?? 'bg-gray-50 text-gray-700' }}">
-                {{ $categoryLabels[$violationType->category] ?? '-' }}
+            <span class="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium {{ $categoryBadgeClasses[$violationType->kategori] ?? 'bg-gray-50 text-gray-700' }}">
+                {{ $categoryLabels[$violationType->kategori] ?? '-' }}
             </span>
-            @if ($violationType->is_active)
+            @if ($violationType->aktif)
                 <span class="inline-flex items-center rounded-full bg-green-50 px-3 py-1 text-sm font-medium text-green-700">Aktif</span>
             @else
                 <span class="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-600">Nonaktif</span>
@@ -48,15 +48,15 @@
     <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">Kategori</p>
-            <p class="mt-1.5 text-sm text-gray-900">{{ $categoryLabels[$violationType->category] ?? '-' }}</p>
+            <p class="mt-1.5 text-sm text-gray-900">{{ $categoryLabels[$violationType->kategori] ?? '-' }}</p>
         </div>
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">Poin Pelanggaran</p>
-            <p class="mt-1.5 text-sm text-gray-900">{{ $violationType->point_deduction }} poin</p>
+            <p class="mt-1.5 text-sm text-gray-900">{{ $violationType->pengurangan_poin }} poin</p>
         </div>
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">Status</p>
-            <p class="mt-1.5 text-sm text-gray-900">{{ $violationType->is_active ? 'Aktif' : 'Nonaktif' }}</p>
+            <p class="mt-1.5 text-sm text-gray-900">{{ $violationType->aktif ? 'Aktif' : 'Nonaktif' }}</p>
         </div>
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">Terakhir Diubah</p>
@@ -64,7 +64,7 @@
         </div>
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5 md:col-span-2">
             <p class="text-sm font-medium text-gray-500">Keterangan</p>
-            <p class="mt-1.5 text-sm text-gray-900">{{ $violationType->description ?? '-' }}</p>
+            <p class="mt-1.5 text-sm text-gray-900">{{ $violationType->keterangan ?? '-' }}</p>
         </div>
     </div>
 </div>

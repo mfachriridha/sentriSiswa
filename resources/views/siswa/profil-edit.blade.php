@@ -18,7 +18,7 @@
 
     <div class="mb-6 flex items-start gap-6"
          x-data="{
-             photoPreview: @js($student->studentProfile?->photo ? asset('storage/'.$student->studentProfile->photo) : ''),
+             photoPreview: @js($student->profilSiswa?->foto ? asset('storage/'.$student->profilSiswa->foto) : ''),
              selected: false,
              onPhotoChange(event) {
                  const file = event.target.files[0];
@@ -35,12 +35,12 @@
              },
          }">
         <template x-if="photoPreview">
-            <img :src="photoPreview" alt="{{ $student->name }}"
+            <img :src="photoPreview" alt="{{ $student->nama }}"
                  class="h-20 w-20 rounded-full border-2 border-gray-200 object-cover">
         </template>
         <template x-if="!photoPreview">
             <div class="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary">
-                {{ strtoupper(substr($student->name, 0, 1)) }}
+                {{ strtoupper(substr($student->nama, 0, 1)) }}
             </div>
         </template>
 
@@ -59,7 +59,7 @@
                     Upload Foto
                 </button>
             </form>
-            @if ($student->studentProfile?->photo)
+            @if ($student->profilSiswa?->foto)
                 <form method="POST" action="{{ route('siswa.profil.photo.delete') }}">
                     @csrf
                     @method('DELETE')
@@ -85,7 +85,7 @@
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
                 <label class="block text-sm font-medium text-gray-500">Nama</label>
-                <p class="mt-1.5 text-sm text-gray-900">{{ $student->name }}</p>
+                <p class="mt-1.5 text-sm text-gray-900">{{ $student->nama }}</p>
             </div>
 
             <div>
@@ -100,35 +100,35 @@
 
             <div>
                 <label class="block text-sm font-medium text-gray-500">NISN</label>
-                <p class="mt-1.5 text-sm text-gray-900">{{ $student->studentProfile?->nisn ?? '-' }}</p>
+                <p class="mt-1.5 text-sm text-gray-900">{{ $student->profilSiswa?->nisn ?? '-' }}</p>
             </div>
 
             <div>
                 <label class="block text-sm font-medium text-gray-500">NIS</label>
-                <p class="mt-1.5 text-sm text-gray-900">{{ $student->studentProfile?->nis ?? '-' }}</p>
+                <p class="mt-1.5 text-sm text-gray-900">{{ $student->profilSiswa?->nis ?? '-' }}</p>
             </div>
 
             <div>
                 <label class="block text-sm font-medium text-gray-500">Kelas</label>
-                <p class="mt-1.5 text-sm text-gray-900">{{ $student->studentProfile?->class?->name ?? '-' }}</p>
+                <p class="mt-1.5 text-sm text-gray-900">{{ $student->profilSiswa?->kelas?->nama ?? '-' }}</p>
             </div>
 
             <div>
-                <label for="phone" class="block text-sm font-medium text-gray-700">Telepon</label>
-                <input id="phone" type="text" name="phone" value="{{ old('phone', $student->studentProfile?->phone) }}"
+                <label for="telepon" class="block text-sm font-medium text-gray-700">Telepon</label>
+                <input id="telepon" type="text" name="telepon" value="{{ old('telepon', $student->profilSiswa?->telepon) }}"
                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                               placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
-                @error('phone')
+                @error('telepon')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
 
             <div class="md:col-span-2">
-                <label for="address" class="block text-sm font-medium text-gray-700">Alamat</label>
-                <textarea id="address" name="address" rows="3"
+                <label for="alamat" class="block text-sm font-medium text-gray-700">Alamat</label>
+                <textarea id="alamat" name="alamat" rows="3"
                           class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
-                                 placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">{{ old('address', $student->studentProfile?->address) }}</textarea>
-                @error('address')
+                                 placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">{{ old('alamat', $student->profilSiswa?->alamat) }}</textarea>
+                @error('alamat')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>

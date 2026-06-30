@@ -55,8 +55,8 @@
     :search="$search"
     placeholder="Cari nama atau NIP..."
     :filters="[
-        ['name' => 'role', 'label' => 'Role', 'value' => $filterRole, 'options' => ['' => 'Semua Role', 'wali_kelas' => 'Wali Kelas', 'bk' => 'BK', 'kesiswaan' => 'Kesiswaan']],
-        ['name' => 'grade', 'label' => 'Tingkat', 'value' => $filterGrade, 'options' => ['' => 'Semua Tingkat', '10' => '10', '11' => '11', '12' => '12']],
+        ['name' => 'peran', 'label' => 'Role', 'value' => $filterRole, 'options' => ['' => 'Semua Role', 'wali_kelas' => 'Wali Kelas', 'bk' => 'BK', 'kesiswaan' => 'Kesiswaan']],
+        ['name' => 'tingkat', 'label' => 'Tingkat', 'value' => $filterGrade, 'options' => ['' => 'Semua Tingkat', '10' => '10', '11' => '11', '12' => '12']],
         ['name' => 'status', 'label' => 'Status', 'value' => $filterStatus, 'options' => ['' => 'Semua Status', 'registered' => 'Terdaftar', 'unregistered' => 'Belum Terdaftar']],
     ]"
     :sort="$sort"
@@ -98,8 +98,8 @@
         <tbody class="divide-y divide-gray-100">
             @forelse ($teachers as $teacher)
                 <tr class="hover:bg-gray-50">
-                    <td class="px-4 py-3 text-gray-700">{{ $teacher->teacherProfile?->nip ?? '-' }}</td>
-                    <td class="px-4 py-3 font-medium text-gray-900">{{ $teacher->name }}</td>
+                    <td class="px-4 py-3 text-gray-700">{{ $teacher->profilGuru?->nip ?? '-' }}</td>
+                    <td class="px-4 py-3 font-medium text-gray-900">{{ $teacher->nama }}</td>
                     <td class="hidden px-4 py-3 text-gray-700 lg:table-cell">{{ $teacher->email }}</td>
                     <td class="hidden px-4 py-3 md:table-cell">
                         @if ($teacher->isWaliKelas())
@@ -119,19 +119,19 @@
                         @endif
                     </td>
                     <td class="hidden px-4 py-3 text-gray-700 lg:table-cell">
-                        @if ($teacher->homeroomClass)
-                            <a href="{{ route('admin.kelas.show', $teacher->homeroomClass) }}" class="text-primary hover:underline">
-                                {{ $teacher->homeroomClass->name }}
+                        @if ($teacher->kelasWali)
+                            <a href="{{ route('admin.kelas.show', $teacher->kelasWali) }}" class="text-primary hover:underline">
+                                {{ $teacher->kelasWali->nama }}
                             </a>
-                        @elseif ($teacher->teacherProfile?->grade)
+                        @elseif ($teacher->profilGuru?->tingkat)
                             <span class="inline-flex items-center gap-1 rounded-full bg-teal-50 px-2.5 py-0.5 text-xs font-medium text-teal-700">
-                                BK {{ $teacher->teacherProfile->grade }}
+                                BK {{ $teacher->profilGuru->tingkat }}
                             </span>
                         @else
                             -
                         @endif
                     </td>
-                    <td class="hidden px-4 py-3 text-gray-700 xl:table-cell">{{ $teacher->teacherProfile?->phone ?? '-' }}</td>
+                    <td class="hidden px-4 py-3 text-gray-700 xl:table-cell">{{ $teacher->profilGuru?->telepon ?? '-' }}</td>
                     <td class="px-4 py-3">
                         @if ($teacher->isRegistered())
                             <span class="inline-flex items-center gap-1 rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-700">Terdaftar</span>
@@ -163,7 +163,7 @@
                                     onclick="window.dispatchEvent(new CustomEvent('open-confirm-modal', {
                                         detail: {
                                             title: 'Hapus Guru',
-                                            message: 'Yakin ingin menghapus guru {{ $teacher->name }}?',
+                                            message: 'Yakin ingin menghapus guru {{ $teacher->nama }}?',
                                             formId: 'delete-teacher-{{ $teacher->id }}'
                                         }
                                     }))"

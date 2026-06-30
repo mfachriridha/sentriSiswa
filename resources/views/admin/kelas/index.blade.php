@@ -46,7 +46,7 @@
     :search="$search"
     placeholder="Cari nama kelas..."
     :filters="[
-        ['name' => 'grade', 'label' => 'Tingkat', 'value' => $filterGrade, 'options' => ['' => 'Semua Tingkat', '10' => '10', '11' => '11', '12' => '12']],
+        ['name' => 'tingkat', 'label' => 'Tingkat', 'value' => $filterGrade, 'options' => ['' => 'Semua Tingkat', '10' => '10', '11' => '11', '12' => '12']],
     ]"
     :sort="$sort"
     :direction="$direction"
@@ -66,17 +66,17 @@
         <tbody class="divide-y divide-gray-100">
             @forelse ($classes as $class)
                 <tr class="hover:bg-gray-50">
-                    <td class="px-4 py-3 font-medium text-gray-900">{{ $class->name }}</td>
+                    <td class="px-4 py-3 font-medium text-gray-900">{{ $class->nama }}</td>
                     <td class="px-4 py-3">
-                        @if ($class->grade === '10')
+                        @if ($class->tingkat === '10')
                             <span class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">Tingkat 10</span>
-                        @elseif ($class->grade === '11')
+                        @elseif ($class->tingkat === '11')
                             <span class="inline-flex items-center rounded-full bg-green-50 px-3 py-1 text-sm font-medium text-green-700">Tingkat 11</span>
                         @else
                             <span class="inline-flex items-center rounded-full bg-purple-50 px-3 py-1 text-sm font-medium text-purple-700">Tingkat 12</span>
                         @endif
                     </td>
-                    <td class="px-4 py-3 text-gray-700">{{ $class->homeroomTeacher?->name ?? '-' }}</td>
+                    <td class="px-4 py-3 text-gray-700">{{ $class->waliKelas?->nama ?? '-' }}</td>
                     <td class="px-4 py-3">
                         <div class="flex items-center gap-2">
                             <a href="{{ route('admin.kelas.show', $class) }}"
@@ -101,7 +101,7 @@
                                     onclick="window.dispatchEvent(new CustomEvent('open-confirm-modal', {
                                         detail: {
                                             title: 'Hapus Kelas',
-                                            message: 'Yakin ingin menghapus kelas {{ $class->name }}?',
+                                            message: 'Yakin ingin menghapus kelas {{ $class->nama }}?',
                                             formId: 'delete-class-{{ $class->id }}'
                                         }
                                     }))"

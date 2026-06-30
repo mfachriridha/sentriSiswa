@@ -3,7 +3,7 @@
 @section('title', 'Dashboard Siswa')
 
 @section('content')
-<x-page-header title="Dashboard Siswa" :description="'Selamat datang, '.auth()->user()->name.'!'" />
+<x-page-header title="Dashboard Siswa" :description="'Selamat datang, '.auth()->user()->nama.'!'" />
 
 @if($alphaWarningCount >= $warningThreshold)
     <div class="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">

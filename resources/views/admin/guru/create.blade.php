@@ -23,10 +23,10 @@
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
                 <label for="name" class="block text-sm font-medium text-gray-700">Nama <span class="text-red-500">*</span></label>
-                <input id="name" type="text" name="name" value="{{ old('name') }}" required
+                <input id="name" type="text" name="nama" value="{{ old('nama') }}" required
                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                               placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
-                @error('name')
+                @error('nama')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
@@ -51,10 +51,10 @@
                 @enderror
             </div>
 
-            <div x-data="{ role: '{{ old('role') }}' }">
+            <div x-data="{ role: '{{ old('peran') }}' }">
                 <div>
                     <label for="role" class="block text-sm font-medium text-gray-700">Role <span class="text-red-500">*</span></label>
-                    <select id="role" name="role" required x-model="role"
+                    <select id="role" name="peran" required x-model="role"
                             class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                                    focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                         <option value="">Pilih role</option>
@@ -62,22 +62,22 @@
                         <option value="bk">BK</option>
                         <option value="kesiswaan">Kesiswaan</option>
                     </select>
-                    @error('role')
+                    @error('peran')
                         <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <div x-show="role === 'bk'" x-cloak class="mt-6">
                     <label for="grade" class="block text-sm font-medium text-gray-700">Tingkatan <span class="text-red-500">*</span></label>
-                    <select id="grade" name="grade"
+                    <select id="grade" name="tingkat"
                             class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                                    focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                         <option value="">Pilih tingkatan</option>
-                        <option value="10" {{ old('grade') === '10' ? 'selected' : '' }}>10</option>
-                        <option value="11" {{ old('grade') === '11' ? 'selected' : '' }}>11</option>
-                        <option value="12" {{ old('grade') === '12' ? 'selected' : '' }}>12</option>
+                        <option value="10" {{ old('tingkat') === '10' ? 'selected' : '' }}>10</option>
+                        <option value="11" {{ old('tingkat') === '11' ? 'selected' : '' }}>11</option>
+                        <option value="12" {{ old('tingkat') === '12' ? 'selected' : '' }}>12</option>
                     </select>
-                    @error('grade')
+                    @error('tingkat')
                         <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
@@ -85,10 +85,10 @@
 
             <div>
                 <label for="phone" class="block text-sm font-medium text-gray-700">Telepon</label>
-                <input id="phone" type="text" name="phone" value="{{ old('phone') }}"
+                <input id="phone" type="text" name="telepon" value="{{ old('telepon') }}"
                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                               placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
-                @error('phone')
+                @error('telepon')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>

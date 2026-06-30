@@ -4,10 +4,10 @@
 
 @section('content')
 @php
-    $profile = $teacher->teacherProfile;
-    $teacherScope = match ($teacher->role) {
-        'wali_kelas' => $teacher->homeroomClass?->name,
-        'bk' => $profile?->grade ? 'Tingkat '.$profile->grade : null,
+    $profile = $teacher->profilGuru;
+    $teacherScope = match ($teacher->peran) {
+        'wali_kelas' => $teacher->kelasWali?->nama,
+        'bk' => $profile?->tingkat ? 'Tingkat '.$profile->tingkat : null,
         'kesiswaan' => 'Seluruh sekolah',
         default => null,
     };
@@ -41,7 +41,7 @@
     <form method="POST" action="{{ route(auth()->user()->profilRouteName('update')) }}" class="space-y-10" enctype="multipart/form-data"
           x-data="{
               loading: false,
-              photoPreview: @js($profile?->photo ? asset('storage/'.$profile->photo) : ''),
+              photoPreview: @js($profile?->foto ? asset('storage/'.$profile->foto) : ''),
               deletePhoto: false,
               onPhotoChange(event) {
                   const file = event.target.files[0];
@@ -69,12 +69,12 @@
         <div class="flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:gap-10">
             <div class="relative">
                 <template x-if="photoPreview">
-                    <img :src="photoPreview" alt="{{ $teacher->name }}"
+                    <img :src="photoPreview" alt="{{ $teacher->nama }}"
                          class="h-24 w-24 rounded-full border-4 border-gray-100 object-cover">
                 </template>
                 <template x-if="!photoPreview">
                     <div class="flex h-24 w-24 items-center justify-center rounded-full border-4 border-gray-100 bg-primary/10 text-2xl font-bold text-primary">
-                        {{ strtoupper(substr($teacher->name, 0, 1)) }}
+                        {{ strtoupper(substr($teacher->nama, 0, 1)) }}
                     </div>
                 </template>
             </div>
@@ -89,7 +89,7 @@
                     </label>
                     <input id="photo" type="file" name="photo" accept=".jpg,.jpeg,.png,image/jpeg,image/png" class="hidden" @change="onPhotoChange">
 
-                    @if ($profile?->photo)
+                    @if ($profile?->foto)
                         <button type="button" @click="removePhoto" class="text-sm text-red-600 hover:text-red-800 transition-colors">
                             Hapus Foto
                         </button>
@@ -129,9 +129,9 @@
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div class="md:col-span-2">
                 <label for="name" class="block text-sm font-medium text-gray-700">Nama <span class="text-red-500">*</span></label>
-                <input id="name" type="text" name="name" value="{{ old('name', $teacher->name) }}" required
+                <input id="name" type="text" name="nama" value="{{ old('nama', $teacher->nama) }}" required
                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
-                @error('name')
+                @error('nama')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
@@ -147,9 +147,9 @@
 
             <div>
                 <label for="phone" class="block text-sm font-medium text-gray-700">Nomor HP</label>
-                <input id="phone" type="text" name="phone" value="{{ old('phone', $profile?->phone) }}"
+                <input id="phone" type="text" name="telepon" value="{{ old('telepon', $profile?->telepon) }}"
                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
-                @error('phone')
+                @error('telepon')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>

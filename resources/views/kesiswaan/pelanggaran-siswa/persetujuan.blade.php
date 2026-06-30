@@ -44,20 +44,20 @@
             <tbody class="divide-y divide-gray-100">
                 @forelse ($pending as $violation)
                     <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-3 text-gray-700">{{ $violation->violation_date?->translatedFormat('d F Y') }}</td>
+                        <td class="px-4 py-3 text-gray-700">{{ $violation->tanggal_pelanggaran?->translatedFormat('d F Y') }}</td>
                         <td class="px-4 py-3">
-                            <p class="font-medium text-gray-900">{{ $violation->studentProfile?->user?->name ?? '-' }}</p>
-                            <p class="mt-1 text-xs text-gray-500">NIS: {{ $violation->studentProfile?->nis ?? '-' }}</p>
+                            <p class="font-medium text-gray-900">{{ $violation->profilSiswa?->pengguna?->nama ?? '-' }}</p>
+                            <p class="mt-1 text-xs text-gray-500">NIS: {{ $violation->profilSiswa?->nis ?? '-' }}</p>
                         </td>
-                        <td class="px-4 py-3 text-gray-700">{{ $violation->studentProfile?->class?->name ?? '-' }}</td>
-                        <td class="px-4 py-3 font-medium text-gray-900">{{ $violation->violation_name }}</td>
+                        <td class="px-4 py-3 text-gray-700">{{ $violation->profilSiswa?->kelas?->nama ?? '-' }}</td>
+                        <td class="px-4 py-3 font-medium text-gray-900">{{ $violation->nama_pelanggaran }}</td>
                         <td class="px-4 py-3">
-                            <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium {{ $categoryBadgeClasses[$violation->violation_category] ?? 'bg-gray-50 text-gray-700' }}">
-                                {{ $categoryLabels[$violation->violation_category] ?? '-' }}
+                            <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium {{ $categoryBadgeClasses[$violation->kategori_pelanggaran] ?? 'bg-gray-50 text-gray-700' }}">
+                                {{ $categoryLabels[$violation->kategori_pelanggaran] ?? '-' }}
                             </span>
                         </td>
-                        <td class="px-4 py-3 text-gray-700">-{{ $violation->point_deduction }} poin</td>
-                        <td class="px-4 py-3 text-gray-500">{{ $violation->recordedBy?->name ?? '-' }}</td>
+                        <td class="px-4 py-3 text-gray-700">-{{ $violation->pengurangan_poin }} poin</td>
+                        <td class="px-4 py-3 text-gray-500">{{ $violation->dicatatOleh?->nama ?? '-' }}</td>
                         <td class="px-4 py-3">
                             <div class="flex items-center gap-2">
                                 <form method="POST" action="{{ route('kesiswaan.pelanggaran-siswa.approve', $violation) }}">
@@ -69,7 +69,7 @@
                                     </button>
                                 </form>
                                 <button type="button"
-                                        onclick="openTolakModal({{ $violation->id }}, '{{ addslashes($violation->studentProfile?->user?->name ?? 'siswa ini') }}')"
+                                        onclick="openTolakModal({{ $violation->id }}, '{{ addslashes($violation->profilSiswa?->pengguna?->nama ?? 'siswa ini') }}')"
                                         class="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-3 py-2 text-sm font-medium text-white hover:bg-red-700 transition-colors">
                                     Tolak
                                 </button>
@@ -98,10 +98,10 @@
         <form id="tolakForm" method="POST" class="px-5 py-4">
             @csrf
             @method('PUT')
-            <label for="rejection_reason" class="block text-sm font-medium text-gray-700">
+            <label for="alasan_penolakan" class="block text-sm font-medium text-gray-700">
                 Alasan Penolakan <span class="text-red-500">*</span>
             </label>
-            <textarea id="rejection_reason" name="rejection_reason" rows="3" required
+            <textarea id="alasan_penolakan" name="alasan_penolakan" rows="3" required
                       placeholder="Tuliskan alasan penolakan..."
                       class="mt-1.5 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/20"></textarea>
             <div class="mt-5 flex justify-end gap-3">
@@ -130,7 +130,7 @@
     function openTolakModal(id, studentName) {
         document.getElementById('tolakForm').action = tolakRoutes[id];
         document.getElementById('tolakStudentName').textContent = studentName;
-        document.getElementById('rejection_reason').value = '';
+        document.getElementById('alasan_penolakan').value = '';
         const modal = document.getElementById('tolakModal');
         modal.classList.remove('hidden');
         modal.classList.add('flex');

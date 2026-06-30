@@ -23,10 +23,10 @@
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
                 <label for="name" class="block text-sm font-medium text-gray-700">Nama <span class="text-red-500">*</span></label>
-                <input id="name" type="text" name="name" value="{{ old('name') }}" required
+                <input id="name" type="text" name="nama" value="{{ old('nama') }}" required
                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                               placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
-                @error('name')
+                @error('nama')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
@@ -63,37 +63,37 @@
 
             <div>
                 <label for="class_id" class="block text-sm font-medium text-gray-700">Kelas</label>
-                <select id="class_id" name="class_id"
+                <select id="class_id" name="kelas_id"
                         class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                                focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                     <option value="">Pilih kelas</option>
                     @foreach ($classes as $class)
-                        <option value="{{ $class->id }}" {{ old('class_id') == $class->id ? 'selected' : '' }}>
-                            {{ $class->name }} (Tingkat {{ $class->grade }})
+                        <option value="{{ $class->id }}" {{ old('kelas_id') == $class->id ? 'selected' : '' }}>
+                            {{ $class->nama }} (Tingkat {{ $class->tingkat }})
                         </option>
                     @endforeach
                 </select>
-                @error('class_id')
+                @error('kelas_id')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
 
             <div>
                 <label for="phone" class="block text-sm font-medium text-gray-700">Telepon</label>
-                <input id="phone" type="text" name="phone" value="{{ old('phone') }}"
+                <input id="phone" type="text" name="telepon" value="{{ old('telepon') }}"
                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                               placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
-                @error('phone')
+                @error('telepon')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
 
             <div class="md:col-span-2">
                 <label for="address" class="block text-sm font-medium text-gray-700">Alamat</label>
-                <textarea id="address" name="address" rows="3"
+                <textarea id="address" name="alamat" rows="3"
                           class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
-                                 placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">{{ old('address') }}</textarea>
-                @error('address')
+                                 placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">{{ old('alamat') }}</textarea>
+                @error('alamat')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>

@@ -3,7 +3,7 @@
 @section('title', 'Dashboard Guru')
 
 @section('content')
-<x-page-header title="Dashboard Guru" :description="'Selamat datang, '.auth()->user()->name.'!'" />
+<x-page-header title="Dashboard Guru" :description="'Selamat datang, '.auth()->user()->nama.'!'" />
 
 @if (! empty($summary['homeroom']))
     <div class="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">

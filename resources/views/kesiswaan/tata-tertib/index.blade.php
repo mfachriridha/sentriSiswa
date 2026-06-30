@@ -12,20 +12,20 @@
     <form method="POST" action="{{ route('kesiswaan.tata-tertib.store') }}" enctype="multipart/form-data" class="grid gap-4 lg:grid-cols-4">
         @csrf
         <div class="lg:col-span-2">
-            <label for="title" class="block text-sm font-medium text-gray-700">Judul</label>
-            <input id="title" name="title" type="text" value="{{ old('title', 'Tata Tertib Sekolah') }}"
+            <label for="judul" class="block text-sm font-medium text-gray-700">Judul</label>
+            <input id="judul" name="judul" type="text" value="{{ old('judul', 'Tata Tertib Sekolah') }}"
                    class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
-            @error('title') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+            @error('judul') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
         </div>
         <div>
-            <label for="rule_pdf" class="block text-sm font-medium text-gray-700">File PDF</label>
-            <input id="rule_pdf" name="rule_pdf" type="file" accept="application/pdf"
+            <label for="file_pdf" class="block text-sm font-medium text-gray-700">File PDF</label>
+            <input id="file_pdf" name="file_pdf" type="file" accept="application/pdf"
                    class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
-            @error('rule_pdf') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+            @error('file_pdf') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
         </div>
         <div class="flex items-end gap-3">
             <label class="inline-flex items-center gap-2 text-sm text-gray-700">
-                <input type="checkbox" name="is_published" value="1" class="rounded border-gray-300 text-primary focus:ring-primary">
+                <input type="checkbox" name="dipublikasikan" value="1" class="rounded border-gray-300 text-primary focus:ring-primary">
                 Publikasikan
             </label>
             <button type="submit" class="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-dark">
@@ -50,18 +50,18 @@
                 @forelse ($schoolRules as $rule)
                     <tr>
                         <td class="px-4 py-3">
-                            <div class="font-medium text-gray-900">{{ $rule->title }}</div>
-                            <a href="{{ asset('storage/'.$rule->file_path) }}" target="_blank" class="text-xs font-medium text-primary hover:text-primary-dark">Preview PDF</a>
+                            <div class="font-medium text-gray-900">{{ $rule->judul }}</div>
+                            <a href="{{ asset('storage/'.$rule->path_file) }}" target="_blank" class="text-xs font-medium text-primary hover:text-primary-dark">Preview PDF</a>
                         </td>
                         <td class="px-4 py-3">
-                            <x-badge :variant="$rule->is_published ? 'success' : 'neutral'">
-                                {{ $rule->is_published ? 'Aktif' : 'Draft' }}
+                            <x-badge :variant="$rule->dipublikasikan ? 'success' : 'neutral'">
+                                {{ $rule->dipublikasikan ? 'Aktif' : 'Draft' }}
                             </x-badge>
                         </td>
-                        <td class="px-4 py-3 text-gray-600">{{ $rule->uploadedBy?->name ?? '-' }} · {{ $rule->created_at->translatedFormat('d F Y') }}</td>
+                        <td class="px-4 py-3 text-gray-600">{{ $rule->diunggahOleh?->nama ?? '-' }} · {{ $rule->created_at->translatedFormat('d F Y') }}</td>
                         <td class="px-4 py-3">
                             <div class="flex justify-end gap-2">
-                                @if ($rule->is_published)
+                                @if ($rule->dipublikasikan)
                                     <form method="POST" action="{{ route('kesiswaan.tata-tertib.unpublish', $rule) }}">
                                         @csrf
                                         @method('PUT')

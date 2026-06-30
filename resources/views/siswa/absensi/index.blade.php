@@ -48,8 +48,8 @@
             <div class="flex flex-col gap-5 sm:flex-row sm:items-start">
                 {{-- Selfie thumbnail --}}
                 <div class="shrink-0">
-                    @if($todayAttendance->selfie_path)
-                        <img src="{{ asset('storage/'.$todayAttendance->selfie_path) }}"
+                    @if($todayAttendance->path_selfie)
+                        <img src="{{ asset('storage/'.$todayAttendance->path_selfie) }}"
                              alt="Selfie absensi"
                              class="aspect-[3/4] w-28 rounded-xl border border-gray-200 object-cover shadow-sm">
                     @else
@@ -69,25 +69,25 @@
                     </div>
 
                     <div class="space-y-1.5 text-sm text-gray-500">
-                        @if($todayAttendance->check_in_time)
+                        @if($todayAttendance->waktu_masuk)
                             <div class="flex items-center gap-2">
                                 <svg class="h-4 w-4 shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
-                                <span>Absen pukul <strong class="text-gray-700">{{ $todayAttendance->check_in_time->format('H:i') }}</strong></span>
+                                <span>Absen pukul <strong class="text-gray-700">{{ $todayAttendance->waktu_masuk->format('H:i') }}</strong></span>
                             </div>
                         @endif
-                        @if($todayAttendance->distance_meters !== null)
+                        @if($todayAttendance->jarak_meter !== null)
                             <div class="flex items-center gap-2">
                                 <svg class="h-4 w-4 shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"/>
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                                 </svg>
                                 <span>
-                                    @if($todayAttendance->distance_meters == 0)
+                                    @if($todayAttendance->jarak_meter == 0)
                                         Di dalam area absensi
                                     @else
-                                        {{ number_format($todayAttendance->distance_meters, 0) }} m dari area absensi
+                                        {{ number_format($todayAttendance->jarak_meter, 0) }} m dari area absensi
                                     @endif
                                 </span>
                             </div>

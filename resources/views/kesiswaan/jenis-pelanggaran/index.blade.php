@@ -57,15 +57,15 @@
             <tbody class="divide-y divide-gray-100">
                 @forelse ($violationTypes as $violationType)
                     <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-3 font-medium text-gray-900">{{ $violationType->name }}</td>
+                        <td class="px-4 py-3 font-medium text-gray-900">{{ $violationType->nama }}</td>
                         <td class="px-4 py-3">
-                            <span class="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium {{ $categoryBadgeClasses[$violationType->category] ?? 'bg-gray-50 text-gray-700' }}">
-                                {{ $categoryLabels[$violationType->category] ?? '-' }}
+                            <span class="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium {{ $categoryBadgeClasses[$violationType->kategori] ?? 'bg-gray-50 text-gray-700' }}">
+                                {{ $categoryLabels[$violationType->kategori] ?? '-' }}
                             </span>
                         </td>
-                        <td class="px-4 py-3 text-gray-700">{{ $violationType->point_deduction }} poin</td>
+                        <td class="px-4 py-3 text-gray-700">{{ $violationType->pengurangan_poin }} poin</td>
                         <td class="px-4 py-3">
-                            @if ($violationType->is_active)
+                            @if ($violationType->aktif)
                                 <span class="inline-flex items-center rounded-full bg-green-50 px-3 py-1 text-sm font-medium text-green-700">Aktif</span>
                             @else
                                 <span class="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-600">Nonaktif</span>
@@ -92,7 +92,7 @@
                                         onclick="window.dispatchEvent(new CustomEvent('open-confirm-modal', {
                                             detail: {
                                                 title: 'Hapus Jenis Pelanggaran',
-                                                message: 'Yakin ingin menghapus {{ $violationType->name }}?',
+                                                message: 'Yakin ingin menghapus {{ $violationType->nama }}?',
                                                 formId: 'delete-violation-type-{{ $violationType->id }}'
                                             }
                                         }))"

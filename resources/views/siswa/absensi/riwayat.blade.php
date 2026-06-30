@@ -58,7 +58,7 @@
                     @endphp
                     <tr>
                         <td class="whitespace-nowrap px-4 py-4 text-sm font-medium text-gray-900">
-                            {{ $attendance->date->translatedFormat('d F Y') }}
+                            {{ $attendance->tanggal->translatedFormat('d F Y') }}
                         </td>
                         <td class="whitespace-nowrap px-4 py-4">
                             <span class="inline-flex rounded-full {{ $badgeClass }} px-3 py-1 text-sm font-semibold">
@@ -66,13 +66,13 @@
                             </span>
                         </td>
                         <td class="whitespace-nowrap px-4 py-4 text-sm text-gray-600">
-                            {{ $attendance->check_in_time?->format('H:i') ?? '-' }}
+                            {{ $attendance->waktu_masuk?->format('H:i') ?? '-' }}
                         </td>
                         <td class="whitespace-nowrap px-4 py-4">
-                            @if($attendance->selfie_path)
-                                <a href="{{ asset('storage/'.$attendance->selfie_path) }}" target="_blank" class="inline-block">
-                                    <img src="{{ asset('storage/'.$attendance->selfie_path) }}"
-                                         alt="Selfie absensi {{ $attendance->date->translatedFormat('d F Y') }}"
+                            @if($attendance->path_selfie)
+                                <a href="{{ asset('storage/'.$attendance->path_selfie) }}" target="_blank" class="inline-block">
+                                    <img src="{{ asset('storage/'.$attendance->path_selfie) }}"
+                                         alt="Selfie absensi {{ $attendance->tanggal->translatedFormat('d F Y') }}"
                                          class="h-14 w-14 rounded-lg border border-gray-200 object-cover">
                                 </a>
                             @else

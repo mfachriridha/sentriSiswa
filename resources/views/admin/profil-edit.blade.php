@@ -31,7 +31,7 @@
     <form method="POST" action="{{ route('admin.profil.update') }}" enctype="multipart/form-data" class="space-y-8"
           x-data="{
               loading: false,
-              photoPreview: @js($admin->photo ? asset('storage/'.$admin->photo) : ''),
+              photoPreview: @js($admin->foto ? asset('storage/'.$admin->foto) : ''),
               onPhotoChange(event) {
                   const file = event.target.files[0];
                   if (! file || ! file.type.startsWith('image/')) {
@@ -47,11 +47,11 @@
         <!-- Profile Photo Row -->
         <div class="flex flex-col gap-6 sm:flex-row sm:items-center">
             <template x-if="photoPreview">
-                <img :src="photoPreview" alt="{{ $admin->name }}" class="h-24 w-24 rounded-full border-4 border-slate-100 object-cover shadow-md">
+                <img :src="photoPreview" alt="{{ $admin->nama }}" class="h-24 w-24 rounded-full border-4 border-slate-100 object-cover shadow-md">
             </template>
             <template x-if="! photoPreview">
                 <div class="flex h-24 w-24 items-center justify-center rounded-full border-4 border-slate-100 bg-primary/10 text-3xl font-extrabold text-primary shadow-inner">
-                    {{ strtoupper(substr($admin->name, 0, 1)) }}
+                    {{ strtoupper(substr($admin->nama, 0, 1)) }}
                 </div>
             </template>
             <div>

@@ -5,7 +5,7 @@
 @section('content')
 <div class="mb-6">
     <h1 class="text-2xl font-bold text-gray-900">Rekap Absensi</h1>
-    <p class="mt-1 text-sm text-gray-500">Laporan absensi siswa kelas {{ $class->name }}</p>
+    <p class="mt-1 text-sm text-gray-500">Laporan absensi siswa kelas {{ $class->nama }}</p>
 </div>
 
 <div class="rounded-xl border border-gray-200 bg-white p-6">
@@ -13,20 +13,20 @@
         <form method="GET" action="{{ route('wali-kelas.absensi.index') }}" class="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
             <div>
                 <label for="start_date" class="block text-sm font-medium text-gray-700">Tanggal Mulai</label>
-                <input id="start_date" type="date" name="start_date" value="{{ $startDate }}"
+                <input id="start_date" type="date" name="mulai" value="{{ $startDate }}"
                        class="mt-1 w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
             </div>
             <div>
                 <label for="end_date" class="block text-sm font-medium text-gray-700">Tanggal Selesai</label>
-                <input id="end_date" type="date" name="end_date" value="{{ $endDate }}"
+                <input id="end_date" type="date" name="selesai" value="{{ $endDate }}"
                        class="mt-1 w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
             </div>
             <div>
                 <label for="student_id" class="block text-sm font-medium text-gray-700">Siswa</label>
-                <select id="student_id" name="student_id" class="mt-1 w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
+                <select id="student_id" name="profil_siswa_id" class="mt-1 w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
                     <option value="">Semua Siswa</option>
                     @foreach ($filterStudents as $filterStudent)
-                        <option value="{{ $filterStudent->id }}" {{ $selectedStudent == $filterStudent->id ? 'selected' : '' }}>{{ $filterStudent->user?->name }}</option>
+                        <option value="{{ $filterStudent->id }}" {{ $selectedStudent == $filterStudent->id ? 'selected' : '' }}>{{ $filterStudent->pengguna?->nama }}</option>
                     @endforeach
                 </select>
             </div>
@@ -56,10 +56,10 @@
         </div>
     </div>
 
-    @error('start_date')
+    @error('mulai')
         <p class="mb-4 text-sm text-red-600">{{ $message }}</p>
     @enderror
-    @error('end_date')
+    @error('selesai')
         <p class="mb-4 text-sm text-red-600">{{ $message }}</p>
     @enderror
 
@@ -86,7 +86,7 @@
                     <tr class="hover:bg-gray-50">
                         <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-900">{{ $index + 1 }}</td>
                         <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-500">{{ $student->nis ?? '-' }}</td>
-                        <td class="whitespace-nowrap px-4 py-3 text-sm font-medium text-gray-900">{{ $student->user->name }}</td>
+                        <td class="whitespace-nowrap px-4 py-3 text-sm font-medium text-gray-900">{{ $student->pengguna->nama }}</td>
                         <td class="whitespace-nowrap px-4 py-3 text-center text-sm font-medium text-green-600">{{ $stat['hadir'] }}</td>
                         <td class="whitespace-nowrap px-4 py-3 text-center text-sm font-medium text-amber-600">{{ $stat['terlambat'] }}</td>
                         <td class="whitespace-nowrap px-4 py-3 text-center text-sm font-medium text-blue-600">{{ $stat['izin'] }}</td>

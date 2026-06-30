@@ -60,11 +60,11 @@
                           focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors">
         </div>
 
-        <select name="class_id"
+        <select name="kelas_id"
                 class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-700 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors">
             <option value="">Semua Kelas</option>
             @foreach ($classes as $class)
-                <option value="{{ $class->id }}" {{ (string) $filterClass === (string) $class->id ? 'selected' : '' }}>{{ $class->name }}</option>
+                <option value="{{ $class->id }}" {{ (string) $filterClass === (string) $class->id ? 'selected' : '' }}>{{ $class->nama }}</option>
             @endforeach
         </select>
 
@@ -76,17 +76,17 @@
             @endforeach
         </select>
 
-        <select name="violation_type_id"
+        <select name="jenis_pelanggaran_id"
                 class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-700 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors">
             <option value="">Semua Jenis</option>
             @foreach ($violationTypes as $violationType)
                 <option value="{{ $violationType->id }}" {{ (string) $filterViolationType === (string) $violationType->id ? 'selected' : '' }}>
-                    {{ $violationType->name }} ({{ $violationType->point_deduction }} poin)
+                    {{ $violationType->nama }} ({{ $violationType->pengurangan_poin }} poin)
                 </option>
             @endforeach
         </select>
 
-        <input type="date" name="violation_date" value="{{ $filterDate }}"
+        <input type="date" name="tanggal_pelanggaran" value="{{ $filterDate }}"
                class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-700 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors">
 
         <select name="status"
@@ -131,19 +131,19 @@
             <tbody class="divide-y divide-gray-100">
                 @forelse ($studentViolations as $studentViolation)
                     <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-3 text-gray-700">{{ $studentViolation->violation_date?->translatedFormat('d F Y') }}</td>
+                        <td class="px-4 py-3 text-gray-700">{{ $studentViolation->tanggal_pelanggaran?->translatedFormat('d F Y') }}</td>
                         <td class="px-4 py-3">
-                            <p class="font-medium text-gray-900">{{ $studentViolation->studentProfile?->user?->name ?? '-' }}</p>
-                            <p class="mt-1 text-sm text-gray-500">NISN: {{ $studentViolation->studentProfile?->nisn ?? '-' }} · NIS: {{ $studentViolation->studentProfile?->nis ?? '-' }}</p>
+                            <p class="font-medium text-gray-900">{{ $studentViolation->profilSiswa?->pengguna?->nama ?? '-' }}</p>
+                            <p class="mt-1 text-sm text-gray-500">NISN: {{ $studentViolation->profilSiswa?->nisn ?? '-' }} · NIS: {{ $studentViolation->profilSiswa?->nis ?? '-' }}</p>
                         </td>
-                        <td class="px-4 py-3 text-gray-700">{{ $studentViolation->studentProfile?->class?->name ?? '-' }}</td>
-                        <td class="px-4 py-3 font-medium text-gray-900">{{ $studentViolation->violation_name }}</td>
+                        <td class="px-4 py-3 text-gray-700">{{ $studentViolation->profilSiswa?->kelas?->nama ?? '-' }}</td>
+                        <td class="px-4 py-3 font-medium text-gray-900">{{ $studentViolation->nama_pelanggaran }}</td>
                         <td class="px-4 py-3">
-                            <span class="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium {{ $categoryBadgeClasses[$studentViolation->violation_category] ?? 'bg-gray-50 text-gray-700' }}">
-                                {{ $categoryLabels[$studentViolation->violation_category] ?? '-' }}
+                            <span class="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium {{ $categoryBadgeClasses[$studentViolation->kategori_pelanggaran] ?? 'bg-gray-50 text-gray-700' }}">
+                                {{ $categoryLabels[$studentViolation->kategori_pelanggaran] ?? '-' }}
                             </span>
                         </td>
-                        <td class="px-4 py-3 text-gray-700">{{ $studentViolation->point_deduction }} poin</td>
+                        <td class="px-4 py-3 text-gray-700">{{ $studentViolation->pengurangan_poin }} poin</td>
                         <td class="px-4 py-3 text-gray-700">{{ $statusLabels[$studentViolation->status] ?? $studentViolation->status }}</td>
                         <td class="px-4 py-3">
                             <div class="flex items-center gap-2">
@@ -165,7 +165,7 @@
                                         onclick="window.dispatchEvent(new CustomEvent('open-confirm-modal', {
                                             detail: {
                                                 title: 'Hapus Pelanggaran Siswa',
-                                                message: 'Yakin ingin menghapus catatan pelanggaran {{ $studentViolation->studentProfile?->user?->name ?? 'siswa ini' }}?',
+                                                message: 'Yakin ingin menghapus catatan pelanggaran {{ $studentViolation->profilSiswa?->pengguna?->nama ?? 'siswa ini' }}?',
                                                 formId: 'delete-student-violation-{{ $studentViolation->id }}'
                                             }
                                         }))"

@@ -31,7 +31,7 @@
         <select name="class_id" class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary">
             <option value="">Semua Kelas</option>
             @foreach ($kelas as $k)
-                <option value="{{ $k->id }}" @selected(request('class_id') == $k->id)>{{ $k->name }}</option>
+                <option value="{{ $k->id }}" @selected(request('class_id') == $k->id)>{{ $k->nama }}</option>
             @endforeach
         </select>
     </div>
@@ -63,17 +63,17 @@
             <tbody class="divide-y divide-gray-100">
                 @forelse ($pesan as $p)
                 <tr class="hover:bg-gray-50">
-                    <td class="px-4 py-3 font-medium text-gray-800">{{ $p->schoolClass?->name ?? '-' }}</td>
+                    <td class="px-4 py-3 font-medium text-gray-800">{{ $p->kelas?->nama ?? '-' }}</td>
                     <td class="px-4 py-3">
-                        @if($p->message_type === 'test')
+                        @if($p->tipe_pesan === 'test')
                             <span class="inline-flex items-center rounded-full bg-purple-100 px-2 py-0.5 text-xs font-semibold text-purple-700">Test</span>
                         @else
                             <span class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700">Laporan</span>
                         @endif
                     </td>
                     <td class="px-4 py-3">
-                        <p class="font-medium text-gray-800">{{ $p->recipient_name ?? '-' }}</p>
-                        <p class="text-xs text-gray-500">{{ $p->recipient_phone }}</p>
+                        <p class="font-medium text-gray-800">{{ $p->nama_penerima ?? '-' }}</p>
+                        <p class="text-xs text-gray-500">{{ $p->telepon_penerima }}</p>
                     </td>
                     <td class="px-4 py-3">
                         @php
@@ -94,7 +94,7 @@
                         <span class="badge {{ $badge }} badge-sm">{{ $label }}</span>
                     </td>
                     <td class="px-4 py-3 text-gray-600">
-                        {{ $p->sent_at ? $p->sent_at->format('d/m/Y H:i') : '-' }}
+                        {{ $p->dikirim_pada ? $p->dikirim_pada->format('d/m/Y H:i') : '-' }}
                     </td>
                     <td class="px-4 py-3 text-gray-500 text-xs">
                         {{ $p->created_at->format('d/m/Y H:i') }}

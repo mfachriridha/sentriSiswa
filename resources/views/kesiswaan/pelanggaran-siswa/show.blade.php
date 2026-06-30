@@ -39,13 +39,13 @@
 
 <div class="rounded-xl border border-gray-200 bg-white p-6">
     <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-900">{{ $studentViolation->studentProfile?->user?->name ?? 'Siswa' }}</h1>
+        <h1 class="text-2xl font-bold text-gray-900">{{ $studentViolation->profilSiswa?->pengguna?->nama ?? 'Siswa' }}</h1>
         <div class="mt-3 flex flex-wrap items-center gap-2">
-            <span class="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium {{ $categoryBadgeClasses[$studentViolation->violation_category] ?? 'bg-gray-50 text-gray-700' }}">
-                {{ $categoryLabels[$studentViolation->violation_category] ?? '-' }}
+            <span class="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium {{ $categoryBadgeClasses[$studentViolation->kategori_pelanggaran] ?? 'bg-gray-50 text-gray-700' }}">
+                {{ $categoryLabels[$studentViolation->kategori_pelanggaran] ?? '-' }}
             </span>
             <span class="inline-flex items-center rounded-full bg-red-50 px-3 py-1 text-sm font-medium text-red-700">
-                {{ $studentViolation->point_deduction }} poin
+                {{ $studentViolation->pengurangan_poin }} poin
             </span>
             <span class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">
                 {{ $statusLabels[$studentViolation->status] ?? $studentViolation->status }}
@@ -56,56 +56,56 @@
     <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">Nama Siswa</p>
-            <p class="mt-1.5 text-sm text-gray-900">{{ $studentViolation->studentProfile?->user?->name ?? '-' }}</p>
+            <p class="mt-1.5 text-sm text-gray-900">{{ $studentViolation->profilSiswa?->pengguna?->nama ?? '-' }}</p>
         </div>
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">Kelas</p>
-            <p class="mt-1.5 text-sm text-gray-900">{{ $studentViolation->studentProfile?->class?->name ?? '-' }}</p>
+            <p class="mt-1.5 text-sm text-gray-900">{{ $studentViolation->profilSiswa?->kelas?->nama ?? '-' }}</p>
         </div>
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">NISN</p>
-            <p class="mt-1.5 text-sm text-gray-900">{{ $studentViolation->studentProfile?->nisn ?? '-' }}</p>
+            <p class="mt-1.5 text-sm text-gray-900">{{ $studentViolation->profilSiswa?->nisn ?? '-' }}</p>
         </div>
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">NIS</p>
-            <p class="mt-1.5 text-sm text-gray-900">{{ $studentViolation->studentProfile?->nis ?? '-' }}</p>
+            <p class="mt-1.5 text-sm text-gray-900">{{ $studentViolation->profilSiswa?->nis ?? '-' }}</p>
         </div>
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">Tanggal Pelanggaran</p>
-            <p class="mt-1.5 text-sm text-gray-900">{{ $studentViolation->violation_date?->translatedFormat('d F Y') ?? '-' }}</p>
+            <p class="mt-1.5 text-sm text-gray-900">{{ $studentViolation->tanggal_pelanggaran?->translatedFormat('d F Y') ?? '-' }}</p>
         </div>
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">Dicatat oleh</p>
-            <p class="mt-1.5 text-sm text-gray-900">{{ $studentViolation->recordedBy?->name ?? '-' }}</p>
+            <p class="mt-1.5 text-sm text-gray-900">{{ $studentViolation->dicatatOleh?->nama ?? '-' }}</p>
         </div>
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5 md:col-span-2">
             <p class="text-sm font-medium text-gray-500">Jenis Pelanggaran</p>
-            <p class="mt-1.5 text-sm text-gray-900">{{ $studentViolation->violation_name }}</p>
+            <p class="mt-1.5 text-sm text-gray-900">{{ $studentViolation->nama_pelanggaran }}</p>
         </div>
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">Kategori</p>
-            <p class="mt-1.5 text-sm text-gray-900">{{ $categoryLabels[$studentViolation->violation_category] ?? '-' }}</p>
+            <p class="mt-1.5 text-sm text-gray-900">{{ $categoryLabels[$studentViolation->kategori_pelanggaran] ?? '-' }}</p>
         </div>
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">Poin Pelanggaran</p>
-            <p class="mt-1.5 text-sm text-gray-900">{{ $studentViolation->point_deduction }} poin</p>
+            <p class="mt-1.5 text-sm text-gray-900">{{ $studentViolation->pengurangan_poin }} poin</p>
         </div>
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5 md:col-span-2">
             <p class="text-sm font-medium text-gray-500">Catatan</p>
-            <p class="mt-1.5 text-sm text-gray-900">{{ $studentViolation->notes ?? '-' }}</p>
+            <p class="mt-1.5 text-sm text-gray-900">{{ $studentViolation->catatan ?? '-' }}</p>
         </div>
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">Disetujui/Diproses oleh</p>
-            <p class="mt-1.5 text-sm text-gray-900">{{ $studentViolation->approvedBy?->name ?? '-' }}</p>
+            <p class="mt-1.5 text-sm text-gray-900">{{ $studentViolation->disetujuiOleh?->nama ?? '-' }}</p>
         </div>
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">Waktu Proses</p>
-            <p class="mt-1.5 text-sm text-gray-900">{{ $studentViolation->approved_at?->translatedFormat('d F Y H:i') ?? '-' }}</p>
+            <p class="mt-1.5 text-sm text-gray-900">{{ $studentViolation->disetujui_pada?->translatedFormat('d F Y H:i') ?? '-' }}</p>
         </div>
-        @if ($studentViolation->rejection_reason)
+        @if ($studentViolation->alasan_penolakan)
             <div class="rounded-lg border border-red-100 bg-red-50 p-5 md:col-span-2">
                 <p class="text-sm font-medium text-red-700">Alasan Penolakan</p>
-                <p class="mt-1.5 text-sm text-red-700">{{ $studentViolation->rejection_reason }}</p>
+                <p class="mt-1.5 text-sm text-red-700">{{ $studentViolation->alasan_penolakan }}</p>
             </div>
         @endif
     </div>
@@ -117,9 +117,9 @@
         <form method="POST" action="{{ route('kesiswaan.pelanggaran-siswa.reject', $studentViolation) }}" class="mt-4 space-y-3">
             @csrf
             @method('PUT')
-            <textarea name="rejection_reason" rows="3" placeholder="Tuliskan alasan penolakan"
-                      class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">{{ old('rejection_reason') }}</textarea>
-            @error('rejection_reason') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
+            <textarea name="alasan_penolakan" rows="3" placeholder="Tuliskan alasan penolakan"
+                      class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">{{ old('alasan_penolakan') }}</textarea>
+            @error('alasan_penolakan') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
             <button class="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700">Tolak Pengajuan</button>
         </form>
     </div>

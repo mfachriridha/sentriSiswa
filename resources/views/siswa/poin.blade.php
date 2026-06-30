@@ -53,21 +53,21 @@
                 @forelse ($violations as $violation)
                     <tr class="hover:bg-gray-50 transition-colors">
                         <td class="whitespace-nowrap px-4 py-3 text-gray-700">
-                            {{ Carbon\Carbon::parse($violation->violation_date)->translatedFormat('d F Y') }}
+                            {{ Carbon\Carbon::parse($violation->tanggal_pelanggaran)->translatedFormat('d F Y') }}
                         </td>
-                        <td class="px-4 py-3 font-medium text-gray-900">{{ $violation->violation_name }}</td>
+                        <td class="px-4 py-3 font-medium text-gray-900">{{ $violation->nama_pelanggaran }}</td>
                         <td class="hidden px-4 py-3 md:table-cell">
                             @php
                                 $catLabels = ['light' => 'Ringan', 'medium' => 'Sedang', 'heavy' => 'Berat', 'severe' => 'Sangat Berat'];
                                 $catBadges = ['light' => 'bg-green-50 text-green-700', 'medium' => 'bg-amber-50 text-amber-700', 'heavy' => 'bg-orange-50 text-orange-700', 'severe' => 'bg-red-50 text-red-700'];
-                                $cat = $violation->violation_category;
+                                $cat = $violation->kategori_pelanggaran;
                             @endphp
                             <span class="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium {{ $catBadges[$cat] ?? 'bg-gray-50 text-gray-700' }}">
                                 {{ $catLabels[$cat] ?? '-' }}
                             </span>
                         </td>
-                        <td class="px-4 py-3 text-center font-bold text-red-600">-{{ $violation->point_deduction }}</td>
-                        <td class="hidden px-4 py-3 text-gray-600 lg:table-cell">{{ $violation->notes ?? '-' }}</td>
+                        <td class="px-4 py-3 text-center font-bold text-red-600">-{{ $violation->pengurangan_poin }}</td>
+                        <td class="hidden px-4 py-3 text-gray-600 lg:table-cell">{{ $violation->catatan ?? '-' }}</td>
                     </tr>
                 @empty
                     <tr>
