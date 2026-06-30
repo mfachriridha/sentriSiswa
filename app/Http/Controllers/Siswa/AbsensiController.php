@@ -69,6 +69,17 @@ class AbsensiController extends Controller
         ));
     }
 
+    public function statusHariIni(): JsonResponse
+    {
+        $profile = Auth::user()->studentProfile;
+        $absensi = $profile?->attendances()->where('date', now()->toDateString())->first();
+
+        return response()->json([
+            'sudah_absen' => $absensi && $absensi->status !== 'belum_absen',
+            'status' => $absensi?->status ?? 'belum_absen',
+        ]);
+    }
+
     public function checkLocation(Request $request): JsonResponse
     {
         $validated = $request->validate([

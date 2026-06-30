@@ -612,6 +612,20 @@
             },
         };
     }
+
+    // Polling: reload otomatis jika status absensi berubah (mis. wali kelas ubah status manual)
+    @if(!$todayAttendance || $todayAttendance->status === 'belum_absen')
+    (function () {
+        const url = "{{ route('siswa.absensi.status') }}";
+        setInterval(async function () {
+            try {
+                const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                const data = await res.json();
+                if (data.sudah_absen) location.reload();
+            } catch {}
+        }, 15000);
+    })();
+    @endif
 </script>
 @endpush
 @endsection

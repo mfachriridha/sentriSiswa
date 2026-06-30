@@ -10,6 +10,7 @@ use App\Models\SchoolClass;
 use App\Models\StudentProfile;
 use App\Models\StudentViolation;
 use App\Models\ViolationType;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -173,6 +174,13 @@ class StudentViolationController extends Controller
         $studentViolation->delete();
 
         return redirect()->route('kesiswaan.pelanggaran-siswa.index')->with('success', 'Pelanggaran siswa berhasil dihapus.');
+    }
+
+    public function pendingCount(): JsonResponse
+    {
+        $count = StudentViolation::where('status', 'pending')->count();
+
+        return response()->json(['pending' => $count]);
     }
 
     private function students(): Collection

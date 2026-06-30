@@ -17,9 +17,9 @@ class FonnteService
 
     private const CONNECT_TIMEOUT_SECONDS = 10;
 
-    private const DELAY_MIN_SECONDS = 8;
+    private const DELAY_MIN_SECONDS = 15;
 
-    private const DELAY_MAX_SECONDS = 15;
+    private const DELAY_MAX_SECONDS = 30;
 
     public function isConfigured(): bool
     {

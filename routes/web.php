@@ -136,6 +136,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 Route::middleware(['auth', 'registered', 'wali-kelas'])->prefix('wali-kelas')->name('wali-kelas.')->group(function () {
     Route::get('/dashboard', [WaliKelasDashboardController::class, 'index'])->name('dashboard');
     Route::get('/kelas-saya', [KelasSayaController::class, 'index'])->name('kelas-saya');
+    Route::get('/kelas-saya/status-absensi', [KelasSayaController::class, 'statusAbsensi'])->name('kelas-saya.status-absensi');
     Route::get('/kelas-saya/{studentProfile}', [KelasSayaController::class, 'show'])->name('kelas-saya.show');
     Route::put('/kelas-saya/{studentProfile}/absensi', [KelasSayaController::class, 'updateAttendance'])->name('kelas-saya.absensi.update');
     Route::get('/absensi', [WaliKelasAbsensiController::class, 'index'])->name('absensi.index');
@@ -170,6 +171,7 @@ Route::middleware(['auth', 'registered', 'kesiswaan'])->prefix('kesiswaan')->nam
     Route::get('/dashboard', [KesiswaanDashboardController::class, 'index'])->name('dashboard');
     Route::get('/monitoring', [KesiswaanMonitoringController::class, 'index'])->name('monitoring.index');
     Route::get('/monitoring/{monitoring}', [KesiswaanMonitoringController::class, 'show'])->name('monitoring.show');
+    Route::get('/pelanggaran-siswa/pending-count', [PelanggaranSiswaController::class, 'pendingCount'])->name('pelanggaran-siswa.pending-count');
     Route::put('/pelanggaran-siswa/{studentViolation}/approve', [PelanggaranSiswaController::class, 'approve'])->name('pelanggaran-siswa.approve');
     Route::put('/pelanggaran-siswa/{studentViolation}/reject', [PelanggaranSiswaController::class, 'reject'])->name('pelanggaran-siswa.reject');
     Route::resource('pelanggaran-siswa', PelanggaranSiswaController::class)
@@ -197,6 +199,7 @@ Route::middleware(['auth', 'registered', 'siswa'])->prefix('siswa')->name('siswa
     Route::get('/poin', [SiswaProfilController::class, 'poin'])->name('poin');
     Route::get('/tata-tertib', [SiswaSchoolRuleController::class, 'index'])->name('tata-tertib.index');
     Route::get('/absensi', [SiswaAbsensiController::class, 'index'])->name('absensi');
+    Route::get('/absensi/status', [SiswaAbsensiController::class, 'statusHariIni'])->name('absensi.status');
     Route::post('/absensi/cek-lokasi', [SiswaAbsensiController::class, 'checkLocation'])->name('absensi.check-location');
     Route::post('/absensi', [SiswaAbsensiController::class, 'store'])->name('absensi.store');
     Route::get('/absensi/riwayat', [SiswaAbsensiController::class, 'riwayat'])->name('absensi.riwayat');

@@ -3,9 +3,20 @@
 @section('title', 'Kelas Saya')
 
 @section('content')
-<div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-900">Kelas Saya</h1>
-    <p class="mt-1 text-sm text-gray-500">Pantau absensi hari ini untuk kelas {{ $class->name }}</p>
+<div class="mb-6 flex items-start justify-between gap-4 flex-wrap">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-900">Kelas Saya</h1>
+        <p class="mt-1 text-sm text-gray-500">Pantau absensi hari ini untuk kelas {{ $class->name }}</p>
+    </div>
+    @if($isWeekday && $stats['belum_absen'] > 0)
+    <span class="inline-flex items-center gap-1.5 text-xs text-green-600 font-medium mt-1">
+        <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+        </span>
+        Live · Auto-refresh 30 detik
+    </span>
+    @endif
 </div>
 
 <x-alert type="success" :message="session('success')" />
@@ -207,6 +218,25 @@
 
 @push('scripts')
 <script>
+    // Polling status absensi setiap 30 detik (hanya jika masih ada yang belum absen)
+    @if($isWeekday && $stats['belum_absen'] > 0)
+    (function () {
+        const statusUrl = "{{ route('wali-kelas.kelas-saya.status-absensi') }}";
+        let timer = setInterval(async function () {
+            try {
+                const res = await fetch(statusUrl, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                const data = await res.json();
+                if (data.stats && data.stats.belum_absen === 0) {
+                    clearInterval(timer);
+                }
+                if (data.stats && data.stats.belum_absen !== {{ $stats['belum_absen'] }}) {
+                    location.reload();
+                }
+            } catch {}
+        }, 30000);
+    })();
+    @endif
+
     function openEditModal(updateUrl, currentStatus, studentName) {
         document.getElementById('editForm').action = updateUrl;
         document.getElementById('status').value = currentStatus;

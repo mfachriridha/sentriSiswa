@@ -7,6 +7,7 @@ use App\Http\Requests\Guru\UpdateDailyAttendanceRequest;
 use App\Models\Attendance;
 use App\Models\StudentProfile;
 use App\Services\AbsenceWarningService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -62,6 +63,36 @@ class ClassRosterController extends Controller
         $warningThreshold = AbsenceWarningService::Threshold;
 
         return view('wali-kelas.kelas-saya.index', compact('class', 'students', 'attendances', 'stats', 'isWeekday', 'alphaWarnings', 'warningThreshold'));
+    }
+
+    public function statusAbsensi(): JsonResponse
+    {
+        $class = Auth::user()->homeroomClass;
+
+        if (! $class) {
+            return response()->json(['stats' => [], 'rows' => []]);
+        }
+
+        $today = now()->toDateString();
+        $studentIds = $class->students()->pluck('student_profiles.id');
+        $attendances = Attendance::whereIn('student_profile_id', $studentIds)
+            ->whereDate('date', $today)
+            ->get()
+            ->keyBy('student_profile_id');
+
+        $stats = ['hadir' => 0, 'terlambat' => 0, 'izin' => 0, 'sakit' => 0, 'alpha' => 0, 'belum_absen' => 0];
+        foreach ($studentIds as $id) {
+            $status = $attendances->get($id)?->status ?? 'belum_absen';
+            $stats[$status]++;
+        }
+
+        $rows = $class->students()->with('user')->get()->map(fn ($sp) => [
+            'id' => $sp->id,
+            'status' => $attendances->get($sp->id)?->status ?? 'belum_absen',
+            'check_in_time' => $attendances->get($sp->id)?->check_in_time,
+        ]);
+
+        return response()->json(compact('stats', 'rows'));
     }
 
     public function updateAttendance(UpdateDailyAttendanceRequest $request, StudentProfile $studentProfile): RedirectResponse

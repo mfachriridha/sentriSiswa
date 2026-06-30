@@ -183,3 +183,20 @@
     @endif
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    // Poll pending violations count every 60s and reload if changed
+    (function () {
+        const url = "{{ route('kesiswaan.pelanggaran-siswa.pending-count') }}";
+        const currentPending = {{ \App\Models\StudentViolation::where('status','pending')->count() }};
+        setInterval(async function () {
+            try {
+                const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                const data = await res.json();
+                if (data.pending !== currentPending) location.reload();
+            } catch {}
+        }, 60000);
+    })();
+</script>
+@endpush
