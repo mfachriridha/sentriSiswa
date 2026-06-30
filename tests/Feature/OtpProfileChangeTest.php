@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Mail;
 
 uses(RefreshDatabase::class);
 
-test('admin can update whatsapp number without OTP but updating email redirects to OTP', function () {
+test('admin can update whatsapp number and email directly without OTP', function () {
     Mail::fake();
 
     $admin = Pengguna::factory()->create([
@@ -31,16 +31,17 @@ test('admin can update whatsapp number without OTP but updating email redirects 
     $admin->refresh();
     expect($admin->nomor_wa)->toBe('081234567890');
 
-    // Update Email
+    // Admin email change is direct (no OTP) so admin can fix seeder emails
     $this->actingAs($admin)
         ->put(route('admin.profil.update'), [
             'email' => 'new-admin-email@example.com',
             'whatsapp_number' => '081234567890',
         ])
-        ->assertRedirect(route('otp.show'));
+        ->assertRedirect(route('admin.profil'))
+        ->assertSessionHas('success', 'Profil admin berhasil diperbarui.');
 
-    expect(session('otp_type'))->toBe('email_change');
-    expect(session('otp_pending.new_email'))->toBe('new-admin-email@example.com');
+    $admin->refresh();
+    expect($admin->email)->toBe('new-admin-email@example.com');
 });
 
 test('teacher updating phone is immediate but email/password change generates OTP', function () {
