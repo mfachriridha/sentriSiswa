@@ -1,0 +1,166 @@
+<?php
+
+namespace App\Models;
+
+use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+
+#[Fillable(['nama', 'email', 'password', 'peran', 'status', 'foto', 'nomor_wa', 'id_google'])]
+#[Hidden(['password', 'remember_token'])]
+class Pengguna extends Authenticatable
+{
+    /** @use HasFactory<UserFactory> */
+    use HasFactory, Notifiable;
+
+    protected $table = 'pengguna';
+
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+            'status' => 'string',
+        ];
+    }
+
+    public function isRegistered(): bool
+    {
+        return $this->status === 'registered';
+    }
+
+    public function hasGoogleLinked(): bool
+    {
+        return $this->id_google !== null;
+    }
+
+    public function hasPassword(): bool
+    {
+        return $this->password !== null;
+    }
+
+    public function needsAdminSetup(): bool
+    {
+        return $this->isAdmin() && $this->email_verified_at === null;
+    }
+
+    public function profilGuru(): HasOne
+    {
+        return $this->hasOne(ProfilGuru::class, 'pengguna_id');
+    }
+
+    public function profilSiswa(): HasOne
+    {
+        return $this->hasOne(ProfilSiswa::class, 'pengguna_id');
+    }
+
+    public function kelasWali(): HasOne
+    {
+        return $this->hasOne(Kelas::class, 'wali_kelas_id');
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->peran === 'admin';
+    }
+
+    public function isGuru(): bool
+    {
+        return in_array($this->peran, ['wali_kelas', 'bk', 'kesiswaan'], true);
+    }
+
+    public function isWaliKelas(): bool
+    {
+        return $this->peran === 'wali_kelas';
+    }
+
+    public function isBk(): bool
+    {
+        return $this->peran === 'bk';
+    }
+
+    public function isKesiswaan(): bool
+    {
+        return $this->peran === 'kesiswaan';
+    }
+
+    public function isSiswa(): bool
+    {
+        return $this->peran === 'siswa';
+    }
+
+    public function isTeacher(): bool
+    {
+        return $this->isGuru();
+    }
+
+    public function isHomeroom(): bool
+    {
+        return $this->isWaliKelas();
+    }
+
+    public function isCounselor(): bool
+    {
+        return $this->isBk();
+    }
+
+    public function isStudentAffairs(): bool
+    {
+        return $this->isKesiswaan();
+    }
+
+    public function isStudent(): bool
+    {
+        return $this->isSiswa();
+    }
+
+    public function dashboardRouteName(): string
+    {
+        return match ($this->peran) {
+            'admin' => 'admin.dashboard',
+            'wali_kelas' => 'wali-kelas.dashboard',
+            'bk' => 'bk.dashboard',
+            'kesiswaan' => 'kesiswaan.dashboard',
+            'siswa' => 'siswa.dashboard',
+            default => 'login',
+        };
+    }
+
+    public function roleLabel(): string
+    {
+        return match ($this->peran) {
+            'admin' => 'Admin',
+            'wali_kelas' => 'Wali Kelas',
+            'bk' => 'BK',
+            'kesiswaan' => 'Kesiswaan',
+            'siswa' => 'Siswa',
+            default => 'Pengguna',
+        };
+    }
+
+    public function profilRouteName(string $action = 'show'): string
+    {
+        $prefix = match ($this->peran) {
+            'admin' => 'admin',
+            'wali_kelas' => 'wali-kelas',
+            'bk' => 'bk',
+            'kesiswaan' => 'kesiswaan',
+            'siswa' => 'siswa',
+            default => 'login',
+        };
+
+        if ($prefix === 'login') {
+            return 'login';
+        }
+
+        return match ($action) {
+            'edit' => "{$prefix}.profil.edit",
+            'update' => "{$prefix}.profil.update",
+            default => "{$prefix}.profil",
+        };
+    }
+}

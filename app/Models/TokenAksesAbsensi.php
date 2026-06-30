@@ -10,27 +10,27 @@ class TokenAksesAbsensi extends Model
 {
     protected $table = 'token_akses_absensi';
 
-    protected $fillable = ['token', 'class_id', 'tanggal', 'expires_at'];
+    protected $fillable = ['token', 'kelas_id', 'tanggal', 'kadaluwarsa_pada'];
 
-    protected $casts = ['tanggal' => 'date', 'expires_at' => 'datetime'];
+    protected $casts = ['tanggal' => 'date', 'kadaluwarsa_pada' => 'datetime'];
 
     public function kelas(): BelongsTo
     {
-        return $this->belongsTo(SchoolClass::class, 'class_id');
+        return $this->belongsTo(Kelas::class, 'kelas_id');
     }
 
     public function sudahExpired(): bool
     {
-        return $this->expires_at->isPast();
+        return $this->kadaluwarsa_pada->isPast();
     }
 
-    public static function buatAtauPerbarui(int $classId, string $tanggal): self
+    public static function buatAtauPerbarui(int $kelasId, string $tanggal): self
     {
         return static::updateOrCreate(
-            ['class_id' => $classId, 'tanggal' => $tanggal],
+            ['kelas_id' => $kelasId, 'tanggal' => $tanggal],
             [
                 'token' => Str::random(64),
-                'expires_at' => now()->endOfDay(),
+                'kadaluwarsa_pada' => now()->endOfDay(),
             ]
         );
     }

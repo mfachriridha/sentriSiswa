@@ -2,14 +2,14 @@
 
 namespace Database\Seeders;
 
-use App\Models\Attendance;
-use App\Models\SchoolClass;
-use App\Models\SchoolRule;
-use App\Models\StudentBiodata;
-use App\Models\StudentProfile;
-use App\Models\StudentViolation;
-use App\Models\User;
-use App\Models\ViolationType;
+use App\Models\Absensi;
+use App\Models\BiodataSiswa;
+use App\Models\JenisPelanggaran;
+use App\Models\Kelas;
+use App\Models\PelanggaranSiswa;
+use App\Models\Pengguna;
+use App\Models\ProfilSiswa;
+use App\Models\TataTertib;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -39,7 +39,7 @@ class DemoSchoolSeeder extends Seeder
         $this->createSchoolRule();
     }
 
-    /** @return array<string, User> keyed by slug e.g. "10.ipa1" */
+    /** @return array<string, Pengguna> keyed by slug e.g. "10.ipa1" */
     private function createHomeroomTeachers(): array
     {
         $teacherData = [
@@ -60,27 +60,27 @@ class DemoSchoolSeeder extends Seeder
         $teachers = [];
         $nip = 1;
 
-        foreach ($teacherData as $slug => [$name, $grade]) {
+        foreach ($teacherData as $slug => [$nama, $tingkat]) {
             $emailSlug = str_replace('.', '-', $slug);
-            $teacher = User::create([
-                'name' => $name,
+            $guru = Pengguna::create([
+                'nama' => $nama,
                 'email' => "wali.{$emailSlug}@sentrisiswa.test",
                 'password' => Hash::make('password'),
-                'role' => 'wali_kelas',
+                'peran' => 'wali_kelas',
                 'status' => 'registered',
             ]);
 
-            $profile = $teacher->teacherProfile()->create([
+            $profil = $guru->profilGuru()->create([
                 'nip' => sprintf('197%02d0000000000', $nip++),
-                'phone' => sprintf('628121%05d', $nip),
-                'teacher_type' => 'homeroom',
-                'grade' => $grade,
+                'telepon' => sprintf('628121%05d', $nip),
+                'tipe_guru' => 'homeroom',
+                'tingkat' => $tingkat,
             ]);
 
-            $photoPath = $this->generateTeacherPhoto($teacher->id, $name);
-            $profile->update(['photo' => $photoPath]);
+            $photoPath = $this->generateTeacherPhoto($guru->id, $nama);
+            $profil->update(['foto' => $photoPath]);
 
-            $teachers[$slug] = $teacher;
+            $teachers[$slug] = $guru;
         }
 
         return $teachers;
@@ -94,51 +94,51 @@ class DemoSchoolSeeder extends Seeder
             '12' => 'Yusuf Firmansyah',
         ];
 
-        foreach ($counselors as $grade => $name) {
-            $grade = (string) $grade;
-            $teacher = User::create([
-                'name' => $name,
-                'email' => "bk{$grade}@sentrisiswa.test",
+        foreach ($counselors as $tingkat => $nama) {
+            $tingkat = (string) $tingkat;
+            $guru = Pengguna::create([
+                'nama' => $nama,
+                'email' => "bk{$tingkat}@sentrisiswa.test",
                 'password' => Hash::make('password'),
-                'role' => 'bk',
+                'peran' => 'bk',
                 'status' => 'registered',
             ]);
 
-            $profile = $teacher->teacherProfile()->create([
-                'nip' => "19{$grade}9000000000",
-                'phone' => "62813{$grade}000000",
-                'teacher_type' => 'counselor',
-                'grade' => $grade,
+            $profil = $guru->profilGuru()->create([
+                'nip' => "19{$tingkat}9000000000",
+                'telepon' => "62813{$tingkat}000000",
+                'tipe_guru' => 'counselor',
+                'tingkat' => $tingkat,
             ]);
 
-            $photoPath = $this->generateTeacherPhoto($teacher->id, $name);
-            $profile->update(['photo' => $photoPath]);
+            $photoPath = $this->generateTeacherPhoto($guru->id, $nama);
+            $profil->update(['foto' => $photoPath]);
         }
     }
 
     private function createStudentAffairs(): void
     {
-        $teacher = User::create([
-            'name' => 'Hendra Saputra',
+        $guru = Pengguna::create([
+            'nama' => 'Hendra Saputra',
             'email' => 'kesiswaan@sentrisiswa.test',
             'password' => Hash::make('password'),
-            'role' => 'kesiswaan',
+            'peran' => 'kesiswaan',
             'status' => 'registered',
         ]);
 
-        $profile = $teacher->teacherProfile()->create([
+        $profil = $guru->profilGuru()->create([
             'nip' => '19990000000000',
-            'phone' => '6281399000000',
-            'teacher_type' => 'student_affairs',
+            'telepon' => '6281399000000',
+            'tipe_guru' => 'student_affairs',
         ]);
 
-        $photoPath = $this->generateTeacherPhoto($teacher->id, $teacher->name);
-        $profile->update(['photo' => $photoPath]);
+        $photoPath = $this->generateTeacherPhoto($guru->id, $guru->nama);
+        $profil->update(['foto' => $photoPath]);
     }
 
     /**
-     * @param  array<string, User>  $homerooms
-     * @return array<int, SchoolClass>
+     * @param  array<string, Pengguna>  $homerooms
+     * @return array<int, Kelas>
      */
     private function createClasses(array $homerooms): array
     {
@@ -159,11 +159,11 @@ class DemoSchoolSeeder extends Seeder
 
         $classes = [];
 
-        foreach ($classConfig as [$grade, $roman, $jurusan, $number, $slug]) {
-            $classes[] = SchoolClass::create([
-                'name' => "{$roman} {$jurusan} {$number}",
-                'grade' => $grade,
-                'homeroom_teacher_id' => $homerooms[$slug]->id,
+        foreach ($classConfig as [$tingkat, $roman, $jurusan, $nomor, $slug]) {
+            $classes[] = Kelas::create([
+                'nama' => "{$roman} {$jurusan} {$nomor}",
+                'tingkat' => $tingkat,
+                'wali_kelas_id' => $homerooms[$slug]->id,
             ]);
         }
 
@@ -171,8 +171,8 @@ class DemoSchoolSeeder extends Seeder
     }
 
     /**
-     * @param  array<int, SchoolClass>  $classes
-     * @return array<int, StudentProfile>
+     * @param  array<int, Kelas>  $classes
+     * @return array<int, ProfilSiswa>
      */
     private function createStudents(array $classes): array
     {
@@ -212,57 +212,56 @@ class DemoSchoolSeeder extends Seeder
 
         $nameIndex = 0;
 
-        foreach ($classes as $class) {
+        foreach ($classes as $kelas) {
             for ($slot = 1; $slot <= 3; $slot++) {
                 $nis = sprintf('%05d', $sequence);
-                $name = $names[$nameIndex] ?? "Siswa {$sequence}";
+                $nama = $names[$nameIndex] ?? "Siswa {$sequence}";
                 $street = $streets[($sequence - 1) % count($streets)];
-                // Siswa ke-3 di tiap kelas = unregistered (belum buat akun)
                 $isUnregistered = $slot === 3;
 
-                $user = User::create([
-                    'name' => $name,
+                $pengguna = Pengguna::create([
+                    'nama' => $nama,
                     'email' => $isUnregistered ? null : "siswa{$nis}@sentrisiswa.test",
                     'password' => Hash::make('password'),
-                    'role' => 'siswa',
+                    'peran' => 'siswa',
                     'status' => $isUnregistered ? 'unregistered' : 'registered',
                 ]);
 
-                $profile = StudentProfile::create([
-                    'user_id' => $user->id,
+                $profil = ProfilSiswa::create([
+                    'pengguna_id' => $pengguna->id,
                     'nisn' => sprintf('00%08d', $sequence),
                     'nis' => $nis,
-                    'class_id' => $class->id,
-                    'phone' => "0812{$nis}",
-                    'address' => $street . ', Kelurahan Sentri',
+                    'kelas_id' => $kelas->id,
+                    'telepon' => "0812{$nis}",
+                    'alamat' => $street . ', Kelurahan Sentri',
                 ]);
 
-                StudentBiodata::create([
-                    'student_profile_id' => $profile->id,
-                    'place_of_birth' => $birthPlaces[($sequence - 1) % count($birthPlaces)],
-                    'date_of_birth' => now()->subYears(16)->subDays($sequence)->toDateString(),
-                    'gender' => $slot % 2 === 0 ? 'P' : 'L',
-                    'religion' => 'Islam',
-                    'family_status' => 'Kandung',
-                    'child_number' => $slot,
-                    'school_of_origin' => 'SMP Nusantara',
-                    'admission_date' => now()->subYear()->startOfMonth()->toDateString(),
-                    'father_name' => "Bapak dari {$name}",
-                    'father_occupation' => $occupations[($sequence - 1) % count($occupations)],
-                    'mother_name' => "Ibu dari {$name}",
-                    'mother_occupation' => 'Ibu Rumah Tangga',
-                    'parent_address' => $street . ', Kelurahan Sentri',
-                    'parent_phone' => "0821{$nis}",
-                    'guardian_name' => "Wali dari {$name}",
-                    'guardian_occupation' => $occupations[$sequence % count($occupations)],
-                    'guardian_address' => $street . ', Kelurahan Sentri',
-                    'guardian_phone' => "0831{$nis}",
+                BiodataSiswa::create([
+                    'profil_siswa_id' => $profil->id,
+                    'tempat_lahir' => $birthPlaces[($sequence - 1) % count($birthPlaces)],
+                    'tanggal_lahir' => now()->subYears(16)->subDays($sequence)->toDateString(),
+                    'jenis_kelamin' => $slot % 2 === 0 ? 'P' : 'L',
+                    'agama' => 'Islam',
+                    'status_keluarga' => 'Kandung',
+                    'anak_ke' => $slot,
+                    'asal_sekolah' => 'SMP Nusantara',
+                    'tanggal_masuk' => now()->subYear()->startOfMonth()->toDateString(),
+                    'nama_ayah' => "Bapak dari {$nama}",
+                    'pekerjaan_ayah' => $occupations[($sequence - 1) % count($occupations)],
+                    'nama_ibu' => "Ibu dari {$nama}",
+                    'pekerjaan_ibu' => 'Ibu Rumah Tangga',
+                    'alamat_ortu' => $street . ', Kelurahan Sentri',
+                    'telepon_ortu' => "0821{$nis}",
+                    'nama_wali' => "Wali dari {$nama}",
+                    'pekerjaan_wali' => $occupations[$sequence % count($occupations)],
+                    'alamat_wali' => $street . ', Kelurahan Sentri',
+                    'telepon_wali' => "0831{$nis}",
                 ]);
 
-                $photoPath = $this->generateStudentPhoto($nis, $name);
-                $profile->update(['photo' => $photoPath]);
+                $photoPath = $this->generateStudentPhoto($nis, $nama);
+                $profil->update(['foto' => $photoPath]);
 
-                $students[] = $profile;
+                $students[] = $profil;
                 $sequence++;
                 $nameIndex++;
             }
@@ -271,7 +270,7 @@ class DemoSchoolSeeder extends Seeder
         return $students;
     }
 
-    /** @param array<int, StudentProfile> $students */
+    /** @param array<int, ProfilSiswa> $students */
     private function createAttendanceRecords(array $students): void
     {
         $dates = collect(range(0, 20))
@@ -280,13 +279,9 @@ class DemoSchoolSeeder extends Seeder
             ->take(10)
             ->values();
 
-        // Variasi status: tiap siswa punya pola berbeda
         $patterns = [
-            // Rajin hadir
             ['hadir', 'hadir', 'hadir', 'hadir', 'hadir', 'hadir', 'hadir', 'terlambat', 'hadir', 'hadir'],
-            // Sering terlambat
             ['terlambat', 'hadir', 'terlambat', 'hadir', 'terlambat', 'hadir', 'terlambat', 'hadir', 'hadir', 'terlambat'],
-            // Sering absen/izin
             ['izin', 'sakit', 'hadir', 'alpha', 'izin', 'hadir', 'sakit', 'hadir', 'izin', 'belum_absen'],
         ];
 
@@ -300,52 +295,52 @@ class DemoSchoolSeeder extends Seeder
                     $selfiePath = $this->generateSelfiePhoto($student->id, $date->format('Y-m-d'));
                 }
 
-                Attendance::create([
-                    'student_profile_id' => $student->id,
-                    'date' => $date->toDateString(),
+                Absensi::create([
+                    'profil_siswa_id' => $student->id,
+                    'tanggal' => $date->toDateString(),
                     'status' => $status,
-                    'check_in_time' => match ($status) {
+                    'waktu_masuk' => match ($status) {
                         'hadir' => '06:45:00',
                         'terlambat' => '07:'.sprintf('%02d', 10 + ($idx % 15)).':00',
                         default => null,
                     },
-                    'selfie_path' => $selfiePath,
+                    'path_selfie' => $selfiePath,
                 ]);
             }
         }
     }
 
-    /** @param array<int, StudentProfile> $students */
+    /** @param array<int, ProfilSiswa> $students */
     private function createViolationRecords(array $students): void
     {
-        $violationTypes = ViolationType::orderBy('point_deduction')->get();
-        $recorders = User::whereIn('role', ['wali_kelas', 'bk', 'kesiswaan'])->pluck('id');
+        $violationTypes = JenisPelanggaran::orderBy('pengurangan_poin')->get();
+        $recorders = Pengguna::whereIn('peran', ['wali_kelas', 'bk', 'kesiswaan'])->pluck('id');
 
         foreach (array_values($students) as $index => $student) {
             if ($index % 3 !== 0) {
                 continue;
             }
 
-            $violationType = $violationTypes[$index % $violationTypes->count()];
+            $jenis = $violationTypes[$index % $violationTypes->count()];
             $status = match ($index % 9) {
                 0 => 'pending',
                 3 => 'rejected',
                 default => 'approved',
             };
 
-            StudentViolation::create([
-                'student_profile_id' => $student->id,
-                'violation_type_id' => $violationType->id,
-                'recorded_by_user_id' => $recorders[$index % $recorders->count()],
-                'violation_date' => today()->subDays($index % 20)->toDateString(),
-                'violation_name' => $violationType->name,
-                'violation_category' => $violationType->category,
-                'point_deduction' => $violationType->point_deduction,
-                'notes' => 'Data demo pelanggaran.',
+            PelanggaranSiswa::create([
+                'profil_siswa_id' => $student->id,
+                'jenis_pelanggaran_id' => $jenis->id,
+                'dicatat_oleh_id' => $recorders[$index % $recorders->count()],
+                'tanggal_pelanggaran' => today()->subDays($index % 20)->toDateString(),
+                'nama_pelanggaran' => $jenis->nama,
+                'kategori_pelanggaran' => $jenis->kategori,
+                'pengurangan_poin' => $jenis->pengurangan_poin,
+                'catatan' => 'Data demo pelanggaran.',
                 'status' => $status,
-                'approved_by_user_id' => $status === 'pending' ? null : $recorders->last(),
-                'approved_at' => $status === 'pending' ? null : now(),
-                'rejection_reason' => $status === 'rejected' ? 'Data demo ditolak.' : null,
+                'disetujui_oleh_id' => $status === 'pending' ? null : $recorders->last(),
+                'disetujui_pada' => $status === 'pending' ? null : now(),
+                'alasan_penolakan' => $status === 'rejected' ? 'Data demo ditolak.' : null,
             ]);
         }
     }
@@ -361,7 +356,6 @@ class DemoSchoolSeeder extends Seeder
         $bg = imagecolorallocate($img, $r, $g, $b);
         imagefill($img, 0, 0, $bg);
 
-        // Subtle lighter circle in center
         $light = imagecolorallocatealpha($img, 255, 255, 255, 80);
         imagefilledellipse($img, (int) ($width / 2), (int) ($height / 2), (int) ($width * 0.5), (int) ($height * 0.5), $light);
 
@@ -369,19 +363,19 @@ class DemoSchoolSeeder extends Seeder
         imagedestroy($img);
     }
 
-    private function generateTeacherPhoto(int $userId, string $name): string
+    private function generateTeacherPhoto(int $userId, string $nama): string
     {
         $path = "photos/teachers/{$userId}.jpg";
-        [$r, $g, $b] = self::$palette[ord($name[0]) % count(self::$palette)];
+        [$r, $g, $b] = self::$palette[ord($nama[0]) % count(self::$palette)];
         $this->generateImage(200, 200, $r, $g, $b, storage_path("app/public/{$path}"));
 
         return $path;
     }
 
-    private function generateStudentPhoto(string $nis, string $name): string
+    private function generateStudentPhoto(string $nis, string $nama): string
     {
         $path = "photos/students/{$nis}.jpg";
-        [$r, $g, $b] = self::$palette[ord($name[0]) % count(self::$palette)];
+        [$r, $g, $b] = self::$palette[ord($nama[0]) % count(self::$palette)];
         $this->generateImage(300, 400, $r, $g, $b, storage_path("app/public/{$path}"));
 
         return $path;
@@ -402,11 +396,11 @@ class DemoSchoolSeeder extends Seeder
         $path = 'school-rules/tata-tertib-demo.pdf';
         Storage::disk('public')->put($path, "%PDF-1.4\n1 0 obj<<>>endobj\ntrailer<<>>\n%%EOF");
 
-        SchoolRule::create([
-            'title' => 'Tata Tertib Sekolah Demo',
-            'file_path' => $path,
-            'is_published' => true,
-            'uploaded_by_user_id' => User::where('role', 'kesiswaan')->value('id'),
+        TataTertib::create([
+            'judul' => 'Tata Tertib Sekolah Demo',
+            'path_file' => $path,
+            'dipublikasikan' => true,
+            'diunggah_oleh_id' => Pengguna::where('peran', 'kesiswaan')->value('id'),
         ]);
     }
 }

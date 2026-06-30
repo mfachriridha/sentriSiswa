@@ -1,0 +1,59 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+
+#[Fillable(['nisn', 'nis', 'kelas_id', 'telepon', 'alamat', 'foto'])]
+class ProfilSiswa extends Model
+{
+    /** @use HasFactory<\Database\Factories\StudentProfileFactory> */
+    use HasFactory;
+
+    protected $table = 'profil_siswa';
+
+    public function pengguna(): BelongsTo
+    {
+        return $this->belongsTo(Pengguna::class, 'pengguna_id');
+    }
+
+    public function kelas(): BelongsTo
+    {
+        return $this->belongsTo(Kelas::class, 'kelas_id');
+    }
+
+    public function biodata(): HasOne
+    {
+        return $this->hasOne(BiodataSiswa::class, 'profil_siswa_id');
+    }
+
+    public function absensi(): HasMany
+    {
+        return $this->hasMany(Absensi::class, 'profil_siswa_id');
+    }
+
+    public function pelanggaranSiswa(): HasMany
+    {
+        return $this->hasMany(PelanggaranSiswa::class, 'profil_siswa_id');
+    }
+
+    public function getPointsAttribute(): int
+    {
+        $deductions = 0;
+
+        if (array_key_exists('pelanggaran_siswa_sum_pengurangan_poin', $this->attributes)) {
+            $deductions = (int) $this->attributes['pelanggaran_siswa_sum_pengurangan_poin'];
+        } elseif ($this->relationLoaded('pelanggaranSiswa')) {
+            $deductions = $this->pelanggaranSiswa->where('status', 'approved')->sum('pengurangan_poin');
+        } else {
+            $deductions = (int) $this->pelanggaranSiswa()->approved()->sum('pengurangan_poin');
+        }
+
+        return max(0, 100 - $deductions);
+    }
+}

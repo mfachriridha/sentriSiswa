@@ -2,56 +2,56 @@
 
 namespace Database\Seeders;
 
-use App\Models\SchoolClass;
-use App\Models\StudentBiodata;
-use App\Models\StudentProfile;
-use App\Models\User;
+use App\Models\BiodataSiswa;
+use App\Models\Kelas;
+use App\Models\Pengguna;
+use App\Models\ProfilSiswa;
 use Illuminate\Database\Seeder;
 
 class DemoStudentBiodataSeeder extends Seeder
 {
     public function run(): void
     {
-        $class = SchoolClass::first();
+        $kelas = Kelas::first();
 
-        $user = User::create([
-            'name' => 'Siti Nurhaliza',
+        $pengguna = Pengguna::create([
+            'nama' => 'Siti Nurhaliza',
             'email' => 'siti.demo@sentrisiswa.test',
             'password' => bcrypt('password'),
-            'role' => 'siswa',
+            'peran' => 'siswa',
         ]);
 
-        $profile = StudentProfile::create([
-            'user_id' => $user->id,
+        $profil = ProfilSiswa::create([
+            'pengguna_id' => $pengguna->id,
             'nisn' => '0012345678',
             'nis' => '20240001',
-            'class_id' => $class->id,
-            'phone' => '081234567890',
-            'address' => 'Jl. Merdeka No. 45, Jakarta Selatan',
+            'kelas_id' => $kelas->id,
+            'telepon' => '081234567890',
+            'alamat' => 'Jl. Merdeka No. 45, Jakarta Selatan',
         ]);
 
-        StudentBiodata::create([
-            'student_profile_id' => $profile->id,
-            'place_of_birth' => 'Jakarta',
-            'date_of_birth' => '2008-05-15',
-            'gender' => 'P',
-            'religion' => 'Islam',
-            'family_status' => 'Kandung',
-            'child_number' => 2,
-            'school_of_origin' => 'SMP Negeri 1 Jakarta',
-            'admission_date' => '2024-07-15',
-            'father_name' => 'Budi Santoso',
-            'father_occupation' => 'Pegawai Negeri',
-            'mother_name' => 'Sari Dewi',
-            'mother_occupation' => 'Guru',
-            'parent_address' => 'Jl. Merdeka No. 45, Jakarta Selatan',
-            'parent_phone' => '081298765432',
-            'guardian_name' => null,
-            'guardian_occupation' => null,
-            'guardian_address' => null,
-            'guardian_phone' => null,
+        BiodataSiswa::create([
+            'profil_siswa_id' => $profil->id,
+            'tempat_lahir' => 'Jakarta',
+            'tanggal_lahir' => '2008-05-15',
+            'jenis_kelamin' => 'P',
+            'agama' => 'Islam',
+            'status_keluarga' => 'Kandung',
+            'anak_ke' => 2,
+            'asal_sekolah' => 'SMP Negeri 1 Jakarta',
+            'tanggal_masuk' => '2024-07-15',
+            'nama_ayah' => 'Budi Santoso',
+            'pekerjaan_ayah' => 'Pegawai Negeri',
+            'nama_ibu' => 'Sari Dewi',
+            'pekerjaan_ibu' => 'Guru',
+            'alamat_ortu' => 'Jl. Merdeka No. 45, Jakarta Selatan',
+            'telepon_ortu' => '081298765432',
+            'nama_wali' => null,
+            'pekerjaan_wali' => null,
+            'alamat_wali' => null,
+            'telepon_wali' => null,
         ]);
 
-        $this->command->info("Demo student created: {$user->name} (ID: {$user->id})");
+        $this->command->info("Demo student created: {$pengguna->nama} (ID: {$pengguna->id})");
     }
 }
