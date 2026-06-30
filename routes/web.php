@@ -39,17 +39,17 @@ use App\Http\Controllers\WaliKelas\ProfilController as WaliKelasProfilController
 use App\Http\Controllers\WaliKelas\RiwayatPelanggaranController;
 use App\Http\Controllers\AbsensiPublikController;
 use App\Http\Controllers\Admin\RiwayatPesanController;
-use App\Models\SchoolClass;
-use App\Models\StudentProfile;
-use App\Models\User;
+use App\Models\Kelas;
+use App\Models\Pengguna;
+use App\Models\ProfilSiswa;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     if (! auth()->check()) {
         return view('welcome', [
-            'studentCount' => StudentProfile::count(),
-            'teacherCount' => User::whereIn('role', ['wali_kelas', 'bk', 'kesiswaan'])->count(),
-            'classCount' => SchoolClass::count(),
+            'studentCount' => ProfilSiswa::count(),
+            'teacherCount' => Pengguna::whereIn('peran', ['wali_kelas', 'bk', 'kesiswaan'])->count(),
+            'classCount' => Kelas::count(),
         ]);
     }
 
