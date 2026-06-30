@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Bk;
 use App\Exports\ArrayExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Guru\AttendanceRecapFilterRequest;
-use App\Models\Attendance;
-use App\Models\SchoolClass;
-use App\Models\StudentProfile;
+use App\Models\Absensi;
+use App\Models\Kelas;
+use App\Models\ProfilSiswa;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -21,13 +21,13 @@ class AbsensiRecapController extends Controller
 {
     public function index(AttendanceRecapFilterRequest $request): View
     {
-        $bkGrade = Auth::user()->loadMissing('teacherProfile')->teacherProfile?->grade;
+        $bkGrade = Auth::user()->loadMissing('profilGuru')->profilGuru?->tingkat;
 
         if (! $bkGrade) {
             return view('bk.laporan.empty');
         }
 
-        $classes = SchoolClass::where('grade', $bkGrade)->orderBy('name')->get();
+        $classes = Kelas::where('tingkat', $bkGrade)->orderBy('nama')->get();
         [$startDate, $endDate] = $this->dateRange($request);
         $validated = $request->validated();
         $selectedClassId = $request->query('class_id', '');
@@ -53,13 +53,13 @@ class AbsensiRecapController extends Controller
 
     public function exportExcel(AttendanceRecapFilterRequest $request): BinaryFileResponse
     {
-        $bkGrade = Auth::user()->loadMissing('teacherProfile')->teacherProfile?->grade;
+        $bkGrade = Auth::user()->loadMissing('profilGuru')->profilGuru?->tingkat;
 
         if (! $bkGrade) {
             abort(403);
         }
 
-        $classes = SchoolClass::where('grade', $bkGrade)->orderBy('name')->get();
+        $classes = Kelas::where('tingkat', $bkGrade)->orderBy('nama')->get();
         [$startDate, $endDate] = $this->dateRange($request);
         $validated = $request->validated();
         $selectedClassId = $request->query('class_id', '');
@@ -69,13 +69,13 @@ class AbsensiRecapController extends Controller
         $stats = $this->calculateStats($students, $this->attendancesByStudent($students, $startDate, $endDate));
         $students = $this->filterStudentsByStatus($students, $stats, $validated['status'] ?? '');
 
-        $rows = $students->map(function (StudentProfile $student) use ($stats): array {
+        $rows = $students->map(function (ProfilSiswa $student) use ($stats): array {
             $stat = $stats[$student->id];
 
             return [
                 $student->nis ?? '-',
-                $student->user->name,
-                $student->class?->name ?? '-',
+                $student->pengguna->nama,
+                $student->kelas?->nama ?? '-',
                 $stat['hadir'],
                 $stat['terlambat'],
                 $stat['izin'],
@@ -93,13 +93,13 @@ class AbsensiRecapController extends Controller
 
     public function exportPdf(AttendanceRecapFilterRequest $request): Response
     {
-        $bkGrade = Auth::user()->loadMissing('teacherProfile')->teacherProfile?->grade;
+        $bkGrade = Auth::user()->loadMissing('profilGuru')->profilGuru?->tingkat;
 
         if (! $bkGrade) {
             abort(403);
         }
 
-        $classes = SchoolClass::where('grade', $bkGrade)->orderBy('name')->get();
+        $classes = Kelas::where('tingkat', $bkGrade)->orderBy('nama')->get();
         [$startDate, $endDate] = $this->dateRange($request);
         $validated = $request->validated();
         $selectedClassId = $request->query('class_id', '');
@@ -144,39 +144,39 @@ class AbsensiRecapController extends Controller
 
     /**
      * @param  list<int>  $classIds
-     * @return Collection<int, StudentProfile>
+     * @return Collection<int, ProfilSiswa>
      */
     private function gradeStudents(array $classIds, int|string|null $studentId = null): Collection
     {
-        return StudentProfile::query()
-            ->whereIn('class_id', $classIds)
-            ->when($studentId, fn ($query) => $query->where('student_profiles.id', $studentId))
-            ->join('users', 'student_profiles.user_id', '=', 'users.id')
-            ->with(['user', 'class'])
-            ->orderBy('student_profiles.class_id')
-            ->orderBy('users.name')
-            ->select('student_profiles.*')
+        return ProfilSiswa::query()
+            ->whereIn('kelas_id', $classIds)
+            ->when($studentId, fn ($query) => $query->where('profil_siswa.id', $studentId))
+            ->join('pengguna', 'profil_siswa.pengguna_id', '=', 'pengguna.id')
+            ->with(['pengguna', 'kelas'])
+            ->orderBy('profil_siswa.kelas_id')
+            ->orderBy('pengguna.nama')
+            ->select('profil_siswa.*')
             ->get();
     }
 
     /**
-     * @param  Collection<int, StudentProfile>  $students
-     * @return Collection<int, Collection<int, Attendance>>
+     * @param  Collection<int, ProfilSiswa>  $students
+     * @return Collection<int, Collection<int, Absensi>>
      */
     private function attendancesByStudent(Collection $students, string $startDate, string $endDate): Collection
     {
-        return Attendance::query()
-            ->whereDate('date', '>=', $startDate)
-            ->whereDate('date', '<=', $endDate)
-            ->whereIn('student_profile_id', $students->pluck('id'))
+        return Absensi::query()
+            ->whereDate('tanggal', '>=', $startDate)
+            ->whereDate('tanggal', '<=', $endDate)
+            ->whereIn('profil_siswa_id', $students->pluck('id'))
             ->get()
-            ->filter(fn (Attendance $attendance): bool => $attendance->date->isWeekday())
-            ->groupBy('student_profile_id');
+            ->filter(fn (Absensi $absensi): bool => $absensi->tanggal->isWeekday())
+            ->groupBy('profil_siswa_id');
     }
 
     /**
-     * @param  Collection<int, StudentProfile>  $students
-     * @param  Collection<int, Collection<int, Attendance>>  $attendances
+     * @param  Collection<int, ProfilSiswa>  $students
+     * @param  Collection<int, Collection<int, Absensi>>  $attendances
      * @return array<int, array{hadir: int, terlambat: int, izin: int, sakit: int, alpha: int, percentage: float}>
      */
     private function calculateStats(Collection $students, Collection $attendances): array
@@ -210,7 +210,7 @@ class AbsensiRecapController extends Controller
         }
 
         return $students
-            ->filter(fn (StudentProfile $student): bool => ($stats[$student->id][$status] ?? 0) > 0)
+            ->filter(fn (ProfilSiswa $student): bool => ($stats[$student->id][$status] ?? 0) > 0)
             ->values();
     }
 

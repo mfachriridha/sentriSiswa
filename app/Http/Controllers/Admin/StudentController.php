@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Student\StoreStudentRequest;
 use App\Http\Requests\Student\UpdateStudentRequest;
-use App\Models\SchoolClass;
-use App\Models\StudentProfile;
-use App\Models\User;
+use App\Models\Kelas;
+use App\Models\Pengguna;
+use App\Models\ProfilSiswa;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -23,24 +23,24 @@ class StudentController extends Controller
         $filterStatus = $request->get('status', '');
         $sort = $request->get('sort', 'created_at');
         $direction = $request->get('direction', 'desc');
-        $allowed = ['name', 'email', 'created_at', 'nisn', 'nis', 'class_name'];
+        $allowed = ['nama', 'email', 'created_at', 'nisn', 'nis', 'class_name'];
         $sort = in_array($sort, $allowed) ? $sort : 'created_at';
         $direction = in_array($direction, ['asc', 'desc']) ? $direction : 'desc';
 
-        $students = User::where('role', 'siswa')
-            ->with('studentProfile.class');
+        $students = Pengguna::where('peran', 'siswa')
+            ->with('profilSiswa.kelas');
 
         if ($search) {
             $students->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhereHas('studentProfile', fn ($q) => $q
+                $q->where('nama', 'like', "%{$search}%")
+                    ->orWhereHas('profilSiswa', fn ($q) => $q
                         ->where('nisn', 'like', "%{$search}%")
                         ->orWhere('nis', 'like', "%{$search}%"));
             });
         }
 
         if ($filterGrade) {
-            $students->whereHas('studentProfile.class', fn ($q) => $q->where('grade', $filterGrade));
+            $students->whereHas('profilSiswa.kelas', fn ($q) => $q->where('tingkat', $filterGrade));
         }
 
         if (in_array($filterStatus, ['registered', 'unregistered'], true)) {
@@ -49,15 +49,15 @@ class StudentController extends Controller
 
         if ($sort === 'class_name') {
             $students = $students->orderBy(
-                SchoolClass::select('name')
-                    ->whereColumn('id', 'student_profiles.class_id')
+                Kelas::select('nama')
+                    ->whereColumn('id', 'profil_siswa.kelas_id')
                     ->limit(1),
                 $direction,
             );
         } elseif (in_array($sort, ['nisn', 'nis'])) {
             $students = $students->orderBy(
-                StudentProfile::select($sort)
-                    ->whereColumn('student_profiles.user_id', 'users.id')
+                ProfilSiswa::select($sort)
+                    ->whereColumn('profil_siswa.pengguna_id', 'pengguna.id')
                     ->limit(1),
                 $direction,
             );
@@ -78,7 +78,7 @@ class StudentController extends Controller
 
     public function create(): View
     {
-        $classes = SchoolClass::orderBy('grade')->orderBy('name')->get();
+        $classes = Kelas::orderBy('tingkat')->orderBy('nama')->get();
 
         return view('admin.siswa.create', compact('classes'));
     }
@@ -87,47 +87,47 @@ class StudentController extends Controller
     {
         DB::transaction(function () use ($request) {
             $data = [
-                'name' => $request->name,
+                'nama' => $request->name,
                 'email' => $request->email,
-                'role' => 'siswa',
+                'peran' => 'siswa',
                 'status' => 'unregistered',
                 'password' => Hash::make($request->filled('password') ? $request->password : 'password'),
             ];
 
-            $user = User::create($data);
+            $user = Pengguna::create($data);
 
-            $user->studentProfile()->create([
+            $user->profilSiswa()->create([
                 'nisn' => $request->nisn,
                 'nis' => $request->nis,
-                'class_id' => $request->class_id,
-                'phone' => $request->phone,
-                'address' => $request->address,
+                'kelas_id' => $request->class_id,
+                'telepon' => $request->phone,
+                'alamat' => $request->address,
             ]);
         });
 
         return redirect()->route('admin.siswa.index')->with('success', 'Siswa berhasil ditambahkan.');
     }
 
-    public function show(User $student): View
+    public function show(Pengguna $student): View
     {
-        $student->load('studentProfile.class');
+        $student->load('profilSiswa.kelas');
 
         return view('admin.siswa.show', compact('student'));
     }
 
-    public function edit(User $student): View
+    public function edit(Pengguna $student): View
     {
-        $student->load('studentProfile');
-        $classes = SchoolClass::orderBy('grade')->orderBy('name')->get();
+        $student->load('profilSiswa');
+        $classes = Kelas::orderBy('tingkat')->orderBy('nama')->get();
 
         return view('admin.siswa.edit', compact('student', 'classes'));
     }
 
-    public function update(UpdateStudentRequest $request, User $student): RedirectResponse
+    public function update(UpdateStudentRequest $request, Pengguna $student): RedirectResponse
     {
         DB::transaction(function () use ($request, $student) {
             $student->update([
-                'name' => $request->name,
+                'nama' => $request->name,
                 'email' => $request->email,
             ]);
 
@@ -135,14 +135,14 @@ class StudentController extends Controller
                 $student->update(['password' => Hash::make($request->password)]);
             }
 
-            $student->studentProfile()->updateOrCreate(
-                ['user_id' => $student->id],
+            $student->profilSiswa()->updateOrCreate(
+                ['pengguna_id' => $student->id],
                 [
                     'nisn' => $request->nisn,
                     'nis' => $request->nis,
-                    'class_id' => $request->class_id,
-                    'phone' => $request->phone,
-                    'address' => $request->address,
+                    'kelas_id' => $request->class_id,
+                    'telepon' => $request->phone,
+                    'alamat' => $request->address,
                 ],
             );
         });
@@ -150,7 +150,7 @@ class StudentController extends Controller
         return redirect()->route('admin.siswa.index')->with('success', 'Siswa berhasil diperbarui.');
     }
 
-    public function destroy(User $student): RedirectResponse
+    public function destroy(Pengguna $student): RedirectResponse
     {
         $student->delete();
 
@@ -159,8 +159,8 @@ class StudentController extends Controller
 
     public function deleteAll(): RedirectResponse
     {
-        StudentProfile::whereHas('user', fn ($q) => $q->where('role', 'siswa'))->delete();
-        User::where('role', 'siswa')->delete();
+        ProfilSiswa::whereHas('pengguna', fn ($q) => $q->where('peran', 'siswa'))->delete();
+        Pengguna::where('peran', 'siswa')->delete();
 
         return redirect()->route('admin.siswa.index')->with('success', 'Semua siswa berhasil dihapus.');
     }

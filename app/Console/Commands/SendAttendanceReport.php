@@ -3,11 +3,11 @@
 namespace App\Console\Commands;
 
 use App\Jobs\SendWhatsAppNotification;
-use App\Models\Attendance;
-use App\Models\SchoolClass;
-use App\Models\Setting;
+use App\Models\Absensi;
+use App\Models\Kelas;
+use App\Models\Pengaturan;
+use App\Models\PesanWhatsapp;
 use App\Models\TokenAksesAbsensi;
-use App\Models\WhatsappMessage;
 use App\Services\FonnteService;
 use Illuminate\Console\Command;
 
@@ -32,7 +32,7 @@ class SendAttendanceReport extends Command
             return self::SUCCESS;
         }
 
-        $endTime = Setting::get('attendance_end_time', '07:00');
+        $endTime = Pengaturan::get('attendance_end_time', '07:00');
 
         if (! $this->option('force')) {
             $graceMinutes = 5;
@@ -46,8 +46,8 @@ class SendAttendanceReport extends Command
         }
 
         $today = now()->toDateString();
-        $classes = SchoolClass::with(['homeroomTeacher.teacherProfile', 'students.user'])
-            ->whereNotNull('homeroom_teacher_id')
+        $classes = Kelas::with(['waliKelas.profilGuru', 'siswa.pengguna'])
+            ->whereNotNull('wali_kelas_id')
             ->get();
 
         if ($classes->isEmpty()) {
@@ -59,17 +59,17 @@ class SendAttendanceReport extends Command
         $sentCount = 0;
         $delaySeconds = 0;
 
-        foreach ($classes as $class) {
-            $teacher = $class->homeroomTeacher;
-            $phone = $teacher?->teacherProfile?->phone;
+        foreach ($classes as $kelas) {
+            $waliKelas = $kelas->waliKelas;
+            $phone = $waliKelas?->profilGuru?->telepon;
 
             if (blank($phone)) {
-                $this->warn("Wali kelas {$class->name} tidak punya nomor HP. Lewati.");
+                $this->warn("Wali kelas {$kelas->nama} tidak punya nomor HP. Lewati.");
 
                 continue;
             }
 
-            $studentProfiles = $class->students;
+            $studentProfiles = $kelas->siswa;
             $totalStudents = $studentProfiles->count();
 
             if ($totalStudents === 0) {
@@ -77,10 +77,10 @@ class SendAttendanceReport extends Command
             }
 
             $profileIds = $studentProfiles->pluck('id');
-            $attendances = Attendance::whereIn('student_profile_id', $profileIds)
-                ->whereDate('date', $today)
+            $attendances = Absensi::whereIn('profil_siswa_id', $profileIds)
+                ->whereDate('tanggal', $today)
                 ->get()
-                ->keyBy('student_profile_id');
+                ->keyBy('profil_siswa_id');
 
             $sudahAbsen = $studentProfiles->filter(fn ($sp) => $attendances->has($sp->id)
                 && in_array($attendances[$sp->id]->status, ['hadir', 'terlambat', 'izin', 'sakit']));
@@ -91,19 +91,18 @@ class SendAttendanceReport extends Command
             $sudahCount = $sudahAbsen->count();
             $belumCount = $belumAbsen->count();
 
-            // Generate atau perbarui token akses publik untuk kelas ini hari ini
-            $aksesToken = TokenAksesAbsensi::buatAtauPerbarui($class->id, $today);
+            $aksesToken = TokenAksesAbsensi::buatAtauPerbarui($kelas->id, $today);
             $linkAbsensi = route('absensi.publik', $aksesToken->token);
 
             $hari = now()->locale('id')->translatedFormat('l');
             $tanggal = now()->locale('id')->translatedFormat('d F Y');
-            $waktu = now()->format('H:i') . ' WIB';
+            $waktu = now()->format('H:i').' WIB';
 
             $message = "{$hari}, {$tanggal}\n";
             $message .= "{$waktu}\n";
             $message .= "=================\n";
-            $message .= "Wali Kelas: {$teacher->name}\n";
-            $message .= "Kelas: {$class->name}\n";
+            $message .= "Wali Kelas: {$waliKelas->nama}\n";
+            $message .= "Kelas: {$kelas->nama}\n";
             $message .= "\n";
             $message .= "Yang sudah absen : {$sudahCount}\n";
             $message .= "Yang belum absen : {$belumCount}\n";
@@ -114,23 +113,23 @@ class SendAttendanceReport extends Command
                 $message .= "Seluruh siswa telah melakukan absensi hari ini.\n";
             } else {
                 foreach ($belumAbsen as $sp) {
-                    $message .= '- '.($sp->user?->name ?? 'Siswa #'.$sp->id)."\n";
+                    $message .= '- '.($sp->pengguna?->nama ?? 'Siswa #'.$sp->id)."\n";
                 }
             }
 
             $message .= "\n==================\n";
             $message .= "Cek absensi siswa:\n{$linkAbsensi}";
 
-            $whatsappMessage = WhatsappMessage::create([
-                'school_class_id' => $class->id,
-                'recipient_phone' => $phone,
-                'recipient_name' => $teacher->name,
-                'message_type' => 'attendance_report',
-                'message' => $message,
+            $pesanWa = PesanWhatsapp::create([
+                'kelas_id' => $kelas->id,
+                'telepon_penerima' => $phone,
+                'nama_penerima' => $waliKelas->nama,
+                'tipe_pesan' => 'attendance_report',
+                'isi_pesan' => $message,
                 'status' => 'pending',
             ]);
 
-            SendWhatsAppNotification::dispatch($whatsappMessage)
+            SendWhatsAppNotification::dispatch($pesanWa)
                 ->delay(now()->addSeconds($delaySeconds));
 
             $sentCount++;

@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Attendance;
-use App\Models\Setting;
+use App\Models\Absensi;
+use App\Models\Pengaturan;
 use Illuminate\Console\Command;
 
 class UpdateUnmarkedAttendance extends Command
@@ -20,7 +20,7 @@ class UpdateUnmarkedAttendance extends Command
             return self::SUCCESS;
         }
 
-        $endTime = Setting::get('attendance_end_time', '07:00');
+        $endTime = Pengaturan::get('attendance_end_time', '07:00');
         $graceMinutes = 5;
         $updateAfter = now()->setTimeFromTimeString($endTime)->addMinutes($graceMinutes);
 
@@ -32,7 +32,7 @@ class UpdateUnmarkedAttendance extends Command
 
         $today = now()->toDateString();
 
-        $updated = Attendance::whereDate('date', $today)
+        $updated = Absensi::whereDate('tanggal', $today)
             ->where('status', 'belum_absen')
             ->update(['status' => 'alpha']);
 

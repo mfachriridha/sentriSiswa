@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\ViolationType;
 
-use App\Models\ViolationType;
+use App\Models\JenisPelanggaran;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
@@ -22,11 +22,11 @@ class UpdateViolationTypeRequest extends FormRequest
         $violationType = $this->route('violationType');
 
         return [
-            'name' => ['required', 'string', 'max:255', Rule::unique('violation_types', 'name')->ignore($violationType)],
-            'category' => ['required', Rule::in(array_keys(ViolationType::categoryLabels()))],
-            'point_deduction' => ['required', 'integer', 'min:5', 'max:100'],
-            'description' => ['nullable', 'string'],
-            'is_active' => ['required', 'boolean'],
+            'nama' => ['required', 'string', 'max:255', Rule::unique('jenis_pelanggaran', 'nama')->ignore($violationType)],
+            'kategori' => ['required', Rule::in(array_keys(JenisPelanggaran::categoryLabels()))],
+            'pengurangan_poin' => ['required', 'integer', 'min:5', 'max:100'],
+            'keterangan' => ['nullable', 'string'],
+            'aktif' => ['required', 'boolean'],
         ];
     }
 
@@ -48,38 +48,38 @@ class UpdateViolationTypeRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'Nama pelanggaran wajib diisi.',
-            'name.unique' => 'Nama pelanggaran sudah digunakan.',
-            'category.required' => 'Kategori wajib dipilih.',
-            'category.in' => 'Kategori tidak valid.',
-            'point_deduction.required' => 'Poin pelanggaran wajib diisi.',
-            'point_deduction.integer' => 'Poin pelanggaran harus berupa angka.',
-            'point_deduction.min' => 'Poin pelanggaran minimal 5.',
-            'point_deduction.max' => 'Poin pelanggaran maksimal 100.',
+            'nama.required' => 'Nama pelanggaran wajib diisi.',
+            'nama.unique' => 'Nama pelanggaran sudah digunakan.',
+            'kategori.required' => 'Kategori wajib dipilih.',
+            'kategori.in' => 'Kategori tidak valid.',
+            'pengurangan_poin.required' => 'Poin pelanggaran wajib diisi.',
+            'pengurangan_poin.integer' => 'Poin pelanggaran harus berupa angka.',
+            'pengurangan_poin.min' => 'Poin pelanggaran minimal 5.',
+            'pengurangan_poin.max' => 'Poin pelanggaran maksimal 100.',
         ];
     }
 
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'is_active' => $this->boolean('is_active'),
+            'aktif' => $this->boolean('aktif'),
         ]);
     }
 
     private function validatePointRange(Validator $validator): void
     {
-        $category = (string) $this->input('category');
-        $point = (int) $this->input('point_deduction');
-        $ranges = ViolationType::categoryRanges();
+        $category = (string) $this->input('kategori');
+        $point = (int) $this->input('pengurangan_poin');
+        $ranges = JenisPelanggaran::categoryRanges();
 
-        if (! isset($ranges[$category]) || ! $this->filled('point_deduction')) {
+        if (! isset($ranges[$category]) || ! $this->filled('pengurangan_poin')) {
             return;
         }
 
         [$minimumPoint, $maximumPoint] = $ranges[$category];
 
         if ($point < $minimumPoint || $point > $maximumPoint) {
-            $validator->errors()->add('point_deduction', "Poin untuk kategori ini harus berada di antara {$minimumPoint} sampai {$maximumPoint}.");
+            $validator->errors()->add('pengurangan_poin', "Poin untuk kategori ini harus berada di antara {$minimumPoint} sampai {$maximumPoint}.");
         }
     }
 }

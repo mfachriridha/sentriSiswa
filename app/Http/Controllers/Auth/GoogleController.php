@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Models\Pengguna;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -49,7 +49,7 @@ class GoogleController extends Controller
         }
 
         // Check email not taken by another user
-        $existing = User::where('email', $googleUser->getEmail())
+        $existing = Pengguna::where('email', $googleUser->getEmail())
             ->where('id', '!=', $userId)
             ->first();
 
@@ -58,7 +58,7 @@ class GoogleController extends Controller
                 ->withErrors(['email' => 'Email Google ini sudah digunakan oleh akun lain.']);
         }
 
-        $user = User::find($userId);
+        $user = Pengguna::find($userId);
 
         if (! $user || $user->isRegistered()) {
             return redirect()->route('register')
@@ -67,7 +67,7 @@ class GoogleController extends Controller
 
         $user->update([
             'email' => $googleUser->getEmail(),
-            'google_id' => $googleUser->getId(),
+            'id_google' => $googleUser->getId(),
             'status' => 'registered',
             'email_verified_at' => now(),
         ]);
@@ -90,9 +90,9 @@ class GoogleController extends Controller
 
     private function handleLogin(\Laravel\Socialite\Contracts\User $googleUser): RedirectResponse
     {
-        // Find by google_id first, then by email
-        $user = User::where('google_id', $googleUser->getId())->first()
-            ?? User::where('email', $googleUser->getEmail())->first();
+        // Find by id_google first, then by email
+        $user = Pengguna::where('id_google', $googleUser->getId())->first()
+            ?? Pengguna::where('email', $googleUser->getEmail())->first();
 
         if (! $user) {
             return redirect()->route('register')
@@ -104,9 +104,9 @@ class GoogleController extends Controller
                 ->with('error', 'Selesaikan pendaftaran akun Anda terlebih dahulu.');
         }
 
-        // Link google_id if not linked yet (user registered via email, now logging in with Google)
-        if (! $user->google_id) {
-            $user->update(['google_id' => $googleUser->getId()]);
+        // Link id_google if not linked yet (user registered via email, now logging in with Google)
+        if (! $user->id_google) {
+            $user->update(['id_google' => $googleUser->getId()]);
         }
 
         Auth::login($user);

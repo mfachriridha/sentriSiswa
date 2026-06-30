@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Models\WhatsappMessage;
+use App\Models\PesanWhatsapp;
 use App\Services\FonnteService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -16,7 +16,7 @@ class SendWhatsAppNotification implements ShouldQueue
     public int $timeout = 30;
 
     public function __construct(
-        public WhatsappMessage $whatsappMessage,
+        public PesanWhatsapp $whatsappMessage,
     ) {}
 
     public function handle(FonnteService $whatsapp): void
@@ -24,24 +24,24 @@ class SendWhatsAppNotification implements ShouldQueue
         $this->whatsappMessage->update(['status' => 'processing']);
 
         $result = $whatsapp->send(
-            $this->whatsappMessage->recipient_phone,
-            $this->whatsappMessage->message,
+            $this->whatsappMessage->telepon_penerima,
+            $this->whatsappMessage->isi_pesan,
         );
 
         if ($result['success']) {
             $this->whatsappMessage->update([
                 'status' => 'sent',
-                'provider_message_id' => data_get($result, 'response.id.0'),
-                'response' => json_encode($result['response']),
-                'sent_at' => now(),
+                'id_pesan_provider' => data_get($result, 'response.id.0'),
+                'respons' => json_encode($result['response']),
+                'dikirim_pada' => now(),
             ]);
         } else {
             $this->whatsappMessage->update([
                 'status' => 'failed',
-                'response' => json_encode($result['response'] ?? $result['error']),
+                'respons' => json_encode($result['response'] ?? $result['error']),
             ]);
 
-            Log::warning('Gagal kirim WA ke '.$this->whatsappMessage->recipient_phone.': '.($result['error'] ?? ''));
+            Log::warning('Gagal kirim WA ke '.$this->whatsappMessage->telepon_penerima.': '.($result['error'] ?? ''));
         }
     }
 

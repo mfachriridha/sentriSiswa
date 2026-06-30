@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Guru;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Guru\StoreSchoolRuleRequest;
-use App\Models\SchoolRule;
+use App\Models\TataTertib;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -14,7 +14,7 @@ class SchoolRuleController extends Controller
 {
     public function index(): View
     {
-        $schoolRules = SchoolRule::with('uploadedBy')
+        $schoolRules = TataTertib::with('diunggahOleh')
             ->latest()
             ->paginate(15);
 
@@ -24,37 +24,37 @@ class SchoolRuleController extends Controller
     public function store(StoreSchoolRuleRequest $request): RedirectResponse
     {
         if ($request->boolean('is_published')) {
-            SchoolRule::query()->update(['is_published' => false]);
+            TataTertib::query()->update(['dipublikasikan' => false]);
         }
 
-        SchoolRule::create([
-            'title' => (string) $request->string('title'),
-            'file_path' => $request->file('rule_pdf')->store('school-rules', 'public'),
-            'is_published' => $request->boolean('is_published'),
-            'uploaded_by_user_id' => Auth::id(),
+        TataTertib::create([
+            'judul' => (string) $request->string('title'),
+            'path_file' => $request->file('rule_pdf')->store('school-rules', 'public'),
+            'dipublikasikan' => $request->boolean('is_published'),
+            'diunggah_oleh_id' => Auth::id(),
         ]);
 
         return redirect()->route('kesiswaan.tata-tertib.index')->with('success', 'Tata tertib berhasil diunggah.');
     }
 
-    public function publish(SchoolRule $schoolRule): RedirectResponse
+    public function publish(TataTertib $schoolRule): RedirectResponse
     {
-        SchoolRule::query()->where('id', '!=', $schoolRule->id)->update(['is_published' => false]);
-        $schoolRule->update(['is_published' => true]);
+        TataTertib::query()->where('id', '!=', $schoolRule->id)->update(['dipublikasikan' => false]);
+        $schoolRule->update(['dipublikasikan' => true]);
 
         return redirect()->route('kesiswaan.tata-tertib.index')->with('success', 'Tata tertib berhasil dipublikasikan.');
     }
 
-    public function unpublish(SchoolRule $schoolRule): RedirectResponse
+    public function unpublish(TataTertib $schoolRule): RedirectResponse
     {
-        $schoolRule->update(['is_published' => false]);
+        $schoolRule->update(['dipublikasikan' => false]);
 
         return redirect()->route('kesiswaan.tata-tertib.index')->with('success', 'Tata tertib berhasil dinonaktifkan.');
     }
 
-    public function destroy(SchoolRule $schoolRule): RedirectResponse
+    public function destroy(TataTertib $schoolRule): RedirectResponse
     {
-        Storage::disk('public')->delete($schoolRule->file_path);
+        Storage::disk('public')->delete($schoolRule->path_file);
         $schoolRule->delete();
 
         return redirect()->route('kesiswaan.tata-tertib.index')->with('success', 'Tata tertib berhasil dihapus.');

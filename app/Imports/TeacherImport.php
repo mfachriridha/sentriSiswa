@@ -2,9 +2,9 @@
 
 namespace App\Imports;
 
-use App\Models\SchoolClass;
-use App\Models\TeacherProfile;
-use App\Models\User;
+use App\Models\Kelas;
+use App\Models\Pengguna;
+use App\Models\ProfilGuru;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -46,28 +46,28 @@ class TeacherImport implements ToCollection, WithChunkReading, WithHeadingRow
         foreach ($rows as $row) {
             $parsed = $this->parseRow($row);
 
-            if (empty($parsed['name'])) {
+            if (empty($parsed['nama'])) {
                 $this->errors++;
 
                 continue;
             }
 
-            $grade = $parsed['className'] ? (int) strtok($parsed['className'], ' .-') : null;
+            $tingkat = $parsed['className'] ? (int) strtok($parsed['className'], ' .-') : null;
 
-            if ($parsed['className'] && $grade) {
+            if ($parsed['className'] && $tingkat) {
                 if (! isset($this->classCache[$parsed['className']])) {
-                    $class = SchoolClass::firstOrCreate(
-                        ['name' => $parsed['className']],
-                        ['grade' => in_array($grade, [10, 11, 12]) ? (string) $grade : '10']
+                    $kelasObj = Kelas::firstOrCreate(
+                        ['nama' => $parsed['className']],
+                        ['tingkat' => in_array($tingkat, [10, 11, 12]) ? (string) $tingkat : '10']
                     );
-                    $this->classCache[$parsed['className']] = $class->id;
+                    $this->classCache[$parsed['className']] = $kelasObj->id;
                     $this->classesCreated++;
                 }
             }
 
             $newUsers[] = [
-                'name' => $parsed['name'],
-                'role' => $parsed['role'],
+                'nama' => $parsed['nama'],
+                'peran' => $parsed['peran'],
                 'status' => 'unregistered',
                 'password' => $this->defaultPassword,
                 'email' => null,
@@ -76,11 +76,11 @@ class TeacherImport implements ToCollection, WithChunkReading, WithHeadingRow
             ];
 
             $profileRows[] = [
-                'name' => $parsed['name'],
+                'nama' => $parsed['nama'],
                 'nip' => $parsed['nip'],
-                'role' => $parsed['role'],
+                'peran' => $parsed['peran'],
                 'className' => $parsed['className'],
-                'grade' => $parsed['grade'],
+                'tingkat' => $parsed['tingkat'],
             ];
         }
 
@@ -93,8 +93,8 @@ class TeacherImport implements ToCollection, WithChunkReading, WithHeadingRow
 
             $existingProfiles = [];
             if (! empty($nips)) {
-                $existingProfiles = TeacherProfile::whereIn('nip', $nips)
-                    ->pluck('user_id', 'nip')
+                $existingProfiles = ProfilGuru::whereIn('nip', $nips)
+                    ->pluck('pengguna_id', 'nip')
                     ->toArray();
             }
 
@@ -112,14 +112,14 @@ class TeacherImport implements ToCollection, WithChunkReading, WithHeadingRow
             }
 
             foreach (array_chunk($freshUsers, 500) as $chunk) {
-                User::insert($chunk);
+                Pengguna::insert($chunk);
             }
 
             $this->teachersCreated += count($freshUsers);
             $this->teachersExisting += $existingCount;
 
             if (count($freshUsers) > 0) {
-                $firstId = User::whereIn('role', ['wali_kelas', 'bk', 'kesiswaan'])->latest('id')->first()->id;
+                $firstId = Pengguna::whereIn('peran', ['wali_kelas', 'bk', 'kesiswaan'])->latest('id')->first()->id;
                 $newUserOffset = $firstId - count($freshUsers) + 1;
             } else {
                 $newUserOffset = 0;
@@ -131,10 +131,10 @@ class TeacherImport implements ToCollection, WithChunkReading, WithHeadingRow
             foreach ($profileRows as $profile) {
                 $nip = $profile['nip'];
                 $className = $profile['className'];
-                $userId = null;
+                $penggunaId = null;
 
                 if ($nip && isset($existingProfiles[$nip])) {
-                    $userId = $existingProfiles[$nip];
+                    $penggunaId = $existingProfiles[$nip];
                 } else {
                     $newIdx++;
 
@@ -142,25 +142,25 @@ class TeacherImport implements ToCollection, WithChunkReading, WithHeadingRow
                         continue;
                     }
 
-                    $userId = $newUserOffset + $newIdx - 1;
+                    $penggunaId = $newUserOffset + $newIdx - 1;
                 }
 
                 $inserts[] = [
-                    'user_id' => $userId,
+                    'pengguna_id' => $penggunaId,
                     'nip' => $nip,
-                    'grade' => $profile['grade'],
+                    'tingkat' => $profile['tingkat'],
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];
 
-                if ($profile['role'] === 'wali_kelas' && $className && isset($this->classCache[$className]) && $userId) {
-                    SchoolClass::where('id', $this->classCache[$className])
-                        ->update(['homeroom_teacher_id' => $userId]);
+                if ($profile['peran'] === 'wali_kelas' && $className && isset($this->classCache[$className]) && $penggunaId) {
+                    Kelas::where('id', $this->classCache[$className])
+                        ->update(['wali_kelas_id' => $penggunaId]);
                 }
             }
 
             foreach (array_chunk($inserts, 500) as $chunk) {
-                TeacherProfile::upsert($chunk, ['user_id'], ['nip', 'grade', 'updated_at']);
+                ProfilGuru::upsert($chunk, ['pengguna_id'], ['nip', 'tingkat', 'updated_at']);
             }
         });
     }
@@ -168,47 +168,47 @@ class TeacherImport implements ToCollection, WithChunkReading, WithHeadingRow
     protected function parseRow(Collection $row): array
     {
         if ($this->isOldFormat) {
-            $name = trim((string) ($row['walas'] ?? ''));
+            $nama = trim((string) ($row['walas'] ?? ''));
             $nipRaw = isset($row['nip']) && $row['nip'] !== '-' ? trim((string) $row['nip']) : null;
             $nip = $nipRaw ? str_replace(' ', '', $nipRaw) : null;
             $className = trim((string) ($row['kelas'] ?? ''));
-            $grade = null;
+            $tingkat = null;
 
             if ($className) {
-                $gradeNum = (int) strtok($className, ' .-');
-                $grade = in_array($gradeNum, [10, 11, 12]) ? (string) $gradeNum : null;
+                $tingkatNum = (int) strtok($className, ' .-');
+                $tingkat = in_array($tingkatNum, [10, 11, 12]) ? (string) $tingkatNum : null;
             }
 
             return [
-                'name' => $name,
+                'nama' => $nama,
                 'nip' => $nip,
-                'role' => 'wali_kelas',
+                'peran' => 'wali_kelas',
                 'className' => $className,
-                'grade' => $grade,
+                'tingkat' => $tingkat,
             ];
         }
 
-        $name = trim((string) ($row['nama'] ?? ''));
+        $nama = trim((string) ($row['nama'] ?? ''));
         $nipRaw = isset($row['nip']) && $row['nip'] !== '-' ? trim((string) $row['nip']) : null;
         $nip = $nipRaw ? str_replace(' ', '', $nipRaw) : null;
         $className = trim((string) ($row['kelas'] ?? ''));
 
         $typeRaw = trim((string) ($row['tipe'] ?? ''));
-        $role = in_array(strtolower($typeRaw), ['bk', 'guru bk'], true) ? 'bk'
+        $peran = in_array(strtolower($typeRaw), ['bk', 'guru bk'], true) ? 'bk'
             : (in_array(strtolower($typeRaw), ['kesiswaan', 'student_affairs'], true) ? 'kesiswaan' : 'wali_kelas');
 
-        $grade = null;
-        if ($role === 'bk' && ! empty($typeRaw)) {
-            $gradeNum = (int) strtok($className ? $className : '0', ' .-');
-            $grade = in_array($gradeNum, [10, 11, 12]) ? (string) $gradeNum : null;
+        $tingkat = null;
+        if ($peran === 'bk' && ! empty($typeRaw)) {
+            $tingkatNum = (int) strtok($className ? $className : '0', ' .-');
+            $tingkat = in_array($tingkatNum, [10, 11, 12]) ? (string) $tingkatNum : null;
         }
 
         return [
-            'name' => $name,
+            'nama' => $nama,
             'nip' => $nip,
-            'role' => $role,
+            'peran' => $peran,
             'className' => $className,
-            'grade' => $grade,
+            'tingkat' => $tingkat,
         ];
     }
 

@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Student\UpdateStudentBiodataRequest;
-use App\Models\User;
+use App\Models\Pengguna;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,22 +15,22 @@ use Intervention\Image\ImageManager;
 
 class StudentBiodataController extends Controller
 {
-    public function edit(User $student): View
+    public function edit(Pengguna $student): View
     {
-        $student->load('studentProfile.biodata');
+        $student->load('profilSiswa.biodata');
 
         return view('admin.siswa.biodata', compact('student'));
     }
 
-    public function update(UpdateStudentBiodataRequest $request, User $student): RedirectResponse
+    public function update(UpdateStudentBiodataRequest $request, Pengguna $student): RedirectResponse
     {
-        $student->load('studentProfile');
-        $profile = $student->studentProfile;
+        $student->load('profilSiswa');
+        $profile = $student->profilSiswa;
 
         abort_if(! $profile, 404);
 
         $profile->biodata()->updateOrCreate(
-            ['student_profile_id' => $profile->id],
+            ['profil_siswa_id' => $profile->id],
             $request->validated(),
         );
 
@@ -39,20 +39,20 @@ class StudentBiodataController extends Controller
             ->with('success', 'Biodata berhasil diperbarui.');
     }
 
-    public function uploadPhoto(Request $request, User $student): JsonResponse
+    public function uploadPhoto(Request $request, Pengguna $student): JsonResponse
     {
         $request->validate([
             'photo' => ['required', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
         ]);
 
-        $student->load('studentProfile');
-        $profile = $student->studentProfile;
+        $student->load('profilSiswa');
+        $profile = $student->profilSiswa;
         $file = $request->file('photo');
 
         abort_if(! $profile || ! $file instanceof UploadedFile, 422);
 
-        if ($profile->photo) {
-            $oldPath = storage_path('app/public/'.$profile->photo);
+        if ($profile->foto) {
+            $oldPath = storage_path('app/public/'.$profile->foto);
             if (file_exists($oldPath)) {
                 unlink($oldPath);
             }
@@ -69,23 +69,23 @@ class StudentBiodataController extends Controller
         $image->cover(300, 400);
         $image->toJpeg(85)->save(storage_path('app/public/'.$path));
 
-        $profile->update(['photo' => $path]);
+        $profile->update(['foto' => $path]);
 
         return response()->json(['url' => asset('storage/'.$path)]);
     }
 
-    public function deletePhoto(User $student): JsonResponse
+    public function deletePhoto(Pengguna $student): JsonResponse
     {
-        $student->load('studentProfile');
-        $profile = $student->studentProfile;
+        $student->load('profilSiswa');
+        $profile = $student->profilSiswa;
 
-        if ($profile?->photo) {
-            $oldPath = storage_path('app/public/'.$profile->photo);
+        if ($profile?->foto) {
+            $oldPath = storage_path('app/public/'.$profile->foto);
             if (file_exists($oldPath)) {
                 unlink($oldPath);
             }
 
-            $profile->update(['photo' => null]);
+            $profile->update(['foto' => null]);
         }
 
         return response()->json(['success' => true]);

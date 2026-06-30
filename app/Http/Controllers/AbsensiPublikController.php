@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Attendance;
-use App\Models\StudentProfile;
+use App\Models\Absensi;
+use App\Models\ProfilSiswa;
 use App\Models\TokenAksesAbsensi;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -34,20 +34,20 @@ class AbsensiPublikController extends Controller
             'nama' => ['required', 'string'],
         ]);
 
-        $siswa = StudentProfile::where('class_id', $aksesToken->class_id)
+        $siswa = ProfilSiswa::where('kelas_id', $aksesToken->class_id)
             ->where(function ($q) use ($request) {
                 $q->where('nis', $request->nis_nisn)
                   ->orWhere('nisn', $request->nis_nisn);
             })
-            ->whereHas('user', fn ($q) => $q->whereRaw('LOWER(name) = ?', [strtolower($request->nama)]))
+            ->whereHas('pengguna', fn ($q) => $q->whereRaw('LOWER(nama) = ?', [strtolower($request->nama)]))
             ->first();
 
         if (! $siswa) {
             return back()->withErrors(['nis_nisn' => 'Data siswa tidak ditemukan. Periksa NIS/NISN dan nama lengkap.'])->withInput();
         }
 
-        $absensi = Attendance::where('student_profile_id', $siswa->id)
-            ->where('date', $aksesToken->tanggal)
+        $absensi = Absensi::where('profil_siswa_id', $siswa->id)
+            ->where('tanggal', $aksesToken->tanggal)
             ->first();
 
         return view('publik.absensi.hasil', compact('siswa', 'absensi', 'aksesToken'));

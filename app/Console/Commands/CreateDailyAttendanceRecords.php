@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Attendance;
-use App\Models\StudentProfile;
+use App\Models\Absensi;
+use App\Models\ProfilSiswa;
 use Illuminate\Console\Command;
 
 class CreateDailyAttendanceRecords extends Command
@@ -22,18 +22,18 @@ class CreateDailyAttendanceRecords extends Command
 
         $today = now()->toDateString();
 
-        $students = StudentProfile::all();
+        $students = ProfilSiswa::all();
         $created = 0;
 
         foreach ($students as $student) {
-            $exists = Attendance::where('student_profile_id', $student->id)
-                ->where('date', $today)
+            $exists = Absensi::where('profil_siswa_id', $student->id)
+                ->where('tanggal', $today)
                 ->exists();
 
             if (! $exists) {
-                Attendance::create([
-                    'student_profile_id' => $student->id,
-                    'date' => $today,
+                Absensi::create([
+                    'profil_siswa_id' => $student->id,
+                    'tanggal' => $today,
                     'status' => 'belum_absen',
                 ]);
                 $created++;

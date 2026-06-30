@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\Attendance;
+use App\Models\Absensi;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
 
@@ -39,13 +39,13 @@ class AbsenceWarningService
 
         [$startDate, $endDate] = $this->currentSemesterRange();
 
-        return Attendance::query()
-            ->whereIn('student_profile_id', $ids)
+        return Absensi::query()
+            ->whereIn('profil_siswa_id', $ids)
             ->where('status', 'alpha')
-            ->whereBetween('date', [$startDate->toDateString(), $endDate->toDateString()])
-            ->selectRaw('student_profile_id, count(*) as alpha_count')
-            ->groupBy('student_profile_id')
-            ->pluck('alpha_count', 'student_profile_id')
+            ->whereBetween('tanggal', [$startDate->toDateString(), $endDate->toDateString()])
+            ->selectRaw('profil_siswa_id, count(*) as alpha_count')
+            ->groupBy('profil_siswa_id')
+            ->pluck('alpha_count', 'profil_siswa_id')
             ->map(fn (int|string $count): int => (int) $count);
     }
 

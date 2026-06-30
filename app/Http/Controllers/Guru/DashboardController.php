@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Guru;
 
 use App\Http\Controllers\Controller;
-use App\Models\Attendance;
-use App\Models\SchoolClass;
-use App\Models\StudentProfile;
-use App\Models\StudentViolation;
+use App\Models\Absensi;
+use App\Models\Kelas;
+use App\Models\PelanggaranSiswa;
+use App\Models\ProfilSiswa;
 use App\Services\AbsenceWarningService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -15,13 +15,13 @@ class DashboardController extends Controller
 {
     public function index(AbsenceWarningService $absenceWarning): View
     {
-        $user = Auth::user()->loadMissing('teacherProfile', 'homeroomClass');
+        $user = Auth::user()->loadMissing('profilGuru', 'kelasWali');
         $summary = [];
 
-        if ($user->isWaliKelas() && $user->homeroomClass) {
-            $profileIds = $user->homeroomClass->students()->pluck('id');
-            $todayAttendances = Attendance::whereIn('student_profile_id', $profileIds)
-                ->whereDate('date', today())
+        if ($user->isWaliKelas() && $user->kelasWali) {
+            $profileIds = $user->kelasWali->siswa()->pluck('id');
+            $todayAttendances = Absensi::whereIn('profil_siswa_id', $profileIds)
+                ->whereDate('tanggal', today())
                 ->get();
             $notSubmitted = max(0, $profileIds->count() - $todayAttendances->count())
                 + $todayAttendances->where('status', 'belum_absen')->count();
@@ -30,7 +30,7 @@ class DashboardController extends Controller
                 ->count();
 
             $summary['homeroom'] = [
-                'class_name' => $user->homeroomClass->name,
+                'class_name' => $user->kelasWali->nama,
                 'students' => $profileIds->count(),
                 'hadir' => $todayAttendances->where('status', 'hadir')->count(),
                 'terlambat' => $todayAttendances->where('status', 'terlambat')->count(),
@@ -47,9 +47,9 @@ class DashboardController extends Controller
         }
 
         if ($user->isBk()) {
-            $grade = $user->teacherProfile?->grade;
-            $studentIds = StudentProfile::whereHas('class', fn ($query) => $query->where('grade', $grade))->pluck('id');
-            $violations = StudentViolation::whereIn('student_profile_id', $studentIds)->get();
+            $grade = $user->profilGuru?->tingkat;
+            $studentIds = ProfilSiswa::whereHas('kelas', fn ($query) => $query->where('tingkat', $grade))->pluck('id');
+            $violations = PelanggaranSiswa::whereIn('profil_siswa_id', $studentIds)->get();
             $warningCount = $absenceWarning->alphaCountsForStudentIds($studentIds)
                 ->filter(fn (int $count): bool => $absenceWarning->hasWarning($count))
                 ->count();
@@ -69,15 +69,15 @@ class DashboardController extends Controller
         }
 
         if ($user->isKesiswaan()) {
-            $violations = StudentViolation::all();
-            $studentIds = StudentProfile::query()->pluck('id');
+            $violations = PelanggaranSiswa::all();
+            $studentIds = ProfilSiswa::query()->pluck('id');
             $warningCount = $absenceWarning->alphaCountsForStudentIds($studentIds)
                 ->filter(fn (int $count): bool => $absenceWarning->hasWarning($count))
                 ->count();
 
             $summary['kesiswaan'] = [
-                'classes' => SchoolClass::count(),
-                'students' => StudentProfile::count(),
+                'classes' => Kelas::count(),
+                'students' => ProfilSiswa::count(),
                 'pending' => $violations->where('status', 'pending')->count(),
                 'approved' => $violations->where('status', 'approved')->count(),
                 'warnings' => $warningCount,

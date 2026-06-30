@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\StudentViolation;
 
-use App\Models\StudentViolation;
-use App\Models\ViolationType;
+use App\Models\JenisPelanggaran;
+use App\Models\PelanggaranSiswa;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
@@ -21,10 +21,10 @@ class UpdateStudentViolationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'student_profile_id' => ['required', 'integer', Rule::exists('student_profiles', 'id')],
-            'violation_type_id' => ['required', 'integer', Rule::exists('violation_types', 'id')],
-            'violation_date' => ['required', 'date', 'before_or_equal:today'],
-            'notes' => ['nullable', 'string'],
+            'profil_siswa_id' => ['required', 'integer', Rule::exists('profil_siswa', 'id')],
+            'jenis_pelanggaran_id' => ['required', 'integer', Rule::exists('jenis_pelanggaran', 'id')],
+            'tanggal_pelanggaran' => ['required', 'date', 'before_or_equal:today'],
+            'catatan' => ['nullable', 'string'],
         ];
     }
 
@@ -36,10 +36,10 @@ class UpdateStudentViolationRequest extends FormRequest
         return [
             function (Validator $validator): void {
                 $studentViolation = $this->route('studentViolation');
-                $violationType = ViolationType::find($this->input('violation_type_id'));
+                $violationType = JenisPelanggaran::find($this->input('jenis_pelanggaran_id'));
 
-                if ($violationType && ! $violationType->is_active && ! $this->isCurrentViolationType($studentViolation, $violationType)) {
-                    $validator->errors()->add('violation_type_id', 'Jenis pelanggaran tidak aktif dan tidak dapat dipilih.');
+                if ($violationType && ! $violationType->aktif && ! $this->isCurrentViolationType($studentViolation, $violationType)) {
+                    $validator->errors()->add('jenis_pelanggaran_id', 'Jenis pelanggaran tidak aktif dan tidak dapat dipilih.');
                 }
             },
         ];
@@ -51,18 +51,18 @@ class UpdateStudentViolationRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'student_profile_id.required' => 'Siswa wajib dipilih.',
-            'student_profile_id.exists' => 'Siswa tidak valid.',
-            'violation_type_id.required' => 'Jenis pelanggaran wajib dipilih.',
-            'violation_type_id.exists' => 'Jenis pelanggaran tidak valid.',
-            'violation_date.required' => 'Tanggal pelanggaran wajib diisi.',
-            'violation_date.date' => 'Tanggal pelanggaran tidak valid.',
-            'violation_date.before_or_equal' => 'Tanggal pelanggaran tidak boleh melebihi hari ini.',
+            'profil_siswa_id.required' => 'Siswa wajib dipilih.',
+            'profil_siswa_id.exists' => 'Siswa tidak valid.',
+            'jenis_pelanggaran_id.required' => 'Jenis pelanggaran wajib dipilih.',
+            'jenis_pelanggaran_id.exists' => 'Jenis pelanggaran tidak valid.',
+            'tanggal_pelanggaran.required' => 'Tanggal pelanggaran wajib diisi.',
+            'tanggal_pelanggaran.date' => 'Tanggal pelanggaran tidak valid.',
+            'tanggal_pelanggaran.before_or_equal' => 'Tanggal pelanggaran tidak boleh melebihi hari ini.',
         ];
     }
 
-    private function isCurrentViolationType(mixed $studentViolation, ViolationType $violationType): bool
+    private function isCurrentViolationType(mixed $studentViolation, JenisPelanggaran $violationType): bool
     {
-        return $studentViolation instanceof StudentViolation && (int) $studentViolation->violation_type_id === $violationType->id;
+        return $studentViolation instanceof PelanggaranSiswa && (int) $studentViolation->jenis_pelanggaran_id === $violationType->id;
     }
 }

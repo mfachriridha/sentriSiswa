@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Siswa;
 
 use App\Http\Controllers\Controller;
-use App\Models\Setting;
+use App\Models\Pengaturan;
 use App\Services\GeofenceValidator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -17,13 +17,13 @@ class AbsensiController extends Controller
     public function index(): View
     {
         $student = Auth::user();
-        $profile = $student->studentProfile;
+        $profile = $student->profilSiswa;
 
         $today = now()->toDateString();
-        $todayAttendance = $profile?->attendances()->where('date', $today)->first();
+        $todayAttendance = $profile?->absensi()->where('tanggal', $today)->first();
 
-        $startTime = Setting::get('attendance_start_time', '06:30');
-        $endTime = Setting::get('attendance_end_time', '07:00');
+        $startTime = Pengaturan::get('attendance_start_time', '06:30');
+        $endTime = Pengaturan::get('attendance_end_time', '07:00');
 
         $now = now();
         $currentTime = $now->format('H:i');
@@ -31,7 +31,7 @@ class AbsensiController extends Controller
         $isWeekday = $now->isWeekday();
         $canCheckIn = $isWeekday && $currentTime >= $startTime && $currentTime <= $endTime;
 
-        $geofenceData = Setting::get('attendance_geofence_data');
+        $geofenceData = Pengaturan::get('attendance_geofence_data');
         $geofenceActive = false;
         if (is_string($geofenceData) && $geofenceData !== '') {
             $decoded = json_decode($geofenceData, true);
@@ -42,9 +42,9 @@ class AbsensiController extends Controller
 
         $currentMonth = $now->month;
         $currentYear = $now->year;
-        $monthAttendances = $profile?->attendances()
-            ->whereMonth('date', $currentMonth)
-            ->whereYear('date', $currentYear)
+        $monthAttendances = $profile?->absensi()
+            ->whereMonth('tanggal', $currentMonth)
+            ->whereYear('tanggal', $currentYear)
             ->get() ?? collect();
 
         $stats = [
@@ -71,8 +71,8 @@ class AbsensiController extends Controller
 
     public function statusHariIni(): JsonResponse
     {
-        $profile = Auth::user()->studentProfile;
-        $absensi = $profile?->attendances()->where('date', now()->toDateString())->first();
+        $profile = Auth::user()->profilSiswa;
+        $absensi = $profile?->absensi()->where('tanggal', now()->toDateString())->first();
 
         return response()->json([
             'sudah_absen' => $absensi && $absensi->status !== 'belum_absen',
@@ -97,7 +97,7 @@ class AbsensiController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $student = Auth::user();
-        $profile = $student->studentProfile;
+        $profile = $student->profilSiswa;
 
         if (! $profile) {
             return redirect()->route('siswa.absensi')->with('error', 'Profil siswa tidak ditemukan.');
@@ -108,11 +108,11 @@ class AbsensiController extends Controller
         }
 
         $today = now()->toDateString();
-        $attendance = $profile->attendances()->whereDate('date', $today)->first();
+        $attendance = $profile->absensi()->whereDate('tanggal', $today)->first();
 
         if (! $attendance) {
-            $attendance = $profile->attendances()->create([
-                'date' => $today,
+            $attendance = $profile->absensi()->create([
+                'tanggal' => $today,
                 'status' => 'belum_absen',
             ]);
         }
@@ -121,8 +121,8 @@ class AbsensiController extends Controller
             return redirect()->route('siswa.absensi')->with('error', 'Anda sudah absen hari ini.');
         }
 
-        $startTime = Setting::get('attendance_start_time', '06:30');
-        $endTime = Setting::get('attendance_end_time', '07:00');
+        $startTime = Pengaturan::get('attendance_start_time', '06:30');
+        $endTime = Pengaturan::get('attendance_end_time', '07:00');
         $lateToleranceMinutes = $this->lateToleranceMinutes($endTime);
         $currentTime = now()->format('H:i');
 
@@ -182,12 +182,12 @@ class AbsensiController extends Controller
 
         $attendance->update([
             'status' => $status,
-            'check_in_time' => $currentTime,
-            'selfie_path' => $selfiePath,
+            'waktu_masuk' => $currentTime,
+            'path_selfie' => $selfiePath,
             'latitude' => $latitude,
             'longitude' => $longitude,
-            'accuracy' => $accuracy,
-            'distance_meters' => $distanceMeters,
+            'akurasi' => $accuracy,
+            'jarak_meter' => $distanceMeters,
         ]);
 
         return redirect()->route('siswa.absensi')->with('success', $status === 'terlambat' ? 'Absen tercatat: Terlambat.' : 'Absen berhasil: Hadir.');
@@ -202,13 +202,13 @@ class AbsensiController extends Controller
 
     private function lateToleranceMinutes(string $endTime): int
     {
-        $lateToleranceMinutes = Setting::get('attendance_late_tolerance_minutes');
+        $lateToleranceMinutes = Pengaturan::get('attendance_late_tolerance_minutes');
 
         if (is_numeric($lateToleranceMinutes)) {
             return (int) $lateToleranceMinutes;
         }
 
-        return max(0, $this->minutesFromTime($endTime) - $this->minutesFromTime(Setting::get('attendance_late_time', '07:00')));
+        return max(0, $this->minutesFromTime($endTime) - $this->minutesFromTime(Pengaturan::get('attendance_late_time', '07:00')));
     }
 
     /**
@@ -216,7 +216,7 @@ class AbsensiController extends Controller
      */
     private function attendancePolygon(): ?array
     {
-        $geofenceData = Setting::get('attendance_geofence_data');
+        $geofenceData = Pengaturan::get('attendance_geofence_data');
 
         if (! is_string($geofenceData) || $geofenceData === '') {
             return null;
@@ -259,7 +259,7 @@ class AbsensiController extends Controller
         }
 
         $distanceMeters = $validator->distanceToPolygonEdge($latitude, $longitude, $polygon);
-        $toleranceMeters = (int) Setting::get('attendance_tolerance_meters', '0');
+        $toleranceMeters = (int) Pengaturan::get('attendance_tolerance_meters', '0');
 
         if ($distanceMeters <= $toleranceMeters) {
             return [
@@ -281,7 +281,7 @@ class AbsensiController extends Controller
     public function riwayat(Request $request): View
     {
         $student = Auth::user();
-        $profile = $student->studentProfile;
+        $profile = $student->profilSiswa;
         $selectedMonth = $request->query('month', now()->format('Y-m'));
 
         if (! is_string($selectedMonth) || ! preg_match('/^\d{4}-(0[1-9]|1[0-2])$/', $selectedMonth)) {
@@ -290,12 +290,12 @@ class AbsensiController extends Controller
 
         $month = Carbon::createFromFormat('Y-m', $selectedMonth)->startOfMonth();
 
-        $attendances = $profile?->attendances()
-            ->whereBetween('date', [
+        $attendances = $profile?->absensi()
+            ->whereBetween('tanggal', [
                 $month->toDateString(),
                 $month->copy()->endOfMonth()->toDateString(),
             ])
-            ->latest('date')
+            ->latest('tanggal')
             ->get() ?? collect();
 
         $monthLabel = $month->translatedFormat('F Y');

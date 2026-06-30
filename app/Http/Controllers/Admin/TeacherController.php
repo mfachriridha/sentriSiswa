@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Teacher\StoreTeacherRequest;
 use App\Http\Requests\Teacher\UpdateTeacherRequest;
-use App\Models\SchoolClass;
-use App\Models\TeacherProfile;
-use App\Models\User;
+use App\Models\Kelas;
+use App\Models\Pengguna;
+use App\Models\ProfilGuru;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -24,28 +24,28 @@ class TeacherController extends Controller
         $filterStatus = $request->get('status', '');
         $sort = $request->get('sort', 'created_at');
         $direction = $request->get('direction', 'desc');
-        $allowed = ['name', 'email', 'created_at', 'nip', 'role', 'phone', 'class_name'];
+        $allowed = ['nama', 'email', 'created_at', 'nip', 'peran', 'telepon', 'class_name'];
         $sort = in_array($sort, $allowed) ? $sort : 'created_at';
         $direction = in_array($direction, ['asc', 'desc']) ? $direction : 'desc';
 
-        $teachers = User::whereIn('role', ['wali_kelas', 'bk', 'kesiswaan'])
-            ->with(['teacherProfile', 'homeroomClass']);
+        $teachers = Pengguna::whereIn('peran', ['wali_kelas', 'bk', 'kesiswaan'])
+            ->with(['profilGuru', 'kelasWali']);
 
         if ($search) {
             $teachers->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhereHas('teacherProfile', fn ($q) => $q->where('nip', 'like', "%{$search}%"));
+                $q->where('nama', 'like', "%{$search}%")
+                    ->orWhereHas('profilGuru', fn ($q) => $q->where('nip', 'like', "%{$search}%"));
             });
         }
 
         if (in_array($filterRole, ['wali_kelas', 'bk', 'kesiswaan'], true)) {
-            $teachers->where('role', $filterRole);
+            $teachers->where('peran', $filterRole);
         }
 
         if ($filterGrade) {
             $teachers->where(function ($q) use ($filterGrade) {
-                $q->whereHas('teacherProfile', fn ($q) => $q->where('grade', $filterGrade))
-                    ->orWhereHas('homeroomClass', fn ($q) => $q->where('grade', $filterGrade));
+                $q->whereHas('profilGuru', fn ($q) => $q->where('tingkat', $filterGrade))
+                    ->orWhereHas('kelasWali', fn ($q) => $q->where('tingkat', $filterGrade));
             });
         }
 
@@ -55,15 +55,15 @@ class TeacherController extends Controller
 
         if ($sort === 'class_name') {
             $teachers = $teachers->orderBy(
-                SchoolClass::select('name')
-                    ->whereColumn('homeroom_teacher_id', 'users.id')
+                Kelas::select('nama')
+                    ->whereColumn('wali_kelas_id', 'pengguna.id')
                     ->limit(1),
                 $direction,
             );
-        } elseif (in_array($sort, ['nip', 'phone'])) {
+        } elseif (in_array($sort, ['nip', 'telepon'])) {
             $teachers = $teachers->orderBy(
-                TeacherProfile::select($sort)
-                    ->whereColumn('teacher_profiles.user_id', 'users.id')
+                ProfilGuru::select($sort)
+                    ->whereColumn('profil_guru.pengguna_id', 'pengguna.id')
                     ->limit(1),
                 $direction,
             );
@@ -92,58 +92,58 @@ class TeacherController extends Controller
     {
         DB::transaction(function () use ($request) {
             $data = [
-                'name' => $request->name,
+                'nama' => $request->name,
                 'email' => $request->email,
-                'role' => $request->role,
+                'peran' => $request->role,
                 'status' => 'unregistered',
                 'password' => Hash::make($request->filled('password') ? $request->password : 'password'),
             ];
 
-            $user = User::create($data);
+            $user = Pengguna::create($data);
 
-            $user->teacherProfile()->create([
+            $user->profilGuru()->create([
                 'nip' => $request->nip,
-                'phone' => $request->phone,
-                'grade' => $request->role === 'bk' ? $request->grade : null,
+                'telepon' => $request->phone,
+                'tingkat' => $request->role === 'bk' ? $request->grade : null,
             ]);
         });
 
         return redirect()->route('admin.guru.index')->with('success', 'Guru berhasil ditambahkan.');
     }
 
-    public function show(User $teacher): View
+    public function show(Pengguna $teacher): View
     {
-        $teacher->load(['teacherProfile', 'homeroomClass']);
+        $teacher->load(['profilGuru', 'kelasWali']);
 
         return view('admin.guru.show', compact('teacher'));
     }
 
-    public function edit(User $teacher): View
+    public function edit(Pengguna $teacher): View
     {
-        $teacher->load('teacherProfile');
+        $teacher->load('profilGuru');
 
         return view('admin.guru.edit', compact('teacher'));
     }
 
-    public function update(UpdateTeacherRequest $request, User $teacher): RedirectResponse
+    public function update(UpdateTeacherRequest $request, Pengguna $teacher): RedirectResponse
     {
         DB::transaction(function () use ($request, $teacher) {
             $teacher->update([
-                'name' => $request->name,
+                'nama' => $request->name,
                 'email' => $request->email,
-                'role' => $request->role,
+                'peran' => $request->role,
             ]);
 
             if ($request->filled('password')) {
                 $teacher->update(['password' => Hash::make($request->password)]);
             }
 
-            $teacher->teacherProfile()->updateOrCreate(
-                ['user_id' => $teacher->id],
+            $teacher->profilGuru()->updateOrCreate(
+                ['pengguna_id' => $teacher->id],
                 [
                     'nip' => $request->nip,
-                    'phone' => $request->phone,
-                    'grade' => $request->role === 'bk' ? $request->grade : null,
+                    'telepon' => $request->phone,
+                    'tingkat' => $request->role === 'bk' ? $request->grade : null,
                 ],
             );
         });
@@ -151,7 +151,7 @@ class TeacherController extends Controller
         return redirect()->route('admin.guru.index')->with('success', 'Guru berhasil diperbarui.');
     }
 
-    public function destroy(User $teacher): RedirectResponse
+    public function destroy(Pengguna $teacher): RedirectResponse
     {
         $teacher->delete();
 
@@ -160,8 +160,8 @@ class TeacherController extends Controller
 
     public function deleteAll(): RedirectResponse
     {
-        TeacherProfile::whereHas('user', fn ($q) => $q->whereIn('role', ['wali_kelas', 'bk', 'kesiswaan']))->delete();
-        User::whereIn('role', ['wali_kelas', 'bk', 'kesiswaan'])->delete();
+        ProfilGuru::whereHas('pengguna', fn ($q) => $q->whereIn('peran', ['wali_kelas', 'bk', 'kesiswaan']))->delete();
+        Pengguna::whereIn('peran', ['wali_kelas', 'bk', 'kesiswaan'])->delete();
 
         return redirect()->route('admin.guru.index')->with('success', 'Semua guru berhasil dihapus.');
     }

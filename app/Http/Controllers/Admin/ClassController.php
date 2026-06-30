@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Class\StoreClassRequest;
 use App\Http\Requests\Class\UpdateClassRequest;
-use App\Models\SchoolClass;
-use App\Models\User;
+use App\Models\Kelas;
+use App\Models\Pengguna;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -17,28 +17,28 @@ class ClassController extends Controller
     {
         $search = $request->get('search', '');
         $filterGrade = $request->get('grade', '');
-        $sort = $request->get('sort', 'name');
+        $sort = $request->get('sort', 'nama');
         $direction = $request->get('direction', 'asc');
-        $allowed = ['name', 'grade', 'created_at'];
-        $sort = in_array($sort, $allowed) ? $sort : 'name';
+        $allowed = ['nama', 'tingkat', 'created_at'];
+        $sort = in_array($sort, $allowed) ? $sort : 'nama';
         $direction = in_array($direction, ['asc', 'desc']) ? $direction : 'asc';
 
-        $classes = SchoolClass::with('homeroomTeacher');
+        $classes = Kelas::with('waliKelas');
 
         if ($search) {
-            $classes->where('name', 'like', "%{$search}%");
+            $classes->where('nama', 'like', "%{$search}%");
         }
 
         if ($filterGrade) {
-            $classes->where('grade', $filterGrade);
+            $classes->where('tingkat', $filterGrade);
         }
 
-        if ($sort === 'name') {
-            $classes = $classes->orderBy('grade', $direction)
-                ->orderByRaw("CAST(SUBSTRING_INDEX(name, '. ', -1) AS UNSIGNED) {$direction}")
-                ->orderBy('name', $direction);
-        } elseif ($sort === 'grade') {
-            $classes = $classes->orderBy('grade', $direction)->orderBy('name', 'asc');
+        if ($sort === 'nama') {
+            $classes = $classes->orderBy('tingkat', $direction)
+                ->orderByRaw("CAST(SUBSTRING_INDEX(nama, '. ', -1) AS UNSIGNED) {$direction}")
+                ->orderBy('nama', $direction);
+        } elseif ($sort === 'tingkat') {
+            $classes = $classes->orderBy('tingkat', $direction)->orderBy('nama', 'asc');
         } else {
             $classes = $classes->orderBy($sort, $direction);
         }
@@ -55,7 +55,7 @@ class ClassController extends Controller
 
     public function create(): View
     {
-        $homeroomTeachers = User::where('role', 'wali_kelas')
+        $homeroomTeachers = Pengguna::where('peran', 'wali_kelas')
             ->get();
 
         return view('admin.kelas.create', compact('homeroomTeachers'));
@@ -65,43 +65,43 @@ class ClassController extends Controller
     {
         $data = $request->validated();
         $separator = is_numeric($data['identifier']) ? '. ' : ' ';
-        $data['name'] = $data['grade'].$separator.$data['identifier'];
+        $data['nama'] = $data['grade'].$separator.$data['identifier'];
 
-        SchoolClass::create($data);
+        Kelas::create($data);
 
         return redirect()->route('admin.kelas.index')->with('success', 'Kelas berhasil ditambahkan.');
     }
 
-    public function show(SchoolClass $class): View
+    public function show(Kelas $class): View
     {
-        $class->load(['homeroomTeacher']);
-        $class->loadCount('students');
+        $class->load(['waliKelas']);
+        $class->loadCount('siswa');
 
         return view('admin.kelas.show', compact('class'));
     }
 
-    public function edit(SchoolClass $class): View
+    public function edit(Kelas $class): View
     {
-        $class->load('homeroomTeacher');
-        $identifier = trim((string) str_replace($class->grade, '', $class->name));
-        $homeroomTeachers = User::where('role', 'wali_kelas')
+        $class->load('waliKelas');
+        $identifier = trim((string) str_replace($class->tingkat, '', $class->nama));
+        $homeroomTeachers = Pengguna::where('peran', 'wali_kelas')
             ->get();
 
         return view('admin.kelas.edit', compact('class', 'identifier', 'homeroomTeachers'));
     }
 
-    public function update(UpdateClassRequest $request, SchoolClass $class): RedirectResponse
+    public function update(UpdateClassRequest $request, Kelas $class): RedirectResponse
     {
         $data = $request->validated();
         $separator = is_numeric($data['identifier']) ? '. ' : ' ';
-        $data['name'] = $data['grade'].$separator.$data['identifier'];
+        $data['nama'] = $data['grade'].$separator.$data['identifier'];
 
         $class->update($data);
 
         return redirect()->route('admin.kelas.index')->with('success', 'Kelas berhasil diperbarui.');
     }
 
-    public function destroy(SchoolClass $class): RedirectResponse
+    public function destroy(Kelas $class): RedirectResponse
     {
         $class->delete();
 
@@ -110,7 +110,7 @@ class ClassController extends Controller
 
     public function deleteAll(): RedirectResponse
     {
-        SchoolClass::query()->delete();
+        Kelas::query()->delete();
 
         return redirect()->route('admin.kelas.index')->with('success', 'Semua kelas berhasil dihapus.');
     }

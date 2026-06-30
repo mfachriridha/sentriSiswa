@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Guru;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ViolationType\StoreViolationTypeRequest;
 use App\Http\Requests\ViolationType\UpdateViolationTypeRequest;
-use App\Models\ViolationType;
+use App\Models\JenisPelanggaran;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -17,36 +17,36 @@ class ViolationTypeController extends Controller
         $search = $request->get('search', '');
         $filterCategory = $request->get('category', '');
         $filterStatus = $request->get('status', '');
-        $sort = $request->get('sort', 'category');
+        $sort = $request->get('sort', 'kategori');
         $direction = $request->get('direction', 'asc');
-        $allowed = ['name', 'category', 'point_deduction', 'is_active', 'created_at'];
-        $sort = in_array($sort, $allowed) ? $sort : 'category';
+        $allowed = ['nama', 'kategori', 'pengurangan_poin', 'aktif', 'created_at'];
+        $sort = in_array($sort, $allowed) ? $sort : 'kategori';
         $direction = in_array($direction, ['asc', 'desc']) ? $direction : 'asc';
 
-        $violationTypes = ViolationType::query();
+        $violationTypes = JenisPelanggaran::query();
 
         if ($search) {
             $violationTypes->where(function ($query) use ($search) {
-                $query->where('name', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
+                $query->where('nama', 'like', "%{$search}%")
+                    ->orWhere('keterangan', 'like', "%{$search}%");
             });
         }
 
-        if (array_key_exists($filterCategory, ViolationType::categoryLabels())) {
-            $violationTypes->where('category', $filterCategory);
+        if (array_key_exists($filterCategory, JenisPelanggaran::categoryLabels())) {
+            $violationTypes->where('kategori', $filterCategory);
         }
 
         if ($filterStatus === 'active') {
-            $violationTypes->where('is_active', true);
+            $violationTypes->where('aktif', true);
         } elseif ($filterStatus === 'inactive') {
-            $violationTypes->where('is_active', false);
+            $violationTypes->where('aktif', false);
         }
 
-        if ($sort === 'category') {
+        if ($sort === 'kategori') {
             $violationTypes = $violationTypes
-                ->orderByRaw("CASE category WHEN 'light' THEN 1 WHEN 'medium' THEN 2 WHEN 'heavy' THEN 3 WHEN 'severe' THEN 4 ELSE 5 END {$direction}")
-                ->orderBy('point_deduction', $direction)
-                ->orderBy('name');
+                ->orderByRaw("CASE kategori WHEN 'light' THEN 1 WHEN 'medium' THEN 2 WHEN 'heavy' THEN 3 WHEN 'severe' THEN 4 ELSE 5 END {$direction}")
+                ->orderBy('pengurangan_poin', $direction)
+                ->orderBy('nama');
         } else {
             $violationTypes = $violationTypes->orderBy($sort, $direction);
         }
@@ -59,51 +59,51 @@ class ViolationTypeController extends Controller
             'direction' => $direction,
         ]);
 
-        $categoryLabels = ViolationType::categoryLabels();
+        $categoryLabels = JenisPelanggaran::categoryLabels();
 
         return view('kesiswaan.jenis-pelanggaran.index', compact('violationTypes', 'categoryLabels', 'sort', 'direction', 'search', 'filterCategory', 'filterStatus'));
     }
 
     public function create(): View
     {
-        $categoryLabels = ViolationType::categoryLabels();
-        $categoryRanges = ViolationType::categoryRanges();
+        $categoryLabels = JenisPelanggaran::categoryLabels();
+        $categoryRanges = JenisPelanggaran::categoryRanges();
 
         return view('kesiswaan.jenis-pelanggaran.create', compact('categoryLabels', 'categoryRanges'));
     }
 
     public function store(StoreViolationTypeRequest $request): RedirectResponse
     {
-        ViolationType::create($request->validated());
+        JenisPelanggaran::create($request->validated());
 
         return redirect()->route('kesiswaan.jenis-pelanggaran.index')->with('success', 'Jenis pelanggaran berhasil ditambahkan.');
     }
 
-    public function show(ViolationType $violationType): View
+    public function show(JenisPelanggaran $violationType): View
     {
-        $categoryLabels = ViolationType::categoryLabels();
+        $categoryLabels = JenisPelanggaran::categoryLabels();
 
         return view('kesiswaan.jenis-pelanggaran.show', compact('violationType', 'categoryLabels'));
     }
 
-    public function edit(ViolationType $violationType): View
+    public function edit(JenisPelanggaran $violationType): View
     {
-        $categoryLabels = ViolationType::categoryLabels();
-        $categoryRanges = ViolationType::categoryRanges();
+        $categoryLabels = JenisPelanggaran::categoryLabels();
+        $categoryRanges = JenisPelanggaran::categoryRanges();
 
         return view('kesiswaan.jenis-pelanggaran.edit', compact('violationType', 'categoryLabels', 'categoryRanges'));
     }
 
-    public function update(UpdateViolationTypeRequest $request, ViolationType $violationType): RedirectResponse
+    public function update(UpdateViolationTypeRequest $request, JenisPelanggaran $violationType): RedirectResponse
     {
         $violationType->update($request->validated());
 
         return redirect()->route('kesiswaan.jenis-pelanggaran.index')->with('success', 'Jenis pelanggaran berhasil diperbarui.');
     }
 
-    public function destroy(ViolationType $violationType): RedirectResponse
+    public function destroy(JenisPelanggaran $violationType): RedirectResponse
     {
-        if ($violationType->studentViolations()->exists()) {
+        if ($violationType->pelanggaranSiswa()->exists()) {
             return redirect()->route('kesiswaan.jenis-pelanggaran.index')->with('error', 'Jenis pelanggaran sudah dipakai pada data pelanggaran siswa. Nonaktifkan jika tidak ingin digunakan lagi.');
         }
 

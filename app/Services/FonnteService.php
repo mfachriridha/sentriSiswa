@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\Setting;
+use App\Models\Pengaturan;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Throwable;
@@ -117,6 +117,6 @@ class FonnteService
 
     private function token(): string
     {
-        return (string) Setting::get('fonnte_token', '');
+        return (string) Pengaturan::get('fonnte_token', '');
     }
 }

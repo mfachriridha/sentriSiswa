@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Setting;
-use App\Models\WhatsappMessage;
+use App\Models\Pengaturan;
+use App\Models\PesanWhatsapp;
 use App\Services\FonnteService;
 use App\Services\KmlParser;
 use Illuminate\Http\JsonResponse;
@@ -18,13 +18,13 @@ class SettingController extends Controller
 {
     public function attendanceTime(): View
     {
-        $startTime = Setting::get('attendance_start_time', '06:30');
-        $endTime = Setting::get('attendance_end_time', '07:00');
-        $lateToleranceMinutes = Setting::get('attendance_late_tolerance_minutes');
-        $updatedAt = Setting::get('attendance_time_updated_at');
+        $startTime = Pengaturan::get('attendance_start_time', '06:30');
+        $endTime = Pengaturan::get('attendance_end_time', '07:00');
+        $lateToleranceMinutes = Pengaturan::get('attendance_late_tolerance_minutes');
+        $updatedAt = Pengaturan::get('attendance_time_updated_at');
 
         if (! is_numeric($lateToleranceMinutes)) {
-            $lateToleranceMinutes = max(0, $this->minutesFromTime($endTime) - $this->minutesFromTime(Setting::get('attendance_late_time', '07:00')));
+            $lateToleranceMinutes = max(0, $this->minutesFromTime($endTime) - $this->minutesFromTime(Pengaturan::get('attendance_late_time', '07:00')));
         }
 
         return view('admin.pengaturan.attendance-time', [
@@ -69,11 +69,11 @@ class SettingController extends Controller
             ])->withInput();
         }
 
-        Setting::set('attendance_start_time', $startTime);
-        Setting::set('attendance_end_time', $endTime);
-        Setting::set('attendance_late_tolerance_minutes', (string) $lateToleranceMinutes);
-        Setting::set('attendance_late_time', $this->formatMinutesAsTime($this->minutesFromTime($endTime) - $lateToleranceMinutes));
-        Setting::set('attendance_time_updated_at', now()->toDateTimeString());
+        Pengaturan::set('attendance_start_time', $startTime);
+        Pengaturan::set('attendance_end_time', $endTime);
+        Pengaturan::set('attendance_late_tolerance_minutes', (string) $lateToleranceMinutes);
+        Pengaturan::set('attendance_late_time', $this->formatMinutesAsTime($this->minutesFromTime($endTime) - $lateToleranceMinutes));
+        Pengaturan::set('attendance_time_updated_at', now()->toDateTimeString());
 
         return redirect()->route('admin.settings.attendance-time.index')->with('success', 'Konfigurasi waktu absen berhasil disimpan.');
     }
@@ -99,8 +99,8 @@ class SettingController extends Controller
 
     public function attendanceLocation(): View
     {
-        $geofenceData = Setting::get('attendance_geofence_data');
-        $toleranceMeters = Setting::get('attendance_tolerance_meters', '0');
+        $geofenceData = Pengaturan::get('attendance_geofence_data');
+        $toleranceMeters = Pengaturan::get('attendance_tolerance_meters', '0');
 
         if (is_string($geofenceData) && $geofenceData !== '') {
             $decoded = json_decode($geofenceData, true);
@@ -137,10 +137,10 @@ class SettingController extends Controller
             return back()->withErrors(['kml_file' => $result['error']])->withInput();
         }
 
-        Setting::set('attendance_geofence_data', json_encode($result));
+        Pengaturan::set('attendance_geofence_data', json_encode($result));
 
-        if (! Setting::get('attendance_tolerance_meters')) {
-            Setting::set('attendance_tolerance_meters', '0');
+        if (! Pengaturan::get('attendance_tolerance_meters')) {
+            Pengaturan::set('attendance_tolerance_meters', '0');
         }
 
         return redirect()->route('admin.settings.attendance-location.index')->with('success', 'Area absensi berhasil diimpor.');
@@ -157,15 +157,15 @@ class SettingController extends Controller
             'tolerance_meters.max' => 'Toleransi maksimal 500 meter.',
         ]);
 
-        Setting::set('attendance_tolerance_meters', (string) $validated['tolerance_meters']);
+        Pengaturan::set('attendance_tolerance_meters', (string) $validated['tolerance_meters']);
 
         return redirect()->route('admin.settings.attendance-location.index')->with('success', 'Toleransi jarak berhasil disimpan.');
     }
 
     public function attendanceLocationDelete(): RedirectResponse
     {
-        Setting::set('attendance_geofence_data', '');
-        Setting::set('attendance_tolerance_meters', '0');
+        Pengaturan::set('attendance_geofence_data', '');
+        Pengaturan::set('attendance_tolerance_meters', '0');
 
         return redirect()->route('admin.settings.attendance-location.index')->with('success', 'Lokasi absen berhasil dihapus.');
     }
@@ -174,7 +174,7 @@ class SettingController extends Controller
     {
         return view('admin.pengaturan.whatsapp', [
             'config' => [
-                'token' => Setting::get('fonnte_token', ''),
+                'token' => Pengaturan::get('fonnte_token', ''),
             ],
         ]);
     }
@@ -189,9 +189,9 @@ class SettingController extends Controller
         ]);
 
         if ($request->boolean('clear_fonnte_token')) {
-            Setting::set('fonnte_token', '');
-        } elseif (filled($validated['fonnte_token'] ?? null) || blank(Setting::get('fonnte_token', ''))) {
-            Setting::set('fonnte_token', $validated['fonnte_token'] ?? '');
+            Pengaturan::set('fonnte_token', '');
+        } elseif (filled($validated['fonnte_token'] ?? null) || blank(Pengaturan::get('fonnte_token', ''))) {
+            Pengaturan::set('fonnte_token', $validated['fonnte_token'] ?? '');
         }
 
         return redirect()->route('admin.settings.whatsapp.index')->with('success', 'Konfigurasi WhatsApp berhasil disimpan.');
@@ -229,15 +229,15 @@ class SettingController extends Controller
             'retries' => 0,
         ]);
 
-        WhatsappMessage::create([
-            'school_class_id' => null,
-            'recipient_phone' => $normalizedPhone,
-            'recipient_name' => 'Test (Pesan Uji)',
-            'message_type' => 'test',
-            'message' => $validated['message'],
+        PesanWhatsapp::create([
+            'kelas_id' => null,
+            'telepon_penerima' => $normalizedPhone,
+            'nama_penerima' => 'Test (Pesan Uji)',
+            'tipe_pesan' => 'test',
+            'isi_pesan' => $validated['message'],
             'status' => $result['success'] ? 'sent' : 'failed',
-            'response' => json_encode($result),
-            'sent_at' => now(),
+            'respons' => json_encode($result),
+            'dikirim_pada' => now(),
         ]);
 
         return response()->json([

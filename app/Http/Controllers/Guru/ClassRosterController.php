@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Guru;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Guru\UpdateDailyAttendanceRequest;
-use App\Models\Attendance;
-use App\Models\StudentProfile;
+use App\Models\Absensi;
+use App\Models\ProfilSiswa;
 use App\Services\AbsenceWarningService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -17,7 +17,7 @@ class ClassRosterController extends Controller
 {
     public function index(Request $request, AbsenceWarningService $absenceWarning): View
     {
-        $class = Auth::user()->homeroomClass;
+        $class = Auth::user()->kelasWali;
 
         if (! $class) {
             return view('wali-kelas.kelas-saya.empty');
@@ -25,24 +25,24 @@ class ClassRosterController extends Controller
 
         $today = now()->toDateString();
         $isWeekday = now()->isWeekday();
-        $studentIds = $class->students()->pluck('student_profiles.id');
-        $attendances = Attendance::query()
-            ->whereIn('student_profile_id', $studentIds)
-            ->whereDate('date', $today)
+        $studentIds = $class->siswa()->pluck('profil_siswa.id');
+        $attendances = Absensi::query()
+            ->whereIn('profil_siswa_id', $studentIds)
+            ->whereDate('tanggal', $today)
             ->get()
-            ->keyBy('student_profile_id');
+            ->keyBy('profil_siswa_id');
 
-        $students = $class->students()
-            ->join('users', 'student_profiles.user_id', '=', 'users.id')
-            ->with('user')
+        $students = $class->siswa()
+            ->join('pengguna', 'profil_siswa.pengguna_id', '=', 'pengguna.id')
+            ->with('pengguna')
             ->when($request->string('search')->toString(), function ($query, string $search) {
                 $query->where(function ($query) use ($search) {
-                    $query->where('users.name', 'like', "%{$search}%")
-                        ->orWhere('student_profiles.nis', 'like', "%{$search}%");
+                    $query->where('pengguna.nama', 'like', "%{$search}%")
+                        ->orWhere('profil_siswa.nis', 'like', "%{$search}%");
                 });
             })
-            ->orderBy('users.name')
-            ->select('student_profiles.*')
+            ->orderBy('pengguna.nama')
+            ->select('profil_siswa.*')
             ->get();
 
         $stats = [
@@ -67,18 +67,18 @@ class ClassRosterController extends Controller
 
     public function statusAbsensi(): JsonResponse
     {
-        $class = Auth::user()->homeroomClass;
+        $class = Auth::user()->kelasWali;
 
         if (! $class) {
             return response()->json(['stats' => [], 'rows' => []]);
         }
 
         $today = now()->toDateString();
-        $studentIds = $class->students()->pluck('student_profiles.id');
-        $attendances = Attendance::whereIn('student_profile_id', $studentIds)
-            ->whereDate('date', $today)
+        $studentIds = $class->siswa()->pluck('profil_siswa.id');
+        $attendances = Absensi::whereIn('profil_siswa_id', $studentIds)
+            ->whereDate('tanggal', $today)
             ->get()
-            ->keyBy('student_profile_id');
+            ->keyBy('profil_siswa_id');
 
         $stats = ['hadir' => 0, 'terlambat' => 0, 'izin' => 0, 'sakit' => 0, 'alpha' => 0, 'belum_absen' => 0];
         foreach ($studentIds as $id) {
@@ -86,20 +86,20 @@ class ClassRosterController extends Controller
             $stats[$status]++;
         }
 
-        $rows = $class->students()->with('user')->get()->map(fn ($sp) => [
+        $rows = $class->siswa()->with('pengguna')->get()->map(fn ($sp) => [
             'id' => $sp->id,
             'status' => $attendances->get($sp->id)?->status ?? 'belum_absen',
-            'check_in_time' => $attendances->get($sp->id)?->check_in_time,
+            'check_in_time' => $attendances->get($sp->id)?->waktu_masuk,
         ]);
 
         return response()->json(compact('stats', 'rows'));
     }
 
-    public function updateAttendance(UpdateDailyAttendanceRequest $request, StudentProfile $studentProfile): RedirectResponse
+    public function updateAttendance(UpdateDailyAttendanceRequest $request, ProfilSiswa $studentProfile): RedirectResponse
     {
-        $class = Auth::user()->homeroomClass;
+        $class = Auth::user()->kelasWali;
 
-        if (! $class || $studentProfile->class_id !== $class->id) {
+        if (! $class || $studentProfile->kelas_id !== $class->id) {
             abort(403);
         }
 
@@ -107,15 +107,15 @@ class ClassRosterController extends Controller
             return redirect()->route('wali-kelas.kelas-saya')->with('error', 'Absensi hanya tersedia pada hari Senin sampai Jumat.');
         }
 
-        $attendance = Attendance::query()
-            ->where('student_profile_id', $studentProfile->id)
-            ->whereDate('date', now()->toDateString())
+        $attendance = Absensi::query()
+            ->where('profil_siswa_id', $studentProfile->id)
+            ->whereDate('tanggal', now()->toDateString())
             ->first();
 
         if (! $attendance) {
-            $attendance = new Attendance([
-                'student_profile_id' => $studentProfile->id,
-                'date' => now()->toDateString(),
+            $attendance = new Absensi([
+                'profil_siswa_id' => $studentProfile->id,
+                'tanggal' => now()->toDateString(),
             ]);
         }
 
@@ -125,20 +125,20 @@ class ClassRosterController extends Controller
         return redirect()->route('wali-kelas.kelas-saya')->with('success', 'Status absensi hari ini berhasil diperbarui.');
     }
 
-    public function show(StudentProfile $studentProfile, AbsenceWarningService $absenceWarning): View
+    public function show(ProfilSiswa $studentProfile, AbsenceWarningService $absenceWarning): View
     {
-        $class = Auth::user()->homeroomClass;
+        $class = Auth::user()->kelasWali;
 
-        if (! $class || $studentProfile->class_id !== $class->id) {
+        if (! $class || $studentProfile->kelas_id !== $class->id) {
             abort(403);
         }
 
         $studentProfile->load([
-            'user',
-            'class',
+            'pengguna',
+            'kelas',
             'biodata',
-            'studentViolations' => fn ($query) => $query->approved()->latest('violation_date')->with(['recordedBy', 'violationType']),
-            'attendances' => fn ($query) => $query->latest('date')->take(30),
+            'pelanggaranSiswa' => fn ($query) => $query->approved()->latest('tanggal_pelanggaran')->with(['dicatatOleh', 'jenisPelanggaran']),
+            'absensi' => fn ($query) => $query->latest('tanggal')->take(30),
         ]);
 
         return view('kesiswaan.monitoring.show', [

@@ -2,9 +2,9 @@
 
 namespace App\Imports;
 
-use App\Models\SchoolClass;
-use App\Models\StudentProfile;
-use App\Models\User;
+use App\Models\Kelas;
+use App\Models\Pengguna;
+use App\Models\ProfilSiswa;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -40,7 +40,7 @@ class StudentImport implements ToCollection, WithChunkReading, WithHeadingRow
 
         foreach ($rows as $row) {
             $this->rowIndex++;
-            $name = trim((string) ($row['nama'] ?? ''));
+            $nama = trim((string) ($row['nama'] ?? ''));
             $nisRaw = isset($row['nis']) ? trim((string) $row['nis']) : null;
             $nis = $nisRaw ? mb_substr($nisRaw, 0, 20) : null;
             $nisnRaw = isset($row['nisn']) ? trim((string) $row['nisn']) : null;
@@ -48,29 +48,29 @@ class StudentImport implements ToCollection, WithChunkReading, WithHeadingRow
             $nisn = $nisnRaw ? mb_substr((string) $nisnRaw, 0, 10) : null;
             $kelas = isset($row['kelas']) ? trim((string) $row['kelas']) : null;
 
-            if (empty($name)) {
+            if (empty($nama)) {
                 $this->errors++;
-                $this->errorDetails[] = ['row' => $this->rowIndex, 'name' => '(kosong)', 'reason' => 'Nama kosong'];
+                $this->errorDetails[] = ['row' => $this->rowIndex, 'nama' => '(kosong)', 'reason' => 'Nama kosong'];
 
                 continue;
             }
 
-            $classId = null;
+            $kelasId = null;
             if ($kelas) {
                 if (! isset($this->classCache[$kelas])) {
-                    $grade = (int) strtok($kelas, ' .-');
-                    $class = SchoolClass::firstOrCreate(
-                        ['name' => $kelas],
-                        ['grade' => in_array($grade, [10, 11, 12]) ? (string) $grade : '10']
+                    $tingkat = (int) strtok($kelas, ' .-');
+                    $kelasObj = Kelas::firstOrCreate(
+                        ['nama' => $kelas],
+                        ['tingkat' => in_array($tingkat, [10, 11, 12]) ? (string) $tingkat : '10']
                     );
-                    $this->classCache[$kelas] = $class->id;
+                    $this->classCache[$kelas] = $kelasObj->id;
                 }
-                $classId = $this->classCache[$kelas];
+                $kelasId = $this->classCache[$kelas];
             }
 
             $newUsers[] = [
-                'name' => $name,
-                'role' => 'siswa',
+                'nama' => $nama,
+                'peran' => 'siswa',
                 'status' => 'unregistered',
                 'password' => $this->defaultPassword,
                 'email' => null,
@@ -79,10 +79,10 @@ class StudentImport implements ToCollection, WithChunkReading, WithHeadingRow
             ];
 
             $profileRows[] = [
-                'name' => $name,
+                'nama' => $nama,
                 'nisn' => $nisn,
                 'nis' => $nis,
-                'class_id' => $classId,
+                'kelas_id' => $kelasId,
                 'row' => $this->rowIndex,
             ];
         }
@@ -99,8 +99,8 @@ class StudentImport implements ToCollection, WithChunkReading, WithHeadingRow
 
             $existingProfiles = [];
             if (! empty($existingNisns)) {
-                $existingProfiles = StudentProfile::whereIn('nisn', $existingNisns)
-                    ->pluck('user_id', 'nisn')
+                $existingProfiles = ProfilSiswa::whereIn('nisn', $existingNisns)
+                    ->pluck('pengguna_id', 'nisn')
                     ->toArray();
             }
 
@@ -109,43 +109,43 @@ class StudentImport implements ToCollection, WithChunkReading, WithHeadingRow
             $existingCount = 0;
 
             foreach ($profileRows as $i => $profile) {
-                $name = $profile['name'];
+                $nama = $profile['nama'];
                 $nisn = $profile['nisn'];
 
                 if ($nisn && isset($existingProfiles[$nisn])) {
                     $existingCount++;
                     $this->errorDetails[] = [
                         'row' => $profile['row'],
-                        'name' => $name,
+                        'nama' => $nama,
                         'reason' => 'NISN sudah ada di database ('.$nisn.')',
                     ];
                     $profileData[] = [
-                        'user_id' => $existingProfiles[$nisn],
+                        'pengguna_id' => $existingProfiles[$nisn],
                         'nisn' => $nisn,
                         'nis' => $profile['nis'],
-                        'class_id' => $profile['class_id'],
+                        'kelas_id' => $profile['kelas_id'],
                         'updated_at' => now(),
                     ];
                 } else {
                     $freshUsers[] = $newUsers[$i];
                     $profileData[] = [
-                        'user_id' => null,
+                        'pengguna_id' => null,
                         'nisn' => $nisn,
                         'nis' => $profile['nis'],
-                        'class_id' => $profile['class_id'],
+                        'kelas_id' => $profile['kelas_id'],
                     ];
                 }
             }
 
             foreach (array_chunk($freshUsers, 500) as $chunk) {
-                User::insert($chunk);
+                Pengguna::insert($chunk);
             }
 
             $this->studentsCreated += count($freshUsers);
             $this->studentsExisting += $existingCount;
 
             if (count($freshUsers) > 0) {
-                $firstId = User::where('role', 'siswa')->latest('id')->first()->id;
+                $firstId = Pengguna::where('peran', 'siswa')->latest('id')->first()->id;
                 $newUserOffset = $firstId - count($freshUsers) + 1;
             } else {
                 $newUserOffset = 0;
@@ -155,7 +155,7 @@ class StudentImport implements ToCollection, WithChunkReading, WithHeadingRow
             $newIdx = 0;
 
             foreach ($profileData as $profile) {
-                if ($profile['user_id'] === null) {
+                if ($profile['pengguna_id'] === null) {
                     $newIdx++;
 
                     if ($newIdx > count($freshUsers)) {
@@ -163,26 +163,26 @@ class StudentImport implements ToCollection, WithChunkReading, WithHeadingRow
                     }
 
                     $inserts[] = [
-                        'user_id' => $newUserOffset + $newIdx - 1,
+                        'pengguna_id' => $newUserOffset + $newIdx - 1,
                         'nisn' => $profile['nisn'],
                         'nis' => $profile['nis'],
-                        'class_id' => $profile['class_id'],
+                        'kelas_id' => $profile['kelas_id'],
                         'created_at' => now(),
                         'updated_at' => now(),
                     ];
                 } else {
                     $inserts[] = [
-                        'user_id' => $profile['user_id'],
+                        'pengguna_id' => $profile['pengguna_id'],
                         'nisn' => $profile['nisn'],
                         'nis' => $profile['nis'],
-                        'class_id' => $profile['class_id'],
+                        'kelas_id' => $profile['kelas_id'],
                         'updated_at' => now(),
                     ];
                 }
             }
 
             foreach (array_chunk($inserts, 500) as $chunk) {
-                StudentProfile::upsert($chunk, ['user_id'], ['nisn', 'nis', 'class_id', 'updated_at']);
+                ProfilSiswa::upsert($chunk, ['pengguna_id'], ['nisn', 'nis', 'kelas_id', 'updated_at']);
             }
         });
     }

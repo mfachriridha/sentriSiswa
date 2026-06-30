@@ -3,8 +3,8 @@
 namespace App\Services;
 
 use App\Mail\OtpMail;
-use App\Models\EmailOtpToken;
-use App\Models\User;
+use App\Models\Pengguna;
+use App\Models\TokenOtp;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 
@@ -17,25 +17,24 @@ class OtpService
      *
      * @param  array{new_email?: string, new_password?: string}  $pending
      */
-    public function generate(User $user, string $type, array $pending = []): EmailOtpToken
+    public function generate(Pengguna $user, string $type, array $pending = []): TokenOtp
     {
-        // Invalidate any existing unused OTPs of this type for the user
-        EmailOtpToken::where('user_id', $user->id)
-            ->where('type', $type)
-            ->whereNull('used_at')
+        TokenOtp::where('pengguna_id', $user->id)
+            ->where('tipe', $type)
+            ->whereNull('digunakan_pada')
             ->delete();
 
         $rawOtp = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
-        $token = EmailOtpToken::create([
-            'user_id' => $user->id,
+        $token = TokenOtp::create([
+            'pengguna_id' => $user->id,
             'otp' => Hash::make($rawOtp),
-            'type' => $type,
-            'new_email' => $pending['new_email'] ?? null,
-            'new_password' => isset($pending['new_password'])
+            'tipe' => $type,
+            'email_baru' => $pending['new_email'] ?? null,
+            'sandi_baru' => isset($pending['new_password'])
                 ? Hash::make($pending['new_password'])
                 : null,
-            'expires_at' => now()->addMinutes(self::EXPIRY_MINUTES),
+            'kadaluwarsa_pada' => now()->addMinutes(self::EXPIRY_MINUTES),
         ]);
 
         $recipientEmail = $pending['new_email'] ?? $user->email;
@@ -47,10 +46,10 @@ class OtpService
     /**
      * Verify a raw OTP against the latest valid token for the user and type.
      */
-    public function verify(User $user, string $rawOtp, string $type): ?EmailOtpToken
+    public function verify(Pengguna $user, string $rawOtp, string $type): ?TokenOtp
     {
-        $token = EmailOtpToken::where('user_id', $user->id)
-            ->where('type', $type)
+        $token = TokenOtp::where('pengguna_id', $user->id)
+            ->where('tipe', $type)
             ->valid()
             ->latest()
             ->first();
@@ -65,17 +64,17 @@ class OtpService
     /**
      * Mark a token as used and apply the pending credential change to the user.
      */
-    public function applyChange(User $user, EmailOtpToken $token): void
+    public function applyChange(Pengguna $user, TokenOtp $token): void
     {
-        $token->update(['used_at' => now()]);
+        $token->update(['digunakan_pada' => now()]);
 
-        if ($token->new_email) {
-            $user->email = $token->new_email;
+        if ($token->email_baru) {
+            $user->email = $token->email_baru;
             $user->email_verified_at = now();
         }
 
-        if ($token->new_password) {
-            $user->password = $token->new_password;
+        if ($token->sandi_baru) {
+            $user->password = $token->sandi_baru;
         }
 
         $user->save();
