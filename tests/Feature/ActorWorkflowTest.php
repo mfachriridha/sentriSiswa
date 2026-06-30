@@ -1,11 +1,11 @@
 <?php
 
-use App\Models\SchoolClass;
-use App\Models\SchoolRule;
-use App\Models\StudentProfile;
-use App\Models\StudentViolation;
-use App\Models\User;
-use App\Models\ViolationType;
+use App\Models\Kelas;
+use App\Models\PelanggaranSiswa;
+use App\Models\Pengguna;
+use App\Models\ProfilSiswa;
+use App\Models\TataTertib;
+use App\Models\JenisPelanggaran;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -19,8 +19,8 @@ test('counselor can only monitor assigned grade and cannot approve violations', 
     $this->actingAs($counselor)
         ->get(route('guru.bk.monitoring.index'))
         ->assertSuccessful()
-        ->assertSee($gradeTenStudent->user->name)
-        ->assertDontSee($gradeElevenStudent->user->name);
+        ->assertSee($gradeTenStudent->pengguna->nama)
+        ->assertDontSee($gradeElevenStudent->pengguna->nama);
 
     $this->actingAs($counselor)
         ->get(route('guru.bk.monitoring.show', $gradeTenStudent))
@@ -32,11 +32,11 @@ test('counselor can only monitor assigned grade and cannot approve violations', 
         ->get(route('guru.bk.monitoring.show', $gradeElevenStudent))
         ->assertForbidden();
 
-    $violation = StudentViolation::factory()->create([
-        'student_profile_id' => $gradeTenStudent->id,
-        'recorded_by_user_id' => $counselor->id,
+    $violation = PelanggaranSiswa::factory()->create([
+        'profil_siswa_id' => $gradeTenStudent->id,
+        'dicatat_oleh_id' => $counselor->id,
         'status' => 'pending',
-        'approved_at' => null,
+        'disetujui_pada' => null,
     ]);
 
     $this->actingAs($counselor)
@@ -51,81 +51,81 @@ test('student affairs can view student detail across classes', function () {
     $this->actingAs($studentAffairs)
         ->get(route('guru.kesiswaan.monitoring.show', $gradeTenStudent))
         ->assertSuccessful()
-        ->assertSee($gradeTenStudent->user->name);
+        ->assertSee($gradeTenStudent->pengguna->nama);
 
     $this->actingAs($studentAffairs)
         ->get(route('guru.kesiswaan.monitoring.show', $gradeElevenStudent))
         ->assertSuccessful()
-        ->assertSee($gradeElevenStudent->user->name);
+        ->assertSee($gradeElevenStudent->pengguna->nama);
 });
 
 test('counselor submits violation and student affairs approves it', function () {
     [$counselor, $student] = actorWorkflowUsers();
     $studentAffairs = createActorWorkflowTeacher('student_affairs');
-    $violationType = ViolationType::factory()->create();
+    $jenisPelanggaran = JenisPelanggaran::factory()->create();
 
     $this->actingAs($counselor)
         ->post(route('guru.bk.pelanggaran.store'), [
-            'student_profile_id' => $student->id,
-            'violation_type_id' => $violationType->id,
-            'violation_date' => now()->toDateString(),
-            'notes' => 'Terlambat masuk kelas.',
+            'profil_siswa_id' => $student->id,
+            'jenis_pelanggaran_id' => $jenisPelanggaran->id,
+            'tanggal_pelanggaran' => now()->toDateString(),
+            'catatan' => 'Terlambat masuk kelas.',
         ])
         ->assertRedirect(route('guru.bk.pelanggaran.index'));
 
-    $violation = StudentViolation::first();
+    $violation = PelanggaranSiswa::first();
 
     expect($violation->status)->toBe('pending');
-    expect($student->fresh()->points)->toBe(100);
+    expect($student->fresh()->poin)->toBe(100);
 
     $this->actingAs($studentAffairs)
         ->put(route('guru.pelanggaran-siswa.approve', $violation))
         ->assertRedirect(route('guru.pelanggaran-siswa.show', $violation));
 
     expect($violation->fresh()->status)->toBe('approved');
-    expect($student->fresh()->points)->toBe(100 - $violationType->point_deduction);
+    expect($student->fresh()->poin)->toBe(100 - $jenisPelanggaran->pengurangan_poin);
 });
 
 test('student affairs can reject violation without reducing student points', function () {
     [$counselor, $student] = actorWorkflowUsers();
     $studentAffairs = createActorWorkflowTeacher('student_affairs');
-    $violation = StudentViolation::factory()->create([
-        'student_profile_id' => $student->id,
-        'recorded_by_user_id' => $counselor->id,
+    $violation = PelanggaranSiswa::factory()->create([
+        'profil_siswa_id' => $student->id,
+        'dicatat_oleh_id' => $counselor->id,
         'status' => 'pending',
-        'approved_at' => null,
+        'disetujui_pada' => null,
     ]);
 
     $this->actingAs($studentAffairs)
         ->put(route('guru.pelanggaran-siswa.reject', $violation), [
-            'rejection_reason' => 'Bukti belum cukup.',
+            'alasan_penolakan' => 'Bukti belum cukup.',
         ])
         ->assertRedirect(route('guru.pelanggaran-siswa.show', $violation));
 
     expect($violation->fresh()->status)->toBe('rejected');
-    expect($student->fresh()->points)->toBe(100);
+    expect($student->fresh()->poin)->toBe(100);
 });
 
 test('school rule pdf can be uploaded by student affairs and viewed by student', function () {
     Storage::fake('public');
 
     $studentAffairs = createActorWorkflowTeacher('student_affairs');
-    $studentUser = User::factory()->student()->create(['status' => 'registered']);
-    StudentProfile::factory()->create(['user_id' => $studentUser->id]);
+    $studentUser = Pengguna::factory()->student()->create(['status' => 'registered']);
+    ProfilSiswa::factory()->create(['pengguna_id' => $studentUser->id]);
 
     $this->actingAs($studentAffairs)
         ->post(route('guru.kesiswaan.tata-tertib.store'), [
-            'title' => 'Tata Tertib 2026',
-            'rule_pdf' => UploadedFile::fake()->create('aturan.pdf', 64, 'application/pdf'),
-            'is_published' => '1',
+            'judul' => 'Tata Tertib 2026',
+            'file_pdf' => UploadedFile::fake()->create('aturan.pdf', 64, 'application/pdf'),
+            'dipublikasikan' => '1',
         ])
         ->assertRedirect(route('guru.kesiswaan.tata-tertib.index'));
 
-    $rule = SchoolRule::first();
+    $rule = TataTertib::first();
 
     expect($rule)->not->toBeNull();
-    expect($rule->is_published)->toBeTrue();
-    Storage::disk('public')->assertExists($rule->file_path);
+    expect($rule->dipublikasikan)->toBeTrue();
+    Storage::disk('public')->assertExists($rule->path_file);
 
     $this->actingAs($studentUser)
         ->get(route('siswa.tata-tertib.index'))
@@ -137,13 +137,13 @@ test('violation reports and attendance pdf routes render downloads for allowed r
     [$counselor, $student] = actorWorkflowUsers();
     $studentAffairs = createActorWorkflowTeacher('student_affairs');
     $homeroom = createActorWorkflowTeacher('homeroom');
-    $class = $student->class;
-    $class->update(['homeroom_teacher_id' => $homeroom->id]);
+    $class = $student->kelas;
+    $class->update(['wali_kelas_id' => $homeroom->id]);
 
-    StudentViolation::factory()->create([
-        'student_profile_id' => $student->id,
+    PelanggaranSiswa::factory()->create([
+        'profil_siswa_id' => $student->id,
         'status' => 'approved',
-        'approved_at' => now(),
+        'disetujui_pada' => now(),
     ]);
 
     $this->actingAs($counselor)
@@ -165,7 +165,7 @@ test('violation reports and attendance pdf routes render downloads for allowed r
         ->assertSuccessful();
 
     $this->actingAs($homeroom)
-        ->get(route('guru.absensi.export-excel'))
+        ->get(route('guru.absensi.index'))
         ->assertSuccessful();
 
     $this->actingAs($homeroom)
@@ -176,8 +176,8 @@ test('violation reports and attendance pdf routes render downloads for allowed r
 
 function actorWorkflowUsers(): array
 {
-    $classTen = SchoolClass::create(['name' => 'X RPL 1', 'grade' => '10']);
-    $classEleven = SchoolClass::create(['name' => 'XI RPL 1', 'grade' => '11']);
+    $classTen = Kelas::create(['nama' => 'X RPL 1', 'tingkat' => '10']);
+    $classEleven = Kelas::create(['nama' => 'XI RPL 1', 'tingkat' => '11']);
 
     $counselor = createActorWorkflowTeacher('counselor', '10');
     $gradeTenStudent = createActorWorkflowStudentInClass($classTen);
@@ -186,18 +186,18 @@ function actorWorkflowUsers(): array
     return [$counselor, $gradeTenStudent, $gradeElevenStudent];
 }
 
-function createActorWorkflowTeacher(string $teacherType, ?string $grade = null): User
+function createActorWorkflowTeacher(string $teacherType, ?string $grade = null): Pengguna
 {
     if ($teacherType === 'student_affairs') {
         DB::statement('PRAGMA ignore_check_constraints = ON');
     }
 
-    $teacher = User::factory()->homeroom()->create(['status' => 'registered']);
-    $teacher->teacherProfile()->create([
+    $teacher = Pengguna::factory()->homeroom()->create(['status' => 'registered']);
+    $teacher->profilGuru()->create([
         'nip' => fake()->unique()->numerify('19############'),
-        'phone' => fake()->numerify('08##########'),
-        'teacher_type' => $teacherType,
-        'grade' => $grade,
+        'telepon' => fake()->numerify('08##########'),
+        'tipe_guru' => $teacherType,
+        'tingkat' => $grade,
     ]);
 
     if ($teacherType === 'student_affairs') {
@@ -207,14 +207,14 @@ function createActorWorkflowTeacher(string $teacherType, ?string $grade = null):
     return $teacher;
 }
 
-function createActorWorkflowStudentInClass(SchoolClass $class): StudentProfile
+function createActorWorkflowStudentInClass(Kelas $class): ProfilSiswa
 {
-    $student = User::factory()->student()->create(['status' => 'registered']);
+    $student = Pengguna::factory()->student()->create(['status' => 'registered']);
 
-    return StudentProfile::factory()->create([
-        'user_id' => $student->id,
-        'class_id' => $class->id,
+    return ProfilSiswa::factory()->create([
+        'pengguna_id' => $student->id,
+        'kelas_id' => $class->id,
         'nisn' => fake()->unique()->numerify('##########'),
         'nis' => fake()->unique()->numerify('#####'),
-    ])->load(['user', 'class']);
+    ])->load(['pengguna', 'kelas']);
 }

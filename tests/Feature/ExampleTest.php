@@ -1,19 +1,19 @@
 <?php
 
-use App\Models\StudentProfile;
-use App\Models\User;
+use App\Models\Pengguna;
+use App\Models\ProfilSiswa;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
 test('guests can see the landing page from the root page', function () {
-    User::factory()->count(2)->homeroom()->create();
-    User::factory()
+    Pengguna::factory()->count(2)->homeroom()->create();
+    Pengguna::factory()
         ->count(3)
         ->student()
         ->create()
-        ->each(fn (User $student) => StudentProfile::factory()->create([
-            'user_id' => $student->id,
+        ->each(fn (Pengguna $student) => ProfilSiswa::factory()->create([
+            'pengguna_id' => $student->id,
         ]));
 
     $this->get('/')
@@ -29,7 +29,7 @@ test('guests can see the landing page from the root page', function () {
 });
 
 test('authenticated users are redirected from root page to their dashboard', function () {
-    $admin = User::factory()->admin()->create();
+    $admin = Pengguna::factory()->admin()->create();
 
     $this->actingAs($admin)
         ->get('/')

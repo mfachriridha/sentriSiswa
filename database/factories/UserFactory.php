@@ -2,41 +2,32 @@
 
 namespace Database\Factories;
 
-use App\Models\User;
+use App\Models\Pengguna;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
- * @extends Factory<User>
+ * @extends Factory<Pengguna>
  */
 class UserFactory extends Factory
 {
-    /**
-     * The current password being used by the factory.
-     */
+    protected $model = Pengguna::class;
+
     protected static ?string $password;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
+            'nama' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
-            'role' => 'siswa',
+            'peran' => 'siswa',
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
         ];
     }
 
-    /**
-     * Indicate that the model's email address should be unverified.
-     */
     public function unverified(): static
     {
         return $this->state(fn (array $attributes) => [
@@ -47,35 +38,35 @@ class UserFactory extends Factory
     public function admin(): static
     {
         return $this->state(fn (array $attributes) => [
-            'role' => 'admin',
+            'peran' => 'admin',
         ]);
     }
 
     public function homeroom(): static
     {
         return $this->state(fn (array $attributes) => [
-            'role' => 'wali_kelas',
+            'peran' => 'wali_kelas',
         ]);
     }
 
     public function counselor(): static
     {
         return $this->state(fn (array $attributes) => [
-            'role' => 'bk',
+            'peran' => 'bk',
         ]);
     }
 
     public function studentAffairs(): static
     {
         return $this->state(fn (array $attributes) => [
-            'role' => 'kesiswaan',
+            'peran' => 'kesiswaan',
         ]);
     }
 
     public function student(): static
     {
         return $this->state(fn (array $attributes) => [
-            'role' => 'siswa',
+            'peran' => 'siswa',
         ]);
     }
 }

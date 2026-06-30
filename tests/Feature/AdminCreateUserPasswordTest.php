@@ -1,165 +1,165 @@
 <?php
 
-use App\Models\SchoolClass;
-use App\Models\StudentProfile;
-use App\Models\TeacherProfile;
-use App\Models\User;
+use App\Models\Kelas;
+use App\Models\Pengguna;
+use App\Models\ProfilGuru;
+use App\Models\ProfilSiswa;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 
 uses(RefreshDatabase::class);
 
 test('admin can create a student without a password and gets the default hashed fallback', function () {
-    $admin = User::factory()->admin()->create();
-    $class = SchoolClass::create([
-        'name' => '10. 1',
-        'grade' => '10',
+    $admin = Pengguna::factory()->admin()->create();
+    $class = Kelas::create([
+        'nama' => '10. 1',
+        'tingkat' => '10',
     ]);
 
     $response = $this->actingAs($admin)->post(route('admin.siswa.store'), [
-        'name' => 'Siswa Tes',
+        'nama' => 'Siswa Tes',
         'email' => 'siswa.tes@example.com',
         'nisn' => '1234567890',
         'nis' => '12345',
-        'class_id' => (string) $class->id,
-        'phone' => '081234567890',
-        'address' => 'Jl. Testing 1',
+        'kelas_id' => (string) $class->id,
+        'telepon' => '081234567890',
+        'alamat' => 'Jl. Testing 1',
     ]);
 
     expect($response->getStatusCode())->toBe(302);
     expect($response->headers->get('Location'))->toBe(route('admin.siswa.index'));
 
-    $student = User::where('email', 'siswa.tes@example.com')->firstOrFail();
+    $student = Pengguna::where('email', 'siswa.tes@example.com')->firstOrFail();
 
-    expect($student->role)->toBe('student');
+    expect($student->peran)->toBe('siswa');
     expect($student->status)->toBe('unregistered');
     expect(Hash::check('password', $student->password))->toBeTrue();
 
-    $this->assertDatabaseHas('student_profiles', [
-        'user_id' => $student->id,
+    $this->assertDatabaseHas('profil_siswa', [
+        'pengguna_id' => $student->id,
         'nisn' => '1234567890',
-        'class_id' => (string) $class->id,
+        'kelas_id' => (string) $class->id,
     ]);
-    $this->assertDatabaseHas('users', [
+    $this->assertDatabaseHas('pengguna', [
         'id' => $student->id,
-        'role' => 'student',
+        'peran' => 'siswa',
         'status' => 'unregistered',
     ]);
 
-    $this->assertNotNull(StudentProfile::where('user_id', $student->id)->first());
+    $this->assertNotNull(ProfilSiswa::where('pengguna_id', $student->id)->first());
 });
 
 test('admin can create a teacher without a password and gets the default hashed fallback', function () {
-    $admin = User::factory()->admin()->create();
+    $admin = Pengguna::factory()->admin()->create();
 
     $response = $this->actingAs($admin)->post(route('admin.guru.store'), [
-        'name' => 'Guru Tes',
+        'nama' => 'Guru Tes',
         'email' => 'guru.tes@example.com',
         'nip' => '198765432109876543',
-        'phone' => '081298765432',
-        'teacher_type' => 'homeroom',
+        'telepon' => '081298765432',
+        'peran' => 'wali_kelas',
     ]);
 
     $response->assertRedirect(route('admin.guru.index'));
 
-    $teacher = User::where('email', 'guru.tes@example.com')->firstOrFail();
+    $teacher = Pengguna::where('email', 'guru.tes@example.com')->firstOrFail();
 
-    expect($teacher->role)->toBe('teacher');
+    expect($teacher->peran)->toBe('wali_kelas');
     expect($teacher->status)->toBe('unregistered');
     expect(Hash::check('password', $teacher->password))->toBeTrue();
 
-    $this->assertDatabaseHas('teacher_profiles', [
-        'user_id' => $teacher->id,
+    $this->assertDatabaseHas('profil_guru', [
+        'pengguna_id' => $teacher->id,
         'nip' => '198765432109876543',
-        'teacher_type' => 'homeroom',
+        'tipe_guru' => 'homeroom',
     ]);
-    $this->assertDatabaseHas('users', [
+    $this->assertDatabaseHas('pengguna', [
         'id' => $teacher->id,
-        'role' => 'teacher',
+        'peran' => 'wali_kelas',
         'status' => 'unregistered',
     ]);
 
-    $this->assertNotNull(TeacherProfile::where('user_id', $teacher->id)->first());
+    $this->assertNotNull(ProfilGuru::where('pengguna_id', $teacher->id)->first());
 });
 
 test('admin can create a student with a manual password and still gets unregistered status', function () {
-    $admin = User::factory()->admin()->create();
-    $class = SchoolClass::create([
-        'name' => '10. 2',
-        'grade' => '10',
+    $admin = Pengguna::factory()->admin()->create();
+    $class = Kelas::create([
+        'nama' => '10. 2',
+        'tingkat' => '10',
     ]);
 
     $response = $this->actingAs($admin)->post(route('admin.siswa.store'), [
-        'name' => 'Siswa Manual',
+        'nama' => 'Siswa Manual',
         'email' => 'siswa.manual@example.com',
         'password' => 'Secret123',
         'nisn' => '2234567890',
         'nis' => '54321',
-        'class_id' => (string) $class->id,
-        'phone' => '081200000000',
-        'address' => 'Jl. Manual 2',
+        'kelas_id' => (string) $class->id,
+        'telepon' => '081200000000',
+        'alamat' => 'Jl. Manual 2',
     ]);
 
     expect($response->getStatusCode())->toBe(302);
     expect($response->headers->get('Location'))->toBe(route('admin.siswa.index'));
 
-    $student = User::where('email', 'siswa.manual@example.com')->firstOrFail();
+    $student = Pengguna::where('email', 'siswa.manual@example.com')->firstOrFail();
 
-    expect($student->role)->toBe('student');
+    expect($student->peran)->toBe('siswa');
     expect($student->status)->toBe('unregistered');
     expect(Hash::check('Secret123', $student->password))->toBeTrue();
     expect(Hash::check('password', $student->password))->toBeFalse();
 
-    $this->assertDatabaseHas('student_profiles', [
-        'user_id' => $student->id,
+    $this->assertDatabaseHas('profil_siswa', [
+        'pengguna_id' => $student->id,
         'nisn' => '2234567890',
-        'class_id' => (string) $class->id,
+        'kelas_id' => (string) $class->id,
     ]);
 });
 
 test('admin can create a teacher with a manual password and still gets unregistered status', function () {
-    $admin = User::factory()->admin()->create();
+    $admin = Pengguna::factory()->admin()->create();
 
     $response = $this->actingAs($admin)->post(route('admin.guru.store'), [
-        'name' => 'Guru Manual',
+        'nama' => 'Guru Manual',
         'email' => 'guru.manual@example.com',
         'password' => 'Secret123',
         'nip' => '198765432109876544',
-        'phone' => '081233344455',
-        'teacher_type' => 'counselor',
-        'grade' => '11',
+        'telepon' => '081233344455',
+        'peran' => 'bk',
+        'tingkat' => '11',
     ]);
 
     expect($response->getStatusCode())->toBe(302);
     expect($response->headers->get('Location'))->toBe(route('admin.guru.index'));
 
-    $teacher = User::where('email', 'guru.manual@example.com')->firstOrFail();
+    $teacher = Pengguna::where('email', 'guru.manual@example.com')->firstOrFail();
 
-    expect($teacher->role)->toBe('teacher');
+    expect($teacher->peran)->toBe('bk');
     expect($teacher->status)->toBe('unregistered');
     expect(Hash::check('Secret123', $teacher->password))->toBeTrue();
     expect(Hash::check('password', $teacher->password))->toBeFalse();
 
-    $this->assertDatabaseHas('teacher_profiles', [
-        'user_id' => $teacher->id,
+    $this->assertDatabaseHas('profil_guru', [
+        'pengguna_id' => $teacher->id,
         'nip' => '198765432109876544',
-        'teacher_type' => 'counselor',
-        'grade' => '11',
+        'tipe_guru' => 'counselor',
+        'tingkat' => '11',
     ]);
 });
 
 test('unregistered students are blocked from siswa dashboard by the registered middleware', function () {
-    $student = User::factory()->student()->create([
+    $student = Pengguna::factory()->student()->create([
         'status' => 'unregistered',
         'password' => Hash::make('password'),
     ]);
 
-    $student->studentProfile()->create([
+    $student->profilSiswa()->create([
         'nisn' => '3234567890',
         'nis' => '65432',
-        'class_id' => null,
-        'phone' => null,
-        'address' => null,
+        'kelas_id' => null,
+        'telepon' => null,
+        'alamat' => null,
     ]);
 
     $this->actingAs($student)
@@ -171,16 +171,16 @@ test('unregistered students are blocked from siswa dashboard by the registered m
 });
 
 test('unregistered teachers are blocked from guru dashboard by the registered middleware', function () {
-    $teacher = User::factory()->homeroom()->create([
+    $teacher = Pengguna::factory()->homeroom()->create([
         'status' => 'unregistered',
         'password' => Hash::make('password'),
     ]);
 
-    $teacher->teacherProfile()->create([
+    $teacher->profilGuru()->create([
         'nip' => '298765432109876544',
-        'phone' => '081244455566',
-        'teacher_type' => 'homeroom',
-        'grade' => null,
+        'telepon' => '081244455566',
+        'tipe_guru' => 'homeroom',
+        'tingkat' => null,
     ]);
 
     $this->actingAs($teacher)
@@ -192,18 +192,18 @@ test('unregistered teachers are blocked from guru dashboard by the registered mi
 });
 
 test('admin can filter students by registration status', function () {
-    $admin = User::factory()->admin()->create();
-    $registeredStudent = User::factory()->student()->create([
-        'name' => 'Siswa Terdaftar',
+    $admin = Pengguna::factory()->admin()->create();
+    $registeredStudent = Pengguna::factory()->student()->create([
+        'nama' => 'Siswa Terdaftar',
         'status' => 'registered',
     ]);
-    $unregisteredStudent = User::factory()->student()->create([
-        'name' => 'Siswa Belum Daftar',
+    $unregisteredStudent = Pengguna::factory()->student()->create([
+        'nama' => 'Siswa Belum Daftar',
         'status' => 'unregistered',
     ]);
 
-    StudentProfile::factory()->create(['user_id' => $registeredStudent->id]);
-    StudentProfile::factory()->create(['user_id' => $unregisteredStudent->id]);
+    ProfilSiswa::factory()->create(['pengguna_id' => $registeredStudent->id]);
+    ProfilSiswa::factory()->create(['pengguna_id' => $unregisteredStudent->id]);
 
     $this->actingAs($admin)
         ->get(route('admin.siswa.index', ['status' => 'registered']))
@@ -219,23 +219,23 @@ test('admin can filter students by registration status', function () {
 });
 
 test('admin can filter teachers by registration status', function () {
-    $admin = User::factory()->admin()->create();
-    $registeredTeacher = User::factory()->homeroom()->create([
-        'name' => 'Guru Terdaftar',
+    $admin = Pengguna::factory()->admin()->create();
+    $registeredTeacher = Pengguna::factory()->homeroom()->create([
+        'nama' => 'Guru Terdaftar',
         'status' => 'registered',
     ]);
-    $unregisteredTeacher = User::factory()->homeroom()->create([
-        'name' => 'Guru Belum Daftar',
+    $unregisteredTeacher = Pengguna::factory()->homeroom()->create([
+        'nama' => 'Guru Belum Daftar',
         'status' => 'unregistered',
     ]);
 
-    TeacherProfile::factory()->create([
-        'user_id' => $registeredTeacher->id,
-        'teacher_type' => 'homeroom',
+    ProfilGuru::factory()->create([
+        'pengguna_id' => $registeredTeacher->id,
+        'tipe_guru' => 'homeroom',
     ]);
-    TeacherProfile::factory()->create([
-        'user_id' => $unregisteredTeacher->id,
-        'teacher_type' => 'homeroom',
+    ProfilGuru::factory()->create([
+        'pengguna_id' => $unregisteredTeacher->id,
+        'tipe_guru' => 'homeroom',
     ]);
 
     $this->actingAs($admin)

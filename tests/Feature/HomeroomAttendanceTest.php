@@ -1,9 +1,9 @@
 <?php
 
-use App\Models\Attendance;
-use App\Models\SchoolClass;
-use App\Models\StudentProfile;
-use App\Models\User;
+use App\Models\Absensi;
+use App\Models\Kelas;
+use App\Models\Pengguna;
+use App\Models\ProfilSiswa;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 
@@ -15,34 +15,34 @@ afterEach(function () {
 
 function createHomeroomTeacherWithClass(string $className = 'X IPA 1'): array
 {
-    $teacher = User::factory()->homeroom()->create([
+    $teacher = Pengguna::factory()->homeroom()->create([
         'status' => 'registered',
     ]);
 
-    $teacher->teacherProfile()->create([
+    $teacher->profilGuru()->create([
         'nip' => fake()->unique()->numerify('19################'),
-        'teacher_type' => 'homeroom',
+        'tipe_guru' => 'homeroom',
     ]);
 
-    $class = SchoolClass::create([
-        'name' => $className,
-        'grade' => '10',
-        'homeroom_teacher_id' => $teacher->id,
+    $class = Kelas::create([
+        'nama' => $className,
+        'tingkat' => '10',
+        'wali_kelas_id' => $teacher->id,
     ]);
 
     return [$teacher, $class];
 }
 
-function createStudentInClass(SchoolClass $class, string $name, string $nis): StudentProfile
+function createStudentInClass(Kelas $class, string $name, string $nis): ProfilSiswa
 {
-    $student = User::factory()->student()->create([
-        'name' => $name,
+    $student = Pengguna::factory()->student()->create([
+        'nama' => $name,
         'status' => 'registered',
     ]);
 
-    return StudentProfile::factory()->create([
-        'user_id' => $student->id,
-        'class_id' => $class->id,
+    return ProfilSiswa::factory()->create([
+        'pengguna_id' => $student->id,
+        'kelas_id' => $class->id,
         'nis' => $nis,
     ]);
 }
@@ -54,12 +54,12 @@ test('kelas saya shows today attendance summary and all students without paginat
     $firstStudent = createStudentInClass($class, 'Ayu', '10001');
     createStudentInClass($class, 'Bima', '10002');
 
-    Attendance::create([
-        'student_profile_id' => $firstStudent->id,
-        'date' => now()->toDateString(),
+    Absensi::create([
+        'profil_siswa_id' => $firstStudent->id,
+        'tanggal' => now()->toDateString(),
         'status' => 'hadir',
-        'check_in_time' => '06:40',
-        'selfie_path' => 'attendance-selfies/1/selfie.jpg',
+        'waktu_masuk' => '06:40',
+        'path_selfie' => 'attendance-selfies/1/selfie.jpg',
     ]);
 
     $this->actingAs($teacher)
@@ -86,11 +86,11 @@ test('homeroom teacher can set manual attendance without fake check in data', fu
         ])
         ->assertRedirect(route('guru.kelas-saya'));
 
-    $attendance = Attendance::firstOrFail();
+    $attendance = Absensi::firstOrFail();
 
     expect($attendance->status)->toBe('hadir')
-        ->and($attendance->check_in_time)->toBeNull()
-        ->and($attendance->selfie_path)->toBeNull();
+        ->and($attendance->waktu_masuk)->toBeNull()
+        ->and($attendance->path_selfie)->toBeNull();
 });
 
 test('homeroom teacher cannot update student from another class', function () {
@@ -109,7 +109,7 @@ test('homeroom teacher cannot update student from another class', function () {
 
 test('homeroom teacher can view own student detail but not another class detail', function () {
     [$teacher, $class] = createHomeroomTeacherWithClass();
-    $student = createStudentInClass($class, 'Ayu', '10001')->load('user');
+    $student = createStudentInClass($class, 'Ayu', '10001')->load('pengguna');
     [, $otherClass] = createHomeroomTeacherWithClass('X IPA 2');
     $otherStudent = createStudentInClass($otherClass, 'Citra', '10003');
 
@@ -118,7 +118,7 @@ test('homeroom teacher can view own student detail but not another class detail'
         ->assertSuccessful()
         ->assertSee('Detail Siswa')
         ->assertSee('Biodata Lengkap')
-        ->assertSee($student->user->name);
+        ->assertSee($student->pengguna->nama);
 
     $this->actingAs($teacher)
         ->get(route('guru.kelas-saya.show', $otherStudent))
@@ -138,17 +138,17 @@ test('recap summarizes final weekday records and ignores weekend and belum absen
         ['2026-06-06', 'alpha'],
         ['2026-06-08', 'belum_absen'],
     ] as [$date, $status]) {
-        Attendance::create([
-            'student_profile_id' => $student->id,
-            'date' => $date,
+        Absensi::create([
+            'profil_siswa_id' => $student->id,
+            'tanggal' => $date,
             'status' => $status,
         ]);
     }
 
     $this->actingAs($teacher)
         ->get(route('guru.absensi.index', [
-            'start_date' => '2026-06-01',
-            'end_date' => '2026-06-08',
+            'mulai' => '2026-06-01',
+            'selesai' => '2026-06-08',
         ]))
         ->assertSuccessful()
         ->assertViewHas('stats', function (array $stats) use ($student): bool {
@@ -171,8 +171,8 @@ test('homeroom teacher can download excel recap for selected range', function ()
 
     $this->actingAs($teacher)
         ->get(route('guru.absensi.export-excel', [
-            'start_date' => '2026-06-01',
-            'end_date' => '2026-06-08',
+            'mulai' => '2026-06-01',
+            'selesai' => '2026-06-08',
         ]))
         ->assertDownload('rekap-absensi-X IPA 1-2026-06-01-sampai-2026-06-08.xlsx');
 });

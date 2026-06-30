@@ -2,22 +2,22 @@
 
 namespace Database\Factories;
 
-use App\Models\StudentProfile;
+use App\Models\ProfilSiswa;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<StudentProfile>
+ * @extends Factory<ProfilSiswa>
  */
-class StudentProfileFactory extends Factory
+class ProfilSiswaFactory extends Factory
 {
     public function definition(): array
     {
         return [
             'nisn' => null,
             'nis' => null,
-            'class_id' => null,
-            'phone' => null,
-            'address' => null,
+            'kelas_id' => null,
+            'telepon' => null,
+            'alamat' => null,
         ];
     }
 }

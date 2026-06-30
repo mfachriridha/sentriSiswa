@@ -1,9 +1,9 @@
 <?php
 
-use App\Models\EmailOtpToken;
-use App\Models\StudentProfile;
-use App\Models\TeacherProfile;
-use App\Models\User;
+use App\Models\Pengguna;
+use App\Models\ProfilGuru;
+use App\Models\ProfilSiswa;
+use App\Models\TokenOtp;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -13,8 +13,8 @@ uses(RefreshDatabase::class);
 test('admin can update whatsapp number without OTP but updating email redirects to OTP', function () {
     Mail::fake();
 
-    $admin = User::factory()->create([
-        'role' => 'admin',
+    $admin = Pengguna::factory()->create([
+        'peran' => 'admin',
         'email_verified_at' => now(),
         'email' => 'admin@example.com',
     ]);
@@ -29,7 +29,7 @@ test('admin can update whatsapp number without OTP but updating email redirects 
         ->assertSessionHas('success', 'Profil admin berhasil diperbarui.');
 
     $admin->refresh();
-    expect($admin->whatsapp_number)->toBe('081234567890');
+    expect($admin->nomor_wa)->toBe('081234567890');
 
     // Update Email
     $this->actingAs($admin)
@@ -46,36 +46,36 @@ test('admin can update whatsapp number without OTP but updating email redirects 
 test('teacher updating phone is immediate but email/password change generates OTP', function () {
     Mail::fake();
 
-    $teacher = User::factory()->homeroom()->create([
+    $teacher = Pengguna::factory()->homeroom()->create([
         'email_verified_at' => now(),
         'email' => 'teacher@example.com',
         'status' => 'registered',
     ]);
-    TeacherProfile::factory()->homeroom()->create([
-        'user_id' => $teacher->id,
+    ProfilGuru::factory()->homeroom()->create([
+        'pengguna_id' => $teacher->id,
         'nip' => '123456',
-        'phone' => '08111111111',
+        'telepon' => '08111111111',
     ]);
 
     // Update Phone only
     $this->actingAs($teacher)
         ->put(route('wali-kelas.profil.update'), [
-            'name' => $teacher->name,
+            'nama' => $teacher->nama,
             'email' => 'teacher@example.com',
-            'phone' => '08222222222',
+            'telepon' => '08222222222',
         ])
         ->assertRedirect(route('wali-kelas.profil'))
         ->assertSessionHas('success', 'Profil berhasil diperbarui.');
 
     $teacher->refresh();
-    expect($teacher->teacherProfile->phone)->toBe('08222222222');
+    expect($teacher->profilGuru->telepon)->toBe('08222222222');
 
     // Update password
     $this->actingAs($teacher)
         ->put(route('wali-kelas.profil.update'), [
-            'name' => $teacher->name,
+            'nama' => $teacher->nama,
             'email' => 'teacher@example.com',
-            'phone' => '08222222222',
+            'telepon' => '08222222222',
             'password' => 'NewPassword123',
         ])
         ->assertRedirect(route('otp.show'));
@@ -86,37 +86,37 @@ test('teacher updating phone is immediate but email/password change generates OT
 test('student updating address is immediate but email change generates OTP', function () {
     Mail::fake();
 
-    $student = User::factory()->student()->create([
+    $student = Pengguna::factory()->student()->create([
         'email_verified_at' => now(),
         'email' => 'student@example.com',
         'status' => 'registered',
     ]);
-    StudentProfile::factory()->create([
-        'user_id' => $student->id,
+    ProfilSiswa::factory()->create([
+        'pengguna_id' => $student->id,
         'nisn' => '12345678',
-        'phone' => '08333333333',
-        'address' => 'Old Address',
+        'telepon' => '08333333333',
+        'alamat' => 'Old Address',
     ]);
 
     // Update address only
     $this->actingAs($student)
         ->put(route('siswa.profil.update'), [
             'email' => 'student@example.com',
-            'phone' => '08333333333',
-            'address' => 'New Address',
+            'telepon' => '08333333333',
+            'alamat' => 'New Address',
         ])
         ->assertRedirect(route('siswa.profil'))
         ->assertSessionHas('success', 'Profil berhasil diperbarui.');
 
     $student->refresh();
-    expect($student->studentProfile->address)->toBe('New Address');
+    expect($student->profilSiswa->alamat)->toBe('New Address');
 
     // Update email
     $this->actingAs($student)
         ->put(route('siswa.profil.update'), [
             'email' => 'new-student@example.com',
-            'phone' => '08333333333',
-            'address' => 'New Address',
+            'telepon' => '08333333333',
+            'alamat' => 'New Address',
         ])
         ->assertRedirect(route('otp.show'));
 
@@ -124,23 +124,23 @@ test('student updating address is immediate but email change generates OTP', fun
 });
 
 test('verifying profile OTP applies changes', function () {
-    $student = User::factory()->student()->create([
+    $student = Pengguna::factory()->student()->create([
         'email_verified_at' => now(),
         'email' => 'student@example.com',
         'status' => 'registered',
     ]);
-    StudentProfile::factory()->create([
-        'user_id' => $student->id,
+    ProfilSiswa::factory()->create([
+        'pengguna_id' => $student->id,
     ]);
 
     // Manually build OTP state
     $rawOtp = '654321';
-    EmailOtpToken::create([
-        'user_id' => $student->id,
+    TokenOtp::create([
+        'pengguna_id' => $student->id,
         'otp' => Hash::make($rawOtp),
-        'type' => 'email_change',
-        'new_email' => 'verified-new-email@example.com',
-        'expires_at' => now()->addMinutes(10),
+        'tipe' => 'email_change',
+        'email_baru' => 'verified-new-email@example.com',
+        'kadaluwarsa_pada' => now()->addMinutes(10),
     ]);
 
     session([

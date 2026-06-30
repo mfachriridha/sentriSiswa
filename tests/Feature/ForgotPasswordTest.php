@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\User;
+use App\Models\Pengguna;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
@@ -18,7 +18,7 @@ test('guest can view forgot password page', function () {
 test('submitting forgot password form sends reset email', function () {
     Notification::fake();
 
-    $user = User::factory()->create([
+    $user = Pengguna::factory()->create([
         'email' => 'registered@example.com',
     ]);
 
@@ -30,7 +30,7 @@ test('submitting forgot password form sends reset email', function () {
 });
 
 test('guest can view reset password page with token', function () {
-    $user = User::factory()->create([
+    $user = Pengguna::factory()->create([
         'email' => 'registered@example.com',
     ]);
 
@@ -43,7 +43,7 @@ test('guest can view reset password page with token', function () {
 });
 
 test('user can reset password with valid token', function () {
-    $user = User::factory()->create([
+    $user = Pengguna::factory()->create([
         'email' => 'registered@example.com',
         'password' => Hash::make('OldPassword123'),
     ]);

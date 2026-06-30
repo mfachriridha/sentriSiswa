@@ -1,8 +1,8 @@
 <?php
 
-use App\Models\Attendance;
-use App\Models\StudentProfile;
-use App\Models\User;
+use App\Models\Absensi;
+use App\Models\Pengguna;
+use App\Models\ProfilSiswa;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
@@ -14,14 +14,14 @@ afterEach(function () {
     Carbon::setTestNow();
 });
 
-function createRegisteredStudent(): User
+function createRegisteredStudent(): Pengguna
 {
-    $student = User::factory()->student()->create([
+    $student = Pengguna::factory()->student()->create([
         'status' => 'registered',
     ]);
 
-    StudentProfile::factory()->create([
-        'user_id' => $student->id,
+    ProfilSiswa::factory()->create([
+        'pengguna_id' => $student->id,
         'nis' => fake()->unique()->numerify('#####'),
     ]);
 
@@ -33,10 +33,10 @@ test('student check in updates pre-created belum absen record', function () {
     Storage::fake('public');
 
     $student = createRegisteredStudent();
-    $profile = $student->studentProfile;
-    Attendance::create([
-        'student_profile_id' => $profile->id,
-        'date' => now()->toDateString(),
+    $profile = $student->profilSiswa;
+    Absensi::create([
+        'profil_siswa_id' => $profile->id,
+        'tanggal' => now()->toDateString(),
         'status' => 'belum_absen',
     ]);
 
@@ -46,13 +46,13 @@ test('student check in updates pre-created belum absen record', function () {
         ])
         ->assertRedirect(route('siswa.absensi'));
 
-    $attendance = Attendance::firstOrFail();
+    $attendance = Absensi::firstOrFail();
 
     expect($attendance->status)->toBe('hadir')
-        ->and($attendance->check_in_time?->format('H:i'))->toBe('06:45')
-        ->and($attendance->selfie_path)->not->toBeNull();
+        ->and($attendance->waktu_masuk?->format('H:i'))->toBe('06:45')
+        ->and($attendance->path_selfie)->not->toBeNull();
 
-    Storage::disk('public')->assertExists($attendance->selfie_path);
+    Storage::disk('public')->assertExists($attendance->path_selfie);
 });
 
 test('student check in creates fallback record when daily command has not run', function () {
@@ -67,10 +67,10 @@ test('student check in creates fallback record when daily command has not run', 
         ])
         ->assertRedirect(route('siswa.absensi'));
 
-    $attendance = Attendance::firstOrFail();
+    $attendance = Absensi::firstOrFail();
 
-    expect($attendance->student_profile_id)->toBe($student->studentProfile->id)
-        ->and($attendance->date->toDateString())->toBe('2026-06-01')
+    expect($attendance->profil_siswa_id)->toBe($student->profilSiswa->id)
+        ->and($attendance->tanggal->toDateString())->toBe('2026-06-01')
         ->and($attendance->status)->toBe('hadir');
 });
 
@@ -79,9 +79,9 @@ test('student cannot overwrite final manual attendance status', function () {
     Storage::fake('public');
 
     $student = createRegisteredStudent();
-    Attendance::create([
-        'student_profile_id' => $student->studentProfile->id,
-        'date' => now()->toDateString(),
+    Absensi::create([
+        'profil_siswa_id' => $student->profilSiswa->id,
+        'tanggal' => now()->toDateString(),
         'status' => 'izin',
     ]);
 
@@ -92,7 +92,7 @@ test('student cannot overwrite final manual attendance status', function () {
         ->assertRedirect(route('siswa.absensi'))
         ->assertSessionHas('error', 'Anda sudah absen hari ini.');
 
-    expect(Attendance::firstOrFail()->status)->toBe('izin');
+    expect(Absensi::firstOrFail()->status)->toBe('izin');
     Storage::disk('public')->assertDirectoryEmpty('/');
 });
 
@@ -109,5 +109,5 @@ test('student cannot check in on weekend', function () {
         ->assertRedirect(route('siswa.absensi'))
         ->assertSessionHas('error', 'Absensi hanya tersedia pada hari Senin sampai Jumat.');
 
-    expect(Attendance::count())->toBe(0);
+    expect(Absensi::count())->toBe(0);
 });

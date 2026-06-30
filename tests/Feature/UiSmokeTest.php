@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\StudentProfile;
-use App\Models\User;
+use App\Models\Pengguna;
+use App\Models\ProfilSiswa;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 
@@ -16,7 +16,7 @@ test('guest login renders compact authentication form', function () {
 });
 
 test('admin dashboard renders responsive shell and management shortcuts', function () {
-    $admin = User::factory()->admin()->create();
+    $admin = Pengguna::factory()->admin()->create();
 
     $this->actingAs($admin)
         ->get(route('admin.dashboard'))
@@ -67,12 +67,12 @@ test('counselor dashboard renders bk shortcuts', function () {
 });
 
 test('student dashboard and attendance page render existing primary actions', function () {
-    $student = User::factory()->student()->create([
+    $student = Pengguna::factory()->student()->create([
         'status' => 'registered',
     ]);
 
-    StudentProfile::factory()->create([
-        'user_id' => $student->id,
+    ProfilSiswa::factory()->create([
+        'pengguna_id' => $student->id,
     ]);
 
     $this->actingAs($student)
@@ -90,16 +90,16 @@ test('student dashboard and attendance page render existing primary actions', fu
         ->assertSee('Riwayat');
 });
 
-function createDashboardTeacher(string $teacherType, ?string $grade = null): User
+function createDashboardTeacher(string $teacherType, ?string $grade = null): Pengguna
 {
-    $teacher = User::factory()->homeroom()->create([
+    $teacher = Pengguna::factory()->homeroom()->create([
         'status' => 'registered',
     ]);
 
-    $teacher->teacherProfile()->create([
+    $teacher->profilGuru()->create([
         'nip' => fake()->unique()->numerify('19################'),
-        'teacher_type' => $teacherType,
-        'grade' => $grade,
+        'tipe_guru' => $teacherType,
+        'tingkat' => $grade,
     ]);
 
     return $teacher;

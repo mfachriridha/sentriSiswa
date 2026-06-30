@@ -1,8 +1,8 @@
 <?php
 
-use App\Models\StudentProfile;
-use App\Models\TeacherProfile;
-use App\Models\User;
+use App\Models\Pengguna;
+use App\Models\ProfilGuru;
+use App\Models\ProfilSiswa;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
@@ -18,12 +18,12 @@ test('google login redirect works', function () {
 });
 
 test('google callback handles student registration successfully', function () {
-    $student = User::factory()->student()->create([
+    $student = Pengguna::factory()->student()->create([
         'status' => 'unregistered',
         'email' => null,
     ]);
-    StudentProfile::factory()->create([
-        'user_id' => $student->id,
+    ProfilSiswa::factory()->create([
+        'pengguna_id' => $student->id,
         'nisn' => '12345678',
     ]);
 
@@ -31,7 +31,7 @@ test('google callback handles student registration successfully', function () {
     $abstractUser = Mockery::mock('Laravel\Socialite\Two\User');
     $abstractUser->shouldReceive('getId')->andReturn('google-id-123');
     $abstractUser->shouldReceive('getEmail')->andReturn('student-google@example.com');
-    $abstractUser->shouldReceive('getName')->andReturn($student->name);
+    $abstractUser->shouldReceive('getName')->andReturn($student->nama);
 
     $provider = Mockery::mock('Laravel\Socialite\Two\GoogleProvider');
     $provider->shouldReceive('user')->andReturn($abstractUser);
@@ -43,7 +43,7 @@ test('google callback handles student registration successfully', function () {
         'register_role' => 'student',
         'register_user_id' => $student->id,
         'register_identity' => '12345678',
-        'register_name' => $student->name,
+        'register_name' => $student->nama,
     ]);
 
     $this->get(route('google.callback'))
@@ -53,18 +53,18 @@ test('google callback handles student registration successfully', function () {
     expect(Auth::user()->id)->toBe($student->id);
 
     $student->refresh();
-    expect($student->google_id)->toBe('google-id-123');
+    expect($student->id_google)->toBe('google-id-123');
     expect($student->email)->toBe('student-google@example.com');
     expect($student->isRegistered())->toBeTrue();
 });
 
 test('google callback handles teacher registration successfully and prompts for whatsapp', function () {
-    $teacher = User::factory()->homeroom()->create([
+    $teacher = Pengguna::factory()->homeroom()->create([
         'status' => 'unregistered',
         'email' => null,
     ]);
-    TeacherProfile::factory()->homeroom()->create([
-        'user_id' => $teacher->id,
+    ProfilGuru::factory()->homeroom()->create([
+        'pengguna_id' => $teacher->id,
         'nip' => '1991234567',
     ]);
 
@@ -72,7 +72,7 @@ test('google callback handles teacher registration successfully and prompts for 
     $abstractUser = Mockery::mock('Laravel\Socialite\Two\User');
     $abstractUser->shouldReceive('getId')->andReturn('google-id-456');
     $abstractUser->shouldReceive('getEmail')->andReturn('teacher-google@example.com');
-    $abstractUser->shouldReceive('getName')->andReturn($teacher->name);
+    $abstractUser->shouldReceive('getName')->andReturn($teacher->nama);
 
     $provider = Mockery::mock('Laravel\Socialite\Two\GoogleProvider');
     $provider->shouldReceive('user')->andReturn($abstractUser);
@@ -84,7 +84,7 @@ test('google callback handles teacher registration successfully and prompts for 
         'register_role' => 'teacher',
         'register_user_id' => $teacher->id,
         'register_identity' => '1991234567',
-        'register_name' => $teacher->name,
+        'register_name' => $teacher->nama,
     ]);
 
     $this->get(route('google.callback'))
@@ -96,23 +96,23 @@ test('google callback handles teacher registration successfully and prompts for 
     // Check we can submit the whatsapp number
     $this->actingAs($teacher)
         ->post(route('google.whatsapp.store'), [
-            'phone' => '081234567890',
+            'telepon' => '081234567890',
         ])
         ->assertRedirect(route('wali-kelas.dashboard'));
 
     $teacher->refresh();
-    expect($teacher->teacherProfile->phone)->toBe('081234567890');
-    expect($teacher->google_id)->toBe('google-id-456');
+    expect($teacher->profilGuru->telepon)->toBe('081234567890');
+    expect($teacher->id_google)->toBe('google-id-456');
     expect($teacher->email)->toBe('teacher-google@example.com');
 });
 
 test('google callback logs in registered user', function () {
-    $user = User::factory()->student()->create([
+    $user = Pengguna::factory()->student()->create([
         'status' => 'registered',
         'email' => 'registered-student@example.com',
-        'google_id' => 'google-id-789',
+        'id_google' => 'google-id-789',
     ]);
-    StudentProfile::factory()->create(['user_id' => $user->id]);
+    ProfilSiswa::factory()->create(['pengguna_id' => $user->id]);
 
     $abstractUser = Mockery::mock('Laravel\Socialite\Two\User');
     $abstractUser->shouldReceive('getId')->andReturn('google-id-789');

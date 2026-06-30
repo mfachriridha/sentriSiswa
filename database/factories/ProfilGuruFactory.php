@@ -2,20 +2,20 @@
 
 namespace Database\Factories;
 
-use App\Models\TeacherProfile;
+use App\Models\ProfilGuru;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<TeacherProfile>
+ * @extends Factory<ProfilGuru>
  */
-class TeacherProfileFactory extends Factory
+class ProfilGuruFactory extends Factory
 {
     public function definition(): array
     {
         return [
             'nip' => null,
-            'phone' => null,
-            'grade' => null,
+            'telepon' => null,
+            'tingkat' => null,
         ];
     }
 
@@ -23,8 +23,9 @@ class TeacherProfileFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'nip' => fake()->unique()->numerify('19##########'),
-            'phone' => fake()->numerify('08##########'),
-            'grade' => null,
+            'telepon' => fake()->numerify('08##########'),
+            'tipe_guru' => 'homeroom',
+            'tingkat' => null,
         ]);
     }
 
@@ -32,8 +33,9 @@ class TeacherProfileFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'nip' => fake()->unique()->numerify('19##########'),
-            'phone' => fake()->numerify('08##########'),
-            'grade' => fake()->randomElement(['10', '11', '12']),
+            'telepon' => fake()->numerify('08##########'),
+            'tipe_guru' => 'counselor',
+            'tingkat' => fake()->randomElement(['10', '11', '12']),
         ]);
     }
 }

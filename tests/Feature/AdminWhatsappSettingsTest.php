@@ -1,14 +1,14 @@
 <?php
 
-use App\Models\Setting;
-use App\Models\User;
+use App\Models\Pengguna;
+use App\Models\Pengaturan;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 
 uses(RefreshDatabase::class);
 
 test('admin can save fonnte token without sending a message', function () {
-    $admin = User::factory()->admin()->create(['status' => 'registered']);
+    $admin = Pengguna::factory()->admin()->create(['status' => 'registered']);
 
     $this->actingAs($admin)
         ->get(route('admin.settings.whatsapp.index'))
@@ -23,7 +23,7 @@ test('admin can save fonnte token without sending a message', function () {
         ])
         ->assertRedirect(route('admin.settings.whatsapp.index'));
 
-    expect(Setting::get('fonnte_token'))->toBe('fonnte-test-token');
+    expect(Pengaturan::get('fonnte_token'))->toBe('fonnte-test-token');
 
     $this->actingAs($admin)
         ->get(route('admin.settings.whatsapp.index'))
@@ -32,8 +32,8 @@ test('admin can save fonnte token without sending a message', function () {
 });
 
 test('admin can clear stored fonnte token', function () {
-    $admin = User::factory()->admin()->create(['status' => 'registered']);
-    Setting::set('fonnte_token', 'fonnte-test-token');
+    $admin = Pengguna::factory()->admin()->create(['status' => 'registered']);
+    Pengaturan::set('fonnte_token', 'fonnte-test-token');
 
     $this->actingAs($admin)
         ->put(route('admin.settings.whatsapp.update'), [
@@ -41,12 +41,12 @@ test('admin can clear stored fonnte token', function () {
         ])
         ->assertRedirect(route('admin.settings.whatsapp.index'));
 
-    expect(Setting::get('fonnte_token'))->toBe('');
+    expect(Pengaturan::get('fonnte_token'))->toBe('');
 });
 
 test('admin can send fonnte test message and repeated target is rate limited', function () {
-    $admin = User::factory()->admin()->create(['status' => 'registered']);
-    Setting::set('fonnte_token', 'fonnte-test-token');
+    $admin = Pengguna::factory()->admin()->create(['status' => 'registered']);
+    Pengaturan::set('fonnte_token', 'fonnte-test-token');
     Http::fake([
         'api.fonnte.com/*' => Http::response([
             'detail' => 'success! message in queue',
@@ -95,8 +95,8 @@ test('admin can send fonnte test message and repeated target is rate limited', f
 });
 
 test('fonnte test returns error when provider connection fails', function () {
-    $admin = User::factory()->admin()->create(['status' => 'registered']);
-    Setting::set('fonnte_token', 'fonnte-test-token');
+    $admin = Pengguna::factory()->admin()->create(['status' => 'registered']);
+    Pengaturan::set('fonnte_token', 'fonnte-test-token');
     Http::fake([
         'api.fonnte.com/*' => Http::failedConnection(),
     ]);

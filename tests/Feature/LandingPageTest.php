@@ -1,14 +1,14 @@
 <?php
 
-use App\Models\StudentProfile;
-use App\Models\User;
+use App\Models\Pengguna;
+use App\Models\ProfilSiswa;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
 test('landing page renders hero background slideshow with three slides', function () {
-    User::factory()->count(2)->student()->create()->each(function (User $student) {
-        StudentProfile::factory()->create(['user_id' => $student->id]);
+    Pengguna::factory()->count(2)->student()->create()->each(function (Pengguna $student) {
+        ProfilSiswa::factory()->create(['pengguna_id' => $student->id]);
     });
 
     $response = $this->get(route('home'))->assertSuccessful();
