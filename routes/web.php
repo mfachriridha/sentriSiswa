@@ -9,7 +9,6 @@ use App\Http\Controllers\Admin\ImporSiswaController;
 use App\Http\Controllers\Admin\KelasController;
 use App\Http\Controllers\Admin\PengaturanController;
 use App\Http\Controllers\Admin\ProfilController as AdminProfilController;
-use App\Http\Controllers\Admin\SetupController;
 use App\Http\Controllers\Admin\SiswaController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\GoogleController;
@@ -90,14 +89,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/auth/google/whatsapp', [GoogleWhatsappController::class, 'store'])->name('google.whatsapp.store');
 });
 
-Route::middleware(['auth', 'admin', 'admin-setup'])->prefix('admin')->name('admin.')->group(function () {
-    // Setup awal (hanya untuk admin yang belum setup — dikecualikan dari admin-setup middleware via RouteIs)
-    Route::get('/setup', [SetupController::class, 'create'])->name('setup');
-    Route::post('/setup', [SetupController::class, 'store'])->name('setup.store');
-    Route::get('/setup/verifikasi', [SetupController::class, 'verifyOtp'])->name('setup.verify');
-    Route::post('/setup/verifikasi', [SetupController::class, 'confirmOtp'])->name('setup.verify.store');
-    Route::post('/setup/kirim-ulang', [SetupController::class, 'resendOtp'])->name('setup.resend');
-
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/profil', [AdminProfilController::class, 'show'])->name('profil');
     Route::get('/profil/edit', [AdminProfilController::class, 'edit'])->name('profil.edit');
