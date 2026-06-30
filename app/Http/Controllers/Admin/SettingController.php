@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Models\WhatsappMessage;
 use App\Services\FonnteService;
 use App\Services\KmlParser;
 use Illuminate\Http\JsonResponse;
@@ -226,6 +227,17 @@ class SettingController extends Controller
             'timeout' => 60,
             'connect_timeout' => 10,
             'retries' => 0,
+        ]);
+
+        WhatsappMessage::create([
+            'school_class_id' => null,
+            'recipient_phone' => $normalizedPhone,
+            'recipient_name' => 'Test (Pesan Uji)',
+            'message_type' => 'test',
+            'message' => $validated['message'],
+            'status' => $result['success'] ? 'sent' : 'failed',
+            'response' => json_encode($result),
+            'sent_at' => now(),
         ]);
 
         return response()->json([

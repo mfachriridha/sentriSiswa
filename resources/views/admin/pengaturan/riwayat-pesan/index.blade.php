@@ -11,7 +11,7 @@
     </a>
     <div>
         <h1 class="text-2xl font-bold text-gray-900">Riwayat Pengiriman Pesan</h1>
-        <p class="mt-0.5 text-sm text-gray-500">Log semua pesan WhatsApp yang dikirim ke wali kelas.</p>
+        <p class="mt-0.5 text-sm text-gray-500">Log semua pesan WhatsApp yang dikirim, termasuk pesan uji.</p>
     </div>
 </div>
 
@@ -52,6 +52,7 @@
             <thead class="bg-gray-50 border-b border-gray-200">
                 <tr>
                     <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Kelas</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Tipe</th>
                     <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Penerima</th>
                     <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Status</th>
                     <th class="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Waktu Kirim</th>
@@ -63,6 +64,13 @@
                 @forelse ($pesan as $p)
                 <tr class="hover:bg-gray-50">
                     <td class="px-4 py-3 font-medium text-gray-800">{{ $p->schoolClass?->name ?? '-' }}</td>
+                    <td class="px-4 py-3">
+                        @if($p->message_type === 'test')
+                            <span class="inline-flex items-center rounded-full bg-purple-100 px-2 py-0.5 text-xs font-semibold text-purple-700">Test</span>
+                        @else
+                            <span class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700">Laporan</span>
+                        @endif
+                    </td>
                     <td class="px-4 py-3">
                         <p class="font-medium text-gray-800">{{ $p->recipient_name ?? '-' }}</p>
                         <p class="text-xs text-gray-500">{{ $p->recipient_phone }}</p>
@@ -98,7 +106,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="6" class="px-4 py-10 text-center text-gray-400 text-sm">Belum ada riwayat pengiriman pesan.</td>
+                    <td colspan="7" class="px-4 py-10 text-center text-gray-400 text-sm">Belum ada riwayat pengiriman pesan.</td>
                 </tr>
                 @endforelse
             </tbody>
