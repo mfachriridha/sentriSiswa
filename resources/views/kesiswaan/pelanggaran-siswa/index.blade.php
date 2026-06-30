@@ -30,7 +30,7 @@
             </svg>
             Antrean Persetujuan
             @if($pendingCount > 0)
-                <span class="inline-flex items-center justify-center rounded-full bg-red-500 px-2 py-0.5 text-xs font-bold text-white leading-none">
+                <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-xs font-bold text-white leading-none">
                     {{ $pendingCount }}
                 </span>
             @endif

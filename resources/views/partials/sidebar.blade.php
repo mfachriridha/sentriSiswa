@@ -158,7 +158,7 @@
                             </svg>
                             <span class="flex-1">Pelanggaran Siswa</span>
                             @if($sidebarPendingCount > 0)
-                                <span class="inline-flex items-center justify-center rounded-full bg-red-500 px-1.5 py-0.5 text-xs font-bold text-white leading-none min-w-[1.25rem]">
+                                <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-xs font-bold text-white leading-none">
                                     {{ $sidebarPendingCount }}
                                 </span>
                             @endif
@@ -364,8 +364,18 @@
 
     <div class="border-t border-slate-100 px-4 py-4 bg-white/50">
         <div class="flex items-center gap-3 px-2">
-            @if(auth()->user()->photo)
-                <img src="{{ asset('storage/'.auth()->user()->photo) }}" alt="{{ auth()->user()->name }}" class="h-9 w-9 rounded-full object-cover">
+            @php
+                $sidebarPhotoUrl = null;
+                if (auth()->user()->photo) {
+                    $sidebarPhotoUrl = asset('storage/'.auth()->user()->photo);
+                } elseif (auth()->user()->isGuru() && auth()->user()->teacherProfile?->photo) {
+                    $sidebarPhotoUrl = asset('storage/'.auth()->user()->teacherProfile->photo);
+                } elseif (auth()->user()->isSiswa() && auth()->user()->studentProfile?->photo) {
+                    $sidebarPhotoUrl = asset('storage/'.auth()->user()->studentProfile->photo);
+                }
+            @endphp
+            @if($sidebarPhotoUrl)
+                <img src="{{ $sidebarPhotoUrl }}" alt="{{ auth()->user()->name }}" class="h-9 w-9 rounded-full object-cover">
             @else
                 <div class="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
                     {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
