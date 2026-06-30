@@ -3,9 +3,18 @@
 @section('title', 'WhatsApp')
 
 @section('content')
-<div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-900">WhatsApp API</h1>
-    <p class="mt-1 text-sm text-gray-500">Konfigurasi token Fonnte untuk mengirim laporan absensi ke wali kelas.</p>
+<div class="mb-6 flex items-start justify-between gap-4 flex-wrap">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-900">WhatsApp API</h1>
+        <p class="mt-1 text-sm text-gray-500">Konfigurasi token Fonnte untuk mengirim laporan absensi ke wali kelas.</p>
+    </div>
+    <a href="{{ route('admin.settings.whatsapp.riwayat') }}"
+       class="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition">
+        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+        </svg>
+        Riwayat Pengiriman
+    </a>
 </div>
 
 <x-alert type="success" :message="session('success')" />

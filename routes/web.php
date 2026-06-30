@@ -38,6 +38,7 @@ use App\Http\Controllers\WaliKelas\KelasSayaController;
 use App\Http\Controllers\WaliKelas\ProfilController as WaliKelasProfilController;
 use App\Http\Controllers\WaliKelas\RiwayatPelanggaranController;
 use App\Http\Controllers\AbsensiPublikController;
+use App\Http\Controllers\Admin\RiwayatPesanController;
 use App\Models\SchoolClass;
 use App\Models\StudentProfile;
 use App\Models\User;
@@ -128,6 +129,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/settings/whatsapp', [PengaturanController::class, 'whatsapp'])->name('settings.whatsapp.index');
     Route::put('/settings/whatsapp', [PengaturanController::class, 'whatsappUpdate'])->name('settings.whatsapp.update');
     Route::post('/settings/whatsapp/test', [PengaturanController::class, 'whatsappTest'])->name('settings.whatsapp.test');
+    Route::get('/settings/whatsapp/riwayat', [RiwayatPesanController::class, 'index'])->name('settings.whatsapp.riwayat');
+    Route::get('/settings/whatsapp/riwayat/{pesanWhatsapp}', [RiwayatPesanController::class, 'show'])->name('settings.whatsapp.riwayat.show');
 });
 
 Route::middleware(['auth', 'registered', 'wali-kelas'])->prefix('wali-kelas')->name('wali-kelas.')->group(function () {
