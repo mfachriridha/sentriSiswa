@@ -88,6 +88,15 @@ class TeacherController extends Controller
         return view('admin.guru.create');
     }
 
+    private function tipeGuru(string $peran): string
+    {
+        return match ($peran) {
+            'wali_kelas' => 'homeroom',
+            'bk'         => 'counselor',
+            default      => 'student_affairs',
+        };
+    }
+
     public function store(StoreTeacherRequest $request): RedirectResponse
     {
         DB::transaction(function () use ($request) {
@@ -102,9 +111,10 @@ class TeacherController extends Controller
             $user = Pengguna::create($data);
 
             $user->profilGuru()->create([
-                'nip' => $request->nip,
-                'telepon' => $request->telepon,
-                'tingkat' => $request->peran === 'bk' ? $request->tingkat : null,
+                'nip'      => $request->nip,
+                'telepon'  => $request->telepon,
+                'tipe_guru'=> $this->tipeGuru($request->peran),
+                'tingkat'  => $request->peran === 'bk' ? $request->tingkat : null,
             ]);
         });
 
@@ -141,9 +151,10 @@ class TeacherController extends Controller
             $teacher->profilGuru()->updateOrCreate(
                 ['pengguna_id' => $teacher->id],
                 [
-                    'nip' => $request->nip,
-                    'telepon' => $request->telepon,
-                    'tingkat' => $request->peran === 'bk' ? $request->tingkat : null,
+                    'nip'       => $request->nip,
+                    'telepon'   => $request->telepon,
+                    'tipe_guru' => $this->tipeGuru($request->peran),
+                    'tingkat'   => $request->peran === 'bk' ? $request->tingkat : null,
                 ],
             );
         });

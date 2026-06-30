@@ -42,7 +42,7 @@ class ProfilSiswa extends Model
         return $this->hasMany(PelanggaranSiswa::class, 'profil_siswa_id');
     }
 
-    public function getPointsAttribute(): int
+    public function getPoinAttribute(): int
     {
         $deductions = 0;
 

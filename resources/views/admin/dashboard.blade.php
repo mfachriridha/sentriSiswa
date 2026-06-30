@@ -16,7 +16,7 @@
         </div>
         <div>
             <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Siswa</p>
-            <p class="text-2xl font-extrabold text-slate-800 mt-0.5">{{ \App\Models\StudentProfile::count() }}</p>
+            <p class="text-2xl font-extrabold text-slate-800 mt-0.5">{{ \App\Models\ProfilSiswa::count() }}</p>
         </div>
     </div>
 
@@ -29,7 +29,7 @@
         </div>
         <div>
             <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Guru</p>
-            <p class="text-2xl font-extrabold text-slate-800 mt-0.5">{{ \App\Models\User::whereIn('role', ['wali_kelas', 'bk', 'kesiswaan'])->count() }}</p>
+            <p class="text-2xl font-extrabold text-slate-800 mt-0.5">{{ \App\Models\Pengguna::whereIn('peran', ['wali_kelas', 'bk', 'kesiswaan'])->count() }}</p>
         </div>
     </div>
 
@@ -42,7 +42,7 @@
         </div>
         <div>
             <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Kelas</p>
-            <p class="text-2xl font-extrabold text-slate-800 mt-0.5">{{ \App\Models\SchoolClass::count() }}</p>
+            <p class="text-2xl font-extrabold text-slate-800 mt-0.5">{{ \App\Models\Kelas::count() }}</p>
         </div>
     </div>
 </div>

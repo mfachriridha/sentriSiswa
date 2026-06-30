@@ -17,19 +17,19 @@ test('counselor can only monitor assigned grade and cannot approve violations', 
     [$counselor, $gradeTenStudent, $gradeElevenStudent] = actorWorkflowUsers();
 
     $this->actingAs($counselor)
-        ->get(route('guru.bk.monitoring.index'))
+        ->get(route('bk.monitoring.index'))
         ->assertSuccessful()
         ->assertSee($gradeTenStudent->pengguna->nama)
         ->assertDontSee($gradeElevenStudent->pengguna->nama);
 
     $this->actingAs($counselor)
-        ->get(route('guru.bk.monitoring.show', $gradeTenStudent))
+        ->get(route('bk.monitoring.show', $gradeTenStudent))
         ->assertSuccessful()
         ->assertSee('Detail Siswa')
         ->assertSee('Biodata Lengkap');
 
     $this->actingAs($counselor)
-        ->get(route('guru.bk.monitoring.show', $gradeElevenStudent))
+        ->get(route('bk.monitoring.show', $gradeElevenStudent))
         ->assertForbidden();
 
     $violation = PelanggaranSiswa::factory()->create([
@@ -40,7 +40,7 @@ test('counselor can only monitor assigned grade and cannot approve violations', 
     ]);
 
     $this->actingAs($counselor)
-        ->put(route('guru.pelanggaran-siswa.approve', $violation))
+        ->put(route('kesiswaan.pelanggaran-siswa.approve', $violation))
         ->assertForbidden();
 });
 
@@ -49,12 +49,12 @@ test('student affairs can view student detail across classes', function () {
     $studentAffairs = createActorWorkflowTeacher('student_affairs');
 
     $this->actingAs($studentAffairs)
-        ->get(route('guru.kesiswaan.monitoring.show', $gradeTenStudent))
+        ->get(route('kesiswaan.monitoring.show', $gradeTenStudent))
         ->assertSuccessful()
         ->assertSee($gradeTenStudent->pengguna->nama);
 
     $this->actingAs($studentAffairs)
-        ->get(route('guru.kesiswaan.monitoring.show', $gradeElevenStudent))
+        ->get(route('kesiswaan.monitoring.show', $gradeElevenStudent))
         ->assertSuccessful()
         ->assertSee($gradeElevenStudent->pengguna->nama);
 });
@@ -65,13 +65,13 @@ test('counselor submits violation and student affairs approves it', function () 
     $jenisPelanggaran = JenisPelanggaran::factory()->create();
 
     $this->actingAs($counselor)
-        ->post(route('guru.bk.pelanggaran.store'), [
+        ->post(route('bk.pelanggaran.store'), [
             'profil_siswa_id' => $student->id,
             'jenis_pelanggaran_id' => $jenisPelanggaran->id,
             'tanggal_pelanggaran' => now()->toDateString(),
             'catatan' => 'Terlambat masuk kelas.',
         ])
-        ->assertRedirect(route('guru.bk.pelanggaran.index'));
+        ->assertRedirect(route('bk.pelanggaran.index'));
 
     $violation = PelanggaranSiswa::first();
 
@@ -79,8 +79,8 @@ test('counselor submits violation and student affairs approves it', function () 
     expect($student->fresh()->poin)->toBe(100);
 
     $this->actingAs($studentAffairs)
-        ->put(route('guru.pelanggaran-siswa.approve', $violation))
-        ->assertRedirect(route('guru.pelanggaran-siswa.show', $violation));
+        ->put(route('kesiswaan.pelanggaran-siswa.approve', $violation))
+        ->assertRedirect(route('kesiswaan.pelanggaran-siswa.show', $violation));
 
     expect($violation->fresh()->status)->toBe('approved');
     expect($student->fresh()->poin)->toBe(100 - $jenisPelanggaran->pengurangan_poin);
@@ -97,10 +97,10 @@ test('student affairs can reject violation without reducing student points', fun
     ]);
 
     $this->actingAs($studentAffairs)
-        ->put(route('guru.pelanggaran-siswa.reject', $violation), [
+        ->put(route('kesiswaan.pelanggaran-siswa.reject', $violation), [
             'alasan_penolakan' => 'Bukti belum cukup.',
         ])
-        ->assertRedirect(route('guru.pelanggaran-siswa.show', $violation));
+        ->assertRedirect(route('kesiswaan.pelanggaran-siswa.show', $violation));
 
     expect($violation->fresh()->status)->toBe('rejected');
     expect($student->fresh()->poin)->toBe(100);
@@ -114,12 +114,12 @@ test('school rule pdf can be uploaded by student affairs and viewed by student',
     ProfilSiswa::factory()->create(['pengguna_id' => $studentUser->id]);
 
     $this->actingAs($studentAffairs)
-        ->post(route('guru.kesiswaan.tata-tertib.store'), [
+        ->post(route('kesiswaan.tata-tertib.store'), [
             'judul' => 'Tata Tertib 2026',
             'file_pdf' => UploadedFile::fake()->create('aturan.pdf', 64, 'application/pdf'),
             'dipublikasikan' => '1',
         ])
-        ->assertRedirect(route('guru.kesiswaan.tata-tertib.index'));
+        ->assertRedirect(route('kesiswaan.tata-tertib.index'));
 
     $rule = TataTertib::first();
 
@@ -147,29 +147,29 @@ test('violation reports and attendance pdf routes render downloads for allowed r
     ]);
 
     $this->actingAs($counselor)
-        ->get(route('guru.bk.laporan.index'))
+        ->get(route('bk.laporan.index'))
         ->assertSuccessful()
-        ->assertSee('Laporan BK');
+        ->assertSee('Rekap Absensi');
 
     $this->actingAs($counselor)
-        ->get(route('guru.bk.laporan.export-excel'))
+        ->get(route('bk.laporan.export-excel'))
         ->assertSuccessful();
 
     $this->actingAs($studentAffairs)
-        ->get(route('guru.kesiswaan.laporan.index'))
+        ->get(route('kesiswaan.laporan.index'))
         ->assertSuccessful()
         ->assertSee('Laporan Kesiswaan');
 
     $this->actingAs($studentAffairs)
-        ->get(route('guru.kesiswaan.laporan.export-excel'))
+        ->get(route('kesiswaan.laporan.export-excel'))
         ->assertSuccessful();
 
     $this->actingAs($homeroom)
-        ->get(route('guru.absensi.index'))
+        ->get(route('wali-kelas.absensi.index'))
         ->assertSuccessful();
 
     $this->actingAs($homeroom)
-        ->get(route('guru.absensi.export-pdf'))
+        ->get(route('wali-kelas.absensi.export-pdf'))
         ->assertSuccessful()
         ->assertHeader('content-type', 'application/pdf');
 });
@@ -192,12 +192,18 @@ function createActorWorkflowTeacher(string $teacherType, ?string $grade = null):
         DB::statement('PRAGMA ignore_check_constraints = ON');
     }
 
-    $teacher = Pengguna::factory()->homeroom()->create(['status' => 'registered']);
+    $factoryState = match ($teacherType) {
+        'counselor'       => 'counselor',
+        'student_affairs' => 'studentAffairs',
+        default           => 'homeroom',
+    };
+
+    $teacher = Pengguna::factory()->{$factoryState}()->create(['status' => 'registered']);
     $teacher->profilGuru()->create([
-        'nip' => fake()->unique()->numerify('19############'),
-        'telepon' => fake()->numerify('08##########'),
-        'tipe_guru' => $teacherType,
-        'tingkat' => $grade,
+        'nip'      => fake()->unique()->numerify('19############'),
+        'telepon'  => fake()->numerify('08##########'),
+        'tipe_guru'=> $teacherType,
+        'tingkat'  => $grade,
     ]);
 
     if ($teacherType === 'student_affairs') {

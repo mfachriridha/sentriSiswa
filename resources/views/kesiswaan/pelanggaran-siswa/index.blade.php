@@ -15,7 +15,7 @@
 @endphp
 
 @php
-    $pendingCount = \App\Models\StudentViolation::where('status', 'pending')->count();
+    $pendingCount = \App\Models\PelanggaranSiswa::where('status', 'pending')->count();
 @endphp
 <div class="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
     <div>
@@ -203,7 +203,7 @@
     // Poll pending violations count every 60s and reload if changed
     (function () {
         const url = "{{ route('kesiswaan.pelanggaran-siswa.pending-count') }}";
-        const currentPending = {{ \App\Models\StudentViolation::where('status','pending')->count() }};
+        const currentPending = {{ \App\Models\PelanggaranSiswa::where('status','pending')->count() }};
         setInterval(async function () {
             try {
                 const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });

@@ -148,7 +148,7 @@
                     </li>
 
                     <li>
-                        @php $sidebarPendingCount = \App\Models\StudentViolation::where('status', 'pending')->count(); @endphp
+                        @php $sidebarPendingCount = \App\Models\PelanggaranSiswa::where('status', 'pending')->count(); @endphp
                         <a href="{{ route('kesiswaan.pelanggaran-siswa.index') }}"
                            class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
                                   {{ request()->routeIs('kesiswaan.pelanggaran-siswa.*') ? 'bg-gradient-to-r from-primary to-primary-dark text-white shadow-md shadow-primary/10 font-semibold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors' }}">

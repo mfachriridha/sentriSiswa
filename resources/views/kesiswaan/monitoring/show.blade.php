@@ -95,7 +95,7 @@
                 </div>
                 <div>
                     <span class="block text-sm font-medium text-gray-500">Sisa Poin</span>
-                    @php $points = $student->points; @endphp
+                    @php $points = $student->poin; @endphp
                     <span class="mt-1 block text-2xl font-bold {{ $points > 75 ? 'text-green-600' : ($points > 50 ? 'text-amber-600' : 'text-red-600') }}">{{ $points }}</span>
                 </div>
                 <div>
@@ -172,7 +172,7 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
-                        @forelse ($student->attendances as $attendance)
+                        @forelse ($student->absensi as $attendance)
                             @php $statusMeta = $statusLabels[$attendance->status] ?? ['-', 'bg-gray-100 text-gray-600']; @endphp
                             <tr>
                                 <td class="whitespace-nowrap px-4 py-3">{{ $attendance->tanggal->translatedFormat('d F Y') }}</td>

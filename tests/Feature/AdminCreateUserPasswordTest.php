@@ -184,7 +184,7 @@ test('unregistered teachers are blocked from guru dashboard by the registered mi
     ]);
 
     $this->actingAs($teacher)
-        ->get(route('guru.dashboard'))
+        ->get(route('wali-kelas.dashboard'))
         ->assertRedirect(route('login'))
         ->assertSessionHas('error', 'Akun belum terdaftar. Silakan daftar terlebih dahulu.');
 

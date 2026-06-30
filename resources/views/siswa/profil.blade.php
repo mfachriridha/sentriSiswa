@@ -21,15 +21,15 @@
     <div class="flex items-center justify-between">
         <div>
             <p class="text-sm font-medium text-gray-600">Poin Anda</p>
-            <p class="mt-1 text-4xl font-bold {{ $student->profilSiswa?->points <= 50 ? 'text-red-600' : ($student->profilSiswa?->points <= 75 ? 'text-amber-600' : 'text-green-600') }}">
-                {{ $student->profilSiswa?->points ?? 100 }}
+            <p class="mt-1 text-4xl font-bold {{ $student->profilSiswa?->poin <= 50 ? 'text-red-600' : ($student->profilSiswa?->poin <= 75 ? 'text-amber-600' : 'text-green-600') }}">
+                {{ $student->profilSiswa?->poin ?? 100 }}
             </p>
         </div>
         <div class="text-right">
-            <span class="inline-flex items-center gap-1.5 rounded-full {{ $student->profilSiswa?->points <= 50 ? 'bg-red-50 text-red-700' : ($student->profilSiswa?->points <= 75 ? 'bg-amber-50 text-amber-700' : 'bg-green-50 text-green-700') }} px-4 py-2 text-sm font-semibold">
-                @if($student->profilSiswa?->points <= 50)
+            <span class="inline-flex items-center gap-1.5 rounded-full {{ $student->profilSiswa?->poin <= 50 ? 'bg-red-50 text-red-700' : ($student->profilSiswa?->poin <= 75 ? 'bg-amber-50 text-amber-700' : 'bg-green-50 text-green-700') }} px-4 py-2 text-sm font-semibold">
+                @if($student->profilSiswa?->poin <= 50)
                     Perhatian
-                @elseif($student->profilSiswa?->points <= 75)
+                @elseif($student->profilSiswa?->poin <= 75)
                     Cukup
                 @else
                     Baik

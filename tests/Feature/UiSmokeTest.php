@@ -32,7 +32,7 @@ test('homeroom dashboard renders attendance shortcuts', function () {
     $teacher = createDashboardTeacher('homeroom');
 
     $this->actingAs($teacher)
-        ->get(route('guru.dashboard'))
+        ->get(route('wali-kelas.dashboard'))
         ->assertSuccessful()
         ->assertSee('Kelas Saya')
         ->assertSee('Rekap Absensi')
@@ -46,7 +46,7 @@ test('student affairs dashboard renders monitoring shortcuts', function () {
     DB::statement('PRAGMA ignore_check_constraints = OFF');
 
     $this->actingAs($teacher)
-        ->get(route('guru.dashboard'))
+        ->get(route('kesiswaan.dashboard'))
         ->assertSuccessful()
         ->assertSee('Monitoring Siswa')
         ->assertSee('Pelanggaran Siswa')
@@ -59,7 +59,7 @@ test('counselor dashboard renders bk shortcuts', function () {
     $teacher = createDashboardTeacher('counselor', '10');
 
     $this->actingAs($teacher)
-        ->get(route('guru.dashboard'))
+        ->get(route('bk.dashboard'))
         ->assertSuccessful()
         ->assertSee('Monitoring BK')
         ->assertSee('Pengajuan Pelanggaran')
@@ -86,20 +86,26 @@ test('student dashboard and attendance page render existing primary actions', fu
     $this->actingAs($student)
         ->get(route('siswa.absensi'))
         ->assertSuccessful()
-        ->assertSee('Catat kehadiran harian Anda')
+        ->assertSee('Absensi Hari Ini')
         ->assertSee('Riwayat');
 });
 
 function createDashboardTeacher(string $teacherType, ?string $grade = null): Pengguna
 {
-    $teacher = Pengguna::factory()->homeroom()->create([
+    $factoryState = match ($teacherType) {
+        'counselor'       => 'counselor',
+        'student_affairs' => 'studentAffairs',
+        default           => 'homeroom',
+    };
+
+    $teacher = Pengguna::factory()->{$factoryState}()->create([
         'status' => 'registered',
     ]);
 
     $teacher->profilGuru()->create([
-        'nip' => fake()->unique()->numerify('19################'),
-        'tipe_guru' => $teacherType,
-        'tingkat' => $grade,
+        'nip'      => fake()->unique()->numerify('19################'),
+        'tipe_guru'=> $teacherType,
+        'tingkat'  => $grade,
     ]);
 
     return $teacher;

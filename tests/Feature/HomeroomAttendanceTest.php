@@ -63,7 +63,7 @@ test('kelas saya shows today attendance summary and all students without paginat
     ]);
 
     $this->actingAs($teacher)
-        ->get(route('guru.kelas-saya'))
+        ->get(route('wali-kelas.kelas-saya'))
         ->assertSuccessful()
         ->assertSee('Pantau absensi hari ini')
         ->assertSee('10001')
@@ -81,10 +81,10 @@ test('homeroom teacher can set manual attendance without fake check in data', fu
     $student = createStudentInClass($class, 'Ayu', '10001');
 
     $this->actingAs($teacher)
-        ->put(route('guru.kelas-saya.absensi.update', $student), [
+        ->put(route('wali-kelas.kelas-saya.absensi.update', $student), [
             'status' => 'hadir',
         ])
-        ->assertRedirect(route('guru.kelas-saya'));
+        ->assertRedirect(route('wali-kelas.kelas-saya'));
 
     $attendance = Absensi::firstOrFail();
 
@@ -101,7 +101,7 @@ test('homeroom teacher cannot update student from another class', function () {
     $student = createStudentInClass($otherClass, 'Citra', '10003');
 
     $this->actingAs($teacher)
-        ->put(route('guru.kelas-saya.absensi.update', $student), [
+        ->put(route('wali-kelas.kelas-saya.absensi.update', $student), [
             'status' => 'hadir',
         ])
         ->assertForbidden();
@@ -114,14 +114,14 @@ test('homeroom teacher can view own student detail but not another class detail'
     $otherStudent = createStudentInClass($otherClass, 'Citra', '10003');
 
     $this->actingAs($teacher)
-        ->get(route('guru.kelas-saya.show', $student))
+        ->get(route('wali-kelas.kelas-saya.show', $student))
         ->assertSuccessful()
         ->assertSee('Detail Siswa')
         ->assertSee('Biodata Lengkap')
         ->assertSee($student->pengguna->nama);
 
     $this->actingAs($teacher)
-        ->get(route('guru.kelas-saya.show', $otherStudent))
+        ->get(route('wali-kelas.kelas-saya.show', $otherStudent))
         ->assertForbidden();
 });
 
@@ -146,7 +146,7 @@ test('recap summarizes final weekday records and ignores weekend and belum absen
     }
 
     $this->actingAs($teacher)
-        ->get(route('guru.absensi.index', [
+        ->get(route('wali-kelas.absensi.index', [
             'mulai' => '2026-06-01',
             'selesai' => '2026-06-08',
         ]))
@@ -170,7 +170,7 @@ test('homeroom teacher can download excel recap for selected range', function ()
     createStudentInClass($class, 'Ayu', '10001');
 
     $this->actingAs($teacher)
-        ->get(route('guru.absensi.export-excel', [
+        ->get(route('wali-kelas.absensi.export-excel', [
             'mulai' => '2026-06-01',
             'selesai' => '2026-06-08',
         ]))

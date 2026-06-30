@@ -35,7 +35,7 @@ class PelanggaranSiswaController extends StudentViolationController
             'alasan_penolakan' => null,
         ]);
 
-        return redirect()->route('kesiswaan.pelanggaran-siswa.persetujuan')
+        return redirect()->route('kesiswaan.pelanggaran-siswa.show', $studentViolation)
             ->with('success', 'Pelanggaran berhasil diterima.');
     }
 
@@ -50,7 +50,7 @@ class PelanggaranSiswaController extends StudentViolationController
             'alasan_penolakan' => $request->validated()['alasan_penolakan'],
         ]);
 
-        return redirect()->route('kesiswaan.pelanggaran-siswa.persetujuan')
+        return redirect()->route('kesiswaan.pelanggaran-siswa.show', $studentViolation)
             ->with('success', 'Pelanggaran berhasil ditolak.');
     }
 }

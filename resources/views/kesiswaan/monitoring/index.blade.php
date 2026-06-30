@@ -89,7 +89,7 @@
                         <td class="px-4 py-3 text-gray-700">{{ $student->kelas->nama ?? '-' }}</td>
                         <td class="px-4 py-3">
                             @php
-                                $todayAttendance = $student->attendances->first();
+                                $todayAttendance = $student->absensi->first();
                                 $status = $todayAttendance ? $todayAttendance->status : 'none';
                             @endphp
                             @php
@@ -112,7 +112,7 @@
                         </td>
                         <td class="px-4 py-3">
                             @php
-                                $points = $student->points;
+                                $points = $student->poin;
                                 $colorClass = $points > 75 ? 'text-green-600' : ($points > 50 ? 'text-amber-600' : 'text-red-600');
                             @endphp
                             <span class="font-bold {{ $colorClass }}">{{ $points }}</span>
