@@ -17,9 +17,9 @@ class StoreSchoolRuleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => ['required', 'string', 'max:255'],
-            'rule_pdf' => ['required', 'file', 'mimes:pdf', 'max:10240'],
-            'is_published' => ['nullable', 'boolean'],
+            'judul' => ['required', 'string', 'max:200'],
+            'file_pdf' => ['required', 'file', 'mimes:pdf', 'max:10240'],
+            'dipublikasikan' => ['nullable', 'boolean'],
         ];
     }
 
@@ -29,10 +29,10 @@ class StoreSchoolRuleRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'title.required' => 'Judul tata tertib wajib diisi.',
-            'rule_pdf.required' => 'File PDF tata tertib wajib diunggah.',
-            'rule_pdf.mimes' => 'File tata tertib harus berupa PDF.',
-            'rule_pdf.max' => 'Ukuran PDF maksimal 10 MB.',
+            'judul.required' => 'Judul tata tertib wajib diisi.',
+            'file_pdf.required' => 'File PDF tata tertib wajib diunggah.',
+            'file_pdf.mimes' => 'File tata tertib harus berupa PDF.',
+            'file_pdf.max' => 'Ukuran PDF maksimal 10 MB.',
         ];
     }
 }

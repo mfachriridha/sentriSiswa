@@ -29,11 +29,11 @@ class AttendanceRecapController extends Controller
         [$startDate, $endDate] = $this->dateRange($request);
         $validated = $request->validated();
         $filterStudents = $this->classStudents($class->id);
-        $students = $this->classStudents($class->id, $validated['student_id'] ?? null);
+        $students = $this->classStudents($class->id, $validated['profil_siswa_id'] ?? null);
         $stats = $this->calculateStats($students, $this->attendancesByStudent($students, $startDate, $endDate));
         $statusFilter = $validated['status'] ?? '';
         $students = $this->filterStudentsByStatus($students, $stats, $statusFilter);
-        $selectedStudent = $validated['student_id'] ?? '';
+        $selectedStudent = $validated['profil_siswa_id'] ?? '';
         $selectedMonth = $validated['month'] ?? '';
 
         return view('wali-kelas.absensi.index', compact('class', 'students', 'filterStudents', 'stats', 'startDate', 'endDate', 'statusFilter', 'selectedStudent', 'selectedMonth'));
@@ -49,7 +49,7 @@ class AttendanceRecapController extends Controller
 
         [$startDate, $endDate] = $this->dateRange($request);
         $validated = $request->validated();
-        $students = $this->classStudents($class->id, $validated['student_id'] ?? null);
+        $students = $this->classStudents($class->id, $validated['profil_siswa_id'] ?? null);
         $stats = $this->calculateStats($students, $this->attendancesByStudent($students, $startDate, $endDate));
         $students = $this->filterStudentsByStatus($students, $stats, $validated['status'] ?? '');
 
@@ -84,7 +84,7 @@ class AttendanceRecapController extends Controller
 
         [$startDate, $endDate] = $this->dateRange($request);
         $validated = $request->validated();
-        $students = $this->classStudents($class->id, $validated['student_id'] ?? null);
+        $students = $this->classStudents($class->id, $validated['profil_siswa_id'] ?? null);
         $stats = $this->calculateStats($students, $this->attendancesByStudent($students, $startDate, $endDate));
         $students = $this->filterStudentsByStatus($students, $stats, $validated['status'] ?? '');
 
@@ -116,8 +116,8 @@ class AttendanceRecapController extends Controller
         }
 
         return [
-            $validated['start_date'] ?? now()->startOfMonth()->toDateString(),
-            $validated['end_date'] ?? now()->toDateString(),
+            $validated['mulai'] ?? now()->startOfMonth()->toDateString(),
+            $validated['selesai'] ?? now()->toDateString(),
         ];
     }
 

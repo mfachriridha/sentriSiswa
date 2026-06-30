@@ -30,9 +30,9 @@ class AbsensiRecapController extends Controller
         $classes = Kelas::where('tingkat', $bkGrade)->orderBy('nama')->get();
         [$startDate, $endDate] = $this->dateRange($request);
         $validated = $request->validated();
-        $selectedClassId = $request->query('class_id', '');
+        $selectedClassId = $request->query('kelas_id', '');
         $statusFilter = $validated['status'] ?? '';
-        $selectedStudent = $validated['student_id'] ?? '';
+        $selectedStudent = $validated['profil_siswa_id'] ?? '';
         $selectedMonth = $validated['month'] ?? '';
 
         $classIds = filled($selectedClassId)
@@ -40,7 +40,7 @@ class AbsensiRecapController extends Controller
             : $classes->pluck('id')->toArray();
 
         $filterStudents = $this->gradeStudents($classIds);
-        $students = $this->gradeStudents($classIds, $validated['student_id'] ?? null);
+        $students = $this->gradeStudents($classIds, $validated['profil_siswa_id'] ?? null);
         $stats = $this->calculateStats($students, $this->attendancesByStudent($students, $startDate, $endDate));
         $students = $this->filterStudentsByStatus($students, $stats, $statusFilter);
 
@@ -62,10 +62,10 @@ class AbsensiRecapController extends Controller
         $classes = Kelas::where('tingkat', $bkGrade)->orderBy('nama')->get();
         [$startDate, $endDate] = $this->dateRange($request);
         $validated = $request->validated();
-        $selectedClassId = $request->query('class_id', '');
+        $selectedClassId = $request->query('kelas_id', '');
         $classIds = filled($selectedClassId) ? [(int) $selectedClassId] : $classes->pluck('id')->toArray();
 
-        $students = $this->gradeStudents($classIds, $validated['student_id'] ?? null);
+        $students = $this->gradeStudents($classIds, $validated['profil_siswa_id'] ?? null);
         $stats = $this->calculateStats($students, $this->attendancesByStudent($students, $startDate, $endDate));
         $students = $this->filterStudentsByStatus($students, $stats, $validated['status'] ?? '');
 
@@ -102,10 +102,10 @@ class AbsensiRecapController extends Controller
         $classes = Kelas::where('tingkat', $bkGrade)->orderBy('nama')->get();
         [$startDate, $endDate] = $this->dateRange($request);
         $validated = $request->validated();
-        $selectedClassId = $request->query('class_id', '');
+        $selectedClassId = $request->query('kelas_id', '');
         $classIds = filled($selectedClassId) ? [(int) $selectedClassId] : $classes->pluck('id')->toArray();
 
-        $students = $this->gradeStudents($classIds, $validated['student_id'] ?? null);
+        $students = $this->gradeStudents($classIds, $validated['profil_siswa_id'] ?? null);
         $stats = $this->calculateStats($students, $this->attendancesByStudent($students, $startDate, $endDate));
         $students = $this->filterStudentsByStatus($students, $stats, $validated['status'] ?? '');
 
@@ -137,8 +137,8 @@ class AbsensiRecapController extends Controller
         }
 
         return [
-            $validated['start_date'] ?? now()->startOfMonth()->toDateString(),
-            $validated['end_date'] ?? now()->toDateString(),
+            $validated['mulai'] ?? now()->startOfMonth()->toDateString(),
+            $validated['selesai'] ?? now()->toDateString(),
         ];
     }
 

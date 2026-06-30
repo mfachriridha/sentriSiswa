@@ -14,13 +14,13 @@ class StoreTeacherRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'min:3', 'max:255', "regex:/^[\pL\s.\'-]+$/u"],
-            'email' => ['nullable', 'email', 'max:255', 'unique:users,email'],
+            'nama' => ['required', 'string', 'min:3', 'max:100', "regex:/^[\pL\s.\'-]+$/u"],
+            'email' => ['nullable', 'email', 'max:255', 'unique:pengguna,email'],
             'password' => ['nullable', 'string', 'min:8', 'regex:/[a-z]/i', 'regex:/[0-9]/'],
-            'nip' => ['nullable', 'string', 'max:30', 'unique:teacher_profiles,nip'],
-            'phone' => ['nullable', 'string', 'min:10', 'max:20', 'regex:/^[0-9+\-\s()]*$/'],
-            'role' => ['required', 'in:wali_kelas,bk,kesiswaan'],
-            'grade' => ['nullable', 'required_if:role,bk', 'in:10,11,12'],
+            'nip' => ['nullable', 'string', 'max:30', 'unique:profil_guru,nip'],
+            'telepon' => ['nullable', 'string', 'min:10', 'max:20', 'regex:/^[0-9+\-\s()]*$/'],
+            'peran' => ['required', 'in:wali_kelas,bk,kesiswaan'],
+            'tingkat' => ['nullable', 'required_if:peran,bk', 'in:10,11,12'],
         ];
     }
 }

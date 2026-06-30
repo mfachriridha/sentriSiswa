@@ -17,7 +17,7 @@ class RejectStudentViolationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'rejection_reason' => ['required', 'string', 'max:1000'],
+            'alasan_penolakan' => ['required', 'string', 'max:1000'],
         ];
     }
 
@@ -27,8 +27,8 @@ class RejectStudentViolationRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'rejection_reason.required' => 'Alasan penolakan wajib diisi.',
-            'rejection_reason.max' => 'Alasan penolakan maksimal 1000 karakter.',
+            'alasan_penolakan.required' => 'Alasan penolakan wajib diisi.',
+            'alasan_penolakan.max' => 'Alasan penolakan maksimal 1000 karakter.',
         ];
     }
 }

@@ -15,7 +15,7 @@ class ProfilController extends Controller
     public function show(): View
     {
         $teacher = Auth::user();
-        $teacher->load(['teacherProfile', 'homeroomClass']);
+        $teacher->load(['profilGuru', 'kelasWali']);
 
         return view('guru.profil', compact('teacher'));
     }
@@ -23,7 +23,7 @@ class ProfilController extends Controller
     public function edit(): View
     {
         $teacher = Auth::user();
-        $teacher->load(['teacherProfile', 'homeroomClass']);
+        $teacher->load(['profilGuru', 'kelasWali']);
 
         return view('guru.profil-edit', compact('teacher'));
     }
@@ -33,38 +33,30 @@ class ProfilController extends Controller
         $teacher = Auth::user();
         $data = $request->validated();
 
-        // Update user name
         $teacher->update([
-            'name' => $data['name'],
+            'nama' => $data['nama'],
         ]);
 
-        // Handle profile photo
-        $profile = $teacher->teacherProfile;
+        $profile = $teacher->profilGuru;
         if (! $profile) {
-            $profile = $teacher->teacherProfile()->create([]);
+            $profile = $teacher->profilGuru()->create([]);
         }
 
-        // Delete photo if requested
         if ($request->has('delete_photo') && filter_var($request->input('delete_photo'), FILTER_VALIDATE_BOOLEAN)) {
-            if ($profile->photo) {
-                Storage::disk('public')->delete($profile->photo);
-                $profile->update(['photo' => null]);
+            if ($profile->foto) {
+                Storage::disk('public')->delete($profile->foto);
+                $profile->update(['foto' => null]);
             }
-        }
-        // Upload new photo
-        elseif ($request->hasFile('photo')) {
-            // Delete old photo if exists
-            if ($profile->photo) {
-                Storage::disk('public')->delete($profile->photo);
+        } elseif ($request->hasFile('photo')) {
+            if ($profile->foto) {
+                Storage::disk('public')->delete($profile->foto);
             }
             $path = $request->file('photo')->store('photos/teachers', 'public');
-            $profile->update(['photo' => $path]);
+            $profile->update(['foto' => $path]);
         }
 
-        // Update phone (still separate)
-        $profile->update(['phone' => $data['phone'] ?? null]);
+        $profile->update(['telepon' => $data['telepon'] ?? null]);
 
-        // Intercept critical changes
         $emailChanged = isset($data['email']) && $data['email'] !== $teacher->email;
         $passwordChanged = $request->filled('password');
 
@@ -100,15 +92,15 @@ class ProfilController extends Controller
         ]);
 
         $teacher = Auth::user();
-        $profile = $teacher->teacherProfile ?? $teacher->teacherProfile()->create();
+        $profile = $teacher->profilGuru ?? $teacher->profilGuru()->create();
 
-        if ($profile->photo) {
-            Storage::disk('public')->delete($profile->photo);
+        if ($profile->foto) {
+            Storage::disk('public')->delete($profile->foto);
         }
 
         $path = request()->file('photo')->store('photos/teachers', 'public');
 
-        $profile->update(['photo' => $path]);
+        $profile->update(['foto' => $path]);
 
         return redirect()->route($teacher->profilRouteName())->with('success', 'Foto berhasil diunggah.');
     }
@@ -116,11 +108,11 @@ class ProfilController extends Controller
     public function deletePhoto(): RedirectResponse
     {
         $teacher = Auth::user();
-        $profile = $teacher->teacherProfile;
+        $profile = $teacher->profilGuru;
 
-        if ($profile && $profile->photo) {
-            Storage::disk('public')->delete($profile->photo);
-            $profile->update(['photo' => null]);
+        if ($profile && $profile->foto) {
+            Storage::disk('public')->delete($profile->foto);
+            $profile->update(['foto' => null]);
         }
 
         return redirect()->route($teacher->profilRouteName())->with('success', 'Foto berhasil dihapus.');

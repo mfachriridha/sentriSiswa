@@ -14,7 +14,7 @@ class MonitoringController extends Controller
     public function index(Request $request, AbsenceWarningService $absenceWarning): View
     {
         $search = $request->get('search', '');
-        $filterClass = $request->get('class_id', '');
+        $filterClass = $request->get('kelas_id', '');
 
         $query = ProfilSiswa::with(['pengguna', 'kelas'])
             ->withSum(['pelanggaranSiswa' => fn ($query) => $query->approved()], 'pengurangan_poin')
@@ -36,7 +36,7 @@ class MonitoringController extends Controller
 
         $students = $query->paginate(25)->appends([
             'search' => $search,
-            'class_id' => $filterClass,
+            'kelas_id' => $filterClass,
         ]);
 
         $classes = Kelas::orderBy('tingkat')->orderBy('nama')->get();
@@ -63,7 +63,7 @@ class MonitoringController extends Controller
         return view('kesiswaan.monitoring.show', [
             'student' => $monitoring,
             'backRoute' => route('kesiswaan.monitoring.index'),
-            'createViolationRoute' => route('kesiswaan.pelanggaran-siswa.create', ['student_profile_id' => $monitoring->id]),
+            'createViolationRoute' => route('kesiswaan.pelanggaran-siswa.create', ['profil_siswa_id' => $monitoring->id]),
             'alphaWarningCount' => $absenceWarning->alphaCountForStudentId($monitoring->id),
             'warningThreshold' => AbsenceWarningService::Threshold,
         ]);

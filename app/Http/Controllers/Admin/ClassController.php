@@ -16,7 +16,7 @@ class ClassController extends Controller
     public function index(Request $request): View
     {
         $search = $request->get('search', '');
-        $filterGrade = $request->get('grade', '');
+        $filterGrade = $request->get('tingkat', '');
         $sort = $request->get('sort', 'nama');
         $direction = $request->get('direction', 'asc');
         $allowed = ['nama', 'tingkat', 'created_at'];
@@ -45,7 +45,7 @@ class ClassController extends Controller
 
         $classes = $classes->paginate(25)->appends([
             'search' => $search,
-            'grade' => $filterGrade,
+            'tingkat' => $filterGrade,
             'sort' => $sort,
             'direction' => $direction,
         ]);
@@ -64,8 +64,9 @@ class ClassController extends Controller
     public function store(StoreClassRequest $request): RedirectResponse
     {
         $data = $request->validated();
-        $separator = is_numeric($data['identifier']) ? '. ' : ' ';
-        $data['nama'] = $data['grade'].$separator.$data['identifier'];
+        $pengenal = $data['nama'];
+        $separator = is_numeric($pengenal) ? '. ' : ' ';
+        $data['nama'] = $data['tingkat'].$separator.$pengenal;
 
         Kelas::create($data);
 
@@ -93,8 +94,9 @@ class ClassController extends Controller
     public function update(UpdateClassRequest $request, Kelas $class): RedirectResponse
     {
         $data = $request->validated();
-        $separator = is_numeric($data['identifier']) ? '. ' : ' ';
-        $data['nama'] = $data['grade'].$separator.$data['identifier'];
+        $pengenal = $data['nama'];
+        $separator = is_numeric($pengenal) ? '. ' : ' ';
+        $data['nama'] = $data['tingkat'].$separator.$pengenal;
 
         $class->update($data);
 

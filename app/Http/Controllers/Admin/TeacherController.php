@@ -19,8 +19,8 @@ class TeacherController extends Controller
     public function index(Request $request): View
     {
         $search = $request->get('search', '');
-        $filterRole = $request->get('role', '');
-        $filterGrade = $request->get('grade', '');
+        $filterRole = $request->get('peran', '');
+        $filterGrade = $request->get('tingkat', '');
         $filterStatus = $request->get('status', '');
         $sort = $request->get('sort', 'created_at');
         $direction = $request->get('direction', 'desc');
@@ -73,8 +73,8 @@ class TeacherController extends Controller
 
         $teachers = $teachers->paginate(25)->appends([
             'search' => $search,
-            'role' => $filterRole,
-            'grade' => $filterGrade,
+            'peran' => $filterRole,
+            'tingkat' => $filterGrade,
             'status' => $filterStatus,
             'sort' => $sort,
             'direction' => $direction,
@@ -92,9 +92,9 @@ class TeacherController extends Controller
     {
         DB::transaction(function () use ($request) {
             $data = [
-                'nama' => $request->name,
+                'nama' => $request->nama,
                 'email' => $request->email,
-                'peran' => $request->role,
+                'peran' => $request->peran,
                 'status' => 'unregistered',
                 'password' => Hash::make($request->filled('password') ? $request->password : 'password'),
             ];
@@ -103,8 +103,8 @@ class TeacherController extends Controller
 
             $user->profilGuru()->create([
                 'nip' => $request->nip,
-                'telepon' => $request->phone,
-                'tingkat' => $request->role === 'bk' ? $request->grade : null,
+                'telepon' => $request->telepon,
+                'tingkat' => $request->peran === 'bk' ? $request->tingkat : null,
             ]);
         });
 
@@ -129,9 +129,9 @@ class TeacherController extends Controller
     {
         DB::transaction(function () use ($request, $teacher) {
             $teacher->update([
-                'nama' => $request->name,
+                'nama' => $request->nama,
                 'email' => $request->email,
-                'peran' => $request->role,
+                'peran' => $request->peran,
             ]);
 
             if ($request->filled('password')) {
@@ -142,8 +142,8 @@ class TeacherController extends Controller
                 ['pengguna_id' => $teacher->id],
                 [
                     'nip' => $request->nip,
-                    'telepon' => $request->phone,
-                    'tingkat' => $request->role === 'bk' ? $request->grade : null,
+                    'telepon' => $request->telepon,
+                    'tingkat' => $request->peran === 'bk' ? $request->tingkat : null,
                 ],
             );
         });

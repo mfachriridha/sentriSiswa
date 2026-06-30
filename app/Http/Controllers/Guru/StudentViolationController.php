@@ -22,10 +22,10 @@ class StudentViolationController extends Controller
     public function index(Request $request): View
     {
         $search = $request->get('search', '');
-        $filterClass = $request->get('class_id', '');
+        $filterClass = $request->get('kelas_id', '');
         $filterCategory = $request->get('category', '');
-        $filterViolationType = $request->get('violation_type_id', '');
-        $filterDate = $request->get('violation_date', '');
+        $filterViolationType = $request->get('jenis_pelanggaran_id', '');
+        $filterDate = $request->get('tanggal_pelanggaran', '');
         $filterStatus = $request->get('status', $request->route('status', ''));
         $sort = $request->get('sort', 'tanggal_pelanggaran');
         $direction = $request->get('direction', 'desc');
@@ -76,10 +76,10 @@ class StudentViolationController extends Controller
 
         $studentViolations = $studentViolations->paginate(25)->appends([
             'search' => $search,
-            'class_id' => $filterClass,
+            'kelas_id' => $filterClass,
             'category' => $filterCategory,
-            'violation_type_id' => $filterViolationType,
-            'violation_date' => $filterDate,
+            'jenis_pelanggaran_id' => $filterViolationType,
+            'tanggal_pelanggaran' => $filterDate,
             'status' => $filterStatus,
             'sort' => $sort,
             'direction' => $direction,
@@ -163,7 +163,7 @@ class StudentViolationController extends Controller
             'status' => 'rejected',
             'disetujui_oleh_id' => Auth::id(),
             'disetujui_pada' => now(),
-            'alasan_penolakan' => $request->validated()['rejection_reason'],
+            'alasan_penolakan' => $request->validated()['alasan_penolakan'],
         ]);
 
         return redirect()->route('kesiswaan.pelanggaran-siswa.show', $studentViolation)->with('success', 'Pengajuan pelanggaran berhasil ditolak.');

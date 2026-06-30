@@ -11,10 +11,10 @@ class DashboardController extends Controller
 {
     public function index(AbsenceWarningService $absenceWarning): View
     {
-        $student = Auth::user()->loadMissing('studentProfile.attendances', 'studentProfile.studentViolations');
-        $profile = $student->studentProfile;
-        $points = $profile?->points ?? 100;
-        $attendances = $profile?->attendances ?? collect();
+        $student = Auth::user()->loadMissing('profilSiswa.absensi', 'profilSiswa.pelanggaranSiswa');
+        $profile = $student->profilSiswa;
+        $points = $profile?->poin ?? 100;
+        $attendances = $profile?->absensi ?? collect();
         $alphaWarningCount = $profile ? $absenceWarning->alphaCountForStudentId($profile->id) : 0;
         $warningThreshold = AbsenceWarningService::Threshold;
 

@@ -14,12 +14,12 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'email' => ['required', 'email', 'max:255', 'unique:pengguna,email'],
             'password' => ['required', 'string', 'min:8', 'regex:/[a-z]/i', 'regex:/[0-9]/', 'confirmed'],
         ];
 
         if (session('register_role') === 'teacher') {
-            $rules['phone'] = ['required', 'string', 'min:10', 'max:20', 'regex:/^[0-9+\-\s()]*$/'];
+            $rules['telepon'] = ['required', 'string', 'min:10', 'max:20', 'regex:/^[0-9+\-\s()]*$/'];
         }
 
         return $rules;
@@ -35,9 +35,9 @@ class RegisterRequest extends FormRequest
             'password.min' => 'Kata sandi minimal 8 karakter.',
             'password.regex' => 'Kata sandi harus mengandung huruf dan angka.',
             'password.confirmed' => 'Konfirmasi kata sandi tidak cocok.',
-            'phone.required' => 'Nomor HP wajib diisi.',
-            'phone.min' => 'Nomor HP minimal 10 digit.',
-            'phone.regex' => 'Format nomor HP tidak valid.',
+            'telepon.required' => 'Nomor HP wajib diisi.',
+            'telepon.min' => 'Nomor HP minimal 10 digit.',
+            'telepon.regex' => 'Format nomor HP tidak valid.',
         ];
     }
 }

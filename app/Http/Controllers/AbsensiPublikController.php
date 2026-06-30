@@ -34,7 +34,7 @@ class AbsensiPublikController extends Controller
             'nama' => ['required', 'string'],
         ]);
 
-        $siswa = ProfilSiswa::where('kelas_id', $aksesToken->class_id)
+        $siswa = ProfilSiswa::where('kelas_id', $aksesToken->kelas_id)
             ->where(function ($q) use ($request) {
                 $q->where('nis', $request->nis_nisn)
                   ->orWhere('nisn', $request->nis_nisn);

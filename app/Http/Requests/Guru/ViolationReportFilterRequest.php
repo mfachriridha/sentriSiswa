@@ -18,10 +18,10 @@ class ViolationReportFilterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'start_date' => ['nullable', 'date_format:Y-m-d'],
-            'end_date' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:start_date'],
-            'class_id' => ['nullable', 'integer', Rule::exists('classes', 'id')],
-            'grade' => ['nullable', Rule::in(['10', '11', '12'])],
+            'mulai' => ['nullable', 'date_format:Y-m-d'],
+            'selesai' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:mulai'],
+            'kelas_id' => ['nullable', 'integer', Rule::exists('kelas', 'id')],
+            'tingkat' => ['nullable', Rule::in(['10', '11', '12'])],
             'category' => ['nullable', Rule::in(['light', 'medium', 'heavy', 'severe'])],
             'status' => ['nullable', Rule::in(['pending', 'approved', 'rejected'])],
         ];

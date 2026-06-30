@@ -16,7 +16,7 @@ class BkMonitoringController extends Controller
     {
         $grade = Auth::user()->profilGuru?->tingkat;
         $search = $request->get('search', '');
-        $filterClass = $request->get('class_id', '');
+        $filterClass = $request->get('kelas_id', '');
 
         $query = ProfilSiswa::with(['pengguna', 'kelas'])
             ->withSum(['pelanggaranSiswa' => fn ($query) => $query->approved()], 'pengurangan_poin')
@@ -65,7 +65,7 @@ class BkMonitoringController extends Controller
         return view('kesiswaan.monitoring.show', [
             'student' => $monitoring,
             'backRoute' => route('bk.monitoring.index'),
-            'createViolationRoute' => route('bk.pelanggaran.create', ['student_profile_id' => $monitoring->id]),
+            'createViolationRoute' => route('bk.pelanggaran.create', ['profil_siswa_id' => $monitoring->id]),
             'alphaWarningCount' => $absenceWarning->alphaCountForStudentId($monitoring->id),
             'warningThreshold' => AbsenceWarningService::Threshold,
         ]);

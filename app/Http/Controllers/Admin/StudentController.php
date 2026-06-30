@@ -19,7 +19,7 @@ class StudentController extends Controller
     public function index(Request $request): View
     {
         $search = $request->get('search', '');
-        $filterGrade = $request->get('grade', '');
+        $filterGrade = $request->get('tingkat', '');
         $filterStatus = $request->get('status', '');
         $sort = $request->get('sort', 'created_at');
         $direction = $request->get('direction', 'desc');
@@ -67,7 +67,7 @@ class StudentController extends Controller
 
         $students = $students->paginate(25)->appends([
             'search' => $search,
-            'grade' => $filterGrade,
+            'tingkat' => $filterGrade,
             'status' => $filterStatus,
             'sort' => $sort,
             'direction' => $direction,
@@ -87,7 +87,7 @@ class StudentController extends Controller
     {
         DB::transaction(function () use ($request) {
             $data = [
-                'nama' => $request->name,
+                'nama' => $request->nama,
                 'email' => $request->email,
                 'peran' => 'siswa',
                 'status' => 'unregistered',
@@ -99,9 +99,9 @@ class StudentController extends Controller
             $user->profilSiswa()->create([
                 'nisn' => $request->nisn,
                 'nis' => $request->nis,
-                'kelas_id' => $request->class_id,
-                'telepon' => $request->phone,
-                'alamat' => $request->address,
+                'kelas_id' => $request->kelas_id,
+                'telepon' => $request->telepon,
+                'alamat' => $request->alamat,
             ]);
         });
 
@@ -127,7 +127,7 @@ class StudentController extends Controller
     {
         DB::transaction(function () use ($request, $student) {
             $student->update([
-                'nama' => $request->name,
+                'nama' => $request->nama,
                 'email' => $request->email,
             ]);
 
@@ -140,9 +140,9 @@ class StudentController extends Controller
                 [
                     'nisn' => $request->nisn,
                     'nis' => $request->nis,
-                    'kelas_id' => $request->class_id,
-                    'telepon' => $request->phone,
-                    'alamat' => $request->address,
+                    'kelas_id' => $request->kelas_id,
+                    'telepon' => $request->telepon,
+                    'alamat' => $request->alamat,
                 ],
             );
         });

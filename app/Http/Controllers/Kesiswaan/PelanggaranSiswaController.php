@@ -47,7 +47,7 @@ class PelanggaranSiswaController extends StudentViolationController
             'status' => 'rejected',
             'disetujui_oleh_id' => Auth::id(),
             'disetujui_pada' => now(),
-            'alasan_penolakan' => $request->validated()['rejection_reason'],
+            'alasan_penolakan' => $request->validated()['alasan_penolakan'],
         ]);
 
         return redirect()->route('kesiswaan.pelanggaran-siswa.persetujuan')

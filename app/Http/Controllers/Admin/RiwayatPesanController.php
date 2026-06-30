@@ -18,8 +18,8 @@ class RiwayatPesanController extends Controller
             $query->where('status', $request->status);
         }
 
-        if ($request->filled('class_id')) {
-            $query->where('kelas_id', $request->class_id);
+        if ($request->filled('kelas_id')) {
+            $query->where('kelas_id', $request->kelas_id);
         }
 
         if ($request->filled('tanggal')) {

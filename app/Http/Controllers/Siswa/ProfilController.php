@@ -15,14 +15,14 @@ class ProfilController extends Controller
     public function poin(): View
     {
         $student = Auth::user();
-        $student->loadMissing(['studentProfile.studentViolations' => function ($q) {
-            $q->approved()->latest('violation_date');
+        $student->loadMissing(['profilSiswa.pelanggaranSiswa' => function ($q) {
+            $q->approved()->latest('tanggal_pelanggaran');
         }]);
 
-        $profile = $student->studentProfile;
-        $violations = $profile?->studentViolations ?? collect();
-        $totalPoints = $profile?->points ?? 100;
-        $totalDeductions = $violations->sum('point_deduction');
+        $profile = $student->profilSiswa;
+        $violations = $profile?->pelanggaranSiswa ?? collect();
+        $totalPoints = $profile?->poin ?? 100;
+        $totalDeductions = $violations->sum('pengurangan_poin');
 
         return view('siswa.poin', compact('profile', 'violations', 'totalPoints', 'totalDeductions'));
     }
@@ -30,7 +30,7 @@ class ProfilController extends Controller
     public function show(): View
     {
         $student = Auth::user();
-        $student->load(['studentProfile.class', 'studentProfile.biodata']);
+        $student->load(['profilSiswa.kelas', 'profilSiswa.biodata']);
 
         return view('siswa.profil', compact('student'));
     }
@@ -38,7 +38,7 @@ class ProfilController extends Controller
     public function edit(): View
     {
         $student = Auth::user();
-        $student->load('studentProfile');
+        $student->load('profilSiswa');
 
         return view('siswa.profil-edit', compact('student'));
     }
@@ -47,13 +47,11 @@ class ProfilController extends Controller
     {
         $student = Auth::user();
 
-        // Update non-critical fields
-        $student->studentProfile->update([
-            'phone' => $request->phone,
-            'address' => $request->address,
+        $student->profilSiswa->update([
+            'telepon' => $request->telepon,
+            'alamat' => $request->alamat,
         ]);
 
-        // Intercept critical changes
         $emailChanged = $request->email !== $student->email;
         $passwordChanged = $request->filled('password');
 
@@ -89,15 +87,15 @@ class ProfilController extends Controller
         ]);
 
         $student = Auth::user();
-        $profile = $student->studentProfile;
+        $profile = $student->profilSiswa;
 
-        if ($profile->photo) {
-            Storage::disk('public')->delete($profile->photo);
+        if ($profile->foto) {
+            Storage::disk('public')->delete($profile->foto);
         }
 
         $path = request()->file('photo')->store('photos/students', 'public');
 
-        $profile->update(['photo' => $path]);
+        $profile->update(['foto' => $path]);
 
         return redirect()->route('siswa.profil')->with('success', 'Foto berhasil diunggah.');
     }
@@ -105,11 +103,11 @@ class ProfilController extends Controller
     public function deletePhoto(): RedirectResponse
     {
         $student = Auth::user();
-        $profile = $student->studentProfile;
+        $profile = $student->profilSiswa;
 
-        if ($profile->photo) {
-            Storage::disk('public')->delete($profile->photo);
-            $profile->update(['photo' => null]);
+        if ($profile->foto) {
+            Storage::disk('public')->delete($profile->foto);
+            $profile->update(['foto' => null]);
         }
 
         return redirect()->route('siswa.profil')->with('success', 'Foto berhasil dihapus.');

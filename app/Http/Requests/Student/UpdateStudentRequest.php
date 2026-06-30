@@ -16,14 +16,14 @@ class UpdateStudentRequest extends FormRequest
         $user = $this->route('student');
 
         return [
-            'name' => ['required', 'string', 'min:3', 'max:255', "regex:/^[\pL\s.\'-]+$/u"],
-            'email' => ['nullable', 'email', 'max:255', "unique:users,email,{$user->id}"],
+            'nama' => ['required', 'string', 'min:3', 'max:100', "regex:/^[\pL\s.\'-]+$/u"],
+            'email' => ['nullable', 'email', 'max:255', "unique:pengguna,email,{$user->id}"],
             'password' => ['nullable', 'string', 'min:8', 'regex:/[a-z]/i', 'regex:/[0-9]/'],
-            'nisn' => ['required', 'digits:10', "unique:student_profiles,nisn,{$user->studentProfile?->id}"],
+            'nisn' => ['required', 'digits:10', "unique:profil_siswa,nisn,{$user->profilSiswa?->id}"],
             'nis' => ['required', 'string', 'max:20'],
-            'class_id' => ['nullable', 'string', 'exists:classes,id'],
-            'phone' => ['nullable', 'string', 'min:10', 'max:20', 'regex:/^[0-9+\-\s()]*$/'],
-            'address' => ['nullable', 'string'],
+            'kelas_id' => ['nullable', 'string', 'exists:kelas,id'],
+            'telepon' => ['nullable', 'string', 'min:10', 'max:20', 'regex:/^[0-9+\-\s()]*$/'],
+            'alamat' => ['nullable', 'string'],
         ];
     }
 }

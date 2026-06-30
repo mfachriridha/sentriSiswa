@@ -15,7 +15,7 @@ class UpdateProfilAdminRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($this->user())],
+            'email' => ['required', 'email', 'max:255', Rule::unique('pengguna', 'email')->ignore($this->user())],
             'password' => ['nullable', 'string', 'min:8', 'regex:/[a-z]/i', 'regex:/[0-9]/'],
             'whatsapp_number' => ['nullable', 'string', 'min:10', 'max:20', 'regex:/^[0-9+\-\s()]*$/'],
             'photo' => ['nullable', 'image', 'max:2048', 'mimes:jpg,jpeg,png'],

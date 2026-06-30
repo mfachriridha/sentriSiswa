@@ -32,14 +32,14 @@ class ProfilController extends Controller
         $data = $request->validated();
 
         // Update non-critical fields first
-        $admin->whatsapp_number = $data['whatsapp_number'] ?? null;
+        $admin->nomor_wa = $data['whatsapp_number'] ?? null;
 
         if ($request->hasFile('photo')) {
-            if ($admin->photo) {
-                Storage::disk('public')->delete($admin->photo);
+            if ($admin->foto) {
+                Storage::disk('public')->delete($admin->foto);
             }
 
-            $admin->photo = $request->file('photo')->store('photos/admins', 'public');
+            $admin->foto = $request->file('photo')->store('photos/admins', 'public');
         }
 
         $admin->save();

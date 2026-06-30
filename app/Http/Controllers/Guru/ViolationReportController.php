@@ -81,17 +81,17 @@ class ViolationReportController extends Controller
         $user = Auth::user()->loadMissing('profilGuru');
 
         $query = PelanggaranSiswa::with(['profilSiswa.pengguna', 'profilSiswa.kelas', 'dicatatOleh', 'disetujuiOleh'])
-            ->when($filters['start_date'] ?? null, fn ($query, $date) => $query->whereDate('tanggal_pelanggaran', '>=', $date))
-            ->when($filters['end_date'] ?? null, fn ($query, $date) => $query->whereDate('tanggal_pelanggaran', '<=', $date))
-            ->when($filters['class_id'] ?? null, fn ($query, $classId) => $query->whereHas('profilSiswa', fn ($studentQuery) => $studentQuery->where('kelas_id', $classId)))
-            ->when($filters['grade'] ?? null, fn ($query, $grade) => $query->whereHas('profilSiswa.kelas', fn ($classQuery) => $classQuery->where('tingkat', $grade)))
+            ->when($filters['mulai'] ?? null, fn ($query, $date) => $query->whereDate('tanggal_pelanggaran', '>=', $date))
+            ->when($filters['selesai'] ?? null, fn ($query, $date) => $query->whereDate('tanggal_pelanggaran', '<=', $date))
+            ->when($filters['kelas_id'] ?? null, fn ($query, $classId) => $query->whereHas('profilSiswa', fn ($studentQuery) => $studentQuery->where('kelas_id', $classId)))
+            ->when($filters['tingkat'] ?? null, fn ($query, $grade) => $query->whereHas('profilSiswa.kelas', fn ($classQuery) => $classQuery->where('tingkat', $grade)))
             ->when($filters['category'] ?? null, fn ($query, $category) => $query->where('kategori_pelanggaran', $category))
             ->when($filters['status'] ?? null, fn ($query, $status) => $query->where('status', $status));
 
         if ($user->isBk()) {
             $query->whereHas('profilSiswa.kelas', fn (Builder $classQuery) => $classQuery->where('tingkat', $user->profilGuru?->tingkat));
             $classes = Kelas::where('tingkat', $user->profilGuru?->tingkat)->orderBy('nama')->get();
-            $filters['grade'] = $user->profilGuru?->tingkat;
+            $filters['tingkat'] = $user->profilGuru?->tingkat;
         } else {
             $classes = Kelas::orderBy('tingkat')->orderBy('nama')->get();
         }

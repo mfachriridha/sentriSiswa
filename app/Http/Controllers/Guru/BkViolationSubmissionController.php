@@ -41,7 +41,7 @@ class BkViolationSubmissionController extends Controller
             ->orderBy('nama')
             ->get();
         $categoryLabels = JenisPelanggaran::categoryLabels();
-        $selectedStudentId = $request->get('student_profile_id', '');
+        $selectedStudentId = $request->get('profil_siswa_id', '');
 
         return view('bk.pelanggaran.create', compact('students', 'violationTypes', 'categoryLabels', 'selectedStudentId'));
     }

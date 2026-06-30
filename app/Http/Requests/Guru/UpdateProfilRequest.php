@@ -20,9 +20,9 @@ class UpdateProfilRequest extends FormRequest
         $userId = Auth::id();
 
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['nullable', 'email', 'max:255', "unique:users,email,{$userId}"],
-            'phone' => ['nullable', 'string', 'min:10', 'max:20', 'regex:/^[0-9+\-\s()]*$/'],
+            'nama' => ['required', 'string', 'max:100'],
+            'email' => ['nullable', 'email', 'max:255', "unique:pengguna,email,{$userId}"],
+            'telepon' => ['nullable', 'string', 'min:10', 'max:20', 'regex:/^[0-9+\-\s()]*$/'],
             'password' => ['nullable', 'string', 'min:8', 'regex:/[a-z]/i', 'regex:/[0-9]/'],
             'photo' => ['nullable', 'image', 'max:2048', 'mimes:jpg,jpeg,png'],
             'delete_photo' => ['nullable', 'boolean'],
@@ -35,14 +35,14 @@ class UpdateProfilRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'Nama tidak boleh kosong.',
-            'name.max' => 'Nama tidak boleh lebih dari 255 karakter.',
+            'nama.required' => 'Nama tidak boleh kosong.',
+            'nama.max' => 'Nama tidak boleh lebih dari 100 karakter.',
             'email.email' => 'Format email tidak valid.',
             'email.unique' => 'Email sudah digunakan.',
             'email.max' => 'Email tidak boleh lebih dari 255 karakter.',
-            'phone.min' => 'Nomor telepon minimal 10 digit.',
-            'phone.max' => 'Nomor telepon maksimal 20 digit.',
-            'phone.regex' => 'Format nomor telepon tidak valid.',
+            'telepon.min' => 'Nomor telepon minimal 10 digit.',
+            'telepon.max' => 'Nomor telepon maksimal 20 digit.',
+            'telepon.regex' => 'Format nomor telepon tidak valid.',
             'password.min' => 'Kata sandi minimal 8 karakter.',
             'password.regex' => 'Kata sandi harus memuat huruf dan angka.',
             'photo.image' => 'Foto harus berupa file gambar.',

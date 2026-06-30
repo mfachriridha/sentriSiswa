@@ -22,7 +22,7 @@ class RegisterController extends Controller
 
     public function verify(VerifyIdentityRequest $request): RedirectResponse|View
     {
-        $role = $request->role;
+        $role = $request->peran;
         $identity = $request->identity;
 
         if ($role === 'teacher') {
@@ -102,7 +102,7 @@ class RegisterController extends Controller
 
         if ($role === 'teacher') {
             $user->profilGuru?->update([
-                'telepon' => $request->phone,
+                'telepon' => $request->telepon,
             ]);
         }
 

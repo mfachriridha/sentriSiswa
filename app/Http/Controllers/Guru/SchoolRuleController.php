@@ -23,14 +23,14 @@ class SchoolRuleController extends Controller
 
     public function store(StoreSchoolRuleRequest $request): RedirectResponse
     {
-        if ($request->boolean('is_published')) {
+        if ($request->boolean('dipublikasikan')) {
             TataTertib::query()->update(['dipublikasikan' => false]);
         }
 
         TataTertib::create([
-            'judul' => (string) $request->string('title'),
-            'path_file' => $request->file('rule_pdf')->store('school-rules', 'public'),
-            'dipublikasikan' => $request->boolean('is_published'),
+            'judul' => (string) $request->string('judul'),
+            'path_file' => $request->file('file_pdf')->store('school-rules', 'public'),
+            'dipublikasikan' => $request->boolean('dipublikasikan'),
             'diunggah_oleh_id' => Auth::id(),
         ]);
 
