@@ -38,7 +38,8 @@ class OtpService
             'expires_at' => now()->addMinutes(self::EXPIRY_MINUTES),
         ]);
 
-        Mail::to($user->email)->send(new OtpMail($rawOtp, self::EXPIRY_MINUTES));
+        $recipientEmail = $pending['new_email'] ?? $user->email;
+        Mail::to($recipientEmail)->send(new OtpMail($rawOtp, self::EXPIRY_MINUTES));
 
         return $token;
     }

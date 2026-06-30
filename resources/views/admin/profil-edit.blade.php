@@ -24,7 +24,7 @@
         </div>
         <div>
             <p class="text-xs font-bold text-blue-800 uppercase tracking-wider">Informasi Keamanan</p>
-            <p class="mt-1 text-xs text-blue-600 font-medium">Mengubah alamat email atau kata sandi memerlukan langkah verifikasi kode OTP yang akan dikirimkan langsung ke email Anda saat ini demi menjaga keamanan akun.</p>
+            <p class="mt-1 text-xs text-blue-600 font-medium">Mengubah alamat email atau kata sandi memerlukan verifikasi kode OTP. Jika Anda mengubah email, kode akan dikirim ke email baru yang Anda masukkan di formulir.</p>
         </div>
     </div>
 
