@@ -10,12 +10,7 @@
 
 <div class="rounded-xl border border-gray-200 bg-white p-6">
     <div class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <form method="GET" action="{{ route('wali-kelas.absensi.index') }}" class="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
-            <div>
-                <label for="month" class="block text-sm font-medium text-gray-700">Bulan</label>
-                <input id="month" type="month" name="month" value="{{ $selectedMonth }}"
-                       class="mt-1 w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
-            </div>
+        <form method="GET" action="{{ route('wali-kelas.absensi.index') }}" class="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
             <div>
                 <label for="start_date" class="block text-sm font-medium text-gray-700">Tanggal Mulai</label>
                 <input id="start_date" type="date" name="start_date" value="{{ $startDate }}"
