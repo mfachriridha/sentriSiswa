@@ -16,6 +16,15 @@ use Illuminate\Support\Facades\Storage;
 
 class DemoSchoolSeeder extends Seeder
 {
+    private static array $palette = [
+        [52, 152, 219],   // blue
+        [46, 204, 113],   // green
+        [155, 89, 182],   // purple
+        [231, 76, 60],    // red
+        [241, 196, 15],   // yellow
+        [26, 188, 156],   // teal
+    ];
+
     public function run(): void
     {
         $homerooms = $this->createHomeroomTeachers();
@@ -61,12 +70,15 @@ class DemoSchoolSeeder extends Seeder
                 'status' => 'registered',
             ]);
 
-            $teacher->teacherProfile()->create([
+            $profile = $teacher->teacherProfile()->create([
                 'nip' => sprintf('197%02d0000000000', $nip++),
                 'phone' => sprintf('628121%05d', $nip),
                 'teacher_type' => 'homeroom',
                 'grade' => $grade,
             ]);
+
+            $photoPath = $this->generateTeacherPhoto($teacher->id, $name);
+            $profile->update(['photo' => $photoPath]);
 
             $teachers[$slug] = $teacher;
         }
@@ -92,12 +104,15 @@ class DemoSchoolSeeder extends Seeder
                 'status' => 'registered',
             ]);
 
-            $teacher->teacherProfile()->create([
+            $profile = $teacher->teacherProfile()->create([
                 'nip' => "19{$grade}9000000000",
                 'phone' => "62813{$grade}000000",
                 'teacher_type' => 'counselor',
                 'grade' => $grade,
             ]);
+
+            $photoPath = $this->generateTeacherPhoto($teacher->id, $name);
+            $profile->update(['photo' => $photoPath]);
         }
     }
 
@@ -111,11 +126,14 @@ class DemoSchoolSeeder extends Seeder
             'status' => 'registered',
         ]);
 
-        $teacher->teacherProfile()->create([
+        $profile = $teacher->teacherProfile()->create([
             'nip' => '19990000000000',
             'phone' => '6281399000000',
             'teacher_type' => 'student_affairs',
         ]);
+
+        $photoPath = $this->generateTeacherPhoto($teacher->id, $teacher->name);
+        $profile->update(['photo' => $photoPath]);
     }
 
     /**
@@ -241,6 +259,9 @@ class DemoSchoolSeeder extends Seeder
                     'guardian_phone' => "0831{$nis}",
                 ]);
 
+                $photoPath = $this->generateStudentPhoto($nis, $name);
+                $profile->update(['photo' => $photoPath]);
+
                 $students[] = $profile;
                 $sequence++;
                 $nameIndex++;
@@ -273,6 +294,12 @@ class DemoSchoolSeeder extends Seeder
             $pattern = $patterns[$idx % count($patterns)];
             foreach ($dates as $dayIdx => $date) {
                 $status = $pattern[$dayIdx] ?? 'hadir';
+                $selfiePath = null;
+
+                if (in_array($status, ['hadir', 'terlambat'])) {
+                    $selfiePath = $this->generateSelfiePhoto($student->id, $date->format('Y-m-d'));
+                }
+
                 Attendance::create([
                     'student_profile_id' => $student->id,
                     'date' => $date->toDateString(),
@@ -282,6 +309,7 @@ class DemoSchoolSeeder extends Seeder
                         'terlambat' => '07:'.sprintf('%02d', 10 + ($idx % 15)).':00',
                         default => null,
                     },
+                    'selfie_path' => $selfiePath,
                 ]);
             }
         }
@@ -320,6 +348,53 @@ class DemoSchoolSeeder extends Seeder
                 'rejection_reason' => $status === 'rejected' ? 'Data demo ditolak.' : null,
             ]);
         }
+    }
+
+    private function generateImage(int $width, int $height, int $r, int $g, int $b, string $absPath): void
+    {
+        $dir = dirname($absPath);
+        if (! is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        $img = imagecreatetruecolor($width, $height);
+        $bg = imagecolorallocate($img, $r, $g, $b);
+        imagefill($img, 0, 0, $bg);
+
+        // Subtle lighter circle in center
+        $light = imagecolorallocatealpha($img, 255, 255, 255, 80);
+        imagefilledellipse($img, (int) ($width / 2), (int) ($height / 2), (int) ($width * 0.5), (int) ($height * 0.5), $light);
+
+        imagejpeg($img, $absPath, 85);
+        imagedestroy($img);
+    }
+
+    private function generateTeacherPhoto(int $userId, string $name): string
+    {
+        $path = "photos/teachers/{$userId}.jpg";
+        [$r, $g, $b] = self::$palette[ord($name[0]) % count(self::$palette)];
+        $this->generateImage(200, 200, $r, $g, $b, storage_path("app/public/{$path}"));
+
+        return $path;
+    }
+
+    private function generateStudentPhoto(string $nis, string $name): string
+    {
+        $path = "photos/students/{$nis}.jpg";
+        [$r, $g, $b] = self::$palette[ord($name[0]) % count(self::$palette)];
+        $this->generateImage(300, 400, $r, $g, $b, storage_path("app/public/{$path}"));
+
+        return $path;
+    }
+
+    private function generateSelfiePhoto(int $profileId, string $date): string
+    {
+        $path = "attendance-selfies/{$profileId}/{$date}-demo.jpg";
+        $colorIdx = ($profileId + (int) str_replace('-', '', $date)) % count(self::$palette);
+        [$r, $g, $b] = self::$palette[$colorIdx];
+        $this->generateImage(300, 400, $r, $g, $b, storage_path("app/public/{$path}"));
+
+        return $path;
     }
 
     private function createSchoolRule(): void
