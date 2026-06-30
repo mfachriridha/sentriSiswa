@@ -13,10 +13,10 @@
     <form method="GET" action="{{ route('wali-kelas.pelanggaran') }}" class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <div>
             <label class="block text-sm font-medium text-gray-700">Siswa</label>
-            <select name="student_id" class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
+            <select name="profil_siswa_id" class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
                 <option value="">Semua Siswa</option>
                 @foreach($students as $student)
-                    <option value="{{ $student->id }}" {{ request('student_id') == $student->id ? 'selected' : '' }}>
+                    <option value="{{ $student->id }}" {{ request('profil_siswa_id') == $student->id ? 'selected' : '' }}>
                         {{ $student->pengguna->nama }}
                     </option>
                 @endforeach
@@ -25,12 +25,12 @@
 
         <div>
             <label class="block text-sm font-medium text-gray-700">Kategori</label>
-            <select name="category" class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
+            <select name="kategori" class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
                 <option value="">Semua Kategori</option>
-                <option value="light" {{ request('category') === 'light' ? 'selected' : '' }}>Ringan</option>
-                <option value="medium" {{ request('category') === 'medium' ? 'selected' : '' }}>Sedang</option>
-                <option value="heavy" {{ request('category') === 'heavy' ? 'selected' : '' }}>Berat</option>
-                <option value="severe" {{ request('category') === 'severe' ? 'selected' : '' }}>Sangat Berat</option>
+                <option value="light" {{ request('kategori') === 'light' ? 'selected' : '' }}>Ringan</option>
+                <option value="medium" {{ request('kategori') === 'medium' ? 'selected' : '' }}>Sedang</option>
+                <option value="heavy" {{ request('kategori') === 'heavy' ? 'selected' : '' }}>Berat</option>
+                <option value="severe" {{ request('kategori') === 'severe' ? 'selected' : '' }}>Sangat Berat</option>
             </select>
         </div>
 

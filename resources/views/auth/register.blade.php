@@ -35,8 +35,8 @@
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Saya adalah</label>
                     <div class="flex gap-4">
                         <label class="flex-1 flex flex-col items-center justify-center gap-2.5 rounded-xl border-2 p-4 cursor-pointer transition-all duration-300 relative group
-                                      {{ old('role') === 'teacher' ? 'border-primary bg-primary/5 text-primary' : 'border-slate-200 bg-slate-50/50 text-slate-400 hover:border-slate-300 hover:text-slate-500' }}">
-                            <input type="radio" name="role" value="teacher" {{ old('role') === 'teacher' ? 'checked' : '' }} class="sr-only">
+                                      {{ old('peran') === 'teacher' ? 'border-primary bg-primary/5 text-primary' : 'border-slate-200 bg-slate-50/50 text-slate-400 hover:border-slate-300 hover:text-slate-500' }}">
+                            <input type="radio" name="peran" value="teacher" {{ old('peran') === 'teacher' ? 'checked' : '' }} class="sr-only">
                             <svg class="h-6 w-6 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
@@ -44,15 +44,15 @@
                             <span class="text-xs font-bold">Guru</span>
                         </label>
                         <label class="flex-1 flex flex-col items-center justify-center gap-2.5 rounded-xl border-2 p-4 cursor-pointer transition-all duration-300 relative group
-                                      {{ old('role') !== 'teacher' ? 'border-primary bg-primary/5 text-primary' : 'border-slate-200 bg-slate-50/50 text-slate-400 hover:border-slate-300 hover:text-slate-500' }}">
-                            <input type="radio" name="role" value="student" {{ old('role') !== 'teacher' ? 'checked' : '' }} class="sr-only">
+                                      {{ old('peran') !== 'teacher' ? 'border-primary bg-primary/5 text-primary' : 'border-slate-200 bg-slate-50/50 text-slate-400 hover:border-slate-300 hover:text-slate-500' }}">
+                            <input type="radio" name="peran" value="student" {{ old('peran') !== 'teacher' ? 'checked' : '' }} class="sr-only">
                             <svg class="h-6 w-6 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                             </svg>
                             <span class="text-xs font-bold">Siswa</span>
                         </label>
                     </div>
-                    @error('role')<p class="mt-1.5 text-xs text-red-500 font-semibold">{{ $message }}</p>@enderror
+                    @error('peran')<p class="mt-1.5 text-xs text-red-500 font-semibold">{{ $message }}</p>@enderror
                 </div>
 
                 <div>
@@ -79,13 +79,13 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const roles = document.querySelectorAll('input[name="role"]');
+        const roles = document.querySelectorAll('input[name="peran"]');
         const identityLabel = document.getElementById('identity-label');
         const identityInput = document.getElementById('identity');
 
         function updateLabels() {
-            const activeRole = document.querySelector('input[name="role"]:checked').value;
-            const labels = document.querySelectorAll('input[name="role"]');
+            const activeRole = document.querySelector('input[name="peran"]:checked').value;
+            const labels = document.querySelectorAll('input[name="peran"]');
             
             labels.forEach(input => {
                 const parent = input.closest('label');

@@ -68,7 +68,7 @@
             @endforeach
         </select>
 
-        <select name="category"
+        <select name="kategori"
                 class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-700 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors">
             <option value="">Semua Kategori</option>
             @foreach ($categoryLabels as $category => $label)

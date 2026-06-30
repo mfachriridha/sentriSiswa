@@ -10,23 +10,23 @@
         @csrf
         <div>
             <label for="student_profile_id" class="block text-sm font-medium text-gray-700">Siswa</label>
-            <select id="student_profile_id" name="student_profile_id" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
+            <select id="student_profile_id" name="profil_siswa_id" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
                 <option value="">Pilih siswa</option>
                 @foreach ($students as $student)
-                    <option value="{{ $student->id }}" {{ old('student_profile_id', $selectedStudentId) == $student->id ? 'selected' : '' }}>{{ $student->pengguna?->nama }} - {{ $student->kelas?->nama }}</option>
+                    <option value="{{ $student->id }}" {{ old('profil_siswa_id', $selectedStudentId) == $student->id ? 'selected' : '' }}>{{ $student->pengguna?->nama }} - {{ $student->kelas?->nama }}</option>
                 @endforeach
             </select>
-            @error('student_profile_id') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+            @error('profil_siswa_id') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
         </div>
         <div>
             <label for="violation_type_id" class="block text-sm font-medium text-gray-700">Jenis Pelanggaran</label>
-            <select id="violation_type_id" name="violation_type_id" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
+            <select id="violation_type_id" name="jenis_pelanggaran_id" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
                 <option value="">Pilih pelanggaran</option>
                 @foreach ($violationTypes as $type)
-                    <option value="{{ $type->id }}" {{ old('violation_type_id') == $type->id ? 'selected' : '' }}>{{ $type->nama }} - {{ $categoryLabels[$type->kategori] ?? $type->kategori }} (-{{ $type->pengurangan_poin }})</option>
+                    <option value="{{ $type->id }}" {{ old('jenis_pelanggaran_id') == $type->id ? 'selected' : '' }}>{{ $type->nama }} - {{ $categoryLabels[$type->kategori] ?? $type->kategori }} (-{{ $type->pengurangan_poin }})</option>
                 @endforeach
             </select>
-            @error('violation_type_id') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+            @error('jenis_pelanggaran_id') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
         </div>
         <div>
             <label for="violation_date" class="block text-sm font-medium text-gray-700">Tanggal</label>

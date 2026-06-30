@@ -28,10 +28,10 @@
     </div>
     <div>
         <label class="block text-xs font-medium text-gray-600 mb-1">Kelas</label>
-        <select name="class_id" class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary">
+        <select name="kelas_id" class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary">
             <option value="">Semua Kelas</option>
             @foreach ($kelas as $k)
-                <option value="{{ $k->id }}" @selected(request('class_id') == $k->id)>{{ $k->nama }}</option>
+                <option value="{{ $k->id }}" @selected(request('kelas_id') == $k->id)>{{ $k->nama }}</option>
             @endforeach
         </select>
     </div>

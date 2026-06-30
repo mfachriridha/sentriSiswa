@@ -59,7 +59,7 @@
                 @if ($role === 'teacher')
                     <div>
                         <label for="phone" class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Nomor HP <span class="text-red-500">*</span></label>
-                        <input id="phone" type="text" name="phone" value="{{ old('phone') }}" required
+                        <input id="phone" type="text" name="telepon" value="{{ old('telepon') }}" required
                                class="mt-2 block w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 transition-all duration-300"
                                placeholder="081234567890">
                         <p class="mt-1.5 text-[10px] text-slate-400 font-medium">Digunakan untuk mengirimkan notifikasi penting via WhatsApp.</p>
