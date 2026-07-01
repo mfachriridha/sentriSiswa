@@ -90,7 +90,7 @@
                             @foreach (session('import_result.error_details') as $detail)
                                 <tr>
                                     <td class="py-1 pr-4">{{ $detail['row'] }}</td>
-                                    <td class="py-1 pr-4">{{ $detail['name'] }}</td>
+                                    <td class="py-1 pr-4">{{ $detail['nama'] }}</td>
                                     <td class="py-1">{{ $detail['reason'] }}</td>
                                 </tr>
                             @endforeach

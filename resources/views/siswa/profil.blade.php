@@ -79,6 +79,18 @@
             <p class="text-sm font-medium text-gray-500">Alamat</p>
             <p class="mt-1.5 text-sm text-gray-900">{{ $student->profilSiswa?->alamat ?? '-' }}</p>
         </div>
+        <div class="rounded-lg border border-gray-100 bg-gray-50 p-5 flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium text-gray-500">Akun Google</p>
+                <p class="mt-1.5 text-sm {{ $student->id_google ? 'text-green-600 font-medium' : 'text-gray-400' }}">
+                    {{ $student->id_google ? 'Terhubung' : 'Belum terhubung' }}
+                </p>
+            </div>
+            @if (! $student->id_google)
+                <a href="{{ route('siswa.profil.edit') }}"
+                   class="text-xs font-medium text-primary hover:underline">Hubungkan</a>
+            @endif
+        </div>
     </div>
 </div>
 

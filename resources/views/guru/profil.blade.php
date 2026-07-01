@@ -70,6 +70,18 @@
             <p class="text-sm font-medium text-gray-500">Nomor HP</p>
             <p class="mt-1.5 text-sm text-gray-900">{{ $profile?->telepon ?? '-' }}</p>
         </div>
+        <div class="rounded-lg border border-gray-100 bg-gray-50 p-5 flex items-center justify-between">
+            <div>
+                <p class="text-sm font-medium text-gray-500">Akun Google</p>
+                <p class="mt-1.5 text-sm {{ $teacher->id_google ? 'text-green-600 font-medium' : 'text-gray-400' }}">
+                    {{ $teacher->id_google ? 'Terhubung' : 'Belum terhubung' }}
+                </p>
+            </div>
+            @if (! $teacher->id_google)
+                <a href="{{ route(auth()->user()->profilRouteName('edit')) }}"
+                   class="text-xs font-medium text-primary hover:underline">Hubungkan</a>
+            @endif
+        </div>
     </div>
 </div>
 @endsection

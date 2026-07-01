@@ -31,11 +31,41 @@ class GoogleController extends Controller
         $mode = session('google_oauth_mode', 'login');
         session()->forget('google_oauth_mode');
 
+        if ($mode === 'link' && Auth::check()) {
+            return $this->handleLink($googleUser);
+        }
+
         if ($mode === 'register') {
             return $this->handleRegister($googleUser);
         }
 
         return $this->handleLogin($googleUser);
+    }
+
+    public function linkRedirect(): RedirectResponse
+    {
+        session(['google_oauth_mode' => 'link']);
+
+        return Socialite::driver('google')->redirect();
+    }
+
+    private function handleLink(\Laravel\Socialite\Contracts\User $googleUser): RedirectResponse
+    {
+        $user = Auth::user();
+
+        $taken = Pengguna::where('id_google', $googleUser->getId())
+            ->where('id', '!=', $user->id)
+            ->exists();
+
+        if ($taken) {
+            return redirect()->route($user->profilRouteName('edit'))
+                ->withErrors(['google' => 'Akun Google ini sudah terhubung ke akun lain.']);
+        }
+
+        $user->update(['id_google' => $googleUser->getId()]);
+
+        return redirect()->route($user->profilRouteName())
+            ->with('success', 'Akun berhasil dihubungkan ke Google.');
     }
 
     private function handleRegister(\Laravel\Socialite\Contracts\User $googleUser): RedirectResponse

@@ -160,6 +160,8 @@ class Pengguna extends Authenticatable
         return match ($action) {
             'edit' => "{$prefix}.profil.edit",
             'update' => "{$prefix}.profil.update",
+            'ganti-sandi' => "{$prefix}.profil.ganti-sandi",
+            'set-sandi-baru' => "{$prefix}.profil.set-sandi-baru",
             default => "{$prefix}.profil",
         };
     }

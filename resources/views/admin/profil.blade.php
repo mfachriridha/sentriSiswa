@@ -53,7 +53,7 @@
 
             <div class="rounded-xl border border-slate-50 bg-slate-50/50 p-5 shadow-inner">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Nomor WhatsApp Bantuan</span>
-                <p class="mt-2 text-sm font-semibold text-slate-800">{{ $admin->whatsapp_number ?? '-' }}</p>
+                <p class="mt-2 text-sm font-semibold text-slate-800">{{ $admin->nomor_wa ?? '-' }}</p>
                 <p class="mt-4 text-[10px] text-slate-500 font-medium">Nomor yang tertera di atas akan digunakan sebagai kontak bantuan bagi siswa & guru saat mengalami kendala pendaftaran.</p>
             </div>
         </div>

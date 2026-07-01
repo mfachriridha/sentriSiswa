@@ -77,10 +77,12 @@ Route::middleware('guest')->group(function () {
     Route::get('/reset-sandi/{token}', [ResetPasswordController::class, 'create'])->name('password.reset');
     Route::post('/reset-sandi', [ResetPasswordController::class, 'store'])->name('password.update');
 
-    // Google OAuth
+    // Google OAuth (redirect only — callback is outside guest group to support link flow)
     Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('google.redirect');
-    Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('google.callback');
 });
+
+// Google OAuth callback — no auth/guest restriction, handles login/register/link modes
+Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('google.callback');
 
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AdminLoginController::class, 'destroy'])->name('logout');
@@ -89,6 +91,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/otp/verifikasi', [OtpController::class, 'show'])->name('otp.show');
     Route::post('/otp/verifikasi', [OtpController::class, 'verify'])->name('otp.verify');
     Route::post('/otp/kirim-ulang', [OtpController::class, 'resend'])->name('otp.resend');
+
+    // Google OAuth — link existing account
+    Route::get('/auth/google/link', [GoogleController::class, 'linkRedirect'])->name('google.link');
 
     // Google WhatsApp step (guru setelah Google OAuth)
     Route::get('/auth/google/whatsapp', [GoogleWhatsappController::class, 'create'])->name('google.whatsapp');
@@ -100,6 +105,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/profil', [AdminProfilController::class, 'show'])->name('profil');
     Route::get('/profil/edit', [AdminProfilController::class, 'edit'])->name('profil.edit');
     Route::put('/profil', [AdminProfilController::class, 'update'])->name('profil.update');
+    Route::get('/profil/ganti-sandi', [AdminProfilController::class, 'gantiSandiForm'])->name('profil.ganti-sandi');
+    Route::post('/profil/ganti-sandi', [AdminProfilController::class, 'gantiSandi']);
+    Route::get('/profil/set-sandi-baru', [AdminProfilController::class, 'setSandiBaruForm'])->name('profil.set-sandi-baru');
+    Route::post('/profil/set-sandi-baru', [AdminProfilController::class, 'setSandiBaru']);
     Route::get('/guru/impor', [ImporGuruController::class, 'create'])->name('guru.impor');
     Route::get('/guru/impor/template', [ImporGuruController::class, 'template'])->name('guru.impor.template');
     Route::post('/guru/impor/unggah', [ImporGuruController::class, 'upload'])->name('guru.impor.unggah');
@@ -148,6 +157,10 @@ Route::middleware(['auth', 'registered', 'wali-kelas'])->prefix('wali-kelas')->n
     Route::put('/profil', [WaliKelasProfilController::class, 'update'])->name('profil.update');
     Route::post('/profil/photo', [WaliKelasProfilController::class, 'uploadPhoto'])->name('profil.photo');
     Route::delete('/profil/photo', [WaliKelasProfilController::class, 'deletePhoto'])->name('profil.photo.delete');
+    Route::get('/profil/ganti-sandi', [WaliKelasProfilController::class, 'gantiSandiForm'])->name('profil.ganti-sandi');
+    Route::post('/profil/ganti-sandi', [WaliKelasProfilController::class, 'gantiSandi']);
+    Route::get('/profil/set-sandi-baru', [WaliKelasProfilController::class, 'setSandiBaruForm'])->name('profil.set-sandi-baru');
+    Route::post('/profil/set-sandi-baru', [WaliKelasProfilController::class, 'setSandiBaru']);
 });
 
 Route::middleware(['auth', 'registered', 'bk'])->prefix('bk')->name('bk.')->group(function () {
@@ -165,6 +178,10 @@ Route::middleware(['auth', 'registered', 'bk'])->prefix('bk')->name('bk.')->grou
     Route::put('/profil', [BkProfilController::class, 'update'])->name('profil.update');
     Route::post('/profil/photo', [BkProfilController::class, 'uploadPhoto'])->name('profil.photo');
     Route::delete('/profil/photo', [BkProfilController::class, 'deletePhoto'])->name('profil.photo.delete');
+    Route::get('/profil/ganti-sandi', [BkProfilController::class, 'gantiSandiForm'])->name('profil.ganti-sandi');
+    Route::post('/profil/ganti-sandi', [BkProfilController::class, 'gantiSandi']);
+    Route::get('/profil/set-sandi-baru', [BkProfilController::class, 'setSandiBaruForm'])->name('profil.set-sandi-baru');
+    Route::post('/profil/set-sandi-baru', [BkProfilController::class, 'setSandiBaru']);
 });
 
 Route::middleware(['auth', 'registered', 'kesiswaan'])->prefix('kesiswaan')->name('kesiswaan.')->group(function () {
@@ -193,6 +210,10 @@ Route::middleware(['auth', 'registered', 'kesiswaan'])->prefix('kesiswaan')->nam
     Route::put('/profil', [KesiswaanProfilController::class, 'update'])->name('profil.update');
     Route::post('/profil/photo', [KesiswaanProfilController::class, 'uploadPhoto'])->name('profil.photo');
     Route::delete('/profil/photo', [KesiswaanProfilController::class, 'deletePhoto'])->name('profil.photo.delete');
+    Route::get('/profil/ganti-sandi', [KesiswaanProfilController::class, 'gantiSandiForm'])->name('profil.ganti-sandi');
+    Route::post('/profil/ganti-sandi', [KesiswaanProfilController::class, 'gantiSandi']);
+    Route::get('/profil/set-sandi-baru', [KesiswaanProfilController::class, 'setSandiBaruForm'])->name('profil.set-sandi-baru');
+    Route::post('/profil/set-sandi-baru', [KesiswaanProfilController::class, 'setSandiBaru']);
 });
 
 Route::middleware(['auth', 'registered', 'siswa'])->prefix('siswa')->name('siswa.')->group(function () {
@@ -209,4 +230,8 @@ Route::middleware(['auth', 'registered', 'siswa'])->prefix('siswa')->name('siswa
     Route::put('/profil', [SiswaProfilController::class, 'update'])->name('profil.update');
     Route::post('/profil/photo', [SiswaProfilController::class, 'uploadPhoto'])->name('profil.photo');
     Route::delete('/profil/photo', [SiswaProfilController::class, 'deletePhoto'])->name('profil.photo.delete');
+    Route::get('/profil/ganti-sandi', [SiswaProfilController::class, 'gantiSandiForm'])->name('profil.ganti-sandi');
+    Route::post('/profil/ganti-sandi', [SiswaProfilController::class, 'gantiSandi']);
+    Route::get('/profil/set-sandi-baru', [SiswaProfilController::class, 'setSandiBaruForm'])->name('profil.set-sandi-baru');
+    Route::post('/profil/set-sandi-baru', [SiswaProfilController::class, 'setSandiBaru']);
 });

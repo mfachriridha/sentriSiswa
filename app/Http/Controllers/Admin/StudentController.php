@@ -48,11 +48,8 @@ class StudentController extends Controller
         }
 
         if ($sort === 'class_name') {
-            $students = $students->orderBy(
-                Kelas::select('nama')
-                    ->whereColumn('id', 'profil_siswa.kelas_id')
-                    ->limit(1),
-                $direction,
+            $students = $students->orderByRaw(
+                "(SELECT k.nama FROM kelas k JOIN profil_siswa ps ON ps.kelas_id = k.id WHERE ps.pengguna_id = pengguna.id LIMIT 1) {$direction}"
             );
         } elseif (in_array($sort, ['nisn', 'nis'])) {
             $students = $students->orderBy(

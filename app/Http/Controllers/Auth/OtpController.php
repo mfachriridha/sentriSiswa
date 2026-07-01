@@ -19,7 +19,9 @@ class OtpController extends Controller
             return redirect()->route(Auth::user()->profilRouteName('edit'));
         }
 
-        $maskedEmail = $this->maskEmail(Auth::user()->email);
+        $pending = session('otp_pending', []);
+        $emailToShow = $pending['new_email'] ?? Auth::user()->email ?? '';
+        $maskedEmail = $emailToShow ? $this->maskEmail($emailToShow) : '***@***';
 
         return view('auth.verify-otp', compact('maskedEmail'));
     }
@@ -45,6 +47,17 @@ class OtpController extends Controller
 
         if (! $token) {
             return back()->withErrors(['otp' => 'Kode OTP salah atau sudah kedaluwarsa.']);
+        }
+
+        $pending = session('otp_pending', []);
+
+        if ($type === 'password_change' && empty($pending['new_password'])) {
+            $token->update(['digunakan_pada' => now()]);
+            session()->forget(['otp_type', 'otp_pending']);
+            session(['password_change_verified' => true]);
+
+            return redirect()->route($user->profilRouteName('set-sandi-baru'))
+                ->with('success', 'OTP berhasil diverifikasi. Masukkan kata sandi baru Anda.');
         }
 
         $this->otpService->applyChange($user, $token);
