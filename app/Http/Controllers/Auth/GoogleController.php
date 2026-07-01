@@ -21,19 +21,36 @@ class GoogleController extends Controller
 
     public function callback(): RedirectResponse
     {
+        $mode = session('google_oauth_mode', 'login');
+
         try {
             $googleUser = Socialite::driver('google')->user();
         } catch (\Exception) {
+            session()->forget(['google_oauth_mode', 'google_link_user_id']);
+
+            if ($mode === 'link') {
+                return redirect()->route('login')
+                    ->withErrors(['email' => 'Autentikasi Google gagal. Masuk dulu, lalu coba hubungkan lagi dari halaman profil.']);
+            }
+
             return redirect()->route('login')
                 ->withErrors(['email' => 'Autentikasi Google gagal. Silakan coba lagi.']);
         }
 
-        $mode = session('google_oauth_mode', 'login');
         session()->forget('google_oauth_mode');
 
-        if ($mode === 'link' && Auth::check()) {
-            return $this->handleLink($googleUser);
+        if ($mode === 'link') {
+            $user = Auth::user() ?? Pengguna::find(session()->pull('google_link_user_id'));
+
+            if (! $user) {
+                return redirect()->route('login')
+                    ->withErrors(['email' => 'Sesi tautan Google kedaluwarsa. Masuk dulu, lalu coba lagi.']);
+            }
+
+            return $this->handleLink($googleUser, $user);
         }
+
+        session()->forget('google_link_user_id');
 
         if ($mode === 'register') {
             return $this->handleRegister($googleUser);
@@ -44,15 +61,18 @@ class GoogleController extends Controller
 
     public function linkRedirect(): RedirectResponse
     {
-        session(['google_oauth_mode' => 'link']);
+        /** @var \App\Models\Pengguna $user */
+        $user = Auth::user();
+        session([
+            'google_oauth_mode' => 'link',
+            'google_link_user_id' => $user->id,
+        ]);
 
         return Socialite::driver('google')->redirect();
     }
 
-    private function handleLink(\Laravel\Socialite\Contracts\User $googleUser): RedirectResponse
+    private function handleLink(\Laravel\Socialite\Contracts\User $googleUser, \App\Models\Pengguna $user): RedirectResponse
     {
-        $user = Auth::user();
-
         $taken = Pengguna::where('id_google', $googleUser->getId())
             ->where('id', '!=', $user->id)
             ->exists();

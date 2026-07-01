@@ -149,7 +149,12 @@
                     </select>
                     <span class="text-sm text-gray-500">menit</span>
                 </div>
-                <p class="mt-1.5 text-sm text-gray-500">Toleransi keterlambatan hingga jam <span x-text="lateUntil"></span>.</p>
+                <template x-if="Number(lateTolerance) === 0">
+                    <p class="mt-1.5 text-sm text-gray-500">Tidak ada zona terlambat — absen sebelum jam selesai dianggap hadir.</p>
+                </template>
+                <template x-if="Number(lateTolerance) > 0">
+                    <p class="mt-1.5 text-sm text-gray-500">Hadir sebelum jam <span x-text="lateUntil"></span>, terlambat sesudahnya hingga jam selesai.</p>
+                </template>
 
                 @error('attendance_late_tolerance_minutes')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
