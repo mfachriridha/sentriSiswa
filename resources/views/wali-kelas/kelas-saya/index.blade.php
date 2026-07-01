@@ -142,21 +142,22 @@
                                 @endif
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 text-sm">
-                                <a href="{{ route('wali-kelas.kelas-saya.show', $student) }}" class="mr-3 font-medium text-primary hover:text-primary-dark">
-                                    Detail
-                                </a>
+                                <div class="flex items-center gap-2">
+                                <a href="{{ route('wali-kelas.kelas-saya.show', $student) }}"
+                                   class="inline-flex items-center rounded-lg border border-gray-300 px-2.5 py-1 text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors">Detail</a>
                                 @if($isWeekday)
                                     <button type="button"
                                             data-update-url="{{ route('wali-kelas.kelas-saya.absensi.update', $student) }}"
                                             data-current-status="{{ $status === 'belum_absen' ? 'hadir' : $status }}"
                                             data-student-name="{{ $student->pengguna->nama }}"
                                             onclick="openEditModal(this.dataset.updateUrl, this.dataset.currentStatus, this.dataset.studentName)"
-                                            class="font-medium text-primary hover:text-primary-dark">
+                                            class="inline-flex items-center rounded-lg border border-primary/30 px-2.5 py-1 text-xs font-medium text-primary hover:bg-primary/5 transition-colors">
                                         Edit
                                     </button>
                                 @else
                                     <span class="text-gray-400">-</span>
                                 @endif
+                                </div>
                             </td>
                         </tr>
                     @endforeach

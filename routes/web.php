@@ -140,6 +140,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/settings/whatsapp/test', [PengaturanController::class, 'whatsappTest'])->name('settings.whatsapp.test');
     Route::get('/settings/whatsapp/riwayat', [RiwayatPesanController::class, 'index'])->name('settings.whatsapp.riwayat');
     Route::get('/settings/whatsapp/riwayat/{pesanWhatsapp}', [RiwayatPesanController::class, 'show'])->name('settings.whatsapp.riwayat.show');
+    Route::post('/settings/whatsapp/riwayat/{pesanWhatsapp}/kirim-ulang', [RiwayatPesanController::class, 'resend'])->name('settings.whatsapp.riwayat.resend');
 });
 
 Route::middleware(['auth', 'registered', 'wali-kelas'])->prefix('wali-kelas')->name('wali-kelas.')->group(function () {

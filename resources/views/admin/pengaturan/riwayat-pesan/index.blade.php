@@ -101,7 +101,7 @@
                     </td>
                     <td class="px-4 py-3 text-right">
                         <a href="{{ route('admin.settings.whatsapp.riwayat.show', $p) }}"
-                           class="text-xs font-semibold text-primary hover:underline">Detail</a>
+                           class="inline-flex items-center rounded-lg border border-gray-300 px-2.5 py-1 text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Detail</a>
                     </td>
                 </tr>
                 @empty

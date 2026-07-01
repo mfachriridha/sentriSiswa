@@ -13,15 +13,35 @@ class SendWhatsAppNotification implements ShouldQueue
 {
     use Queueable;
 
+    public int $tries = 3;
+
     public int $timeout = 30;
 
     public function __construct(
         public PesanWhatsapp $whatsappMessage,
     ) {}
 
+    public function backoff(): array
+    {
+        return [rand(60, 120), rand(180, 360)];
+    }
+
     public function handle(FonnteService $whatsapp): void
     {
+        $this->whatsappMessage->increment('percobaan');
         $this->whatsappMessage->update(['status' => 'processing']);
+
+        $normalized = $whatsapp->normalizePhone($this->whatsappMessage->telepon_penerima);
+
+        if (! preg_match('/^62\d{8,13}$/', $normalized)) {
+            $this->whatsappMessage->update([
+                'status' => 'failed',
+                'respons' => json_encode(['error' => 'Nomor tidak valid: '.$normalized]),
+            ]);
+            $this->delete();
+
+            return;
+        }
 
         $result = $whatsapp->send(
             $this->whatsappMessage->telepon_penerima,
@@ -37,11 +57,12 @@ class SendWhatsAppNotification implements ShouldQueue
             ]);
         } else {
             $this->whatsappMessage->update([
-                'status' => 'failed',
                 'respons' => json_encode($result['response'] ?? $result['error']),
             ]);
 
-            Log::warning('Gagal kirim WA ke '.$this->whatsappMessage->telepon_penerima.': '.($result['error'] ?? ''));
+            Log::warning('Gagal kirim WA ke '.$this->whatsappMessage->telepon_penerima.' (percobaan '.$this->whatsappMessage->percobaan.'): '.($result['error'] ?? ''));
+
+            throw new \RuntimeException($result['error'] ?? 'Gagal mengirim pesan WhatsApp.');
         }
     }
 
@@ -54,7 +75,7 @@ class SendWhatsAppNotification implements ShouldQueue
     {
         $this->whatsappMessage->update([
             'status' => 'failed',
-            'response' => $e?->getMessage(),
+            'respons' => json_encode(['error' => $e?->getMessage()]),
         ]);
     }
 }

@@ -88,7 +88,7 @@
             </div>
             @if (! $student->id_google)
                 <a href="{{ route('siswa.profil.edit') }}"
-                   class="text-xs font-medium text-primary hover:underline">Hubungkan</a>
+                   class="inline-flex items-center rounded-lg border border-primary/30 px-2.5 py-1 text-xs font-medium text-primary hover:bg-primary/5 transition-colors">Hubungkan</a>
             @endif
         </div>
     </div>

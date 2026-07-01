@@ -51,7 +51,7 @@
                     <tr>
                         <td class="px-4 py-3">
                             <div class="font-medium text-gray-900">{{ $rule->judul }}</div>
-                            <a href="{{ asset('storage/'.$rule->path_file) }}" target="_blank" class="text-xs font-medium text-primary hover:text-primary-dark">Preview PDF</a>
+                            <a href="{{ asset('storage/'.$rule->path_file) }}" target="_blank" class="inline-flex items-center gap-1 rounded-lg border border-gray-300 px-2.5 py-1 text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors">Preview PDF</a>
                         </td>
                         <td class="px-4 py-3">
                             <x-badge :variant="$rule->dipublikasikan ? 'success' : 'neutral'">

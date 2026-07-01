@@ -17,6 +17,7 @@ class PesanWhatsapp extends Model
         'id_pesan_provider',
         'isi_pesan',
         'status',
+        'percobaan',
         'respons',
         'dikirim_pada',
     ];

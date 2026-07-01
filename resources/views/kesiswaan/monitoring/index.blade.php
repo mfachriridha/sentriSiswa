@@ -118,7 +118,7 @@
                             <span class="font-bold {{ $colorClass }}">{{ $points }}</span>
                         </td>
                         <td class="px-4 py-3">
-                            <a href="{{ route($routePrefix.'.show', $student) }}" class="font-medium text-primary hover:text-primary-dark transition-colors">Detail</a>
+                            <a href="{{ route($routePrefix.'.show', $student) }}" class="inline-flex items-center rounded-lg border border-primary/30 px-2.5 py-1 text-xs font-medium text-primary hover:bg-primary/5 transition-colors">Detail</a>
                         </td>
                     </tr>
                 @empty
