@@ -69,6 +69,16 @@ class SendAttendanceReport extends Command
                 continue;
             }
 
+            $alreadySent = PesanWhatsapp::where('kelas_id', $kelas->id)
+                ->where('tipe_pesan', 'attendance_report')
+                ->whereDate('created_at', $today)
+                ->whereIn('status', ['pending', 'processing', 'sent'])
+                ->exists();
+
+            if ($alreadySent) {
+                continue;
+            }
+
             $studentProfiles = $kelas->siswa;
             $totalStudents = $studentProfiles->count();
 
