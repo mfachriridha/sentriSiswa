@@ -5,7 +5,6 @@ use App\Models\PelanggaranSiswa;
 use App\Models\Pengguna;
 use App\Models\ProfilSiswa;
 use App\Models\TataTertib;
-use App\Models\JenisPelanggaran;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -13,7 +12,7 @@ use Illuminate\Support\Facades\Storage;
 
 uses(RefreshDatabase::class);
 
-test('counselor can only monitor assigned grade and cannot approve violations', function () {
+test('counselor can only monitor assigned grade', function () {
     [$counselor, $gradeTenStudent, $gradeElevenStudent] = actorWorkflowUsers();
 
     $this->actingAs($counselor)
@@ -31,17 +30,6 @@ test('counselor can only monitor assigned grade and cannot approve violations', 
     $this->actingAs($counselor)
         ->get(route('bk.monitoring.show', $gradeElevenStudent))
         ->assertForbidden();
-
-    $violation = PelanggaranSiswa::factory()->create([
-        'profil_siswa_id' => $gradeTenStudent->nisn,
-        'dicatat_oleh_id' => $counselor->id,
-        'status' => 'pending',
-        'disetujui_pada' => null,
-    ]);
-
-    $this->actingAs($counselor)
-        ->put(route('kesiswaan.pelanggaran-siswa.approve', $violation))
-        ->assertForbidden();
 });
 
 test('student affairs can view student detail across classes', function () {
@@ -57,53 +45,6 @@ test('student affairs can view student detail across classes', function () {
         ->get(route('kesiswaan.monitoring.show', $gradeElevenStudent))
         ->assertSuccessful()
         ->assertSee($gradeElevenStudent->pengguna->nama);
-});
-
-test('counselor submits violation and student affairs approves it', function () {
-    [$counselor, $student] = actorWorkflowUsers();
-    $studentAffairs = createActorWorkflowTeacher('student_affairs');
-    $jenisPelanggaran = JenisPelanggaran::factory()->create();
-
-    $this->actingAs($counselor)
-        ->post(route('bk.pelanggaran.store'), [
-            'profil_siswa_id' => $student->nisn,
-            'jenis_pelanggaran_id' => $jenisPelanggaran->id,
-            'tanggal_pelanggaran' => now()->toDateString(),
-            'catatan' => 'Terlambat masuk kelas.',
-        ])
-        ->assertRedirect(route('bk.pelanggaran.index'));
-
-    $violation = PelanggaranSiswa::first();
-
-    expect($violation->status)->toBe('pending');
-    expect($student->fresh()->poin)->toBe(100);
-
-    $this->actingAs($studentAffairs)
-        ->put(route('kesiswaan.pelanggaran-siswa.approve', $violation))
-        ->assertRedirect(route('kesiswaan.pelanggaran-siswa.show', $violation));
-
-    expect($violation->fresh()->status)->toBe('approved');
-    expect($student->fresh()->poin)->toBe(100 - $jenisPelanggaran->pengurangan_poin);
-});
-
-test('student affairs can reject violation without reducing student points', function () {
-    [$counselor, $student] = actorWorkflowUsers();
-    $studentAffairs = createActorWorkflowTeacher('student_affairs');
-    $violation = PelanggaranSiswa::factory()->create([
-        'profil_siswa_id' => $student->nisn,
-        'dicatat_oleh_id' => $counselor->id,
-        'status' => 'pending',
-        'disetujui_pada' => null,
-    ]);
-
-    $this->actingAs($studentAffairs)
-        ->put(route('kesiswaan.pelanggaran-siswa.reject', $violation), [
-            'alasan_penolakan' => 'Bukti belum cukup.',
-        ])
-        ->assertRedirect(route('kesiswaan.pelanggaran-siswa.show', $violation));
-
-    expect($violation->fresh()->status)->toBe('rejected');
-    expect($student->fresh()->poin)->toBe(100);
 });
 
 test('school rule pdf can be uploaded by student affairs and viewed by student', function () {

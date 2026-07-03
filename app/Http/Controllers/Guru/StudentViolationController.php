@@ -3,14 +3,12 @@
 namespace App\Http\Controllers\Guru;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Guru\RejectStudentViolationRequest;
 use App\Http\Requests\StudentViolation\StoreStudentViolationRequest;
 use App\Http\Requests\StudentViolation\UpdateStudentViolationRequest;
 use App\Models\JenisPelanggaran;
 use App\Models\Kelas;
 use App\Models\PelanggaranSiswa;
 use App\Models\ProfilSiswa;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -141,46 +139,11 @@ class StudentViolationController extends Controller
         return redirect()->route('kesiswaan.pelanggaran-siswa.index')->with('success', 'Pelanggaran siswa berhasil diperbarui.');
     }
 
-    public function approve(PelanggaranSiswa $studentViolation): RedirectResponse
-    {
-        abort_unless($studentViolation->status === 'pending', 403);
-
-        $studentViolation->update([
-            'status' => 'approved',
-            'disetujui_oleh_id' => Auth::id(),
-            'disetujui_pada' => now(),
-            'alasan_penolakan' => null,
-        ]);
-
-        return redirect()->route('kesiswaan.pelanggaran-siswa.show', $studentViolation)->with('success', 'Pengajuan pelanggaran berhasil disetujui.');
-    }
-
-    public function reject(RejectStudentViolationRequest $request, PelanggaranSiswa $studentViolation): RedirectResponse
-    {
-        abort_unless($studentViolation->status === 'pending', 403);
-
-        $studentViolation->update([
-            'status' => 'rejected',
-            'disetujui_oleh_id' => Auth::id(),
-            'disetujui_pada' => now(),
-            'alasan_penolakan' => $request->validated()['alasan_penolakan'],
-        ]);
-
-        return redirect()->route('kesiswaan.pelanggaran-siswa.show', $studentViolation)->with('success', 'Pengajuan pelanggaran berhasil ditolak.');
-    }
-
     public function destroy(PelanggaranSiswa $studentViolation): RedirectResponse
     {
         $studentViolation->delete();
 
         return redirect()->route('kesiswaan.pelanggaran-siswa.index')->with('success', 'Pelanggaran siswa berhasil dihapus.');
-    }
-
-    public function pendingCount(): JsonResponse
-    {
-        $count = PelanggaranSiswa::where('status', 'pending')->count();
-
-        return response()->json(['pending' => $count]);
     }
 
     private function students(): Collection

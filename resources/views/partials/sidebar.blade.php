@@ -148,7 +148,6 @@
                     </li>
 
                     <li>
-                        @php $sidebarPendingCount = \App\Models\PelanggaranSiswa::where('status', 'pending')->count(); @endphp
                         <a href="{{ route('kesiswaan.pelanggaran-siswa.index') }}"
                            class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
                                   {{ request()->routeIs('kesiswaan.pelanggaran-siswa.*') ? 'bg-gradient-to-r from-primary to-primary-dark text-white shadow-md shadow-primary/10 font-semibold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors' }}">
@@ -156,10 +155,22 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M12 9v2m0 4h.01M5.07 19h13.86a2 2 0 001.74-2.99L13.74 4a2 2 0 00-3.48 0L3.33 16.01A2 2 0 005.07 19z"/>
                             </svg>
-                            <span class="flex-1">Pelanggaran Siswa</span>
-                            @if($sidebarPendingCount > 0)
+                            Pelanggaran Siswa
+                        </a>
+                    </li>
+
+                    <li>
+                        @php $sidebarPendingPoinCount = \App\Models\PengajuanPoin::where('status', 'pending')->count(); @endphp
+                        <a href="{{ route('kesiswaan.pengajuan-poin.persetujuan') }}"
+                           class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
+                                  {{ request()->routeIs('kesiswaan.pengajuan-poin.*') ? 'bg-gradient-to-r from-primary to-primary-dark text-white shadow-md shadow-primary/10 font-semibold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors' }}">
+                            <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <span class="flex-1">Pengajuan Poin</span>
+                            @if($sidebarPendingPoinCount > 0)
                                 <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-xs font-bold text-white leading-none">
-                                    {{ $sidebarPendingCount }}
+                                    {{ $sidebarPendingPoinCount }}
                                 </span>
                             @endif
                         </a>
@@ -214,16 +225,6 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('bk.pelanggaran.index') }}"
-                           class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
-                                  {{ request()->routeIs('bk.pelanggaran.*') ? 'bg-gradient-to-r from-primary to-primary-dark text-white shadow-md shadow-primary/10 font-semibold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors' }}">
-                            <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.07 19h13.86a2 2 0 001.74-2.99L13.74 4a2 2 0 00-3.48 0L3.33 16.01A2 2 0 005.07 19z"/>
-                            </svg>
-                            Pengajuan Pelanggaran
-                        </a>
-                    </li>
-                    <li>
                         <a href="{{ route('bk.laporan.index') }}"
                            class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
                                   {{ request()->routeIs('bk.laporan.*') ? 'bg-gradient-to-r from-primary to-primary-dark text-white shadow-md shadow-primary/10 font-semibold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors' }}">
@@ -273,6 +274,17 @@
                                       d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                             </svg>
                             Riwayat Pelanggaran
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{{ route('wali-kelas.pengajuan-poin.index') }}"
+                           class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
+                                  {{ request()->routeIs('wali-kelas.pengajuan-poin.*') ? 'bg-gradient-to-r from-primary to-primary-dark text-white shadow-md shadow-primary/10 font-semibold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors' }}">
+                            <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            Pengajuan Poin
                         </a>
                     </li>
                 @endif

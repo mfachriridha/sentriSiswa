@@ -72,9 +72,10 @@ app/Http/Controllers/
 │   ├── ClassRosterController     # Wali kelas daily class view
 │   ├── ViolationHistoryController
 │   ├── BkMonitoringController
-│   ├── BkViolationSubmissionController
 │   ├── MonitoringController      # Kesiswaan school-wide
 │   ├── StudentViolationController
+│   ├── PengajuanPoinController   # Wali kelas submits point-addition requests
+│   ├── PersetujuanPoinController # Kesiswaan approves/rejects them
 │   ├── ViolationTypeController
 │   ├── SchoolRuleController
 │   └── ViolationReportController
@@ -133,10 +134,15 @@ Intervention Image v3 is installed but its `create()` method does not exist; onl
 - `resources/views/student/` and `resources/views/teacher/` are legacy — prefer `siswa/` and `guru/`
 
 ### Violation Workflow
-`StudentViolation.status` FSM: `pending → approved | rejected`
-- BK users submit with `status = pending`; Kesiswaan approves/rejects
-- Kesiswaan can create violations directly with `status = approved`
-- Points: `StudentProfile.getPointsAttribute()` = 100 − SUM(approved `point_deduction`)
+`PelanggaranSiswa.status` FSM: `pending → approved | rejected` (the `pending`/`rejected` states are legacy — only old records can hold them now).
+- Kesiswaan creates violations directly with `status = approved` (no submission/approval queue on this side anymore)
+- Points: `ProfilSiswa::getPoinAttribute()` = 100 − SUM(approved `pengurangan_poin`) + SUM(approved `PengajuanPoin.jumlah_poin`), clamped to `[0, 100]`
+
+### Point Addition Workflow (Pengajuan Poin)
+`PengajuanPoin.status` FSM: `pending → approved | rejected`
+- Wali Kelas submits a request for a student in their own homeroom class (`kelasWali->siswa`), with a reason only — no point amount
+- Kesiswaan sets `jumlah_poin` (1-100) when approving; rejecting requires `alasan_penolakan`
+- This replaced the old "BK submits violation" flow, which has been removed entirely
 
 ### TokenAksesAbsensi
 Public attendance check-in uses a token stored in `token_akses_absensi`. Token is valid for the day it was created (end-of-day expiry). `TokenAksesAbsensi::buatAtauPerbarui()` upserts the record.

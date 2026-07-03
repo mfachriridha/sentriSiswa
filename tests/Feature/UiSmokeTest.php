@@ -36,6 +36,7 @@ test('homeroom dashboard renders attendance shortcuts', function () {
         ->assertSuccessful()
         ->assertSee('Kelas Saya')
         ->assertSee('Rekap Absensi')
+        ->assertSee('Pengajuan Poin')
         ->assertSee('Profil Saya');
 });
 
@@ -50,6 +51,7 @@ test('student affairs dashboard renders monitoring shortcuts', function () {
         ->assertSuccessful()
         ->assertSee('Monitoring Siswa')
         ->assertSee('Pelanggaran Siswa')
+        ->assertSee('Pengajuan Poin')
         ->assertSee('Laporan Kesiswaan')
         ->assertSee('Tata Tertib')
         ->assertSee('Profil Saya');
@@ -62,7 +64,7 @@ test('counselor dashboard renders bk shortcuts', function () {
         ->get(route('bk.dashboard'))
         ->assertSuccessful()
         ->assertSee('Monitoring BK')
-        ->assertSee('Pengajuan Pelanggaran')
+        ->assertDontSee('Pengajuan Pelanggaran')
         ->assertSee('Laporan BK');
 });
 

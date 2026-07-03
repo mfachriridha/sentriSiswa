@@ -1,16 +1,16 @@
 @extends('layouts.app')
 
-@section('title', 'Pengajuan Pelanggaran')
+@section('title', 'Pengajuan Poin')
 
 @section('content')
 <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-    <x-page-header title="Pengajuan Pelanggaran" :description="'Pengajuan pelanggaran siswa tingkat '.$grade" />
-    <a href="{{ route('bk.pelanggaran.create') }}" class="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-dark">Buat Pengajuan</a>
+    <x-page-header title="Pengajuan Poin" description="Ajukan penambahan poin untuk siswa di kelas binaan Anda." />
+    <a href="{{ route('wali-kelas.pengajuan-poin.create') }}" class="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-dark">Buat Pengajuan</a>
 </div>
 
 <x-alert type="success" :message="session('success')" />
 
-<form method="GET" action="{{ route('bk.pelanggaran.index') }}" class="mb-4 flex flex-wrap gap-2 rounded-xl border border-gray-200 bg-white p-4">
+<form method="GET" action="{{ route('wali-kelas.pengajuan-poin.index') }}" class="mb-4 flex flex-wrap gap-2 rounded-xl border border-gray-200 bg-white p-4">
     <select name="status" class="rounded-lg border border-gray-300 px-3 py-2 text-sm">
         <option value="">Semua Status</option>
         @foreach ($statusLabels as $value => $label)
@@ -27,19 +27,19 @@
                 <tr>
                     <th class="px-4 py-3">Tanggal</th>
                     <th class="px-4 py-3">Siswa</th>
-                    <th class="px-4 py-3">Pelanggaran</th>
-                    <th class="px-4 py-3">Poin</th>
+                    <th class="px-4 py-3">Alasan</th>
+                    <th class="px-4 py-3">Jumlah Poin</th>
                     <th class="px-4 py-3">Status</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
-                @forelse ($studentViolations as $violation)
+                @forelse ($pengajuanPoin as $pengajuan)
                     <tr>
-                        <td class="px-4 py-3">{{ $violation->tanggal_pelanggaran->translatedFormat('d F Y') }}</td>
-                        <td class="px-4 py-3">{{ $violation->profilSiswa?->pengguna?->nama ?? '-' }}<div class="text-xs text-gray-500">{{ $violation->profilSiswa?->kelas?->nama ?? '-' }}</div></td>
-                        <td class="px-4 py-3">{{ $violation->nama_pelanggaran }}</td>
-                        <td class="px-4 py-3 font-semibold text-red-600">-{{ $violation->pengurangan_poin }}</td>
-                        <td class="px-4 py-3">{{ $statusLabels[$violation->status] ?? $violation->status }}</td>
+                        <td class="px-4 py-3">{{ $pengajuan->created_at->translatedFormat('d F Y') }}</td>
+                        <td class="px-4 py-3">{{ $pengajuan->profilSiswa?->pengguna?->nama ?? '-' }}<div class="text-xs text-gray-500">{{ $pengajuan->profilSiswa?->kelas?->nama ?? '-' }}</div></td>
+                        <td class="px-4 py-3">{{ $pengajuan->alasan }}</td>
+                        <td class="px-4 py-3 font-semibold text-green-600">{{ $pengajuan->jumlah_poin !== null ? '+'.$pengajuan->jumlah_poin : '-' }}</td>
+                        <td class="px-4 py-3">{{ $statusLabels[$pengajuan->status] ?? $pengajuan->status }}</td>
                     </tr>
                 @empty
                     <tr><td colspan="5" class="px-6 py-16 text-center text-sm text-gray-500">Belum ada pengajuan.</td></tr>
@@ -47,8 +47,8 @@
             </tbody>
         </table>
     </div>
-    @if ($studentViolations->hasPages())
-        <div class="border-t border-gray-200 px-4 py-3">{{ $studentViolations->links() }}</div>
+    @if ($pengajuanPoin->hasPages())
+        <div class="border-t border-gray-200 px-4 py-3">{{ $pengajuanPoin->links() }}</div>
     @endif
 </div>
 @endsection

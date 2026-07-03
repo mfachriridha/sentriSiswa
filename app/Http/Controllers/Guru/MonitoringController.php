@@ -18,6 +18,7 @@ class MonitoringController extends Controller
 
         $query = ProfilSiswa::with(['pengguna', 'kelas'])
             ->withSum(['pelanggaranSiswa' => fn ($query) => $query->approved()], 'pengurangan_poin')
+            ->withSum(['pengajuanPoin' => fn ($query) => $query->approved()], 'jumlah_poin')
             ->with(['absensi' => fn ($query) => $query->whereDate('tanggal', today())])
             ->withCount(['absensi as total_attendances'])
             ->withCount(['absensi as present_attendances' => fn ($query) => $query->whereIn('status', ['hadir', 'terlambat'])]);

@@ -20,6 +20,7 @@ class BkMonitoringController extends Controller
 
         $query = ProfilSiswa::with(['pengguna', 'kelas'])
             ->withSum(['pelanggaranSiswa' => fn ($query) => $query->approved()], 'pengurangan_poin')
+            ->withSum(['pengajuanPoin' => fn ($query) => $query->approved()], 'jumlah_poin')
             ->with(['absensi' => fn ($query) => $query->whereDate('tanggal', today())])
             ->withCount(['absensi as total_attendances'])
             ->withCount(['absensi as present_attendances' => fn ($query) => $query->whereIn('status', ['hadir', 'terlambat'])])
@@ -65,7 +66,7 @@ class BkMonitoringController extends Controller
         return view('kesiswaan.monitoring.show', [
             'student' => $monitoring,
             'backRoute' => route('bk.monitoring.index'),
-            'createViolationRoute' => route('bk.pelanggaran.create', ['profil_siswa_id' => $monitoring->nisn]),
+            'createViolationRoute' => null,
             'alphaWarningCount' => $absenceWarning->alphaCountForStudentId($monitoring->nisn),
             'warningThreshold' => AbsenceWarningService::Threshold,
         ]);

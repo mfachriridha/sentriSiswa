@@ -14,27 +14,12 @@
     $hasActiveFilters = filled($search) || filled($filterClass) || filled($filterCategory) || filled($filterViolationType) || filled($filterDate) || filled($filterStatus);
 @endphp
 
-@php
-    $pendingCount = \App\Models\PelanggaranSiswa::where('status', 'pending')->count();
-@endphp
 <div class="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
     <div>
         <h1 class="text-2xl font-bold text-gray-900">Pelanggaran Siswa</h1>
         <p class="mt-2 text-sm text-gray-500">Catat dan kelola pelanggaran siswa.</p>
     </div>
     <div class="flex items-center gap-2 flex-wrap">
-        <a href="{{ route('kesiswaan.pelanggaran-siswa.persetujuan') }}"
-           class="relative inline-flex items-center gap-2 rounded-lg border border-amber-300 bg-amber-50 px-4 py-2.5 text-sm font-semibold text-amber-700 hover:bg-amber-100 transition-colors">
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            Antrean Persetujuan
-            @if($pendingCount > 0)
-                <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-xs font-bold text-white leading-none">
-                    {{ $pendingCount }}
-                </span>
-            @endif
-        </a>
         <a href="{{ route('kesiswaan.pelanggaran-siswa.create') }}"
            class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm
                   hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors">
@@ -155,12 +140,6 @@
                                    class="inline-flex items-center gap-1.5 rounded-lg border border-primary/30 px-3 py-2 text-sm font-medium text-primary hover:bg-primary/5 transition-colors">
                                     Edit
                                 </a>
-                                @if ($studentViolation->status === 'pending')
-                                    <a href="{{ route('kesiswaan.pelanggaran-siswa.persetujuan') }}"
-                                       class="inline-flex items-center gap-1.5 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-700 hover:bg-amber-100 transition-colors">
-                                        Tunggu ACC
-                                    </a>
-                                @endif
                                 <button type="button"
                                         onclick="window.dispatchEvent(new CustomEvent('open-confirm-modal', {
                                             detail: {
@@ -197,20 +176,3 @@
     @endif
 </div>
 @endsection
-
-@push('scripts')
-<script>
-    // Poll pending violations count every 60s and reload if changed
-    (function () {
-        const url = "{{ route('kesiswaan.pelanggaran-siswa.pending-count') }}";
-        const currentPending = {{ \App\Models\PelanggaranSiswa::where('status','pending')->count() }};
-        setInterval(async function () {
-            try {
-                const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
-                const data = await res.json();
-                if (data.pending !== currentPending) location.reload();
-            } catch {}
-        }, 60000);
-    })();
-</script>
-@endpush

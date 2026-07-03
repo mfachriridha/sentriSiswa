@@ -21,15 +21,6 @@
         Kembali
     </a>
     <div class="flex flex-wrap gap-2">
-        @if ($studentViolation->status === 'pending')
-            <form method="POST" action="{{ route('kesiswaan.pelanggaran-siswa.approve', $studentViolation) }}">
-                @csrf
-                @method('PUT')
-                <button class="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-700 transition-colors">
-                    ACC
-                </button>
-            </form>
-        @endif
         <a href="{{ route('kesiswaan.pelanggaran-siswa.edit', $studentViolation) }}"
            class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors">
             Edit
@@ -111,17 +102,4 @@
     </div>
 </div>
 
-@if ($studentViolation->status === 'pending')
-    <div class="mt-5 rounded-xl border border-red-200 bg-white p-6">
-        <h2 class="text-lg font-semibold text-gray-900">Tolak Pengajuan</h2>
-        <form method="POST" action="{{ route('kesiswaan.pelanggaran-siswa.reject', $studentViolation) }}" class="mt-4 space-y-3">
-            @csrf
-            @method('PUT')
-            <textarea name="alasan_penolakan" rows="3" placeholder="Tuliskan alasan penolakan"
-                      class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">{{ old('alasan_penolakan') }}</textarea>
-            @error('alasan_penolakan') <p class="text-sm text-red-600">{{ $message }}</p> @enderror
-            <button class="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700">Tolak Pengajuan</button>
-        </form>
-    </div>
-@endif
 @endsection

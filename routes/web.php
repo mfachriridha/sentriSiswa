@@ -19,13 +19,13 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Bk\DashboardController as BkDashboardController;
 use App\Http\Controllers\Bk\AbsensiRecapController as BkAbsensiRecapController;
 use App\Http\Controllers\Bk\MonitoringController as BkMonitoringController;
-use App\Http\Controllers\Bk\PengajuanPelanggaranController;
 use App\Http\Controllers\Bk\ProfilController as BkProfilController;
 use App\Http\Controllers\Kesiswaan\DashboardController as KesiswaanDashboardController;
 use App\Http\Controllers\Kesiswaan\JenisPelanggaranController;
 use App\Http\Controllers\Kesiswaan\LaporanController as KesiswaanLaporanController;
 use App\Http\Controllers\Kesiswaan\MonitoringController as KesiswaanMonitoringController;
 use App\Http\Controllers\Kesiswaan\PelanggaranSiswaController;
+use App\Http\Controllers\Kesiswaan\PengajuanPoinController as KesiswaanPengajuanPoinController;
 use App\Http\Controllers\Kesiswaan\ProfilController as KesiswaanProfilController;
 use App\Http\Controllers\Kesiswaan\TataTertibController;
 use App\Http\Controllers\Siswa\AbsensiController as SiswaAbsensiController;
@@ -35,6 +35,7 @@ use App\Http\Controllers\Siswa\SchoolRuleController as SiswaSchoolRuleController
 use App\Http\Controllers\WaliKelas\AbsensiController as WaliKelasAbsensiController;
 use App\Http\Controllers\WaliKelas\DashboardController as WaliKelasDashboardController;
 use App\Http\Controllers\WaliKelas\KelasSayaController;
+use App\Http\Controllers\WaliKelas\PengajuanPoinController as WaliKelasPengajuanPoinController;
 use App\Http\Controllers\WaliKelas\ProfilController as WaliKelasProfilController;
 use App\Http\Controllers\WaliKelas\RiwayatPelanggaranController;
 use App\Http\Controllers\AbsensiPublikController;
@@ -154,6 +155,9 @@ Route::middleware(['auth', 'registered', 'wali-kelas'])->prefix('wali-kelas')->n
     Route::get('/absensi/export-excel', [WaliKelasAbsensiController::class, 'exportExcel'])->name('absensi.export-excel');
     Route::get('/absensi/export-pdf', [WaliKelasAbsensiController::class, 'exportPdf'])->name('absensi.export-pdf');
     Route::get('/pelanggaran', [RiwayatPelanggaranController::class, 'index'])->name('pelanggaran');
+    Route::get('/pengajuan-poin', [WaliKelasPengajuanPoinController::class, 'index'])->name('pengajuan-poin.index');
+    Route::get('/pengajuan-poin/buat', [WaliKelasPengajuanPoinController::class, 'create'])->name('pengajuan-poin.create');
+    Route::post('/pengajuan-poin', [WaliKelasPengajuanPoinController::class, 'store'])->name('pengajuan-poin.store');
     Route::get('/profil', [WaliKelasProfilController::class, 'show'])->name('profil');
     Route::get('/profil/edit', [WaliKelasProfilController::class, 'edit'])->name('profil.edit');
     Route::put('/profil', [WaliKelasProfilController::class, 'update'])->name('profil.update');
@@ -169,9 +173,6 @@ Route::middleware(['auth', 'registered', 'bk'])->prefix('bk')->name('bk.')->grou
     Route::get('/dashboard', [BkDashboardController::class, 'index'])->name('dashboard');
     Route::get('/monitoring', [BkMonitoringController::class, 'index'])->name('monitoring.index');
     Route::get('/monitoring/{monitoring}', [BkMonitoringController::class, 'show'])->name('monitoring.show');
-    Route::get('/pelanggaran', [PengajuanPelanggaranController::class, 'index'])->name('pelanggaran.index');
-    Route::get('/pelanggaran/buat', [PengajuanPelanggaranController::class, 'create'])->name('pelanggaran.create');
-    Route::post('/pelanggaran', [PengajuanPelanggaranController::class, 'store'])->name('pelanggaran.store');
     Route::get('/laporan', [BkAbsensiRecapController::class, 'index'])->name('laporan.index');
     Route::get('/laporan/export-excel', [BkAbsensiRecapController::class, 'exportExcel'])->name('laporan.export-excel');
     Route::get('/laporan/export-pdf', [BkAbsensiRecapController::class, 'exportPdf'])->name('laporan.export-pdf');
@@ -190,15 +191,14 @@ Route::middleware(['auth', 'registered', 'kesiswaan'])->prefix('kesiswaan')->nam
     Route::get('/dashboard', [KesiswaanDashboardController::class, 'index'])->name('dashboard');
     Route::get('/monitoring', [KesiswaanMonitoringController::class, 'index'])->name('monitoring.index');
     Route::get('/monitoring/{monitoring}', [KesiswaanMonitoringController::class, 'show'])->name('monitoring.show');
-    Route::get('/pelanggaran-siswa/pending-count', [PelanggaranSiswaController::class, 'pendingCount'])->name('pelanggaran-siswa.pending-count');
-    Route::get('/pelanggaran-siswa/persetujuan', [PelanggaranSiswaController::class, 'persetujuan'])->name('pelanggaran-siswa.persetujuan');
-    Route::put('/pelanggaran-siswa/{studentViolation}/approve', [PelanggaranSiswaController::class, 'approve'])->name('pelanggaran-siswa.approve');
-    Route::put('/pelanggaran-siswa/{studentViolation}/reject', [PelanggaranSiswaController::class, 'reject'])->name('pelanggaran-siswa.reject');
     Route::resource('pelanggaran-siswa', PelanggaranSiswaController::class)
         ->parameters(['pelanggaran-siswa' => 'studentViolation']);
     Route::resource('jenis-pelanggaran', JenisPelanggaranController::class)
         ->parameters(['jenis-pelanggaran' => 'violationType']);
-    Route::get('/pengajuan-pelanggaran', [PelanggaranSiswaController::class, 'index'])->defaults('status', 'pending')->name('pengajuan-pelanggaran.index');
+    Route::get('/pengajuan-poin', [KesiswaanPengajuanPoinController::class, 'persetujuan'])->name('pengajuan-poin.persetujuan');
+    Route::get('/pengajuan-poin/pending-count', [KesiswaanPengajuanPoinController::class, 'pendingCount'])->name('pengajuan-poin.pending-count');
+    Route::put('/pengajuan-poin/{pengajuanPoin}/approve', [KesiswaanPengajuanPoinController::class, 'approve'])->name('pengajuan-poin.approve');
+    Route::put('/pengajuan-poin/{pengajuanPoin}/reject', [KesiswaanPengajuanPoinController::class, 'reject'])->name('pengajuan-poin.reject');
     Route::get('/laporan', [KesiswaanLaporanController::class, 'index'])->name('laporan.index');
     Route::get('/laporan/export-excel', [KesiswaanLaporanController::class, 'exportExcel'])->name('laporan.export-excel');
     Route::get('/laporan/export-pdf', [KesiswaanLaporanController::class, 'exportPdf'])->name('laporan.export-pdf');

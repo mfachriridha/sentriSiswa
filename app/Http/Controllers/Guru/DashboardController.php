@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Absensi;
 use App\Models\Kelas;
 use App\Models\PelanggaranSiswa;
+use App\Models\PengajuanPoin;
 use App\Models\ProfilSiswa;
 use App\Services\AbsenceWarningService;
 use Illuminate\Support\Facades\Auth;
@@ -44,7 +45,6 @@ class DashboardController extends Controller
         if ($user->isBk()) {
             $grade = $user->profilGuru?->tingkat;
             $studentIds = ProfilSiswa::whereHas('kelas', fn ($query) => $query->where('tingkat', $grade))->pluck('nisn');
-            $violations = PelanggaranSiswa::whereIn('profil_siswa_id', $studentIds)->get();
             $warningCount = $absenceWarning->alphaCountsForStudentIds($studentIds)
                 ->filter(fn (int $count): bool => $absenceWarning->hasWarning($count))
                 ->count();
@@ -52,9 +52,6 @@ class DashboardController extends Controller
             $summary['bk'] = [
                 'grade' => $grade,
                 'students' => $studentIds->count(),
-                'pending' => $violations->where('status', 'pending')->count(),
-                'approved' => $violations->where('status', 'approved')->count(),
-                'rejected' => $violations->where('status', 'rejected')->count(),
                 'warnings' => $warningCount,
             ];
         }
@@ -69,9 +66,8 @@ class DashboardController extends Controller
             $summary['kesiswaan'] = [
                 'classes' => Kelas::count(),
                 'students' => ProfilSiswa::count(),
-                'pending' => $violations->where('status', 'pending')->count(),
                 'approved' => $violations->where('status', 'approved')->count(),
-                'rejected' => $violations->where('status', 'rejected')->count(),
+                'pengajuan_poin_pending' => PengajuanPoin::where('status', 'pending')->count(),
                 'warnings' => $warningCount,
             ];
         }

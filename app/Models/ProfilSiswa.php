@@ -48,6 +48,11 @@ class ProfilSiswa extends Model
         return $this->hasMany(PelanggaranSiswa::class, 'profil_siswa_id');
     }
 
+    public function pengajuanPoin(): HasMany
+    {
+        return $this->hasMany(PengajuanPoin::class, 'profil_siswa_id');
+    }
+
     public function getPoinAttribute(): int
     {
         $deductions = 0;
@@ -60,6 +65,16 @@ class ProfilSiswa extends Model
             $deductions = (int) $this->pelanggaranSiswa()->approved()->sum('pengurangan_poin');
         }
 
-        return max(0, 100 - $deductions);
+        $additions = 0;
+
+        if (array_key_exists('pengajuan_poin_sum_jumlah_poin', $this->attributes)) {
+            $additions = (int) $this->attributes['pengajuan_poin_sum_jumlah_poin'];
+        } elseif ($this->relationLoaded('pengajuanPoin')) {
+            $additions = $this->pengajuanPoin->where('status', 'approved')->sum('jumlah_poin');
+        } else {
+            $additions = (int) $this->pengajuanPoin()->approved()->sum('jumlah_poin');
+        }
+
+        return max(0, min(100, 100 - $deductions + $additions));
     }
 }

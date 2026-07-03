@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Guru;
+namespace App\Http\Requests\PengajuanPoin;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class RejectStudentViolationRequest extends FormRequest
+class RejectPengajuanPoinRequest extends FormRequest
 {
     public function authorize(): bool
     {

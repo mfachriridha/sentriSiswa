@@ -39,7 +39,7 @@
 @endif
 
 @if (! empty($summary['bk']))
-    <div class="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
+    <div class="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <div class="rounded-xl border border-gray-200 bg-white p-4">
             <p class="text-xs font-semibold uppercase text-gray-500">Tingkat BK</p>
             <p class="mt-1 text-xl font-bold text-gray-900">{{ $summary['bk']['grade'] ?? '-' }}</p>
@@ -47,18 +47,6 @@
         <div class="rounded-xl border border-gray-200 bg-white p-4">
             <p class="text-xs font-semibold uppercase text-gray-500">Siswa</p>
             <p class="mt-1 text-xl font-bold text-gray-900">{{ $summary['bk']['students'] }}</p>
-        </div>
-        <div class="rounded-xl border border-gray-200 bg-white p-4">
-            <p class="text-xs font-semibold uppercase text-gray-500">Pending</p>
-            <p class="mt-1 text-xl font-bold text-amber-600">{{ $summary['bk']['pending'] }}</p>
-        </div>
-        <div class="rounded-xl border border-gray-200 bg-white p-4">
-            <p class="text-xs font-semibold uppercase text-gray-500">Disetujui</p>
-            <p class="mt-1 text-xl font-bold text-green-600">{{ $summary['bk']['approved'] }}</p>
-        </div>
-        <div class="rounded-xl border border-gray-200 bg-white p-4">
-            <p class="text-xs font-semibold uppercase text-gray-500">Ditolak</p>
-            <p class="mt-1 text-xl font-bold text-red-600">{{ $summary['bk']['rejected'] }}</p>
         </div>
         <div class="rounded-xl border border-red-200 bg-red-50 p-4">
             <p class="text-xs font-semibold uppercase text-red-600">Peringatan Alpha</p>
@@ -68,7 +56,7 @@
 @endif
 
 @if (! empty($summary['kesiswaan']))
-    <div class="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
+    <div class="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <div class="rounded-xl border border-gray-200 bg-white p-4">
             <p class="text-xs font-semibold uppercase text-gray-500">Kelas</p>
             <p class="mt-1 text-xl font-bold text-gray-900">{{ $summary['kesiswaan']['classes'] }}</p>
@@ -78,16 +66,12 @@
             <p class="mt-1 text-xl font-bold text-gray-900">{{ $summary['kesiswaan']['students'] }}</p>
         </div>
         <div class="rounded-xl border border-gray-200 bg-white p-4">
-            <p class="text-xs font-semibold uppercase text-gray-500">Pending</p>
-            <p class="mt-1 text-xl font-bold text-amber-600">{{ $summary['kesiswaan']['pending'] }}</p>
-        </div>
-        <div class="rounded-xl border border-gray-200 bg-white p-4">
-            <p class="text-xs font-semibold uppercase text-gray-500">Disetujui</p>
+            <p class="text-xs font-semibold uppercase text-gray-500">Pelanggaran Dicatat</p>
             <p class="mt-1 text-xl font-bold text-green-600">{{ $summary['kesiswaan']['approved'] }}</p>
         </div>
-        <div class="rounded-xl border border-gray-200 bg-white p-4">
-            <p class="text-xs font-semibold uppercase text-gray-500">Ditolak</p>
-            <p class="mt-1 text-xl font-bold text-red-600">{{ $summary['kesiswaan']['rejected'] }}</p>
+        <div class="rounded-xl border border-amber-200 bg-amber-50 p-4">
+            <p class="text-xs font-semibold uppercase text-amber-600">Pengajuan Poin Pending</p>
+            <p class="mt-1 text-xl font-bold text-amber-700">{{ $summary['kesiswaan']['pengajuan_poin_pending'] }}</p>
         </div>
         <div class="rounded-xl border border-red-200 bg-red-50 p-4">
             <p class="text-xs font-semibold uppercase text-red-600">Peringatan Alpha</p>
@@ -113,6 +97,14 @@
                 </svg>
             </x-slot:icon>
         </x-shortcut-card>
+
+        <x-shortcut-card :href="route('wali-kelas.pengajuan-poin.index')" title="Pengajuan Poin" description="Ajukan penambahan poin untuk siswa di kelas Anda.">
+            <x-slot:icon>
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+            </x-slot:icon>
+        </x-shortcut-card>
     @endif
 
     @if (auth()->user()->isKesiswaan())
@@ -128,6 +120,14 @@
             <x-slot:icon>
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.07 19h13.86a2 2 0 001.74-2.99L13.74 4a2 2 0 00-3.48 0L3.33 16.01A2 2 0 005.07 19z"/>
+                </svg>
+            </x-slot:icon>
+        </x-shortcut-card>
+
+        <x-shortcut-card :href="route('kesiswaan.pengajuan-poin.persetujuan')" title="Pengajuan Poin" description="Terima atau tolak pengajuan penambahan poin dari wali kelas.">
+            <x-slot:icon>
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
             </x-slot:icon>
         </x-shortcut-card>
@@ -154,14 +154,6 @@
             <x-slot:icon>
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                </svg>
-            </x-slot:icon>
-        </x-shortcut-card>
-
-        <x-shortcut-card :href="route('bk.pelanggaran.index')" title="Pengajuan Pelanggaran" description="Ajukan poin pelanggaran untuk disetujui kesiswaan.">
-            <x-slot:icon>
-                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.07 19h13.86a2 2 0 001.74-2.99L13.74 4a2 2 0 00-3.48 0L3.33 16.01A2 2 0 005.07 19z"/>
                 </svg>
             </x-slot:icon>
         </x-shortcut-card>
