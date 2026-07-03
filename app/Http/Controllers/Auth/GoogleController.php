@@ -40,7 +40,8 @@ class GoogleController extends Controller
         session()->forget('google_oauth_mode');
 
         if ($mode === 'link') {
-            $user = Auth::user() ?? Pengguna::find(session()->pull('google_link_user_id'));
+            $user = Auth::user() ?? Pengguna::find(session('google_link_user_id'));
+            session()->forget('google_link_user_id');
 
             if (! $user) {
                 return redirect()->route('login')
@@ -82,10 +83,25 @@ class GoogleController extends Controller
                 ->withErrors(['google' => 'Akun Google ini sudah terhubung ke akun lain.']);
         }
 
+        if (strcasecmp($googleUser->getEmail(), $user->email) !== 0) {
+            return redirect()->route($user->profilRouteName('edit'))
+                ->withErrors(['google' => 'Email akun Google ('.$googleUser->getEmail().') tidak sama dengan email akun Anda. Gunakan akun Google dengan email yang sama untuk menghubungkan.']);
+        }
+
         $user->update(['id_google' => $googleUser->getId()]);
 
         return redirect()->route($user->profilRouteName())
             ->with('success', 'Akun berhasil dihubungkan ke Google.');
+    }
+
+    public function unlink(): RedirectResponse
+    {
+        /** @var Pengguna $user */
+        $user = Auth::user();
+        $user->update(['id_google' => null]);
+
+        return redirect()->route($user->profilRouteName('edit'))
+            ->with('success', 'Akun Google berhasil diputuskan.');
     }
 
     private function handleRegister(\Laravel\Socialite\Contracts\User $googleUser): RedirectResponse
@@ -125,6 +141,7 @@ class GoogleController extends Controller
         session()->forget(['register_role', 'register_user_id', 'register_identity', 'register_name']);
 
         Auth::login($user);
+        session()->regenerate();
 
         if ($role === 'teacher') {
             // Teacher needs to provide WhatsApp number
@@ -160,6 +177,7 @@ class GoogleController extends Controller
         }
 
         Auth::login($user);
+        session()->regenerate();
 
         return redirect()->route($user->dashboardRouteName());
     }

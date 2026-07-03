@@ -174,9 +174,19 @@
                     Hubungkan
                 </a>
             @else
-                <span class="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-3 py-1.5 text-xs font-semibold text-green-700">
-                    ✓ Aktif
-                </span>
+                <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-3 py-1.5 text-xs font-semibold text-green-700">
+                        ✓ Aktif
+                    </span>
+                    <form method="POST" action="{{ route('google.unlink') }}"
+                          onsubmit="return confirm('Putuskan koneksi akun Google?');">
+                        @csrf
+                        <button type="submit"
+                                class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                            Putuskan
+                        </button>
+                    </form>
+                </div>
             @endif
         </div>
 

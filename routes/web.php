@@ -94,6 +94,7 @@ Route::middleware('auth')->group(function () {
 
     // Google OAuth — link existing account
     Route::get('/auth/google/link', [GoogleController::class, 'linkRedirect'])->name('google.link');
+    Route::post('/auth/google/unlink', [GoogleController::class, 'unlink'])->name('google.unlink');
 
     // Google WhatsApp step (guru setelah Google OAuth)
     Route::get('/auth/google/whatsapp', [GoogleWhatsappController::class, 'create'])->name('google.whatsapp');

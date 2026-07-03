@@ -150,3 +150,140 @@ test('google login fails for unregistered or non-existent user', function () {
 
     expect(Auth::check())->toBeFalse();
 });
+
+test('google link succeeds when google email matches account email', function () {
+    $student = Pengguna::factory()->student()->create([
+        'status' => 'registered',
+        'email' => 'student@example.com',
+        'id_google' => null,
+    ]);
+    ProfilSiswa::factory()->create(['pengguna_id' => $student->id]);
+
+    $abstractUser = Mockery::mock('Laravel\Socialite\Two\User');
+    $abstractUser->shouldReceive('getId')->andReturn('google-id-match');
+    $abstractUser->shouldReceive('getEmail')->andReturn('student@example.com');
+
+    $provider = Mockery::mock('Laravel\Socialite\Two\GoogleProvider');
+    $provider->shouldReceive('user')->andReturn($abstractUser);
+
+    Socialite::shouldReceive('driver')->with('google')->andReturn($provider);
+
+    session(['google_oauth_mode' => 'link', 'google_link_user_id' => $student->id]);
+
+    $this->actingAs($student)
+        ->get(route('google.callback'))
+        ->assertRedirect(route('siswa.profil'))
+        ->assertSessionHas('success');
+
+    $student->refresh();
+    expect($student->id_google)->toBe('google-id-match');
+});
+
+test('google link is blocked when google email does not match account email', function () {
+    $student = Pengguna::factory()->student()->create([
+        'status' => 'registered',
+        'email' => 'student@example.com',
+        'id_google' => null,
+    ]);
+    ProfilSiswa::factory()->create(['pengguna_id' => $student->id]);
+
+    $abstractUser = Mockery::mock('Laravel\Socialite\Two\User');
+    $abstractUser->shouldReceive('getId')->andReturn('google-id-mismatch');
+    $abstractUser->shouldReceive('getEmail')->andReturn('unrelated@gmail.com');
+
+    $provider = Mockery::mock('Laravel\Socialite\Two\GoogleProvider');
+    $provider->shouldReceive('user')->andReturn($abstractUser);
+
+    Socialite::shouldReceive('driver')->with('google')->andReturn($provider);
+
+    session(['google_oauth_mode' => 'link', 'google_link_user_id' => $student->id]);
+
+    $this->actingAs($student)
+        ->get(route('google.callback'))
+        ->assertRedirect(route('siswa.profil.edit'))
+        ->assertSessionHasErrors('google');
+
+    $student->refresh();
+    expect($student->id_google)->toBeNull();
+});
+
+test('google link is blocked when google id already belongs to another account', function () {
+    Pengguna::factory()->student()->create([
+        'status' => 'registered',
+        'email' => 'other@example.com',
+        'id_google' => 'google-id-taken',
+    ]);
+
+    $student = Pengguna::factory()->student()->create([
+        'status' => 'registered',
+        'email' => 'student@example.com',
+        'id_google' => null,
+    ]);
+    ProfilSiswa::factory()->create(['pengguna_id' => $student->id]);
+
+    $abstractUser = Mockery::mock('Laravel\Socialite\Two\User');
+    $abstractUser->shouldReceive('getId')->andReturn('google-id-taken');
+    $abstractUser->shouldReceive('getEmail')->andReturn('student@example.com');
+
+    $provider = Mockery::mock('Laravel\Socialite\Two\GoogleProvider');
+    $provider->shouldReceive('user')->andReturn($abstractUser);
+
+    Socialite::shouldReceive('driver')->with('google')->andReturn($provider);
+
+    session(['google_oauth_mode' => 'link', 'google_link_user_id' => $student->id]);
+
+    $this->actingAs($student)
+        ->get(route('google.callback'))
+        ->assertRedirect(route('siswa.profil.edit'))
+        ->assertSessionHasErrors('google');
+
+    $student->refresh();
+    expect($student->id_google)->toBeNull();
+});
+
+test('login via google works after account was linked', function () {
+    $student = Pengguna::factory()->student()->create([
+        'status' => 'registered',
+        'email' => 'student@example.com',
+        'id_google' => null,
+    ]);
+    ProfilSiswa::factory()->create(['pengguna_id' => $student->id]);
+
+    $abstractUser = Mockery::mock('Laravel\Socialite\Two\User');
+    $abstractUser->shouldReceive('getId')->andReturn('google-id-linked');
+    $abstractUser->shouldReceive('getEmail')->andReturn('student@example.com');
+
+    $provider = Mockery::mock('Laravel\Socialite\Two\GoogleProvider');
+    $provider->shouldReceive('user')->andReturn($abstractUser);
+
+    Socialite::shouldReceive('driver')->with('google')->andReturn($provider);
+
+    session(['google_oauth_mode' => 'link', 'google_link_user_id' => $student->id]);
+    $this->actingAs($student)->get(route('google.callback'));
+
+    Auth::logout();
+    session(['google_oauth_mode' => 'login']);
+
+    $this->get(route('google.callback'))
+        ->assertRedirect(route('siswa.dashboard'));
+
+    expect(Auth::check())->toBeTrue();
+    expect(Auth::user()->id)->toBe($student->id);
+});
+
+test('google unlink removes id_google and user can still log in with password', function () {
+    $student = Pengguna::factory()->student()->create([
+        'status' => 'registered',
+        'email' => 'student@example.com',
+        'id_google' => 'google-id-to-remove',
+    ]);
+    ProfilSiswa::factory()->create(['pengguna_id' => $student->id]);
+
+    $this->actingAs($student)
+        ->post(route('google.unlink'))
+        ->assertRedirect(route('siswa.profil.edit'))
+        ->assertSessionHas('success');
+
+    $student->refresh();
+    expect($student->id_google)->toBeNull();
+});
