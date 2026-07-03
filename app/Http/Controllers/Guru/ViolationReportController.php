@@ -33,17 +33,25 @@ class ViolationReportController extends Controller
     {
         [$violations] = $this->reportData($request, paginated: false);
 
-        $rows = $violations->map(fn (PelanggaranSiswa $violation): array => [
-            $violation->tanggal_pelanggaran->format('Y-m-d'),
-            $violation->profilSiswa?->pengguna?->nama ?? '-',
-            $violation->profilSiswa?->nis ?? '-',
-            $violation->profilSiswa?->kelas?->nama ?? '-',
-            $violation->nama_pelanggaran,
-            JenisPelanggaran::categoryLabels()[$violation->kategori_pelanggaran] ?? $violation->kategori_pelanggaran,
-            '-'.$violation->pengurangan_poin,
-            PelanggaranSiswa::statusLabels()[$violation->status] ?? $violation->status,
-            $violation->dicatatOleh?->nama ?? '-',
-        ])->values()->all();
+        $remainingPoints = $this->remainingPointsByStudent($violations);
+
+        $rows = $violations->map(function (PelanggaranSiswa $violation) use ($remainingPoints): array {
+            $sisaPoin = $remainingPoints[$violation->profil_siswa_id] ?? 100;
+
+            return [
+                $violation->tanggal_pelanggaran->format('Y-m-d'),
+                $violation->profilSiswa?->pengguna?->nama ?? '-',
+                $violation->profilSiswa?->nis ?? '-',
+                $violation->profilSiswa?->kelas?->nama ?? '-',
+                $violation->nama_pelanggaran,
+                JenisPelanggaran::categoryLabels()[$violation->kategori_pelanggaran] ?? $violation->kategori_pelanggaran,
+                '-'.$violation->pengurangan_poin,
+                PelanggaranSiswa::statusLabels()[$violation->status] ?? $violation->status,
+                $violation->dicatatOleh?->nama ?? '-',
+                $sisaPoin,
+                $sisaPoin <= 50 ? 'Perhatian' : '-',
+            ];
+        })->values()->all();
 
         return Excel::download(new ArrayExport([
             'Tanggal',
@@ -55,6 +63,8 @@ class ViolationReportController extends Controller
             'Poin',
             'Status',
             'Dicatat Oleh',
+            'Sisa Poin Siswa',
+            'Keterangan',
         ], $rows), 'laporan-pelanggaran.xlsx');
     }
 
@@ -67,7 +77,7 @@ class ViolationReportController extends Controller
             'title' => $title,
             'violations' => $violations,
             'filters' => $filters,
-            'chartRows' => $this->statusChartRows($violations),
+            'pointsSummary' => $this->studentPointsSummary($violations),
             'categoryLabels' => JenisPelanggaran::categoryLabels(),
             'statusLabels' => PelanggaranSiswa::statusLabels(),
         ])->setPaper('a4', 'landscape');
@@ -106,15 +116,39 @@ class ViolationReportController extends Controller
     }
 
     /**
-     * @return list<array{0: string, 1: int}>
+     * @return array<string, int>
      */
-    private function statusChartRows(iterable $violations): array
+    private function remainingPointsByStudent(iterable $violations): array
     {
-        $collection = collect($violations);
-        $labels = PelanggaranSiswa::statusLabels();
+        return collect($violations)
+            ->where('status', 'approved')
+            ->groupBy('profil_siswa_id')
+            ->map(fn ($group) => max(0, 100 - $group->sum('pengurangan_poin')))
+            ->all();
+    }
 
-        return collect(['pending', 'approved', 'rejected'])
-            ->map(fn (string $status): array => [$labels[$status], $collection->where('status', $status)->count()])
+    /**
+     * @return list<array{nama: string, nis: string, kelas: string, total_terpotong: int, sisa_poin: int}>
+     */
+    private function studentPointsSummary(iterable $violations): array
+    {
+        return collect($violations)
+            ->where('status', 'approved')
+            ->groupBy('profil_siswa_id')
+            ->map(function ($group) {
+                $first = $group->first();
+                $totalDeducted = $group->sum('pengurangan_poin');
+
+                return [
+                    'nama' => $first->profilSiswa?->pengguna?->nama ?? '-',
+                    'nis' => $first->profilSiswa?->nis ?? '-',
+                    'kelas' => $first->profilSiswa?->kelas?->nama ?? '-',
+                    'total_terpotong' => $totalDeducted,
+                    'sisa_poin' => max(0, 100 - $totalDeducted),
+                ];
+            })
+            ->sortBy('sisa_poin')
+            ->values()
             ->all();
     }
 }
