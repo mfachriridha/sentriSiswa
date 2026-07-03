@@ -60,6 +60,8 @@
                         <td class="px-4 py-3 text-gray-500">{{ $violation->dicatatOleh?->nama ?? '-' }}</td>
                         <td class="px-4 py-3">
                             <div class="flex items-center gap-2">
+                                <a href="{{ route('kesiswaan.pelanggaran-siswa.show', $violation) }}"
+                                   class="inline-flex items-center rounded-lg border border-gray-300 px-2.5 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors">Detail</a>
                                 <form method="POST" action="{{ route('kesiswaan.pelanggaran-siswa.approve', $violation) }}">
                                     @csrf
                                     @method('PUT')
