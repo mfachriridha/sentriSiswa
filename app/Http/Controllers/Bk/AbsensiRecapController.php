@@ -8,6 +8,7 @@ use App\Http\Requests\Guru\AttendanceRecapFilterRequest;
 use App\Models\Absensi;
 use App\Models\Kelas;
 use App\Models\ProfilSiswa;
+use App\Services\AbsenceWarningService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -71,6 +72,7 @@ class AbsensiRecapController extends Controller
 
         $rows = $students->map(function (ProfilSiswa $student) use ($stats): array {
             $stat = $stats[$student->nisn];
+            $flagged = $stat['alpha'] >= AbsenceWarningService::Threshold;
 
             return [
                 $student->nis ?? '-',
@@ -82,11 +84,12 @@ class AbsensiRecapController extends Controller
                 $stat['sakit'],
                 $stat['alpha'],
                 $stat['percentage'].'%',
+                $flagged ? 'Perlu tindak lanjut' : '-',
             ];
         })->values()->all();
 
         return Excel::download(
-            new ArrayExport(['NIS', 'Nama', 'Kelas', 'Hadir', 'Terlambat', 'Izin', 'Sakit', 'Alpha', 'Kehadiran'], $rows),
+            new ArrayExport(['NIS', 'Nama', 'Kelas', 'Hadir', 'Terlambat', 'Izin', 'Sakit', 'Alpha', 'Kehadiran', 'Keterangan'], $rows),
             "rekap-absensi-tingkat-{$bkGrade}-{$startDate}-sampai-{$endDate}.xlsx",
         );
     }
@@ -114,7 +117,6 @@ class AbsensiRecapController extends Controller
             'className' => "Tingkat {$bkGrade}",
             'students' => $students,
             'stats' => $stats,
-            'chartRows' => $this->attendanceChartRows($stats),
             'startDate' => $startDate,
             'endDate' => $endDate,
         ])->setPaper('a4', 'portrait');
@@ -214,18 +216,4 @@ class AbsensiRecapController extends Controller
             ->values();
     }
 
-    /**
-     * @param  array<int, array{hadir: int, terlambat: int, izin: int, sakit: int, alpha: int, percentage: float}>  $stats
-     * @return list<array{label: string, value: int}>
-     */
-    private function attendanceChartRows(array $stats): array
-    {
-        return [
-            ['label' => 'Hadir', 'value' => collect($stats)->sum('hadir')],
-            ['label' => 'Terlambat', 'value' => collect($stats)->sum('terlambat')],
-            ['label' => 'Izin', 'value' => collect($stats)->sum('izin')],
-            ['label' => 'Sakit', 'value' => collect($stats)->sum('sakit')],
-            ['label' => 'Alpha', 'value' => collect($stats)->sum('alpha')],
-        ];
-    }
 }

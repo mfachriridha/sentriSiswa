@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Guru\AttendanceRecapFilterRequest;
 use App\Models\Absensi;
 use App\Models\ProfilSiswa;
+use App\Services\AbsenceWarningService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -55,6 +56,7 @@ class AttendanceRecapController extends Controller
 
         $rows = $students->map(function (ProfilSiswa $student) use ($stats): array {
             $stat = $stats[$student->nisn];
+            $flagged = $stat['alpha'] >= AbsenceWarningService::Threshold;
 
             return [
                 $student->nis ?? '-',
@@ -65,6 +67,7 @@ class AttendanceRecapController extends Controller
                 $stat['sakit'],
                 $stat['alpha'],
                 $stat['percentage'].'%',
+                $flagged ? 'Perlu tindak lanjut' : '-',
             ];
         })->values()->all();
 
@@ -93,7 +96,6 @@ class AttendanceRecapController extends Controller
             'className' => $class->nama,
             'students' => $students,
             'stats' => $stats,
-            'chartRows' => $this->attendanceChartRows($stats),
             'startDate' => $startDate,
             'endDate' => $endDate,
         ])->setPaper('a4', 'portrait');
@@ -191,18 +193,4 @@ class AttendanceRecapController extends Controller
             ->values();
     }
 
-    /**
-     * @param  array<int, array{hadir: int, terlambat: int, izin: int, sakit: int, alpha: int, percentage: float}>  $stats
-     * @return list<array{label: string, value: int}>
-     */
-    private function attendanceChartRows(array $stats): array
-    {
-        return [
-            ['label' => 'Hadir', 'value' => collect($stats)->sum('hadir')],
-            ['label' => 'Terlambat', 'value' => collect($stats)->sum('terlambat')],
-            ['label' => 'Izin', 'value' => collect($stats)->sum('izin')],
-            ['label' => 'Sakit', 'value' => collect($stats)->sum('sakit')],
-            ['label' => 'Alpha', 'value' => collect($stats)->sum('alpha')],
-        ];
-    }
 }

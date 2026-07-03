@@ -26,8 +26,8 @@ class AbsenceWarningService
     }
 
     /**
-     * @param  Collection<int, int>|array<int, int>  $studentIds
-     * @return Collection<int, int>
+     * @param  Collection<int, string>|array<int, string>  $studentIds
+     * @return Collection<string, int>
      */
     public function alphaCountsForStudentIds(Collection|array $studentIds): Collection
     {
@@ -49,7 +49,7 @@ class AbsenceWarningService
             ->map(fn (int|string $count): int => (int) $count);
     }
 
-    public function alphaCountForStudentId(int $studentId): int
+    public function alphaCountForStudentId(string $studentId): int
     {
         return $this->alphaCountsForStudentIds([$studentId])->get($studentId, 0);
     }
