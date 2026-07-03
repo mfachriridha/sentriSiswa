@@ -15,7 +15,7 @@ class DashboardController extends Controller
         $profile = $student->profilSiswa;
         $points = $profile?->poin ?? 100;
         $attendances = $profile?->absensi ?? collect();
-        $alphaWarningCount = $profile ? $absenceWarning->alphaCountForStudentId($profile->id) : 0;
+        $alphaWarningCount = $profile ? $absenceWarning->alphaCountForStudentId($profile->nisn) : 0;
         $warningThreshold = AbsenceWarningService::Threshold;
 
         $charts = [

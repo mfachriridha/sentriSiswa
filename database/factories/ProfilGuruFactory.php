@@ -13,7 +13,7 @@ class ProfilGuruFactory extends Factory
     public function definition(): array
     {
         return [
-            'nip' => null,
+            'nip' => fake()->unique()->numerify('19##########'),
             'telepon' => null,
             'tingkat' => null,
         ];

@@ -56,7 +56,7 @@
         <tbody>
             @forelse ($students as $index => $student)
                 @php
-                    $stat = $stats[$student->id];
+                    $stat = $stats[$student->nisn];
                 @endphp
                 <tr>
                     <td>{{ $index + 1 }}</td>

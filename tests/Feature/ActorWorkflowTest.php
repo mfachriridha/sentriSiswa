@@ -33,7 +33,7 @@ test('counselor can only monitor assigned grade and cannot approve violations', 
         ->assertForbidden();
 
     $violation = PelanggaranSiswa::factory()->create([
-        'profil_siswa_id' => $gradeTenStudent->id,
+        'profil_siswa_id' => $gradeTenStudent->nisn,
         'dicatat_oleh_id' => $counselor->id,
         'status' => 'pending',
         'disetujui_pada' => null,
@@ -66,7 +66,7 @@ test('counselor submits violation and student affairs approves it', function () 
 
     $this->actingAs($counselor)
         ->post(route('bk.pelanggaran.store'), [
-            'profil_siswa_id' => $student->id,
+            'profil_siswa_id' => $student->nisn,
             'jenis_pelanggaran_id' => $jenisPelanggaran->id,
             'tanggal_pelanggaran' => now()->toDateString(),
             'catatan' => 'Terlambat masuk kelas.',
@@ -90,7 +90,7 @@ test('student affairs can reject violation without reducing student points', fun
     [$counselor, $student] = actorWorkflowUsers();
     $studentAffairs = createActorWorkflowTeacher('student_affairs');
     $violation = PelanggaranSiswa::factory()->create([
-        'profil_siswa_id' => $student->id,
+        'profil_siswa_id' => $student->nisn,
         'dicatat_oleh_id' => $counselor->id,
         'status' => 'pending',
         'disetujui_pada' => null,
@@ -141,7 +141,7 @@ test('violation reports and attendance pdf routes render downloads for allowed r
     $class->update(['wali_kelas_id' => $homeroom->id]);
 
     PelanggaranSiswa::factory()->create([
-        'profil_siswa_id' => $student->id,
+        'profil_siswa_id' => $student->nisn,
         'status' => 'approved',
         'disetujui_pada' => now(),
     ]);

@@ -31,7 +31,7 @@ class DemoStudentBiodataSeeder extends Seeder
         ]);
 
         BiodataSiswa::create([
-            'profil_siswa_id' => $profil->id,
+            'profil_siswa_id' => $profil->nisn,
             'tempat_lahir' => 'Jakarta',
             'tanggal_lahir' => '2008-05-15',
             'jenis_kelamin' => 'P',

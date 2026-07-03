@@ -13,7 +13,7 @@
             <select id="student_profile_id" name="profil_siswa_id" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
                 <option value="">Pilih siswa</option>
                 @foreach ($students as $student)
-                    <option value="{{ $student->id }}" {{ old('profil_siswa_id', $selectedStudentId) == $student->id ? 'selected' : '' }}>{{ $student->pengguna?->nama }} - {{ $student->kelas?->nama }}</option>
+                    <option value="{{ $student->nisn }}" {{ old('profil_siswa_id', $selectedStudentId) == $student->nisn ? 'selected' : '' }}>{{ $student->pengguna?->nama }} - {{ $student->kelas?->nama }}</option>
                 @endforeach
             </select>
             @error('profil_siswa_id') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror

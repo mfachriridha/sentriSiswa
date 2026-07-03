@@ -18,16 +18,14 @@ class PelanggaranSiswaFactory extends Factory
         $jenisPelanggaran = JenisPelanggaran::factory()->create();
 
         return [
-            'profil_siswa_id' => function (): int {
+            'profil_siswa_id' => function (): string {
                 $student = Pengguna::factory()->student()->create([
                     'status' => 'registered',
                 ]);
 
                 return ProfilSiswa::factory()->create([
                     'pengguna_id' => $student->id,
-                    'nisn' => fake()->unique()->numerify('##########'),
-                    'nis' => fake()->unique()->numerify('#####'),
-                ])->id;
+                ])->nisn;
             },
             'jenis_pelanggaran_id' => $jenisPelanggaran->id,
             'dicatat_oleh_id' => Pengguna::factory()->homeroom(),

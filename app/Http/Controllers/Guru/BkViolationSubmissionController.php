@@ -55,7 +55,7 @@ class BkViolationSubmissionController extends Controller
         $violationType = JenisPelanggaran::findOrFail($data['jenis_pelanggaran_id']);
 
         PelanggaranSiswa::create([
-            'profil_siswa_id' => $student->id,
+            'profil_siswa_id' => $student->nisn,
             'jenis_pelanggaran_id' => $violationType->id,
             'dicatat_oleh_id' => Auth::id(),
             'tanggal_pelanggaran' => $data['tanggal_pelanggaran'],

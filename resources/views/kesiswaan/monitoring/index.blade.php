@@ -74,7 +74,7 @@
             <tbody class="divide-y divide-gray-100">
                 @forelse ($students as $student)
                     @php
-                        $alphaCount = $alphaWarnings->get($student->id, 0);
+                        $alphaCount = $alphaWarnings->get($student->nisn, 0);
                     @endphp
                     <tr class="hover:bg-gray-50 transition-colors">
                         <td class="px-4 py-3">

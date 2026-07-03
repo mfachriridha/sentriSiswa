@@ -35,7 +35,7 @@ test('student check in updates pre-created belum absen record', function () {
     $student = createRegisteredStudent();
     $profile = $student->profilSiswa;
     Absensi::create([
-        'profil_siswa_id' => $profile->id,
+        'profil_siswa_id' => $profile->nisn,
         'tanggal' => now()->toDateString(),
         'status' => 'belum_absen',
     ]);
@@ -69,7 +69,7 @@ test('student check in creates fallback record when daily command has not run', 
 
     $attendance = Absensi::firstOrFail();
 
-    expect($attendance->profil_siswa_id)->toBe($student->profilSiswa->id)
+    expect($attendance->profil_siswa_id)->toBe($student->profilSiswa->nisn)
         ->and($attendance->tanggal->toDateString())->toBe('2026-06-01')
         ->and($attendance->status)->toBe('hadir');
 });
@@ -80,7 +80,7 @@ test('student cannot overwrite final manual attendance status', function () {
 
     $student = createRegisteredStudent();
     Absensi::create([
-        'profil_siswa_id' => $student->profilSiswa->id,
+        'profil_siswa_id' => $student->profilSiswa->nisn,
         'tanggal' => now()->toDateString(),
         'status' => 'izin',
     ]);

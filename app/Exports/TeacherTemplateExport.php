@@ -22,7 +22,7 @@ class TeacherTemplateExport implements FromArray, WithHeadings
         return [
             ['Siti Aminah, S.Pd', '197403052022211001', 'Wali Kelas', '10. 1'],
             ['Budi Santoso, M.Pd', '198506172022211002', 'Wali Kelas', '10. 2'],
-            ['Ratna Dewi, S.Pd', '', 'BK', '11'],
+            ['Ratna Dewi, S.Pd', 'HNR-0001', 'BK', '11'],
         ];
     }
 }

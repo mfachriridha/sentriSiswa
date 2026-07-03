@@ -55,7 +55,7 @@ test('kelas saya shows today attendance summary and all students without paginat
     createStudentInClass($class, 'Bima', '10002');
 
     Absensi::create([
-        'profil_siswa_id' => $firstStudent->id,
+        'profil_siswa_id' => $firstStudent->nisn,
         'tanggal' => now()->toDateString(),
         'status' => 'hadir',
         'waktu_masuk' => '06:40',
@@ -139,7 +139,7 @@ test('recap summarizes final weekday records and ignores weekend and belum absen
         ['2026-06-08', 'belum_absen'],
     ] as [$date, $status]) {
         Absensi::create([
-            'profil_siswa_id' => $student->id,
+            'profil_siswa_id' => $student->nisn,
             'tanggal' => $date,
             'status' => $status,
         ]);
@@ -152,7 +152,7 @@ test('recap summarizes final weekday records and ignores weekend and belum absen
         ]))
         ->assertSuccessful()
         ->assertViewHas('stats', function (array $stats) use ($student): bool {
-            return $stats[$student->id] === [
+            return $stats[$student->nisn] === [
                 'hadir' => 1,
                 'terlambat' => 1,
                 'izin' => 1,

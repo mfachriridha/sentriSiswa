@@ -16,7 +16,7 @@
             <select name="profil_siswa_id" class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
                 <option value="">Semua Siswa</option>
                 @foreach($students as $student)
-                    <option value="{{ $student->id }}" {{ request('profil_siswa_id') == $student->id ? 'selected' : '' }}>
+                    <option value="{{ $student->nisn }}" {{ request('profil_siswa_id') == $student->nisn ? 'selected' : '' }}>
                         {{ $student->pengguna->nama }}
                     </option>
                 @endforeach

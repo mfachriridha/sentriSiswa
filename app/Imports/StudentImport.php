@@ -55,6 +55,20 @@ class StudentImport implements ToCollection, WithChunkReading, WithHeadingRow
                 continue;
             }
 
+            if (empty($nisn)) {
+                $this->errors++;
+                $this->errorDetails[] = ['row' => $this->rowIndex, 'nama' => $nama, 'reason' => 'NISN kosong'];
+
+                continue;
+            }
+
+            if (empty($nis)) {
+                $this->errors++;
+                $this->errorDetails[] = ['row' => $this->rowIndex, 'nama' => $nama, 'reason' => 'NIS kosong'];
+
+                continue;
+            }
+
             $kelasId = null;
             if ($kelas) {
                 if (! isset($this->classCache[$kelas])) {
@@ -182,7 +196,7 @@ class StudentImport implements ToCollection, WithChunkReading, WithHeadingRow
             }
 
             foreach (array_chunk($inserts, 500) as $chunk) {
-                ProfilSiswa::upsert($chunk, ['pengguna_id'], ['nisn', 'nis', 'kelas_id', 'updated_at']);
+                ProfilSiswa::upsert($chunk, ['nisn'], ['pengguna_id', 'nis', 'kelas_id', 'updated_at']);
             }
         });
     }

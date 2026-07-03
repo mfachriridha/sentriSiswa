@@ -42,7 +42,7 @@ class BkMonitoringController extends Controller
         $routePrefix = 'bk.monitoring';
         $title = 'Monitoring BK';
         $description = 'Pantau absensi dan pelanggaran siswa tingkat '.$grade.'.';
-        $alphaWarnings = $absenceWarning->alphaCountsForStudentIds($students->getCollection()->pluck('id'));
+        $alphaWarnings = $absenceWarning->alphaCountsForStudentIds($students->getCollection()->pluck('nisn'));
         $warningThreshold = AbsenceWarningService::Threshold;
 
         return view('kesiswaan.monitoring.index', compact('students', 'classes', 'search', 'filterClass', 'routePrefix', 'title', 'description', 'alphaWarnings', 'warningThreshold'));
@@ -65,8 +65,8 @@ class BkMonitoringController extends Controller
         return view('kesiswaan.monitoring.show', [
             'student' => $monitoring,
             'backRoute' => route('bk.monitoring.index'),
-            'createViolationRoute' => route('bk.pelanggaran.create', ['profil_siswa_id' => $monitoring->id]),
-            'alphaWarningCount' => $absenceWarning->alphaCountForStudentId($monitoring->id),
+            'createViolationRoute' => route('bk.pelanggaran.create', ['profil_siswa_id' => $monitoring->nisn]),
+            'alphaWarningCount' => $absenceWarning->alphaCountForStudentId($monitoring->nisn),
             'warningThreshold' => AbsenceWarningService::Threshold,
         ]);
     }

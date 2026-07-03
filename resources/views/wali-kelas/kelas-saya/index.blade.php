@@ -100,10 +100,10 @@
                 <tbody class="divide-y divide-gray-200 bg-white">
                     @foreach($students as $index => $student)
                         @php
-                            $attendance = $attendances->get($student->id);
+                            $attendance = $attendances->get($student->nisn);
                             $status = $attendance?->status ?? 'belum_absen';
                             [$badgeClass, $statusLabel] = $statusConfig[$status];
-                            $alphaCount = $alphaWarnings->get($student->id, 0);
+                            $alphaCount = $alphaWarnings->get($student->nisn, 0);
                         @endphp
                         <tr class="hover:bg-gray-50">
                             <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-900">{{ $index + 1 }}</td>

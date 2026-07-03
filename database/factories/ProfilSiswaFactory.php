@@ -13,8 +13,8 @@ class ProfilSiswaFactory extends Factory
     public function definition(): array
     {
         return [
-            'nisn' => null,
-            'nis' => null,
+            'nisn' => fake()->unique()->numerify('##########'),
+            'nis' => fake()->unique()->numerify('#####'),
             'kelas_id' => null,
             'telepon' => null,
             'alamat' => null,

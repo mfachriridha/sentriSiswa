@@ -26,7 +26,7 @@
                 <select id="student_id" name="profil_siswa_id" class="mt-1 w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
                     <option value="">Semua Siswa</option>
                     @foreach ($filterStudents as $filterStudent)
-                        <option value="{{ $filterStudent->id }}" {{ $selectedStudent == $filterStudent->id ? 'selected' : '' }}>{{ $filterStudent->pengguna?->nama }}</option>
+                        <option value="{{ $filterStudent->nisn }}" {{ $selectedStudent == $filterStudent->nisn ? 'selected' : '' }}>{{ $filterStudent->pengguna?->nama }}</option>
                     @endforeach
                 </select>
             </div>
@@ -81,7 +81,7 @@
             <tbody class="divide-y divide-gray-200 bg-white">
                 @forelse($students as $index => $student)
                     @php
-                        $stat = $stats[$student->id];
+                        $stat = $stats[$student->nisn];
                     @endphp
                     <tr class="hover:bg-gray-50">
                         <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-900">{{ $index + 1 }}</td>

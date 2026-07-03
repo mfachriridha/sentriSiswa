@@ -30,7 +30,7 @@ class StudentBiodataController extends Controller
         abort_if(! $profile, 404);
 
         $profile->biodata()->updateOrCreate(
-            ['profil_siswa_id' => $profile->id],
+            ['profil_siswa_id' => $profile->nisn],
             $request->validated(),
         );
 

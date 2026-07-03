@@ -70,7 +70,7 @@ class AbsensiRecapController extends Controller
         $students = $this->filterStudentsByStatus($students, $stats, $validated['status'] ?? '');
 
         $rows = $students->map(function (ProfilSiswa $student) use ($stats): array {
-            $stat = $stats[$student->id];
+            $stat = $stats[$student->nisn];
 
             return [
                 $student->nis ?? '-',
@@ -146,11 +146,11 @@ class AbsensiRecapController extends Controller
      * @param  list<int>  $classIds
      * @return Collection<int, ProfilSiswa>
      */
-    private function gradeStudents(array $classIds, int|string|null $studentId = null): Collection
+    private function gradeStudents(array $classIds, ?string $studentId = null): Collection
     {
         return ProfilSiswa::query()
             ->whereIn('kelas_id', $classIds)
-            ->when($studentId, fn ($query) => $query->where('profil_siswa.id', $studentId))
+            ->when($studentId, fn ($query) => $query->where('profil_siswa.nisn', $studentId))
             ->join('pengguna', 'profil_siswa.pengguna_id', '=', 'pengguna.id')
             ->with(['pengguna', 'kelas'])
             ->orderBy('profil_siswa.kelas_id')
@@ -168,7 +168,7 @@ class AbsensiRecapController extends Controller
         return Absensi::query()
             ->whereDate('tanggal', '>=', $startDate)
             ->whereDate('tanggal', '<=', $endDate)
-            ->whereIn('profil_siswa_id', $students->pluck('id'))
+            ->whereIn('profil_siswa_id', $students->pluck('nisn'))
             ->get()
             ->filter(fn (Absensi $absensi): bool => $absensi->tanggal->isWeekday())
             ->groupBy('profil_siswa_id');
@@ -184,11 +184,11 @@ class AbsensiRecapController extends Controller
         $stats = [];
 
         foreach ($students as $student) {
-            $studentAttendances = $attendances->get($student->id, collect());
+            $studentAttendances = $attendances->get($student->nisn, collect());
             $finalAttendances = $studentAttendances->whereIn('status', ['hadir', 'terlambat', 'izin', 'sakit', 'alpha']);
             $finalAttendanceCount = $finalAttendances->count();
 
-            $stats[$student->id] = [
+            $stats[$student->nisn] = [
                 'hadir' => $finalAttendances->where('status', 'hadir')->count(),
                 'terlambat' => $finalAttendances->where('status', 'terlambat')->count(),
                 'izin' => $finalAttendances->where('status', 'izin')->count(),
@@ -210,7 +210,7 @@ class AbsensiRecapController extends Controller
         }
 
         return $students
-            ->filter(fn (ProfilSiswa $student): bool => ($stats[$student->id][$status] ?? 0) > 0)
+            ->filter(fn (ProfilSiswa $student): bool => ($stats[$student->nisn][$status] ?? 0) > 0)
             ->values();
     }
 

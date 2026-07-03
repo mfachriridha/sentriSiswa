@@ -178,7 +178,7 @@ class AbsensiController extends Controller
 
         $lateThresholdMinutes = $this->minutesFromTime($endTime) - $lateToleranceMinutes;
         $status = ($this->minutesFromTime($currentTime) > $lateThresholdMinutes) ? 'terlambat' : 'hadir';
-        $selfiePath = $request->file('selfie')->store('attendance-selfies/'.$profile->id, 'public');
+        $selfiePath = $request->file('selfie')->store('attendance-selfies/'.$profile->nisn, 'public');
 
         $attendance->update([
             'status' => $status,

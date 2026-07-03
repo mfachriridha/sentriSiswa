@@ -25,7 +25,7 @@ class ClassRosterController extends Controller
 
         $today = now()->toDateString();
         $isWeekday = now()->isWeekday();
-        $studentIds = $class->siswa()->pluck('profil_siswa.id');
+        $studentIds = $class->siswa()->pluck('profil_siswa.nisn');
         $attendances = Absensi::query()
             ->whereIn('profil_siswa_id', $studentIds)
             ->whereDate('tanggal', $today)
@@ -59,7 +59,7 @@ class ClassRosterController extends Controller
             $stats[$status]++;
         }
 
-        $alphaWarnings = $absenceWarning->alphaCountsForStudentIds($students->pluck('id'));
+        $alphaWarnings = $absenceWarning->alphaCountsForStudentIds($students->pluck('nisn'));
         $warningThreshold = AbsenceWarningService::Threshold;
 
         return view('wali-kelas.kelas-saya.index', compact('class', 'students', 'attendances', 'stats', 'isWeekday', 'alphaWarnings', 'warningThreshold'));
@@ -74,7 +74,7 @@ class ClassRosterController extends Controller
         }
 
         $today = now()->toDateString();
-        $studentIds = $class->siswa()->pluck('profil_siswa.id');
+        $studentIds = $class->siswa()->pluck('profil_siswa.nisn');
         $attendances = Absensi::whereIn('profil_siswa_id', $studentIds)
             ->whereDate('tanggal', $today)
             ->get()
@@ -87,9 +87,9 @@ class ClassRosterController extends Controller
         }
 
         $rows = $class->siswa()->with('pengguna')->get()->map(fn ($sp) => [
-            'id' => $sp->id,
-            'status' => $attendances->get($sp->id)?->status ?? 'belum_absen',
-            'check_in_time' => $attendances->get($sp->id)?->waktu_masuk,
+            'id' => $sp->nisn,
+            'status' => $attendances->get($sp->nisn)?->status ?? 'belum_absen',
+            'check_in_time' => $attendances->get($sp->nisn)?->waktu_masuk,
         ]);
 
         return response()->json(compact('stats', 'rows'));
@@ -108,13 +108,13 @@ class ClassRosterController extends Controller
         }
 
         $attendance = Absensi::query()
-            ->where('profil_siswa_id', $studentProfile->id)
+            ->where('profil_siswa_id', $studentProfile->nisn)
             ->whereDate('tanggal', now()->toDateString())
             ->first();
 
         if (! $attendance) {
             $attendance = new Absensi([
-                'profil_siswa_id' => $studentProfile->id,
+                'profil_siswa_id' => $studentProfile->nisn,
                 'tanggal' => now()->toDateString(),
             ]);
         }
@@ -146,7 +146,7 @@ class ClassRosterController extends Controller
             'backRoute' => route('wali-kelas.kelas-saya'),
             'backLabel' => 'Kembali ke Kelas Saya',
             'createViolationRoute' => null,
-            'alphaWarningCount' => $absenceWarning->alphaCountForStudentId($studentProfile->id),
+            'alphaWarningCount' => $absenceWarning->alphaCountForStudentId($studentProfile->nisn),
             'warningThreshold' => AbsenceWarningService::Threshold,
         ]);
     }

@@ -15,13 +15,12 @@ afterEach(function () {
 
 function createStudentProfile(): ProfilSiswa
 {
-    $student = Pengguna::factory()->student()->create([
+    $pengguna = Pengguna::factory()->student()->create([
         'status' => 'registered',
     ]);
 
     return ProfilSiswa::factory()->create([
-        'pengguna_id' => $student->id,
-        'nis' => fake()->unique()->numerify('#####'),
+        'pengguna_id' => $pengguna->id,
     ]);
 }
 
@@ -35,7 +34,7 @@ test('daily attendance command creates belum absen records on weekday', function
 
     $attendance = Absensi::firstOrFail();
 
-    expect($attendance->profil_siswa_id)->toBe($student->id)
+    expect($attendance->profil_siswa_id)->toBe($student->nisn)
         ->and($attendance->tanggal->toDateString())->toBe('2026-06-01')
         ->and($attendance->status)->toBe('belum_absen');
 });
@@ -56,7 +55,7 @@ test('unmarked attendance command converts records to alpha after attendance tim
     $student = createStudentProfile();
     Pengaturan::set('attendance_end_time', '07:00');
     Absensi::create([
-        'profil_siswa_id' => $student->id,
+        'profil_siswa_id' => $student->nisn,
         'tanggal' => '2026-06-01',
         'status' => 'belum_absen',
     ]);
@@ -72,7 +71,7 @@ test('unmarked attendance command does nothing on weekend', function () {
     Carbon::setTestNow('2026-06-06 07:06:00');
     $student = createStudentProfile();
     Absensi::create([
-        'profil_siswa_id' => $student->id,
+        'profil_siswa_id' => $student->nisn,
         'tanggal' => '2026-06-06',
         'status' => 'belum_absen',
     ]);

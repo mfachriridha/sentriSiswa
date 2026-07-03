@@ -16,6 +16,12 @@ class ProfilGuru extends Model
 
     protected $table = 'profil_guru';
 
+    protected $primaryKey = 'nip';
+
+    public $incrementing = false;
+
+    protected $keyType = 'string';
+
     public function pengguna(): BelongsTo
     {
         return $this->belongsTo(Pengguna::class, 'pengguna_id');

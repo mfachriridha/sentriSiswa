@@ -22,11 +22,15 @@ class TeacherImport implements ToCollection, WithChunkReading, WithHeadingRow
 
     public int $errors = 0;
 
+    public array $errorDetails = [];
+
     protected string $defaultPassword;
 
     protected array $classCache = [];
 
     protected bool $isOldFormat = false;
+
+    protected int $rowIndex = 0;
 
     public function __construct()
     {
@@ -44,10 +48,19 @@ class TeacherImport implements ToCollection, WithChunkReading, WithHeadingRow
         $profileRows = [];
 
         foreach ($rows as $row) {
+            $this->rowIndex++;
             $parsed = $this->parseRow($row);
 
             if (empty($parsed['nama'])) {
                 $this->errors++;
+                $this->errorDetails[] = ['row' => $this->rowIndex, 'nama' => '(kosong)', 'reason' => 'Nama kosong'];
+
+                continue;
+            }
+
+            if (empty($parsed['nip'])) {
+                $this->errors++;
+                $this->errorDetails[] = ['row' => $this->rowIndex, 'nama' => $parsed['nama'], 'reason' => 'NIP kosong, guru harus didaftarkan manual oleh admin'];
 
                 continue;
             }
@@ -160,7 +173,7 @@ class TeacherImport implements ToCollection, WithChunkReading, WithHeadingRow
             }
 
             foreach (array_chunk($inserts, 500) as $chunk) {
-                ProfilGuru::upsert($chunk, ['pengguna_id'], ['nip', 'tingkat', 'updated_at']);
+                ProfilGuru::upsert($chunk, ['nip'], ['pengguna_id', 'tingkat', 'updated_at']);
             }
         });
     }

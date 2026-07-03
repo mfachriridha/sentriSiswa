@@ -20,7 +20,7 @@ class StoreStudentViolationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'profil_siswa_id' => ['required', 'integer', Rule::exists('profil_siswa', 'id')],
+            'profil_siswa_id' => ['required', 'string', Rule::exists('profil_siswa', 'nisn')],
             'jenis_pelanggaran_id' => ['required', 'integer', Rule::exists('jenis_pelanggaran', 'id')],
             'tanggal_pelanggaran' => ['required', 'date', 'before_or_equal:today'],
             'catatan' => ['nullable', 'string'],

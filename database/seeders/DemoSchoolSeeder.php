@@ -237,7 +237,7 @@ class DemoSchoolSeeder extends Seeder
                 ]);
 
                 BiodataSiswa::create([
-                    'profil_siswa_id' => $profil->id,
+                    'profil_siswa_id' => $profil->nisn,
                     'tempat_lahir' => $birthPlaces[($sequence - 1) % count($birthPlaces)],
                     'tanggal_lahir' => now()->subYears(16)->subDays($sequence)->toDateString(),
                     'jenis_kelamin' => $slot % 2 === 0 ? 'P' : 'L',
@@ -292,11 +292,11 @@ class DemoSchoolSeeder extends Seeder
                 $selfiePath = null;
 
                 if (in_array($status, ['hadir', 'terlambat'])) {
-                    $selfiePath = $this->generateSelfiePhoto($student->id, $date->format('Y-m-d'));
+                    $selfiePath = $this->generateSelfiePhoto($student->nisn, $date->format('Y-m-d'));
                 }
 
                 Absensi::create([
-                    'profil_siswa_id' => $student->id,
+                    'profil_siswa_id' => $student->nisn,
                     'tanggal' => $date->toDateString(),
                     'status' => $status,
                     'waktu_masuk' => match ($status) {
@@ -329,7 +329,7 @@ class DemoSchoolSeeder extends Seeder
             };
 
             PelanggaranSiswa::create([
-                'profil_siswa_id' => $student->id,
+                'profil_siswa_id' => $student->nisn,
                 'jenis_pelanggaran_id' => $jenis->id,
                 'dicatat_oleh_id' => $recorders[$index % $recorders->count()],
                 'tanggal_pelanggaran' => today()->subDays($index % 20)->toDateString(),
@@ -381,10 +381,10 @@ class DemoSchoolSeeder extends Seeder
         return $path;
     }
 
-    private function generateSelfiePhoto(int $profileId, string $date): string
+    private function generateSelfiePhoto(string $profileId, string $date): string
     {
         $path = "attendance-selfies/{$profileId}/{$date}-demo.jpg";
-        $colorIdx = ($profileId + (int) str_replace('-', '', $date)) % count(self::$palette);
+        $colorIdx = ((int) $profileId + (int) str_replace('-', '', $date)) % count(self::$palette);
         [$r, $g, $b] = self::$palette[$colorIdx];
         $this->generateImage(300, 400, $r, $g, $b, storage_path("app/public/{$path}"));
 

@@ -26,13 +26,13 @@ class CreateDailyAttendanceRecords extends Command
         $created = 0;
 
         foreach ($students as $student) {
-            $exists = Absensi::where('profil_siswa_id', $student->id)
+            $exists = Absensi::where('profil_siswa_id', $student->nisn)
                 ->where('tanggal', $today)
                 ->exists();
 
             if (! $exists) {
                 Absensi::create([
-                    'profil_siswa_id' => $student->id,
+                    'profil_siswa_id' => $student->nisn,
                     'tanggal' => $today,
                     'status' => 'belum_absen',
                 ]);
