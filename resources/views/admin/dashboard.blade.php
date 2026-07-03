@@ -47,10 +47,27 @@
     </div>
 </div>
 
-<div class="mb-6 grid gap-4 lg:grid-cols-3">
-    <x-dashboard-bar-chart title="Siswa per Tingkat" :items="$charts['studentsByGrade']" />
-    <x-dashboard-bar-chart title="Status Registrasi Siswa" :items="$charts['registration']" />
-    <x-dashboard-bar-chart title="Komposisi Akun" :items="$charts['roles']" />
+<div class="mb-6 grid gap-4 lg:grid-cols-2">
+    <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+        <h2 class="mb-3 text-sm font-semibold text-gray-900">Siswa per Tingkat</h2>
+        <div class="grid grid-cols-3 gap-3">
+            @foreach ($charts['studentsByGrade'] as $item)
+                <div class="rounded-lg bg-gray-50 p-3 text-center">
+                    <p class="text-xl font-bold text-gray-900">{{ $item['value'] }}</p>
+                    <p class="mt-1 text-xs text-gray-500">{{ $item['label'] }}</p>
+                </div>
+            @endforeach
+        </div>
+    </div>
+
+    <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+        <h2 class="mb-3 text-sm font-semibold text-gray-900">Status Registrasi Siswa</h2>
+        @php
+            $registered = collect($charts['registration'])->firstWhere('label', 'Terdaftar')['value'] ?? 0;
+            $total = collect($charts['registration'])->sum('value');
+        @endphp
+        <p class="text-xl font-bold text-gray-900">{{ $registered }} <span class="text-sm font-normal text-gray-500">/ {{ $total }} terdaftar</span></p>
+    </div>
 </div>
 
 <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">

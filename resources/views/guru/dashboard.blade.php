@@ -6,7 +6,7 @@
 <x-page-header title="Dashboard Guru" :description="'Selamat datang, '.auth()->user()->nama.'!'" />
 
 @if (! empty($summary['homeroom']))
-    <div class="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+    <div class="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
         <div class="rounded-xl border border-gray-200 bg-white p-4">
             <p class="text-xs font-semibold uppercase text-gray-500">Kelas</p>
             <p class="mt-1 text-xl font-bold text-gray-900">{{ $summary['homeroom']['class_name'] }}</p>
@@ -20,6 +20,14 @@
             <p class="mt-1 text-xl font-bold text-amber-600">{{ $summary['homeroom']['terlambat'] }}</p>
         </div>
         <div class="rounded-xl border border-gray-200 bg-white p-4">
+            <p class="text-xs font-semibold uppercase text-gray-500">Izin/Sakit</p>
+            <p class="mt-1 text-xl font-bold text-blue-600">{{ $summary['homeroom']['izin_sakit'] }}</p>
+        </div>
+        <div class="rounded-xl border border-gray-200 bg-white p-4">
+            <p class="text-xs font-semibold uppercase text-gray-500">Alpha</p>
+            <p class="mt-1 text-xl font-bold text-red-600">{{ $summary['homeroom']['alpha'] }}</p>
+        </div>
+        <div class="rounded-xl border border-gray-200 bg-white p-4">
             <p class="text-xs font-semibold uppercase text-gray-500">Belum Absen</p>
             <p class="mt-1 text-xl font-bold text-gray-700">{{ $summary['homeroom']['belum_absen'] }}</p>
         </div>
@@ -28,13 +36,10 @@
             <p class="mt-1 text-xl font-bold text-red-700">{{ $summary['homeroom']['warnings'] }}</p>
         </div>
     </div>
-    <div class="mb-5">
-        <x-dashboard-bar-chart title="Grafik Absensi Hari Ini" :items="$summary['homeroom_chart']" />
-    </div>
 @endif
 
 @if (! empty($summary['bk']))
-    <div class="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
         <div class="rounded-xl border border-gray-200 bg-white p-4">
             <p class="text-xs font-semibold uppercase text-gray-500">Tingkat BK</p>
             <p class="mt-1 text-xl font-bold text-gray-900">{{ $summary['bk']['grade'] ?? '-' }}</p>
@@ -44,21 +49,26 @@
             <p class="mt-1 text-xl font-bold text-gray-900">{{ $summary['bk']['students'] }}</p>
         </div>
         <div class="rounded-xl border border-gray-200 bg-white p-4">
-            <p class="text-xs font-semibold uppercase text-gray-500">Pengajuan Pending</p>
+            <p class="text-xs font-semibold uppercase text-gray-500">Pending</p>
             <p class="mt-1 text-xl font-bold text-amber-600">{{ $summary['bk']['pending'] }}</p>
+        </div>
+        <div class="rounded-xl border border-gray-200 bg-white p-4">
+            <p class="text-xs font-semibold uppercase text-gray-500">Disetujui</p>
+            <p class="mt-1 text-xl font-bold text-green-600">{{ $summary['bk']['approved'] }}</p>
+        </div>
+        <div class="rounded-xl border border-gray-200 bg-white p-4">
+            <p class="text-xs font-semibold uppercase text-gray-500">Ditolak</p>
+            <p class="mt-1 text-xl font-bold text-red-600">{{ $summary['bk']['rejected'] }}</p>
         </div>
         <div class="rounded-xl border border-red-200 bg-red-50 p-4">
             <p class="text-xs font-semibold uppercase text-red-600">Peringatan Alpha</p>
             <p class="mt-1 text-xl font-bold text-red-700">{{ $summary['bk']['warnings'] }}</p>
         </div>
     </div>
-    <div class="mb-5">
-        <x-dashboard-bar-chart title="Grafik Pengajuan Pelanggaran BK" :items="$summary['bk_chart']" />
-    </div>
 @endif
 
 @if (! empty($summary['kesiswaan']))
-    <div class="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+    <div class="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
         <div class="rounded-xl border border-gray-200 bg-white p-4">
             <p class="text-xs font-semibold uppercase text-gray-500">Kelas</p>
             <p class="mt-1 text-xl font-bold text-gray-900">{{ $summary['kesiswaan']['classes'] }}</p>
@@ -75,13 +85,14 @@
             <p class="text-xs font-semibold uppercase text-gray-500">Disetujui</p>
             <p class="mt-1 text-xl font-bold text-green-600">{{ $summary['kesiswaan']['approved'] }}</p>
         </div>
+        <div class="rounded-xl border border-gray-200 bg-white p-4">
+            <p class="text-xs font-semibold uppercase text-gray-500">Ditolak</p>
+            <p class="mt-1 text-xl font-bold text-red-600">{{ $summary['kesiswaan']['rejected'] }}</p>
+        </div>
         <div class="rounded-xl border border-red-200 bg-red-50 p-4">
             <p class="text-xs font-semibold uppercase text-red-600">Peringatan Alpha</p>
             <p class="mt-1 text-xl font-bold text-red-700">{{ $summary['kesiswaan']['warnings'] }}</p>
         </div>
-    </div>
-    <div class="mb-5">
-        <x-dashboard-bar-chart title="Grafik Status Pelanggaran" :items="$summary['kesiswaan_chart']" />
     </div>
 @endif
 

@@ -19,7 +19,7 @@ class DashboardController extends Controller
         $summary = [];
 
         if ($user->isWaliKelas() && $user->kelasWali) {
-            $profileIds = $user->kelasWali->siswa()->pluck('id');
+            $profileIds = $user->kelasWali->siswa()->pluck('nisn');
             $todayAttendances = Absensi::whereIn('profil_siswa_id', $profileIds)
                 ->whereDate('tanggal', today())
                 ->get();
@@ -34,21 +34,16 @@ class DashboardController extends Controller
                 'students' => $profileIds->count(),
                 'hadir' => $todayAttendances->where('status', 'hadir')->count(),
                 'terlambat' => $todayAttendances->where('status', 'terlambat')->count(),
+                'izin_sakit' => $todayAttendances->whereIn('status', ['izin', 'sakit'])->count(),
+                'alpha' => $todayAttendances->where('status', 'alpha')->count(),
                 'belum_absen' => $notSubmitted,
                 'warnings' => $warningCount,
-            ];
-            $summary['homeroom_chart'] = [
-                ['label' => 'Hadir', 'value' => $todayAttendances->where('status', 'hadir')->count(), 'variant' => 'success'],
-                ['label' => 'Terlambat', 'value' => $todayAttendances->where('status', 'terlambat')->count(), 'variant' => 'warning'],
-                ['label' => 'Izin/Sakit', 'value' => $todayAttendances->whereIn('status', ['izin', 'sakit'])->count(), 'variant' => 'info'],
-                ['label' => 'Alpha', 'value' => $todayAttendances->where('status', 'alpha')->count(), 'variant' => 'error'],
-                ['label' => 'Belum Absen', 'value' => $notSubmitted, 'variant' => 'neutral'],
             ];
         }
 
         if ($user->isBk()) {
             $grade = $user->profilGuru?->tingkat;
-            $studentIds = ProfilSiswa::whereHas('kelas', fn ($query) => $query->where('tingkat', $grade))->pluck('id');
+            $studentIds = ProfilSiswa::whereHas('kelas', fn ($query) => $query->where('tingkat', $grade))->pluck('nisn');
             $violations = PelanggaranSiswa::whereIn('profil_siswa_id', $studentIds)->get();
             $warningCount = $absenceWarning->alphaCountsForStudentIds($studentIds)
                 ->filter(fn (int $count): bool => $absenceWarning->hasWarning($count))
@@ -59,18 +54,14 @@ class DashboardController extends Controller
                 'students' => $studentIds->count(),
                 'pending' => $violations->where('status', 'pending')->count(),
                 'approved' => $violations->where('status', 'approved')->count(),
+                'rejected' => $violations->where('status', 'rejected')->count(),
                 'warnings' => $warningCount,
-            ];
-            $summary['bk_chart'] = [
-                ['label' => 'Pending', 'value' => $violations->where('status', 'pending')->count(), 'variant' => 'warning'],
-                ['label' => 'Disetujui', 'value' => $violations->where('status', 'approved')->count(), 'variant' => 'success'],
-                ['label' => 'Ditolak', 'value' => $violations->where('status', 'rejected')->count(), 'variant' => 'error'],
             ];
         }
 
         if ($user->isKesiswaan()) {
             $violations = PelanggaranSiswa::all();
-            $studentIds = ProfilSiswa::query()->pluck('id');
+            $studentIds = ProfilSiswa::query()->pluck('nisn');
             $warningCount = $absenceWarning->alphaCountsForStudentIds($studentIds)
                 ->filter(fn (int $count): bool => $absenceWarning->hasWarning($count))
                 ->count();
@@ -80,12 +71,8 @@ class DashboardController extends Controller
                 'students' => ProfilSiswa::count(),
                 'pending' => $violations->where('status', 'pending')->count(),
                 'approved' => $violations->where('status', 'approved')->count(),
+                'rejected' => $violations->where('status', 'rejected')->count(),
                 'warnings' => $warningCount,
-            ];
-            $summary['kesiswaan_chart'] = [
-                ['label' => 'Pending', 'value' => $violations->where('status', 'pending')->count(), 'variant' => 'warning'],
-                ['label' => 'Disetujui', 'value' => $violations->where('status', 'approved')->count(), 'variant' => 'success'],
-                ['label' => 'Ditolak', 'value' => $violations->where('status', 'rejected')->count(), 'variant' => 'error'],
             ];
         }
 

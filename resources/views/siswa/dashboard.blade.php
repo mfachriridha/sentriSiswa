@@ -12,9 +12,31 @@
     </div>
 @endif
 
-<div class="mb-5 grid gap-4 lg:grid-cols-2">
-    <x-dashboard-bar-chart title="Grafik Poin Disiplin" :items="$charts['points']" />
-    <x-dashboard-bar-chart title="Grafik Absensi Saya" :items="$charts['attendance']" />
+@php
+    $pointsColor = $stats['points'] > 75 ? 'text-green-600' : ($stats['points'] > 50 ? 'text-amber-600' : 'text-red-600');
+@endphp
+<div class="mb-5 rounded-xl border-2 border-primary/20 bg-primary/5 p-5">
+    <p class="text-sm font-medium text-gray-600">Sisa Poin</p>
+    <p class="mt-1 text-3xl font-bold {{ $pointsColor }}">{{ $stats['points'] }}<span class="text-base font-normal text-gray-500">/100</span></p>
+</div>
+
+<div class="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+    <div class="rounded-xl border border-gray-200 bg-white p-4">
+        <p class="text-xs font-semibold uppercase text-gray-500">Hadir</p>
+        <p class="mt-1 text-xl font-bold text-green-600">{{ $stats['hadir'] }}</p>
+    </div>
+    <div class="rounded-xl border border-gray-200 bg-white p-4">
+        <p class="text-xs font-semibold uppercase text-gray-500">Terlambat</p>
+        <p class="mt-1 text-xl font-bold text-amber-600">{{ $stats['terlambat'] }}</p>
+    </div>
+    <div class="rounded-xl border border-gray-200 bg-white p-4">
+        <p class="text-xs font-semibold uppercase text-gray-500">Izin/Sakit</p>
+        <p class="mt-1 text-xl font-bold text-blue-600">{{ $stats['izin_sakit'] }}</p>
+    </div>
+    <div class="rounded-xl border border-gray-200 bg-white p-4">
+        <p class="text-xs font-semibold uppercase text-gray-500">Alpha</p>
+        <p class="mt-1 text-xl font-bold text-red-600">{{ $stats['alpha'] }}</p>
+    </div>
 </div>
 
 <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">

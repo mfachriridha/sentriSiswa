@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Kelas;
 use App\Models\Pengguna;
-use App\Models\ProfilSiswa;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -27,11 +26,6 @@ class DashboardController extends Controller
             'registration' => [
                 ['label' => 'Terdaftar', 'value' => Pengguna::where('peran', 'siswa')->where('status', 'registered')->count(), 'variant' => 'success'],
                 ['label' => 'Belum Daftar', 'value' => Pengguna::where('peran', 'siswa')->where('status', 'unregistered')->count(), 'variant' => 'warning'],
-            ],
-            'roles' => [
-                ['label' => 'Admin', 'value' => Pengguna::where('peran', 'admin')->count(), 'variant' => 'neutral'],
-                ['label' => 'Guru', 'value' => Pengguna::whereIn('peran', ['wali_kelas', 'bk', 'kesiswaan'])->count(), 'variant' => 'info'],
-                ['label' => 'Siswa', 'value' => ProfilSiswa::count(), 'variant' => 'primary'],
             ],
         ];
 

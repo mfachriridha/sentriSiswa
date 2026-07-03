@@ -18,19 +18,14 @@ class DashboardController extends Controller
         $alphaWarningCount = $profile ? $absenceWarning->alphaCountForStudentId($profile->nisn) : 0;
         $warningThreshold = AbsenceWarningService::Threshold;
 
-        $charts = [
-            'points' => [
-                ['label' => 'Sisa Poin', 'value' => $points, 'variant' => $points > 75 ? 'success' : ($points > 50 ? 'warning' : 'error')],
-                ['label' => 'Poin Terpakai', 'value' => max(0, 100 - $points), 'variant' => 'error'],
-            ],
-            'attendance' => [
-                ['label' => 'Hadir', 'value' => $attendances->where('status', 'hadir')->count(), 'variant' => 'success'],
-                ['label' => 'Terlambat', 'value' => $attendances->where('status', 'terlambat')->count(), 'variant' => 'warning'],
-                ['label' => 'Izin/Sakit', 'value' => $attendances->whereIn('status', ['izin', 'sakit'])->count(), 'variant' => 'info'],
-                ['label' => 'Alpha', 'value' => $attendances->where('status', 'alpha')->count(), 'variant' => 'error'],
-            ],
+        $stats = [
+            'points' => $points,
+            'hadir' => $attendances->where('status', 'hadir')->count(),
+            'terlambat' => $attendances->where('status', 'terlambat')->count(),
+            'izin_sakit' => $attendances->whereIn('status', ['izin', 'sakit'])->count(),
+            'alpha' => $attendances->where('status', 'alpha')->count(),
         ];
 
-        return view('siswa.dashboard', compact('charts', 'alphaWarningCount', 'warningThreshold'));
+        return view('siswa.dashboard', compact('stats', 'alphaWarningCount', 'warningThreshold'));
     }
 }
