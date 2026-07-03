@@ -37,9 +37,16 @@ class SendAttendanceReport extends Command
         if (! $this->option('force')) {
             $graceMinutes = 5;
             $sendAfter = now()->setTimeFromTimeString($endTime)->addMinutes($graceMinutes);
+            $sendBefore = now()->setTimeFromTimeString($endTime)->addMinutes(30);
 
             if (now()->lessThan($sendAfter)) {
                 $this->info('Belum waktunya kirim laporan (sesudah '.$endTime.' + '.$graceMinutes.' menit).');
+
+                return self::SUCCESS;
+            }
+
+            if (now()->greaterThan($sendBefore)) {
+                $this->info('Lewat batas waktu pengiriman (30 menit setelah '.$endTime.').');
 
                 return self::SUCCESS;
             }
@@ -86,17 +93,17 @@ class SendAttendanceReport extends Command
                 continue;
             }
 
-            $profileIds = $studentProfiles->pluck('id');
+            $profileIds = $studentProfiles->pluck('nisn');
             $attendances = Absensi::whereIn('profil_siswa_id', $profileIds)
                 ->whereDate('tanggal', $today)
                 ->get()
                 ->keyBy('profil_siswa_id');
 
-            $sudahAbsen = $studentProfiles->filter(fn ($sp) => $attendances->has($sp->id)
-                && in_array($attendances[$sp->id]->status, ['hadir', 'terlambat', 'izin', 'sakit']));
+            $sudahAbsen = $studentProfiles->filter(fn ($sp) => $attendances->has($sp->nisn)
+                && in_array($attendances[$sp->nisn]->status, ['hadir', 'terlambat', 'izin', 'sakit']));
 
-            $belumAbsen = $studentProfiles->reject(fn ($sp) => $attendances->has($sp->id)
-                && in_array($attendances[$sp->id]->status, ['hadir', 'terlambat', 'izin', 'sakit']));
+            $belumAbsen = $studentProfiles->reject(fn ($sp) => $attendances->has($sp->nisn)
+                && in_array($attendances[$sp->nisn]->status, ['hadir', 'terlambat', 'izin', 'sakit']));
 
             $sudahCount = $sudahAbsen->count();
             $belumCount = $belumAbsen->count();
@@ -108,27 +115,27 @@ class SendAttendanceReport extends Command
             $tanggal = now()->locale('id')->translatedFormat('d F Y');
             $waktu = now()->format('H:i').' WIB';
 
-            $message = "{$hari}, {$tanggal}\n";
-            $message .= "{$waktu}\n";
-            $message .= "=================\n";
-            $message .= "Wali Kelas: {$waliKelas->nama}\n";
-            $message .= "Kelas: {$kelas->nama}\n";
+            $message = "📋 *LAPORAN ABSENSI HARIAN*\n";
+            $message .= "🏫 Kelas *{$kelas->nama}*\n";
+            $message .= "👤 Wali Kelas: {$waliKelas->nama}\n";
+            $message .= "📅 {$hari}, {$tanggal} · {$waktu}\n";
             $message .= "\n";
-            $message .= "Yang sudah absen : {$sudahCount}\n";
-            $message .= "Yang belum absen : {$belumCount}\n";
-            $message .= "\n";
-            $message .= "Ket:\n";
+            $message .= "━━━━━━━━━━━━━━━━\n";
+            $message .= "✅ Sudah absen : *{$sudahCount}* siswa\n";
+            $message .= "❌ Belum absen : *{$belumCount}* siswa\n";
+            $message .= "📊 Total          : *{$totalStudents}* siswa\n";
+            $message .= "━━━━━━━━━━━━━━━━\n";
 
             if ($belumCount === 0) {
-                $message .= "Seluruh siswa telah melakukan absensi hari ini.\n";
+                $message .= "\n🎉 Seluruh siswa telah absen hari ini!\n";
             } else {
+                $message .= "\n📌 *Belum absen:*\n";
                 foreach ($belumAbsen as $sp) {
-                    $message .= '- '.($sp->pengguna?->nama ?? 'Siswa #'.$sp->id)."\n";
+                    $message .= '• '.($sp->pengguna?->nama ?? 'Siswa NISN '.$sp->nisn)."\n";
                 }
             }
 
-            $message .= "\n==================\n";
-            $message .= "Cek absensi siswa:\n{$linkAbsensi}";
+            $message .= "\n🔗 Input absensi siswa:\n{$linkAbsensi}\n";
 
             $pesanWa = PesanWhatsapp::create([
                 'kelas_id' => $kelas->id,
