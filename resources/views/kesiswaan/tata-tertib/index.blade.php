@@ -47,34 +47,34 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
-                @forelse ($schoolRules as $rule)
+                @forelse ($tataTertibs as $tataTertib)
                     <tr>
                         <td class="px-4 py-3">
-                            <div class="font-medium text-gray-900">{{ $rule->judul }}</div>
-                            <a href="{{ asset('storage/'.$rule->path_file) }}" target="_blank" class="inline-flex items-center gap-1 rounded-lg border border-gray-300 px-2.5 py-1 text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors">Preview PDF</a>
+                            <div class="font-medium text-gray-900">{{ $tataTertib->judul }}</div>
+                            <a href="{{ asset('storage/'.$tataTertib->path_file) }}" target="_blank" class="inline-flex items-center gap-1 rounded-lg border border-gray-300 px-2.5 py-1 text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors">Preview PDF</a>
                         </td>
                         <td class="px-4 py-3">
-                            <x-badge :variant="$rule->dipublikasikan ? 'success' : 'neutral'">
-                                {{ $rule->dipublikasikan ? 'Aktif' : 'Draft' }}
+                            <x-badge :variant="$tataTertib->dipublikasikan ? 'success' : 'neutral'">
+                                {{ $tataTertib->dipublikasikan ? 'Aktif' : 'Draft' }}
                             </x-badge>
                         </td>
-                        <td class="px-4 py-3 text-gray-600">{{ $rule->diunggahOleh?->nama ?? '-' }} · {{ $rule->created_at->translatedFormat('d F Y') }}</td>
+                        <td class="px-4 py-3 text-gray-600">{{ $tataTertib->diunggahOleh?->nama ?? '-' }} · {{ $tataTertib->created_at->translatedFormat('d F Y') }}</td>
                         <td class="px-4 py-3">
                             <div class="flex justify-end gap-2">
-                                @if ($rule->dipublikasikan)
-                                    <form method="POST" action="{{ route('kesiswaan.tata-tertib.unpublish', $rule) }}">
+                                @if ($tataTertib->dipublikasikan)
+                                    <form method="POST" action="{{ route('kesiswaan.tata-tertib.unpublish', $tataTertib) }}">
                                         @csrf
                                         @method('PUT')
                                         <button class="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50">Nonaktifkan</button>
                                     </form>
                                 @else
-                                    <form method="POST" action="{{ route('kesiswaan.tata-tertib.publish', $rule) }}">
+                                    <form method="POST" action="{{ route('kesiswaan.tata-tertib.publish', $tataTertib) }}">
                                         @csrf
                                         @method('PUT')
                                         <button class="rounded-lg border border-primary px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/5">Publikasikan</button>
                                     </form>
                                 @endif
-                                <form method="POST" action="{{ route('kesiswaan.tata-tertib.destroy', $rule) }}">
+                                <form method="POST" action="{{ route('kesiswaan.tata-tertib.destroy', $tataTertib) }}">
                                     @csrf
                                     @method('DELETE')
                                     <button class="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50">Hapus</button>
@@ -90,8 +90,8 @@
             </tbody>
         </table>
     </div>
-    @if ($schoolRules->hasPages())
-        <div class="border-t border-gray-200 px-4 py-3">{{ $schoolRules->links() }}</div>
+    @if ($tataTertibs->hasPages())
+        <div class="border-t border-gray-200 px-4 py-3">{{ $tataTertibs->links() }}</div>
     @endif
 </div>
 @endsection

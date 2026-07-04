@@ -18,7 +18,7 @@ class TataTertibController extends Controller
             ->latest()
             ->paginate(15);
 
-        return view('kesiswaan.tata-tertib.index', compact('schoolRules'));
+        return view('kesiswaan.tata-tertib.index', compact('tataTertibs'));
     }
 
     public function store(StoreSchoolRuleRequest $request): RedirectResponse
