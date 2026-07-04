@@ -102,10 +102,9 @@ class TeacherController extends Controller
         DB::transaction(function () use ($request) {
             $data = [
                 'nama' => $request->nama,
-                'email' => $request->email,
                 'peran' => $request->peran,
                 'status' => 'unregistered',
-                'password' => Hash::make($request->filled('password') ? $request->password : 'password'),
+                'password' => Hash::make('password'),
             ];
 
             $user = Pengguna::create($data);
@@ -140,13 +139,8 @@ class TeacherController extends Controller
         DB::transaction(function () use ($request, $teacher) {
             $teacher->update([
                 'nama' => $request->nama,
-                'email' => $request->email,
                 'peran' => $request->peran,
             ]);
-
-            if ($request->filled('password')) {
-                $teacher->update(['password' => Hash::make($request->password)]);
-            }
 
             $teacher->profilGuru()->updateOrCreate(
                 ['pengguna_id' => $teacher->id],

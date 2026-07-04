@@ -33,16 +33,6 @@
             </div>
 
             <div>
-                <label for="email" class="block text-sm font-medium text-gray-700">Email <span class="text-sm font-normal text-gray-400">(opsional)</span></label>
-                <input id="email" type="email" name="email" value="{{ old('email', $student->email) }}"
-                       class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
-                              placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
-                @error('email')
-                    <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
-
-            <div>
                 <label for="nisn" class="block text-sm font-medium text-gray-700">NISN <span class="text-red-500">*</span></label>
                 <input id="nisn" type="text" name="nisn" value="{{ old('nisn', $student->profilSiswa?->nisn) }}" required
                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
@@ -99,15 +89,6 @@
                 @enderror
             </div>
 
-            <div>
-                <label for="password" class="block text-sm font-medium text-gray-700">Kata Sandi <span class="text-sm font-normal text-gray-400">(kosongkan jika tidak diubah)</span></label>
-                <input id="password" type="password" name="password"
-                       class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
-                              placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
-                @error('password')
-                    <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
         </div>
 
         <div class="flex items-center gap-4 pt-2">

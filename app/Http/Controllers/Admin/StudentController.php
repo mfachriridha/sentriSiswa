@@ -85,10 +85,9 @@ class StudentController extends Controller
         DB::transaction(function () use ($request) {
             $data = [
                 'nama' => $request->nama,
-                'email' => $request->email,
                 'peran' => 'siswa',
                 'status' => 'unregistered',
-                'password' => Hash::make($request->filled('password') ? $request->password : 'password'),
+                'password' => Hash::make('password'),
             ];
 
             $user = Pengguna::create($data);
@@ -125,12 +124,7 @@ class StudentController extends Controller
         DB::transaction(function () use ($request, $student) {
             $student->update([
                 'nama' => $request->nama,
-                'email' => $request->email,
             ]);
-
-            if ($request->filled('password')) {
-                $student->update(['password' => Hash::make($request->password)]);
-            }
 
             $student->profilSiswa()->updateOrCreate(
                 ['pengguna_id' => $student->id],

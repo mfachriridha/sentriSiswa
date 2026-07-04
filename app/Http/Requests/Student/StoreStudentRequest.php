@@ -15,8 +15,6 @@ class StoreStudentRequest extends FormRequest
     {
         return [
             'nama' => ['required', 'string', 'min:3', 'max:100', "regex:/^[\pL\s.\'-]+$/u"],
-            'email' => ['nullable', 'email', 'max:255', 'unique:pengguna,email'],
-            'password' => ['nullable', 'string', 'min:8', 'regex:/[a-z]/i', 'regex:/[0-9]/'],
             'nisn' => ['required', 'digits:10', 'unique:profil_siswa,nisn'],
             'nis' => ['required', 'string', 'max:20', 'unique:profil_siswa,nis'],
             'kelas_id' => ['nullable', 'string', 'exists:kelas,id'],
