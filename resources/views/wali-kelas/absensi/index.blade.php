@@ -115,3 +115,22 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    (function () {
+        const startInput = document.getElementById('start_date');
+        const endInput = document.getElementById('end_date');
+        if (!startInput || !endInput) return;
+
+        function syncBounds() {
+            endInput.min = startInput.value || '';
+            startInput.max = endInput.value || '';
+        }
+
+        startInput.addEventListener('change', syncBounds);
+        endInput.addEventListener('change', syncBounds);
+        syncBounds();
+    })();
+</script>
+@endpush

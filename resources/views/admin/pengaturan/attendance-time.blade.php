@@ -47,7 +47,14 @@
 
               return `${hour}:${minute}`;
           }
-      }" @submit="loading = true">
+      }"
+      x-effect="
+          if ((Number(endHour) * 60 + Number(endMinute)) < (Number(startHour) * 60 + Number(startMinute))) {
+              endHour = startHour;
+              endMinute = startMinute;
+          }
+      "
+      @submit="loading = true">
     @csrf
     @method('PUT')
 
@@ -107,7 +114,7 @@
                             @php
                                 $value = sprintf('%02d', $hour);
                             @endphp
-                            <option value="{{ $value }}">{{ $value }}</option>
+                            <option value="{{ $value }}" :disabled="{{ $hour }} < Number(startHour)">{{ $value }}</option>
                         @endforeach
                     </select>
                     <span class="font-semibold text-gray-400">:</span>
@@ -120,7 +127,7 @@
                             @php
                                 $value = sprintf('%02d', $minute);
                             @endphp
-                            <option value="{{ $value }}">{{ $value }}</option>
+                            <option value="{{ $value }}" :disabled="Number(endHour) === Number(startHour) && {{ $minute }} < Number(startMinute)">{{ $value }}</option>
                         @endforeach
                     </select>
                 </div>

@@ -7,8 +7,8 @@
 
 <div class="mb-4 rounded-xl border border-gray-200 bg-white p-4">
     <form method="GET" action="{{ route($routeName.'.index') }}" class="grid gap-3 md:grid-cols-3 xl:grid-cols-6">
-        <input type="date" name="mulai" value="{{ $filters['start_date'] ?? '' }}" class="rounded-lg border border-gray-300 px-3 py-2 text-sm">
-        <input type="date" name="selesai" value="{{ $filters['end_date'] ?? '' }}" class="rounded-lg border border-gray-300 px-3 py-2 text-sm">
+        <input id="start_date" type="date" name="mulai" value="{{ $filters['start_date'] ?? '' }}" class="rounded-lg border border-gray-300 px-3 py-2 text-sm">
+        <input id="end_date" type="date" name="selesai" value="{{ $filters['end_date'] ?? '' }}" class="rounded-lg border border-gray-300 px-3 py-2 text-sm">
         <select name="kelas_id" class="rounded-lg border border-gray-300 px-3 py-2 text-sm">
             <option value="">Semua Kelas</option>
             @foreach ($classes as $class)
@@ -69,3 +69,22 @@
     @endif
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    (function () {
+        const startInput = document.getElementById('start_date');
+        const endInput = document.getElementById('end_date');
+        if (!startInput || !endInput) return;
+
+        function syncBounds() {
+            endInput.min = startInput.value || '';
+            startInput.max = endInput.value || '';
+        }
+
+        startInput.addEventListener('change', syncBounds);
+        endInput.addEventListener('change', syncBounds);
+        syncBounds();
+    })();
+</script>
+@endpush
