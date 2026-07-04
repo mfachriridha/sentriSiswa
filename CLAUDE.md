@@ -58,60 +58,51 @@ Five roles, each with a dedicated middleware alias registered in `bootstrap/app.
 `isGuru()` returns true for all three teacher sub-roles. `EnsureUserIsGuru` is applied at the parent group level; sub-role guards (`wali-kelas`, `bk`, `kesiswaan`) are applied inside nested groups in `routes/web.php`.
 
 ### Controller Layout
-Controllers are namespaced by role. Most teacher controllers are thin wrappers around `Guru/` base classes:
+Controllers are namespaced by role. `Guru/` holds shared base controllers reused by other teacher roles via thin subclasses (role-scoped reuse, not translation wrappers):
 
 ```
 app/Http/Controllers/
-├── Admin/          # Admin CRUD: students, teachers, classes, settings, OTP auth
+├── Admin/          # Admin CRUD: siswa, guru, kelas, pengaturan, OTP auth
 │   └── Auth/       # Admin login
 ├── Auth/           # Guest flows: register, forgot password, Google OAuth, OTP verify
-├── Guru/           # Abstract base layer for all teacher roles
+├── Guru/           # Shared base layer reused across teacher roles
 │   ├── DashboardController       # Branches internally per role
 │   ├── ProfilController          # Shared profile CRUD with OTP for email/password change
-│   ├── AttendanceRecapController # Wali kelas rekap absensi
+│   ├── RekapAbsensiController    # Wali kelas rekap absensi
 │   ├── ClassRosterController     # Wali kelas daily class view
-│   ├── ViolationHistoryController
+│   ├── RiwayatPelanggaranController
 │   ├── BkMonitoringController
 │   ├── MonitoringController      # Kesiswaan school-wide
-│   ├── StudentViolationController
+│   ├── PelanggaranSiswaController
 │   ├── PengajuanPoinController   # Wali kelas submits point-addition requests
 │   ├── PersetujuanPoinController # Kesiswaan approves/rejects them
-│   ├── ViolationTypeController
-│   ├── SchoolRuleController
-│   └── ViolationReportController
+│   ├── JenisPelanggaranController
+│   ├── TataTertibController
+│   └── LaporanPelanggaranController
 ├── WaliKelas/      # Thin subclasses → extend Guru/* counterparts
 ├── Bk/             # Thin subclasses + BkAbsensiRecapController (grade-scoped)
 ├── Kesiswaan/      # Thin subclasses
-├── Siswa/          # Student dashboard, absensi, profile, school rules
+├── Siswa/          # Student dashboard, absensi, profile, TataTertibController
 └── AbsensiPublikController  # Public token-based attendance check-in (no auth)
 ```
 
-### Model Alias Pattern
-Indonesian-named models are thin aliases pointing to the same DB table as their English parent. Never add logic to the alias — put it in the parent:
+Admin's siswa/guru/kelas/import/pengaturan controllers used to be split into an English "base" class plus a one-line Indonesian subclass purely to get an Indonesian class name on routes (e.g. `StudentController` wrapped by `SiswaController`). Those pairs have been merged — `Admin/SiswaController`, `GuruController`, `KelasController`, `ImporSiswaController`, `ImporGuruController`, `BiodataSiswaController`, `PengaturanController` hold their logic directly now, no English base class exists. Route parameter names, route names, and URL paths are all Indonesian too (`{siswa}`, `{guru}`, `{kelas}`, `pengaturan.*`, `ekspor-excel`/`ekspor-pdf`) — the only English left is third-party/technical vocabulary (`FonnteService`, `GeofenceValidator`, `KmlParser`, `whatsapp`).
 
-```
-Guru → TeacherProfile (table: teacher_profiles)
-Siswa → StudentProfile (table: student_profiles)
-Kelas → SchoolClass (table: classes)
-Absensi → Attendance (table: attendances)
-PelanggaranSiswa → StudentViolation (table: student_violations)
-JenisPelanggaran → ViolationType (table: violation_types)
-TataTertib → SchoolRule (table: school_rules)
-Pengaturan → Setting (table: settings)
-```
+### Models
+Models are Indonesian-named and map directly to Indonesian tables/columns — there is no separate English model layer or alias to worry about: `Pengguna` (table `pengguna`), `ProfilSiswa` (`profil_siswa`), `ProfilGuru` (`profil_guru`), `Kelas` (`kelas`), `Absensi` (`absensi`), `PelanggaranSiswa` (`pelanggaran_siswa`), `JenisPelanggaran` (`jenis_pelanggaran`), `TataTertib` (`tata_tertib`), `Pengaturan` (`pengaturan`), `PesanWhatsapp` (`pesan_whatsapp`), `TokenOtp` (`token_otp`).
 
 ### Photo Storage
 Photos are stored in three places; the sidebar resolves them in order:
-- Admin → `users.photo` → `storage/photos/admin/`
-- Teacher → `teacher_profiles.photo` → `storage/photos/teachers/`
-- Student → `student_profiles.photo` → `storage/photos/students/`
-- Attendance selfie → `attendances.selfie_path` → `storage/attendance-selfies/{profile_id}/{date}-demo.jpg`
+- Admin → `pengguna.foto` → `storage/photos/admin/`
+- Teacher → `profil_guru.foto` → `storage/photos/teachers/`
+- Student → `profil_siswa.foto` → `storage/photos/students/`
+- Attendance selfie → `absensi.selfie_path` → `storage/attendance-selfies/{profile_id}/{date}-demo.jpg`
 
 Always use `asset('storage/'.$path)` to generate URLs.
 
 ### Key Services
-- `FonnteService` — WhatsApp send via Fonnte API; reads token from `Setting::get('fonnte_token')`
-- `OtpService` — generates 6-digit OTP, stores in `email_otp_tokens`, mails to `pending['new_email'] ?? $user->email`
+- `FonnteService` — WhatsApp send via Fonnte API; reads token from `Pengaturan::get('fonnte_token')`
+- `OtpService` — generates 6-digit OTP, stores in `token_otp`, mails to `pending['new_email'] ?? $user->email`
 - `AbsenceWarningService` — computes alpha count per student for current semester; threshold = 3
 - `GeofenceValidator` — validates GPS check-in against KML-defined geofence polygon
 
@@ -120,8 +111,8 @@ Intervention Image v3 is installed but its `create()` method does not exist; onl
 
 ### Exports
 - `ArrayExport` — generic `FromArray` export, accepts headers + rows
-- `AttendanceRecapExport` — per-class attendance summary
-- `StudentTemplateExport` / `TeacherTemplateExport` — import template downloads
+- `RekapAbsensiExport` — per-class attendance summary
+- `TemplateSiswaExport` / `TemplateGuruExport` — import template downloads
 - PDF exports use `barryvdh/laravel-dompdf` via `PDF::loadView()`
 
 ### Blade Conventions
