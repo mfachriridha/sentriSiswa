@@ -92,7 +92,7 @@ test('register store rejects teacher telepon with 9 characters', function () {
     ])->assertSessionHasErrors('telepon');
 });
 
-// TS.Reg.021 / TC.Reg.021.002 — telepon with exactly 10 characters (at the minimum, valid)
+// TS.Reg.022 / TC.Reg.022.001 — telepon with exactly 10 characters (at the minimum, valid)
 test('register store accepts teacher telepon with exactly 10 characters', function () {
     $teacher = bvaRegisterTeacherSession();
 
@@ -106,7 +106,7 @@ test('register store accepts teacher telepon with exactly 10 characters', functi
     expect($teacher->fresh()->profilGuru->telepon)->toBe('0812345678');
 });
 
-// TS.Reg.022 / TC.Reg.022.001 — telepon with exactly 20 characters (at the maximum, valid)
+// TS.Reg.023 / TC.Reg.023.001 — telepon with exactly 20 characters (at the maximum, valid)
 test('register store accepts teacher telepon with exactly 20 characters', function () {
     $teacher = bvaRegisterTeacherSession();
     $telepon20 = str_repeat('0', 20);
@@ -121,7 +121,7 @@ test('register store accepts teacher telepon with exactly 20 characters', functi
     expect($teacher->fresh()->profilGuru->telepon)->toBe($telepon20);
 });
 
-// TS.Reg.022 / TC.Reg.022.002 — telepon with 21 characters (just above the maximum, invalid)
+// TS.Reg.024 / TC.Reg.024.001 — telepon with 21 characters (just above the maximum, invalid)
 test('register store rejects teacher telepon with 21 characters', function () {
     bvaRegisterTeacherSession();
     $telepon21 = str_repeat('0', 21);
@@ -136,7 +136,7 @@ test('register store rejects teacher telepon with 21 characters', function () {
 
 // ── Boundary: email length, max:255 ───────────────────────────────────────
 
-// TS.Reg.023 / TC.Reg.023.001 — email with exactly 255 characters (at the maximum, valid)
+// TS.Reg.025 / TC.Reg.025.001 — email with exactly 255 characters (at the maximum, valid)
 test('register store accepts email with exactly 255 characters', function () {
     $student = bvaRegisterStudentSession();
     $email255 = bvaEmailOfLength(255);
@@ -150,7 +150,7 @@ test('register store accepts email with exactly 255 characters', function () {
     expect($student->fresh()->email)->toBe($email255);
 });
 
-// TS.Reg.023 / TC.Reg.023.002 — email with 256 characters (just above the maximum, invalid)
+// TS.Reg.026 / TC.Reg.026.001 — email with 256 characters (just above the maximum, invalid)
 test('register store rejects email with 256 characters', function () {
     bvaRegisterStudentSession();
     $email256 = bvaEmailOfLength(256);

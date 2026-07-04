@@ -272,7 +272,7 @@ test('register store redirects to register when verification session is missing'
     ])->assertRedirect(route('register'));
 });
 
-// TS.Reg.024 / TC.Reg.024.001 — student completes registration via Google after identity verification (positive)
+// TS.Reg.027 / TC.Reg.027.001 — student completes registration via Google after identity verification (positive)
 test('register completes for student via google after identity verification', function () {
     $student = Pengguna::factory()->student()->create(['status' => 'unregistered', 'email' => null]);
     ProfilSiswa::factory()->create([
@@ -309,7 +309,7 @@ test('register completes for student via google after identity verification', fu
     expect($student->email)->toBe('siswa.google.baru@example.com');
 });
 
-// TS.Reg.025 / TC.Reg.025.001 — teacher completes registration via Google, then submits telepon (positive)
+// TS.Reg.028 / TC.Reg.028.001 — teacher completes registration via Google, then submits telepon (positive)
 test('register completes for teacher via google then submits telepon', function () {
     $teacher = Pengguna::factory()->homeroom()->create(['status' => 'unregistered', 'email' => null]);
     ProfilGuru::factory()->create([
