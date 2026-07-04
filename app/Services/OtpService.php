@@ -50,7 +50,7 @@ class OtpService
     {
         $token = TokenOtp::where('pengguna_id', $user->id)
             ->where('tipe', $type)
-            ->valid()
+            ->berlaku()
             ->latest()
             ->first();
 

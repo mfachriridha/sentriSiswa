@@ -20,7 +20,7 @@ class RiwayatPelanggaranController extends Controller
 
         $violations = PelanggaranSiswa::with(['profilSiswa.pengguna', 'jenisPelanggaran', 'dicatatOleh'])
             ->whereHas('profilSiswa', fn ($q) => $q->where('kelas_id', $class->id))
-            ->approved()
+            ->disetujui()
             ->when($request->profil_siswa_id, fn ($q, $id) => $q->where('profil_siswa_id', $id))
             ->when($request->category, fn ($q, $cat) => $q->where('kategori_pelanggaran', $cat))
             ->when($request->date_from, fn ($q, $date) => $q->where('tanggal_pelanggaran', '>=', $date))

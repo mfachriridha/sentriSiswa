@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,7 +13,7 @@ use Illuminate\Notifications\Notifiable;
 #[Hidden(['password', 'remember_token'])]
 class Pengguna extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
+    /** @use HasFactory<\Database\Factories\PenggunaFactory> */
     use HasFactory, Notifiable;
 
     protected $table = 'pengguna';
@@ -91,31 +90,6 @@ class Pengguna extends Authenticatable
     public function isSiswa(): bool
     {
         return $this->peran === 'siswa';
-    }
-
-    public function isTeacher(): bool
-    {
-        return $this->isGuru();
-    }
-
-    public function isHomeroom(): bool
-    {
-        return $this->isWaliKelas();
-    }
-
-    public function isCounselor(): bool
-    {
-        return $this->isBk();
-    }
-
-    public function isStudentAffairs(): bool
-    {
-        return $this->isKesiswaan();
-    }
-
-    public function isStudent(): bool
-    {
-        return $this->isSiswa();
     }
 
     public function dashboardRouteName(): string

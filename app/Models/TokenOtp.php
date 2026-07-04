@@ -25,17 +25,17 @@ class TokenOtp extends Model
         return $this->belongsTo(Pengguna::class, 'pengguna_id');
     }
 
-    public function isExpired(): bool
+    public function sudahExpired(): bool
     {
         return $this->kadaluwarsa_pada->isPast();
     }
 
-    public function isUsed(): bool
+    public function sudahDipakai(): bool
     {
         return $this->digunakan_pada !== null;
     }
 
-    public function scopeValid(Builder $query): Builder
+    public function scopeBerlaku(Builder $query): Builder
     {
         return $query
             ->whereNull('digunakan_pada')

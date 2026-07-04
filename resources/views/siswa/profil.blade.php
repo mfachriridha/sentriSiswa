@@ -100,7 +100,7 @@
     <div class="mt-6 rounded-xl border border-gray-200 bg-white p-6">
         <div class="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
             <h2 class="text-xl font-bold text-gray-900">Biodata</h2>
-            @if ($biodata->isComplete())
+            @if ($biodata->lengkap())
                 <span class="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-3 py-1 text-sm font-medium text-green-700">
                     ✓ Lengkap
                 </span>

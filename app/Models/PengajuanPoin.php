@@ -30,7 +30,7 @@ class PengajuanPoin extends Model
         return $this->belongsTo(Pengguna::class, 'disetujui_oleh_id');
     }
 
-    public function scopeApproved(Builder $query): Builder
+    public function scopeDisetujui(Builder $query): Builder
     {
         return $query->where('status', 'approved');
     }

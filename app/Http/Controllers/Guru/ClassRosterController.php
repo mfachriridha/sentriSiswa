@@ -137,7 +137,7 @@ class ClassRosterController extends Controller
             'pengguna',
             'kelas',
             'biodata',
-            'pelanggaranSiswa' => fn ($query) => $query->approved()->latest('tanggal_pelanggaran')->with(['dicatatOleh', 'jenisPelanggaran']),
+            'pelanggaranSiswa' => fn ($query) => $query->disetujui()->latest('tanggal_pelanggaran')->with(['dicatatOleh', 'jenisPelanggaran']),
             'absensi' => fn ($query) => $query->latest('tanggal')->take(30),
         ]);
 

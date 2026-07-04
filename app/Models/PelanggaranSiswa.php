@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Database\Factories\StudentViolationFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 #[Fillable(['profil_siswa_id', 'jenis_pelanggaran_id', 'dicatat_oleh_id', 'tanggal_pelanggaran', 'nama_pelanggaran', 'kategori_pelanggaran', 'pengurangan_poin', 'catatan', 'status', 'disetujui_oleh_id', 'disetujui_pada', 'alasan_penolakan'])]
 class PelanggaranSiswa extends Model
 {
-    /** @use HasFactory<StudentViolationFactory> */
+    /** @use HasFactory<\Database\Factories\PelanggaranSiswaFactory> */
     use HasFactory;
 
     protected $table = 'pelanggaran_siswa';
@@ -37,7 +36,7 @@ class PelanggaranSiswa extends Model
         return $this->belongsTo(Pengguna::class, 'disetujui_oleh_id');
     }
 
-    public function scopeApproved(Builder $query): Builder
+    public function scopeDisetujui(Builder $query): Builder
     {
         return $query->where('status', 'approved');
     }

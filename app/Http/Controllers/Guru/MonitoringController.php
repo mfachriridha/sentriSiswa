@@ -17,8 +17,8 @@ class MonitoringController extends Controller
         $filterClass = $request->get('kelas_id', '');
 
         $query = ProfilSiswa::with(['pengguna', 'kelas'])
-            ->withSum(['pelanggaranSiswa' => fn ($query) => $query->approved()], 'pengurangan_poin')
-            ->withSum(['pengajuanPoin' => fn ($query) => $query->approved()], 'jumlah_poin')
+            ->withSum(['pelanggaranSiswa' => fn ($query) => $query->disetujui()], 'pengurangan_poin')
+            ->withSum(['pengajuanPoin' => fn ($query) => $query->disetujui()], 'jumlah_poin')
             ->with(['absensi' => fn ($query) => $query->whereDate('tanggal', today())])
             ->withCount(['absensi as total_attendances'])
             ->withCount(['absensi as present_attendances' => fn ($query) => $query->whereIn('status', ['hadir', 'terlambat'])]);
@@ -57,7 +57,7 @@ class MonitoringController extends Controller
             'pengguna',
             'kelas',
             'biodata',
-            'pelanggaranSiswa' => fn ($q) => $q->approved()->latest('tanggal_pelanggaran')->with(['dicatatOleh', 'jenisPelanggaran']),
+            'pelanggaranSiswa' => fn ($q) => $q->disetujui()->latest('tanggal_pelanggaran')->with(['dicatatOleh', 'jenisPelanggaran']),
             'absensi' => fn ($q) => $q->latest('tanggal')->take(30),
         ]);
 

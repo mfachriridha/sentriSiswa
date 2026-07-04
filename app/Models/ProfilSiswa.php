@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 #[Fillable(['nisn', 'nis', 'kelas_id', 'telepon', 'alamat', 'foto'])]
 class ProfilSiswa extends Model
 {
-    /** @use HasFactory<\Database\Factories\StudentProfileFactory> */
+    /** @use HasFactory<\Database\Factories\ProfilSiswaFactory> */
     use HasFactory;
 
     protected $table = 'profil_siswa';
@@ -62,7 +62,7 @@ class ProfilSiswa extends Model
         } elseif ($this->relationLoaded('pelanggaranSiswa')) {
             $deductions = $this->pelanggaranSiswa->where('status', 'approved')->sum('pengurangan_poin');
         } else {
-            $deductions = (int) $this->pelanggaranSiswa()->approved()->sum('pengurangan_poin');
+            $deductions = (int) $this->pelanggaranSiswa()->disetujui()->sum('pengurangan_poin');
         }
 
         $additions = 0;
@@ -72,7 +72,7 @@ class ProfilSiswa extends Model
         } elseif ($this->relationLoaded('pengajuanPoin')) {
             $additions = $this->pengajuanPoin->where('status', 'approved')->sum('jumlah_poin');
         } else {
-            $additions = (int) $this->pengajuanPoin()->approved()->sum('jumlah_poin');
+            $additions = (int) $this->pengajuanPoin()->disetujui()->sum('jumlah_poin');
         }
 
         return max(0, min(100, 100 - $deductions + $additions));

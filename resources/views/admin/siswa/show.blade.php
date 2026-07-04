@@ -103,7 +103,7 @@
     <div class="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
         <h2 class="text-xl font-bold text-gray-900">Biodata</h2>
         @php $biodata = $siswa->profilSiswa?->biodata; @endphp
-        @if ($biodata && $biodata->isComplete())
+        @if ($biodata && $biodata->lengkap())
             <span class="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-3 py-1 text-sm font-medium text-green-700">
                 ✓ Lengkap
             </span>

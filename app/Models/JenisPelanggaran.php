@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Database\Factories\ViolationTypeFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[Fillable(['nama', 'kategori', 'pengurangan_poin', 'keterangan', 'aktif'])]
 class JenisPelanggaran extends Model
 {
-    /** @use HasFactory<ViolationTypeFactory> */
+    /** @use HasFactory<\Database\Factories\JenisPelanggaranFactory> */
     use HasFactory;
 
     protected $table = 'jenis_pelanggaran';

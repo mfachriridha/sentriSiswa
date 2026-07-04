@@ -42,7 +42,7 @@ class BiodataSiswa extends Model
         return $this->belongsTo(ProfilSiswa::class, 'profil_siswa_id');
     }
 
-    public function isComplete(): bool
+    public function lengkap(): bool
     {
         return filled($this->tempat_lahir)
             && filled($this->tanggal_lahir)

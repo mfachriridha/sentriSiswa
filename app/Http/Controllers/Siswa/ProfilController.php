@@ -17,7 +17,7 @@ class ProfilController extends Controller
     {
         $student = Auth::user();
         $student->loadMissing(['profilSiswa.pelanggaranSiswa' => function ($q) {
-            $q->approved()->latest('tanggal_pelanggaran');
+            $q->disetujui()->latest('tanggal_pelanggaran');
         }]);
 
         $profile = $student->profilSiswa;
