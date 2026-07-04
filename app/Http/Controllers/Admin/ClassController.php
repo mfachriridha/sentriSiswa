@@ -68,6 +68,10 @@ class ClassController extends Controller
         $separator = is_numeric($pengenal) ? '. ' : ' ';
         $data['nama'] = $data['tingkat'].$separator.$pengenal;
 
+        if (Kelas::where('nama', $data['nama'])->where('tingkat', $data['tingkat'])->exists()) {
+            return back()->withErrors(['nama' => 'Kelas dengan kombinasi ini sudah ada.'])->withInput();
+        }
+
         Kelas::create($data);
 
         return redirect()->route('admin.kelas.index')->with('success', 'Kelas berhasil ditambahkan.');
@@ -97,6 +101,14 @@ class ClassController extends Controller
         $pengenal = $data['nama'];
         $separator = is_numeric($pengenal) ? '. ' : ' ';
         $data['nama'] = $data['tingkat'].$separator.$pengenal;
+
+        $exists = Kelas::where('nama', $data['nama'])->where('tingkat', $data['tingkat'])
+            ->where('id', '!=', $class->id)
+            ->exists();
+
+        if ($exists) {
+            return back()->withErrors(['nama' => 'Kelas dengan kombinasi ini sudah ada.'])->withInput();
+        }
 
         $class->update($data);
 
