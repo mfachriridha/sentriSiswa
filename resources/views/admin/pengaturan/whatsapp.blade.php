@@ -8,7 +8,7 @@
         <h1 class="text-2xl font-bold text-gray-900">WhatsApp API</h1>
         <p class="mt-1 text-sm text-gray-500">Konfigurasi token Fonnte untuk mengirim laporan absensi ke wali kelas.</p>
     </div>
-    <a href="{{ route('admin.settings.whatsapp.riwayat') }}"
+    <a href="{{ route('admin.pengaturan.whatsapp.riwayat') }}"
        class="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition">
         <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
@@ -53,7 +53,7 @@
             @endunless
         </div>
 
-        <form method="POST" action="{{ route('admin.settings.whatsapp.update') }}" class="space-y-4"
+        <form method="POST" action="{{ route('admin.pengaturan.whatsapp.update') }}" class="space-y-4"
               x-data="{ loading: false }" @submit="loading = true">
             @csrf
             @method('PUT')
@@ -102,7 +102,7 @@
     </div>
 
     <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm"
-         data-test-url="{{ route('admin.settings.whatsapp.test', [], false) }}"
+         data-test-url="{{ route('admin.pengaturan.whatsapp.test', [], false) }}"
          x-data="{
              endpoint: '',
              configured: {{ $isConfigured ? 'true' : 'false' }},

@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="mb-6 flex items-center gap-4">
-    <a href="{{ route('admin.settings.whatsapp.riwayat') }}" class="text-gray-400 hover:text-gray-600">
+    <a href="{{ route('admin.pengaturan.whatsapp.riwayat') }}" class="text-gray-400 hover:text-gray-600">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
         </svg>
@@ -88,7 +88,7 @@
         @if ($pesanWhatsapp->status === 'failed')
         <div class="rounded-xl border border-red-100 bg-red-50 p-4">
             <p class="text-sm font-medium text-red-800 mb-3">Pengiriman gagal. Cek respons API di bawah untuk detail error.</p>
-            <form method="POST" action="{{ route('admin.settings.whatsapp.riwayat.resend', $pesanWhatsapp) }}">
+            <form method="POST" action="{{ route('admin.pengaturan.whatsapp.riwayat.kirim-ulang', $pesanWhatsapp) }}">
                 @csrf
                 <button type="submit"
                         class="inline-flex items-center gap-2 rounded-lg border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-50 transition-colors">

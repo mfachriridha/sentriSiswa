@@ -2,6 +2,6 @@
 
 namespace App\Http\Controllers\Kesiswaan;
 
-use App\Http\Controllers\Guru\SchoolRuleController;
+use App\Http\Controllers\Guru\TataTertibController as GuruTataTertibController;
 
-class TataTertibController extends SchoolRuleController {}
+class TataTertibController extends GuruTataTertibController {}

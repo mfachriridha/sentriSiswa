@@ -17,13 +17,13 @@ function waktuAbsenBvaAdmin(): Pengguna
 test('admin can save a late tolerance equal to the attendance duration', function () {
     $admin = waktuAbsenBvaAdmin();
 
-    $this->actingAs($admin)->put(route('admin.settings.attendance-time.update'), [
+    $this->actingAs($admin)->put(route('admin.pengaturan.waktu-absen.update'), [
         'attendance_start_hour' => '06',
         'attendance_start_minute' => '00',
         'attendance_end_hour' => '07',
         'attendance_end_minute' => '00',
         'attendance_late_tolerance_minutes' => '60',
-    ])->assertRedirect(route('admin.settings.attendance-time.index'));
+    ])->assertRedirect(route('admin.pengaturan.waktu-absen.index'));
 
     expect(Pengaturan::get('attendance_late_tolerance_minutes'))->toBe('60');
 });
@@ -32,7 +32,7 @@ test('admin can save a late tolerance equal to the attendance duration', functio
 test('admin cannot save a late tolerance greater than the attendance duration', function () {
     $admin = waktuAbsenBvaAdmin();
 
-    $this->actingAs($admin)->put(route('admin.settings.attendance-time.update'), [
+    $this->actingAs($admin)->put(route('admin.pengaturan.waktu-absen.update'), [
         'attendance_start_hour' => '06',
         'attendance_start_minute' => '00',
         'attendance_end_hour' => '07',

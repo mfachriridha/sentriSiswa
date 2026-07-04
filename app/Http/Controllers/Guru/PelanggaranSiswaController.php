@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Guru;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StudentViolation\StoreStudentViolationRequest;
-use App\Http\Requests\StudentViolation\UpdateStudentViolationRequest;
+use App\Http\Requests\PelanggaranSiswa\StorePelanggaranSiswaRequest;
+use App\Http\Requests\PelanggaranSiswa\UpdatePelanggaranSiswaRequest;
 use App\Models\JenisPelanggaran;
 use App\Models\Kelas;
 use App\Models\PelanggaranSiswa;
@@ -15,7 +15,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
-class StudentViolationController extends Controller
+class PelanggaranSiswaController extends Controller
 {
     public function index(Request $request): View
     {
@@ -100,7 +100,7 @@ class StudentViolationController extends Controller
         return view('kesiswaan.pelanggaran-siswa.create', compact('students', 'violationTypes', 'categoryLabels'));
     }
 
-    public function store(StoreStudentViolationRequest $request): RedirectResponse
+    public function store(StorePelanggaranSiswaRequest $request): RedirectResponse
     {
         $data = $request->validated();
         $violationType = JenisPelanggaran::findOrFail($data['jenis_pelanggaran_id']);
@@ -110,38 +110,38 @@ class StudentViolationController extends Controller
         return redirect()->route('kesiswaan.pelanggaran-siswa.index')->with('success', 'Pelanggaran siswa berhasil dicatat.');
     }
 
-    public function show(PelanggaranSiswa $studentViolation): View
+    public function show(PelanggaranSiswa $pelanggaranSiswa): View
     {
-        $studentViolation->load(['profilSiswa.pengguna', 'profilSiswa.kelas', 'jenisPelanggaran', 'dicatatOleh', 'disetujuiOleh']);
+        $pelanggaranSiswa->load(['profilSiswa.pengguna', 'profilSiswa.kelas', 'jenisPelanggaran', 'dicatatOleh', 'disetujuiOleh']);
         $categoryLabels = JenisPelanggaran::categoryLabels();
         $statusLabels = PelanggaranSiswa::statusLabels();
 
-        return view('kesiswaan.pelanggaran-siswa.show', compact('studentViolation', 'categoryLabels', 'statusLabels'));
+        return view('kesiswaan.pelanggaran-siswa.show', compact('pelanggaranSiswa', 'categoryLabels', 'statusLabels'));
     }
 
-    public function edit(PelanggaranSiswa $studentViolation): View
+    public function edit(PelanggaranSiswa $pelanggaranSiswa): View
     {
-        $studentViolation->load(['profilSiswa.pengguna', 'profilSiswa.kelas', 'jenisPelanggaran']);
+        $pelanggaranSiswa->load(['profilSiswa.pengguna', 'profilSiswa.kelas', 'jenisPelanggaran']);
         $students = $this->students();
-        $violationTypes = $this->violationTypes(activeOnly: true, currentViolationType: $studentViolation->jenisPelanggaran);
+        $violationTypes = $this->violationTypes(activeOnly: true, currentViolationType: $pelanggaranSiswa->jenisPelanggaran);
         $categoryLabels = JenisPelanggaran::categoryLabels();
 
-        return view('kesiswaan.pelanggaran-siswa.edit', compact('studentViolation', 'students', 'violationTypes', 'categoryLabels'));
+        return view('kesiswaan.pelanggaran-siswa.edit', compact('pelanggaranSiswa', 'students', 'violationTypes', 'categoryLabels'));
     }
 
-    public function update(UpdateStudentViolationRequest $request, PelanggaranSiswa $studentViolation): RedirectResponse
+    public function update(UpdatePelanggaranSiswaRequest $request, PelanggaranSiswa $pelanggaranSiswa): RedirectResponse
     {
         $data = $request->validated();
         $violationType = JenisPelanggaran::findOrFail($data['jenis_pelanggaran_id']);
 
-        $studentViolation->update($this->violationData($data, $violationType));
+        $pelanggaranSiswa->update($this->violationData($data, $violationType));
 
         return redirect()->route('kesiswaan.pelanggaran-siswa.index')->with('success', 'Pelanggaran siswa berhasil diperbarui.');
     }
 
-    public function destroy(PelanggaranSiswa $studentViolation): RedirectResponse
+    public function destroy(PelanggaranSiswa $pelanggaranSiswa): RedirectResponse
     {
-        $studentViolation->delete();
+        $pelanggaranSiswa->delete();
 
         return redirect()->route('kesiswaan.pelanggaran-siswa.index')->with('success', 'Pelanggaran siswa berhasil dihapus.');
     }

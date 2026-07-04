@@ -31,7 +31,7 @@ use App\Http\Controllers\Kesiswaan\TataTertibController;
 use App\Http\Controllers\Siswa\AbsensiController as SiswaAbsensiController;
 use App\Http\Controllers\Siswa\DashboardController as SiswaDashboardController;
 use App\Http\Controllers\Siswa\ProfilController as SiswaProfilController;
-use App\Http\Controllers\Siswa\SchoolRuleController as SiswaSchoolRuleController;
+use App\Http\Controllers\Siswa\TataTertibController as SiswaTataTertibController;
 use App\Http\Controllers\WaliKelas\AbsensiController as WaliKelasAbsensiController;
 use App\Http\Controllers\WaliKelas\DashboardController as WaliKelasDashboardController;
 use App\Http\Controllers\WaliKelas\KelasSayaController;
@@ -91,7 +91,7 @@ Route::middleware('auth')->group(function () {
     // OTP verifikasi (shared semua role)
     Route::get('/otp/verifikasi', [OtpController::class, 'show'])->name('otp.show');
     Route::post('/otp/verifikasi', [OtpController::class, 'verify'])->name('otp.verify');
-    Route::post('/otp/kirim-ulang', [OtpController::class, 'resend'])->name('otp.resend');
+    Route::post('/otp/kirim-ulang', [OtpController::class, 'resend'])->name('otp.kirim-ulang');
 
     // Google OAuth — link existing account
     Route::get('/auth/google/link', [GoogleController::class, 'linkRedirect'])->name('google.link');
@@ -117,43 +117,43 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/guru/impor/pratinjau', [ImporGuruController::class, 'preview'])->name('guru.impor.pratinjau');
     Route::post('/guru/impor', [ImporGuruController::class, 'store'])->name('guru.impor.store');
     Route::delete('/guru/hapus-semua', [GuruController::class, 'deleteAll'])->name('guru.hapus-semua');
-    Route::resource('guru', GuruController::class)->parameters(['guru' => 'teacher']);
+    Route::resource('guru', GuruController::class);
     Route::delete('/siswa/hapus-semua', [SiswaController::class, 'deleteAll'])->name('siswa.hapus-semua');
     Route::get('/siswa/impor', [ImporSiswaController::class, 'create'])->name('siswa.impor');
     Route::get('/siswa/impor/template', [ImporSiswaController::class, 'template'])->name('siswa.impor.template');
     Route::post('/siswa/impor/unggah', [ImporSiswaController::class, 'upload'])->name('siswa.impor.unggah');
     Route::get('/siswa/impor/pratinjau', [ImporSiswaController::class, 'preview'])->name('siswa.impor.pratinjau');
     Route::post('/siswa/impor', [ImporSiswaController::class, 'store'])->name('siswa.impor.store');
-    Route::get('/siswa/{student}/biodata/edit', [BiodataSiswaController::class, 'edit'])->name('siswa.biodata.edit');
-    Route::put('/siswa/{student}/biodata', [BiodataSiswaController::class, 'update'])->name('siswa.biodata.update');
-    Route::post('/siswa/{student}/foto', [BiodataSiswaController::class, 'uploadPhoto'])->name('siswa.foto');
-    Route::delete('/siswa/{student}/foto', [BiodataSiswaController::class, 'deletePhoto'])->name('siswa.foto.hapus');
-    Route::resource('siswa', SiswaController::class)->parameters(['siswa' => 'student']);
+    Route::get('/siswa/{siswa}/biodata/edit', [BiodataSiswaController::class, 'edit'])->name('siswa.biodata.edit');
+    Route::put('/siswa/{siswa}/biodata', [BiodataSiswaController::class, 'update'])->name('siswa.biodata.update');
+    Route::post('/siswa/{siswa}/foto', [BiodataSiswaController::class, 'uploadPhoto'])->name('siswa.foto');
+    Route::delete('/siswa/{siswa}/foto', [BiodataSiswaController::class, 'deletePhoto'])->name('siswa.foto.hapus');
+    Route::resource('siswa', SiswaController::class);
     Route::delete('/kelas/hapus-semua', [KelasController::class, 'deleteAll'])->name('kelas.hapus-semua');
-    Route::resource('kelas', KelasController::class)->parameters(['kelas' => 'class']);
-    Route::get('/settings/attendance-time', [PengaturanController::class, 'attendanceTime'])->name('settings.attendance-time.index');
-    Route::put('/settings/attendance-time', [PengaturanController::class, 'attendanceTimeUpdate'])->name('settings.attendance-time.update');
-    Route::get('/settings/attendance-location', [PengaturanController::class, 'attendanceLocation'])->name('settings.attendance-location.index');
-    Route::put('/settings/attendance-location', [PengaturanController::class, 'attendanceLocationUpdate'])->name('settings.attendance-location.update');
-    Route::put('/settings/attendance-location/tolerance', [PengaturanController::class, 'attendanceLocationTolerance'])->name('settings.attendance-location.tolerance');
-    Route::delete('/settings/attendance-location', [PengaturanController::class, 'attendanceLocationDelete'])->name('settings.attendance-location.destroy');
-    Route::get('/settings/whatsapp', [PengaturanController::class, 'whatsapp'])->name('settings.whatsapp.index');
-    Route::put('/settings/whatsapp', [PengaturanController::class, 'whatsappUpdate'])->name('settings.whatsapp.update');
-    Route::post('/settings/whatsapp/test', [PengaturanController::class, 'whatsappTest'])->name('settings.whatsapp.test');
-    Route::get('/settings/whatsapp/riwayat', [RiwayatPesanController::class, 'index'])->name('settings.whatsapp.riwayat');
-    Route::get('/settings/whatsapp/riwayat/{pesanWhatsapp}', [RiwayatPesanController::class, 'show'])->name('settings.whatsapp.riwayat.show');
-    Route::post('/settings/whatsapp/riwayat/{pesanWhatsapp}/kirim-ulang', [RiwayatPesanController::class, 'resend'])->name('settings.whatsapp.riwayat.resend');
+    Route::resource('kelas', KelasController::class)->parameters(['kelas' => 'kelas']);
+    Route::get('/pengaturan/waktu-absen', [PengaturanController::class, 'attendanceTime'])->name('pengaturan.waktu-absen.index');
+    Route::put('/pengaturan/waktu-absen', [PengaturanController::class, 'attendanceTimeUpdate'])->name('pengaturan.waktu-absen.update');
+    Route::get('/pengaturan/lokasi-absen', [PengaturanController::class, 'attendanceLocation'])->name('pengaturan.lokasi-absen.index');
+    Route::put('/pengaturan/lokasi-absen', [PengaturanController::class, 'attendanceLocationUpdate'])->name('pengaturan.lokasi-absen.update');
+    Route::put('/pengaturan/lokasi-absen/tolerance', [PengaturanController::class, 'attendanceLocationTolerance'])->name('pengaturan.lokasi-absen.tolerance');
+    Route::delete('/pengaturan/lokasi-absen', [PengaturanController::class, 'attendanceLocationDelete'])->name('pengaturan.lokasi-absen.destroy');
+    Route::get('/pengaturan/whatsapp', [PengaturanController::class, 'whatsapp'])->name('pengaturan.whatsapp.index');
+    Route::put('/pengaturan/whatsapp', [PengaturanController::class, 'whatsappUpdate'])->name('pengaturan.whatsapp.update');
+    Route::post('/pengaturan/whatsapp/test', [PengaturanController::class, 'whatsappTest'])->name('pengaturan.whatsapp.test');
+    Route::get('/pengaturan/whatsapp/riwayat', [RiwayatPesanController::class, 'index'])->name('pengaturan.whatsapp.riwayat');
+    Route::get('/pengaturan/whatsapp/riwayat/{pesanWhatsapp}', [RiwayatPesanController::class, 'show'])->name('pengaturan.whatsapp.riwayat.show');
+    Route::post('/pengaturan/whatsapp/riwayat/{pesanWhatsapp}/kirim-ulang', [RiwayatPesanController::class, 'resend'])->name('pengaturan.whatsapp.riwayat.kirim-ulang');
 });
 
 Route::middleware(['auth', 'registered', 'wali-kelas'])->prefix('wali-kelas')->name('wali-kelas.')->group(function () {
     Route::get('/dashboard', [WaliKelasDashboardController::class, 'index'])->name('dashboard');
     Route::get('/kelas-saya', [KelasSayaController::class, 'index'])->name('kelas-saya');
     Route::get('/kelas-saya/status-absensi', [KelasSayaController::class, 'statusAbsensi'])->name('kelas-saya.status-absensi');
-    Route::get('/kelas-saya/{studentProfile}', [KelasSayaController::class, 'show'])->name('kelas-saya.show');
-    Route::put('/kelas-saya/{studentProfile}/absensi', [KelasSayaController::class, 'updateAttendance'])->name('kelas-saya.absensi.update');
+    Route::get('/kelas-saya/{profilSiswa}', [KelasSayaController::class, 'show'])->name('kelas-saya.show');
+    Route::put('/kelas-saya/{profilSiswa}/absensi', [KelasSayaController::class, 'updateAttendance'])->name('kelas-saya.absensi.update');
     Route::get('/absensi', [WaliKelasAbsensiController::class, 'index'])->name('absensi.index');
-    Route::get('/absensi/export-excel', [WaliKelasAbsensiController::class, 'exportExcel'])->name('absensi.export-excel');
-    Route::get('/absensi/export-pdf', [WaliKelasAbsensiController::class, 'exportPdf'])->name('absensi.export-pdf');
+    Route::get('/absensi/ekspor-excel', [WaliKelasAbsensiController::class, 'exportExcel'])->name('absensi.ekspor-excel');
+    Route::get('/absensi/ekspor-pdf', [WaliKelasAbsensiController::class, 'exportPdf'])->name('absensi.ekspor-pdf');
     Route::get('/pelanggaran', [RiwayatPelanggaranController::class, 'index'])->name('pelanggaran');
     Route::get('/pengajuan-poin', [WaliKelasPengajuanPoinController::class, 'index'])->name('pengajuan-poin.index');
     Route::get('/pengajuan-poin/buat', [WaliKelasPengajuanPoinController::class, 'create'])->name('pengajuan-poin.create');
@@ -174,8 +174,8 @@ Route::middleware(['auth', 'registered', 'bk'])->prefix('bk')->name('bk.')->grou
     Route::get('/monitoring', [BkMonitoringController::class, 'index'])->name('monitoring.index');
     Route::get('/monitoring/{monitoring}', [BkMonitoringController::class, 'show'])->name('monitoring.show');
     Route::get('/laporan', [BkAbsensiRecapController::class, 'index'])->name('laporan.index');
-    Route::get('/laporan/export-excel', [BkAbsensiRecapController::class, 'exportExcel'])->name('laporan.export-excel');
-    Route::get('/laporan/export-pdf', [BkAbsensiRecapController::class, 'exportPdf'])->name('laporan.export-pdf');
+    Route::get('/laporan/ekspor-excel', [BkAbsensiRecapController::class, 'exportExcel'])->name('laporan.ekspor-excel');
+    Route::get('/laporan/ekspor-pdf', [BkAbsensiRecapController::class, 'exportPdf'])->name('laporan.ekspor-pdf');
     Route::get('/profil', [BkProfilController::class, 'show'])->name('profil');
     Route::get('/profil/edit', [BkProfilController::class, 'edit'])->name('profil.edit');
     Route::put('/profil', [BkProfilController::class, 'update'])->name('profil.update');
@@ -192,21 +192,21 @@ Route::middleware(['auth', 'registered', 'kesiswaan'])->prefix('kesiswaan')->nam
     Route::get('/monitoring', [KesiswaanMonitoringController::class, 'index'])->name('monitoring.index');
     Route::get('/monitoring/{monitoring}', [KesiswaanMonitoringController::class, 'show'])->name('monitoring.show');
     Route::resource('pelanggaran-siswa', PelanggaranSiswaController::class)
-        ->parameters(['pelanggaran-siswa' => 'studentViolation']);
+        ->parameters(['pelanggaran-siswa' => 'pelanggaranSiswa']);
     Route::resource('jenis-pelanggaran', JenisPelanggaranController::class)
-        ->parameters(['jenis-pelanggaran' => 'violationType']);
+        ->parameters(['jenis-pelanggaran' => 'jenisPelanggaran']);
     Route::get('/pengajuan-poin', [KesiswaanPengajuanPoinController::class, 'persetujuan'])->name('pengajuan-poin.persetujuan');
     Route::get('/pengajuan-poin/pending-count', [KesiswaanPengajuanPoinController::class, 'pendingCount'])->name('pengajuan-poin.pending-count');
     Route::put('/pengajuan-poin/{pengajuanPoin}/approve', [KesiswaanPengajuanPoinController::class, 'approve'])->name('pengajuan-poin.approve');
     Route::put('/pengajuan-poin/{pengajuanPoin}/reject', [KesiswaanPengajuanPoinController::class, 'reject'])->name('pengajuan-poin.reject');
     Route::get('/laporan', [KesiswaanLaporanController::class, 'index'])->name('laporan.index');
-    Route::get('/laporan/export-excel', [KesiswaanLaporanController::class, 'exportExcel'])->name('laporan.export-excel');
-    Route::get('/laporan/export-pdf', [KesiswaanLaporanController::class, 'exportPdf'])->name('laporan.export-pdf');
+    Route::get('/laporan/ekspor-excel', [KesiswaanLaporanController::class, 'exportExcel'])->name('laporan.ekspor-excel');
+    Route::get('/laporan/ekspor-pdf', [KesiswaanLaporanController::class, 'exportPdf'])->name('laporan.ekspor-pdf');
     Route::get('/tata-tertib', [TataTertibController::class, 'index'])->name('tata-tertib.index');
     Route::post('/tata-tertib', [TataTertibController::class, 'store'])->name('tata-tertib.store');
-    Route::put('/tata-tertib/{schoolRule}/publish', [TataTertibController::class, 'publish'])->name('tata-tertib.publish');
-    Route::put('/tata-tertib/{schoolRule}/unpublish', [TataTertibController::class, 'unpublish'])->name('tata-tertib.unpublish');
-    Route::delete('/tata-tertib/{schoolRule}', [TataTertibController::class, 'destroy'])->name('tata-tertib.destroy');
+    Route::put('/tata-tertib/{tataTertib}/publish', [TataTertibController::class, 'publish'])->name('tata-tertib.publish');
+    Route::put('/tata-tertib/{tataTertib}/unpublish', [TataTertibController::class, 'unpublish'])->name('tata-tertib.unpublish');
+    Route::delete('/tata-tertib/{tataTertib}', [TataTertibController::class, 'destroy'])->name('tata-tertib.destroy');
     Route::get('/profil', [KesiswaanProfilController::class, 'show'])->name('profil');
     Route::get('/profil/edit', [KesiswaanProfilController::class, 'edit'])->name('profil.edit');
     Route::put('/profil', [KesiswaanProfilController::class, 'update'])->name('profil.update');
@@ -221,10 +221,10 @@ Route::middleware(['auth', 'registered', 'kesiswaan'])->prefix('kesiswaan')->nam
 Route::middleware(['auth', 'registered', 'siswa'])->prefix('siswa')->name('siswa.')->group(function () {
     Route::get('/dashboard', [SiswaDashboardController::class, 'index'])->name('dashboard');
     Route::get('/poin', [SiswaProfilController::class, 'poin'])->name('poin');
-    Route::get('/tata-tertib', [SiswaSchoolRuleController::class, 'index'])->name('tata-tertib.index');
+    Route::get('/tata-tertib', [SiswaTataTertibController::class, 'index'])->name('tata-tertib.index');
     Route::get('/absensi', [SiswaAbsensiController::class, 'index'])->name('absensi');
     Route::get('/absensi/status', [SiswaAbsensiController::class, 'statusHariIni'])->name('absensi.status');
-    Route::post('/absensi/cek-lokasi', [SiswaAbsensiController::class, 'checkLocation'])->name('absensi.check-location');
+    Route::post('/absensi/cek-lokasi', [SiswaAbsensiController::class, 'checkLocation'])->name('absensi.cek-lokasi');
     Route::post('/absensi', [SiswaAbsensiController::class, 'store'])->name('absensi.store');
     Route::get('/absensi/riwayat', [SiswaAbsensiController::class, 'riwayat'])->name('absensi.riwayat');
     Route::get('/profil', [SiswaProfilController::class, 'show'])->name('profil');

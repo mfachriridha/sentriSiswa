@@ -16,7 +16,7 @@
 <div class="rounded-xl border border-gray-200 bg-white p-6">
     <h1 class="mb-6 text-2xl font-bold text-gray-900">Edit Pelanggaran Siswa</h1>
 
-    <form method="POST" action="{{ route('kesiswaan.pelanggaran-siswa.update', $studentViolation) }}" class="space-y-6" x-data="{ loading: false }" @submit="loading = true">
+    <form method="POST" action="{{ route('kesiswaan.pelanggaran-siswa.update', $pelanggaranSiswa) }}" class="space-y-6" x-data="{ loading: false }" @submit="loading = true">
         @csrf
         @method('PUT')
 
@@ -27,7 +27,7 @@
                         class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                     <option value="">Pilih siswa</option>
                     @foreach ($students as $student)
-                        <option value="{{ $student->nisn }}" {{ (string) old('profil_siswa_id', $studentViolation->profil_siswa_id) === (string) $student->nisn ? 'selected' : '' }}>
+                        <option value="{{ $student->nisn }}" {{ (string) old('profil_siswa_id', $pelanggaranSiswa->profil_siswa_id) === (string) $student->nisn ? 'selected' : '' }}>
                             {{ $student->pengguna?->nama }} - {{ $student->kelas?->nama ?? 'Tanpa kelas' }} - NISN {{ $student->nisn ?? '-' }}
                         </option>
                     @endforeach
@@ -39,7 +39,7 @@
 
             <div>
                 <label for="tanggal_pelanggaran" class="block text-sm font-medium text-gray-700">Tanggal Pelanggaran <span class="text-red-500">*</span></label>
-                <input id="tanggal_pelanggaran" type="date" name="tanggal_pelanggaran" value="{{ old('tanggal_pelanggaran', $studentViolation->tanggal_pelanggaran?->toDateString()) }}" max="{{ now()->toDateString() }}" required
+                <input id="tanggal_pelanggaran" type="date" name="tanggal_pelanggaran" value="{{ old('tanggal_pelanggaran', $pelanggaranSiswa->tanggal_pelanggaran?->toDateString()) }}" max="{{ now()->toDateString() }}" required
                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                 @error('tanggal_pelanggaran')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
@@ -54,7 +54,7 @@
                     @foreach ($violationTypes->groupBy('kategori') as $category => $groupedViolationTypes)
                         <optgroup label="{{ $categoryLabels[$category] ?? 'Kategori' }}">
                             @foreach ($groupedViolationTypes as $violationType)
-                                <option value="{{ $violationType->id }}" {{ (string) old('jenis_pelanggaran_id', $studentViolation->jenis_pelanggaran_id) === (string) $violationType->id ? 'selected' : '' }}>
+                                <option value="{{ $violationType->id }}" {{ (string) old('jenis_pelanggaran_id', $pelanggaranSiswa->jenis_pelanggaran_id) === (string) $violationType->id ? 'selected' : '' }}>
                                     {{ $violationType->nama }} ({{ $violationType->pengurangan_poin }} poin){{ $violationType->aktif ? '' : ' - Nonaktif' }}
                                 </option>
                             @endforeach
@@ -69,7 +69,7 @@
             <div class="md:col-span-2">
                 <label for="catatan" class="block text-sm font-medium text-gray-700">Catatan <span class="text-sm font-normal text-gray-400">(opsional)</span></label>
                 <textarea id="catatan" name="catatan" rows="4"
-                          class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">{{ old('catatan', $studentViolation->catatan) }}</textarea>
+                          class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">{{ old('catatan', $pelanggaranSiswa->catatan) }}</textarea>
                 @error('catatan')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror

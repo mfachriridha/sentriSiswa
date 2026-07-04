@@ -494,7 +494,7 @@
                 this.locationChecking = true;
 
                 try {
-                    const response = await fetch('{{ route("siswa.absensi.check-location") }}', {
+                    const response = await fetch('{{ route("siswa.absensi.cek-lokasi") }}', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

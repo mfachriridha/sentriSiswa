@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Student;
+namespace App\Http\Requests\Siswa;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateStudentBiodataRequest extends FormRequest
+class UpdateBiodataSiswaRequest extends FormRequest
 {
     public function authorize(): bool
     {

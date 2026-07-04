@@ -10,11 +10,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
-class SchoolRuleController extends Controller
+class TataTertibController extends Controller
 {
     public function index(): View
     {
-        $schoolRules = TataTertib::with('diunggahOleh')
+        $tataTertibs = TataTertib::with('diunggahOleh')
             ->latest()
             ->paginate(15);
 
@@ -37,25 +37,25 @@ class SchoolRuleController extends Controller
         return redirect()->route('kesiswaan.tata-tertib.index')->with('success', 'Tata tertib berhasil diunggah.');
     }
 
-    public function publish(TataTertib $schoolRule): RedirectResponse
+    public function publish(TataTertib $tataTertib): RedirectResponse
     {
-        TataTertib::query()->where('id', '!=', $schoolRule->id)->update(['dipublikasikan' => false]);
-        $schoolRule->update(['dipublikasikan' => true]);
+        TataTertib::query()->where('id', '!=', $tataTertib->id)->update(['dipublikasikan' => false]);
+        $tataTertib->update(['dipublikasikan' => true]);
 
         return redirect()->route('kesiswaan.tata-tertib.index')->with('success', 'Tata tertib berhasil dipublikasikan.');
     }
 
-    public function unpublish(TataTertib $schoolRule): RedirectResponse
+    public function unpublish(TataTertib $tataTertib): RedirectResponse
     {
-        $schoolRule->update(['dipublikasikan' => false]);
+        $tataTertib->update(['dipublikasikan' => false]);
 
         return redirect()->route('kesiswaan.tata-tertib.index')->with('success', 'Tata tertib berhasil dinonaktifkan.');
     }
 
-    public function destroy(TataTertib $schoolRule): RedirectResponse
+    public function destroy(TataTertib $tataTertib): RedirectResponse
     {
-        Storage::disk('public')->delete($schoolRule->path_file);
-        $schoolRule->delete();
+        Storage::disk('public')->delete($tataTertib->path_file);
+        $tataTertib->delete();
 
         return redirect()->route('kesiswaan.tata-tertib.index')->with('success', 'Tata tertib berhasil dihapus.');
     }

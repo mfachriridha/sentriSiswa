@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\StudentViolation;
+namespace App\Http\Requests\PelanggaranSiswa;
 
 use App\Models\JenisPelanggaran;
 use App\Models\PelanggaranSiswa;
@@ -8,7 +8,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
-class UpdateStudentViolationRequest extends FormRequest
+class UpdatePelanggaranSiswaRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -35,7 +35,7 @@ class UpdateStudentViolationRequest extends FormRequest
     {
         return [
             function (Validator $validator): void {
-                $studentViolation = $this->route('studentViolation');
+                $studentViolation = $this->route('pelanggaranSiswa');
                 $violationType = JenisPelanggaran::find($this->input('jenis_pelanggaran_id'));
 
                 if ($violationType && ! $violationType->aktif && ! $this->isCurrentViolationType($studentViolation, $violationType)) {

@@ -5,7 +5,7 @@ namespace App\Exports;
 use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
-class AttendanceRecapExport implements FromArray, WithHeadings
+class RekapAbsensiExport implements FromArray, WithHeadings
 {
     /**
      * @param  list<array<int, int|string|float>>  $rows

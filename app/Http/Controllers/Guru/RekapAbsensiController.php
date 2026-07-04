@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Guru;
 
-use App\Exports\AttendanceRecapExport;
+use App\Exports\RekapAbsensiExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Guru\AttendanceRecapFilterRequest;
 use App\Models\Absensi;
@@ -17,7 +17,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-class AttendanceRecapController extends Controller
+class RekapAbsensiController extends Controller
 {
     public function index(AttendanceRecapFilterRequest $request): View
     {
@@ -72,7 +72,7 @@ class AttendanceRecapController extends Controller
         })->values()->all();
 
         return Excel::download(
-            new AttendanceRecapExport($rows),
+            new RekapAbsensiExport($rows),
             "rekap-absensi-{$class->nama}-{$startDate}-sampai-{$endDate}.xlsx",
         );
     }

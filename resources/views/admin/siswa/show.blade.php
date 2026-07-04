@@ -12,7 +12,7 @@
         Kembali
     </a>
     <div class="flex flex-wrap items-center gap-2">
-        <a href="{{ route('admin.siswa.biodata.edit', $student) }}"
+        <a href="{{ route('admin.siswa.biodata.edit', $siswa) }}"
            class="inline-flex items-center gap-2 rounded-lg border border-primary/30 px-4 py-2.5 text-sm font-medium text-primary
                   hover:bg-primary/5 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors">
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -21,7 +21,7 @@
             </svg>
             Biodata
         </a>
-        <a href="{{ route('admin.siswa.edit', $student) }}"
+        <a href="{{ route('admin.siswa.edit', $siswa) }}"
            class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm
                   hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors">
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -35,20 +35,20 @@
 
 <div class="rounded-xl border border-gray-200 bg-white p-6">
     <div class="mb-6 flex items-center gap-5">
-        @if ($student->profilSiswa?->foto)
-            <img src="{{ asset('storage/'.$student->profilSiswa->foto) }}" alt="{{ $student->nama }}"
+        @if ($siswa->profilSiswa?->foto)
+            <img src="{{ asset('storage/'.$siswa->profilSiswa->foto) }}" alt="{{ $siswa->nama }}"
                  class="h-20 w-20 rounded-full object-cover border-2 border-gray-200">
         @else
             <div class="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary">
-                {{ strtoupper(substr($student->nama, 0, 1)) }}
+                {{ strtoupper(substr($siswa->nama, 0, 1)) }}
             </div>
         @endif
         <div>
-            <h1 class="text-2xl font-bold text-gray-900">{{ $student->nama }}</h1>
+            <h1 class="text-2xl font-bold text-gray-900">{{ $siswa->nama }}</h1>
             <p class="mt-1 text-sm text-gray-500">
-                @if ($student->profilSiswa?->kelas)
-                    <a href="{{ route('admin.kelas.show', $student->profilSiswa->kelas) }}" class="text-primary hover:underline">
-                        {{ $student->profilSiswa->kelas->nama }}
+                @if ($siswa->profilSiswa?->kelas)
+                    <a href="{{ route('admin.kelas.show', $siswa->profilSiswa->kelas) }}" class="text-primary hover:underline">
+                        {{ $siswa->profilSiswa->kelas->nama }}
                     </a>
                 @else
                     Belum ada kelas
@@ -60,25 +60,25 @@
     <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">Email</p>
-            <p class="mt-1.5 text-sm text-gray-900">{{ $student->email ?? '-' }}</p>
+            <p class="mt-1.5 text-sm text-gray-900">{{ $siswa->email ?? '-' }}</p>
         </div>
 
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">NISN</p>
-            <p class="mt-1.5 text-sm text-gray-900">{{ $student->profilSiswa?->nisn ?? '-' }}</p>
+            <p class="mt-1.5 text-sm text-gray-900">{{ $siswa->profilSiswa?->nisn ?? '-' }}</p>
         </div>
 
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">NIS</p>
-            <p class="mt-1.5 text-sm text-gray-900">{{ $student->profilSiswa?->nis ?? '-' }}</p>
+            <p class="mt-1.5 text-sm text-gray-900">{{ $siswa->profilSiswa?->nis ?? '-' }}</p>
         </div>
 
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">Kelas</p>
             <p class="mt-1.5 text-sm">
-                @if ($student->profilSiswa?->kelas)
-                    <a href="{{ route('admin.kelas.show', $student->profilSiswa->kelas) }}" class="text-primary hover:underline">
-                        {{ $student->profilSiswa->kelas->nama }}
+                @if ($siswa->profilSiswa?->kelas)
+                    <a href="{{ route('admin.kelas.show', $siswa->profilSiswa->kelas) }}" class="text-primary hover:underline">
+                        {{ $siswa->profilSiswa->kelas->nama }}
                     </a>
                 @else
                     <span class="text-gray-400">-</span>
@@ -88,12 +88,12 @@
 
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">Telepon</p>
-            <p class="mt-1.5 text-sm text-gray-900">{{ $student->profilSiswa?->telepon ?? '-' }}</p>
+            <p class="mt-1.5 text-sm text-gray-900">{{ $siswa->profilSiswa?->telepon ?? '-' }}</p>
         </div>
 
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">Alamat</p>
-            <p class="mt-1.5 text-sm text-gray-900">{{ $student->profilSiswa?->alamat ?? '-' }}</p>
+            <p class="mt-1.5 text-sm text-gray-900">{{ $siswa->profilSiswa?->alamat ?? '-' }}</p>
         </div>
     </div>
 </div>
@@ -102,7 +102,7 @@
 <div class="mt-6 rounded-xl border border-gray-200 bg-white p-6">
     <div class="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
         <h2 class="text-xl font-bold text-gray-900">Biodata</h2>
-        @php $biodata = $student->profilSiswa?->biodata; @endphp
+        @php $biodata = $siswa->profilSiswa?->biodata; @endphp
         @if ($biodata && $biodata->isComplete())
             <span class="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-3 py-1 text-sm font-medium text-green-700">
                 ✓ Lengkap
@@ -216,7 +216,7 @@
         @endif
     @else
         <p class="text-sm text-gray-500">Belum ada data biodata.</p>
-        <a href="{{ route('admin.siswa.biodata.edit', $student) }}"
+        <a href="{{ route('admin.siswa.biodata.edit', $siswa) }}"
            class="mt-4 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm
                   hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors">
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

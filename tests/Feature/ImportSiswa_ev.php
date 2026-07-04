@@ -34,7 +34,7 @@ function importSiswaUploadAndGetPath(Pengguna $admin, array $rows): string
         'file' => importSiswaXlsxFile($rows),
     ])->assertRedirect(route('admin.siswa.impor.pratinjau'));
 
-    return session('import_student_file_path');
+    return session('import_siswa_file_path');
 }
 
 // TS.ImportSiswa.001 / TC.ImportSiswa.001.001 — upload valid xlsx then import creates new students (positive)

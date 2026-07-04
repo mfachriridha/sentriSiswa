@@ -25,7 +25,7 @@
         </div>
     </div>
 
-    <form method="POST" action="{{ route('kesiswaan.jenis-pelanggaran.update', $violationType) }}" class="space-y-6"
+    <form method="POST" action="{{ route('kesiswaan.jenis-pelanggaran.update', $jenisPelanggaran) }}" class="space-y-6"
           x-data="{ loading: false }" @submit="loading = true">
         @csrf
         @method('PUT')
@@ -33,7 +33,7 @@
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div class="md:col-span-2">
                 <label for="nama" class="block text-sm font-medium text-gray-700">Nama Pelanggaran <span class="text-red-500">*</span></label>
-                <input id="nama" type="text" name="nama" value="{{ old('nama', $violationType->nama) }}" required
+                <input id="nama" type="text" name="nama" value="{{ old('nama', $jenisPelanggaran->nama) }}" required
                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                               placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                 @error('nama')
@@ -48,7 +48,7 @@
                                focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                     <option value="">Pilih kategori</option>
                     @foreach ($categoryLabels as $category => $label)
-                        <option value="{{ $category }}" {{ old('kategori', $violationType->kategori) === $category ? 'selected' : '' }}>{{ $label }}</option>
+                        <option value="{{ $category }}" {{ old('kategori', $jenisPelanggaran->kategori) === $category ? 'selected' : '' }}>{{ $label }}</option>
                     @endforeach
                 </select>
                 @error('kategori')
@@ -58,7 +58,7 @@
 
             <div>
                 <label for="pengurangan_poin" class="block text-sm font-medium text-gray-700">Poin Pelanggaran <span class="text-red-500">*</span></label>
-                <input id="pengurangan_poin" type="number" name="pengurangan_poin" min="5" max="100" value="{{ old('pengurangan_poin', $violationType->pengurangan_poin) }}" required
+                <input id="pengurangan_poin" type="number" name="pengurangan_poin" min="5" max="100" value="{{ old('pengurangan_poin', $jenisPelanggaran->pengurangan_poin) }}" required
                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                               placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                 @error('pengurangan_poin')
@@ -70,7 +70,7 @@
                 <label for="keterangan" class="block text-sm font-medium text-gray-700">Keterangan <span class="text-sm font-normal text-gray-400">(opsional)</span></label>
                 <textarea id="keterangan" name="keterangan" rows="3"
                           class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
-                                 placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">{{ old('keterangan', $violationType->keterangan) }}</textarea>
+                                 placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">{{ old('keterangan', $jenisPelanggaran->keterangan) }}</textarea>
                 @error('keterangan')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror
@@ -79,7 +79,7 @@
             <div class="md:col-span-2">
                 <input type="hidden" name="aktif" value="0">
                 <label class="inline-flex items-center gap-3 rounded-lg border border-gray-200 px-4 py-3 text-sm text-gray-700">
-                    <input type="checkbox" name="aktif" value="1" @checked((string) old('aktif', $violationType->aktif ? '1' : '0') === '1')
+                    <input type="checkbox" name="aktif" value="1" @checked((string) old('aktif', $jenisPelanggaran->aktif ? '1' : '0') === '1')
                            class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary/30">
                     Aktif digunakan
                 </label>

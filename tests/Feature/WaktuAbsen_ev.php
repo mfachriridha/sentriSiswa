@@ -26,8 +26,8 @@ function waktuAbsenPayload(array $overrides = []): array
 test('admin can save a valid attendance time configuration', function () {
     $admin = waktuAbsenAdmin();
 
-    $this->actingAs($admin)->put(route('admin.settings.attendance-time.update'), waktuAbsenPayload())
-        ->assertRedirect(route('admin.settings.attendance-time.index'));
+    $this->actingAs($admin)->put(route('admin.pengaturan.waktu-absen.update'), waktuAbsenPayload())
+        ->assertRedirect(route('admin.pengaturan.waktu-absen.index'));
 
     expect(Pengaturan::get('attendance_start_time'))->toBe('06:00');
     expect(Pengaturan::get('attendance_end_time'))->toBe('07:00');
@@ -38,7 +38,7 @@ test('admin can save a valid attendance time configuration', function () {
 test('admin cannot save attendance time when end equals start', function () {
     $admin = waktuAbsenAdmin();
 
-    $this->actingAs($admin)->put(route('admin.settings.attendance-time.update'), waktuAbsenPayload([
+    $this->actingAs($admin)->put(route('admin.pengaturan.waktu-absen.update'), waktuAbsenPayload([
         'attendance_end_hour' => '06',
         'attendance_end_minute' => '00',
     ]))->assertSessionHasErrors('attendance_end_hour');
@@ -48,7 +48,7 @@ test('admin cannot save attendance time when end equals start', function () {
 test('admin cannot save attendance time when end is before start', function () {
     $admin = waktuAbsenAdmin();
 
-    $this->actingAs($admin)->put(route('admin.settings.attendance-time.update'), waktuAbsenPayload([
+    $this->actingAs($admin)->put(route('admin.pengaturan.waktu-absen.update'), waktuAbsenPayload([
         'attendance_start_hour' => '07',
         'attendance_end_hour' => '06',
     ]))->assertSessionHasErrors('attendance_end_hour');
@@ -58,9 +58,9 @@ test('admin cannot save attendance time when end is before start', function () {
 test('admin can save attendance time with a zero minute late tolerance', function () {
     $admin = waktuAbsenAdmin();
 
-    $this->actingAs($admin)->put(route('admin.settings.attendance-time.update'), waktuAbsenPayload([
+    $this->actingAs($admin)->put(route('admin.pengaturan.waktu-absen.update'), waktuAbsenPayload([
         'attendance_late_tolerance_minutes' => '0',
-    ]))->assertRedirect(route('admin.settings.attendance-time.index'));
+    ]))->assertRedirect(route('admin.pengaturan.waktu-absen.index'));
 
     expect(Pengaturan::get('attendance_late_tolerance_minutes'))->toBe('0');
 });
@@ -69,7 +69,7 @@ test('admin can save attendance time with a zero minute late tolerance', functio
 test('admin cannot save attendance time with a tolerance outside the fixed options', function () {
     $admin = waktuAbsenAdmin();
 
-    $this->actingAs($admin)->put(route('admin.settings.attendance-time.update'), waktuAbsenPayload([
+    $this->actingAs($admin)->put(route('admin.pengaturan.waktu-absen.update'), waktuAbsenPayload([
         'attendance_late_tolerance_minutes' => '25',
     ]))->assertSessionHasErrors('attendance_late_tolerance_minutes');
 });
@@ -78,7 +78,7 @@ test('admin cannot save attendance time with a tolerance outside the fixed optio
 test('admin cannot save attendance time with an out of range hour', function () {
     $admin = waktuAbsenAdmin();
 
-    $this->actingAs($admin)->put(route('admin.settings.attendance-time.update'), waktuAbsenPayload([
+    $this->actingAs($admin)->put(route('admin.pengaturan.waktu-absen.update'), waktuAbsenPayload([
         'attendance_start_hour' => '24',
     ]))->assertSessionHasErrors('attendance_start_hour');
 });

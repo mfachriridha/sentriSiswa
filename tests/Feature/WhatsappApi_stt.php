@@ -18,9 +18,9 @@ test('whatsapp token transitions from kosong to tersimpan after saving', functio
     $admin = whatsappApiSttAdmin();
     expect(Pengaturan::get('fonnte_token', ''))->toBe('');
 
-    $this->actingAs($admin)->put(route('admin.settings.whatsapp.update'), [
+    $this->actingAs($admin)->put(route('admin.pengaturan.whatsapp.update'), [
         'fonnte_token' => 'token-pertama',
-    ])->assertRedirect(route('admin.settings.whatsapp.index'));
+    ])->assertRedirect(route('admin.pengaturan.whatsapp.index'));
 
     expect(Pengaturan::get('fonnte_token'))->toBe('token-pertama');
 });
@@ -30,9 +30,9 @@ test('whatsapp token stays tersimpan when submitting blank without the clear che
     $admin = whatsappApiSttAdmin();
     Pengaturan::set('fonnte_token', 'token-lama');
 
-    $this->actingAs($admin)->put(route('admin.settings.whatsapp.update'), [
+    $this->actingAs($admin)->put(route('admin.pengaturan.whatsapp.update'), [
         'fonnte_token' => '',
-    ])->assertRedirect(route('admin.settings.whatsapp.index'));
+    ])->assertRedirect(route('admin.pengaturan.whatsapp.index'));
 
     expect(Pengaturan::get('fonnte_token'))->toBe('token-lama');
 });
@@ -42,9 +42,9 @@ test('whatsapp token transitions from tersimpan to kosong when the clear checkbo
     $admin = whatsappApiSttAdmin();
     Pengaturan::set('fonnte_token', 'token-lama');
 
-    $this->actingAs($admin)->put(route('admin.settings.whatsapp.update'), [
+    $this->actingAs($admin)->put(route('admin.pengaturan.whatsapp.update'), [
         'clear_fonnte_token' => '1',
-    ])->assertRedirect(route('admin.settings.whatsapp.index'));
+    ])->assertRedirect(route('admin.pengaturan.whatsapp.index'));
 
     expect(Pengaturan::get('fonnte_token'))->toBe('');
 });
@@ -54,9 +54,9 @@ test('whatsapp token stays kosong when submitting blank while nothing was ever s
     $admin = whatsappApiSttAdmin();
     expect(Pengaturan::get('fonnte_token', ''))->toBe('');
 
-    $this->actingAs($admin)->put(route('admin.settings.whatsapp.update'), [
+    $this->actingAs($admin)->put(route('admin.pengaturan.whatsapp.update'), [
         'fonnte_token' => '',
-    ])->assertRedirect(route('admin.settings.whatsapp.index'));
+    ])->assertRedirect(route('admin.pengaturan.whatsapp.index'));
 
     expect(Pengaturan::get('fonnte_token'))->toBe('');
 });

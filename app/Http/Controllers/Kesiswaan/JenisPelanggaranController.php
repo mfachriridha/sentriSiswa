@@ -2,6 +2,6 @@
 
 namespace App\Http\Controllers\Kesiswaan;
 
-use App\Http\Controllers\Guru\ViolationTypeController;
+use App\Http\Controllers\Guru\JenisPelanggaranController as GuruJenisPelanggaranController;
 
-class JenisPelanggaranController extends ViolationTypeController {}
+class JenisPelanggaranController extends GuruJenisPelanggaranController {}

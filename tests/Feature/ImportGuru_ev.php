@@ -34,7 +34,7 @@ function importGuruUploadAndGetPath(Pengguna $admin, array $headings, array $row
         'file' => importGuruXlsxFile($headings, $rows),
     ])->assertRedirect(route('admin.guru.impor.pratinjau'));
 
-    return session('import_file_path');
+    return session('import_guru_file_path');
 }
 
 // TS.ImportGuru.001 / TC.ImportGuru.001.001 — upload valid xlsx (new format) then import creates new teachers with the right peran (positive)

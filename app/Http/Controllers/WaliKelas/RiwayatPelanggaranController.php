@@ -2,6 +2,6 @@
 
 namespace App\Http\Controllers\WaliKelas;
 
-use App\Http\Controllers\Guru\ViolationHistoryController;
+use App\Http\Controllers\Guru\RiwayatPelanggaranController as GuruRiwayatPelanggaranController;
 
-class RiwayatPelanggaranController extends ViolationHistoryController {}
+class RiwayatPelanggaranController extends GuruRiwayatPelanggaranController {}

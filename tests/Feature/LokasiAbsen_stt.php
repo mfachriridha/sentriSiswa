@@ -33,9 +33,9 @@ test('lokasi absen transitions from kosong to tersimpan after a valid upload', f
     $admin = lokasiAbsenSttAdmin();
     expect(lokasiAbsenIsKosong())->toBeTrue();
 
-    $this->actingAs($admin)->put(route('admin.settings.attendance-location.update'), [
+    $this->actingAs($admin)->put(route('admin.pengaturan.lokasi-absen.update'), [
         'kml_file' => lokasiAbsenSttKmlFile(),
-    ])->assertRedirect(route('admin.settings.attendance-location.index'));
+    ])->assertRedirect(route('admin.pengaturan.lokasi-absen.index'));
 
     expect(lokasiAbsenIsKosong())->toBeFalse();
 });
@@ -46,9 +46,9 @@ test('lokasi absen stays tersimpan and replaces data when uploading again', func
     Pengaturan::set('attendance_geofence_data', json_encode(['coordinates' => [['lat' => 1, 'lng' => 1], ['lat' => 2, 'lng' => 2], ['lat' => 3, 'lng' => 3]]]));
     $oldData = Pengaturan::get('attendance_geofence_data');
 
-    $this->actingAs($admin)->put(route('admin.settings.attendance-location.update'), [
+    $this->actingAs($admin)->put(route('admin.pengaturan.lokasi-absen.update'), [
         'kml_file' => lokasiAbsenSttKmlFile(),
-    ])->assertRedirect(route('admin.settings.attendance-location.index'));
+    ])->assertRedirect(route('admin.pengaturan.lokasi-absen.index'));
 
     expect(lokasiAbsenIsKosong())->toBeFalse();
     expect(Pengaturan::get('attendance_geofence_data'))->not->toBe($oldData);
@@ -61,8 +61,8 @@ test('lokasi absen transitions from tersimpan to kosong after delete', function 
     Pengaturan::set('attendance_tolerance_meters', '80');
     expect(lokasiAbsenIsKosong())->toBeFalse();
 
-    $this->actingAs($admin)->delete(route('admin.settings.attendance-location.destroy'))
-        ->assertRedirect(route('admin.settings.attendance-location.index'));
+    $this->actingAs($admin)->delete(route('admin.pengaturan.lokasi-absen.destroy'))
+        ->assertRedirect(route('admin.pengaturan.lokasi-absen.index'));
 
     expect(lokasiAbsenIsKosong())->toBeTrue();
     expect(Pengaturan::get('attendance_tolerance_meters'))->toBe('0');
@@ -73,9 +73,9 @@ test('lokasi absen stays kosong but still saves tolerance when set before any up
     $admin = lokasiAbsenSttAdmin();
     expect(lokasiAbsenIsKosong())->toBeTrue();
 
-    $this->actingAs($admin)->put(route('admin.settings.attendance-location.tolerance'), [
+    $this->actingAs($admin)->put(route('admin.pengaturan.lokasi-absen.tolerance'), [
         'tolerance_meters' => '25',
-    ])->assertRedirect(route('admin.settings.attendance-location.index'));
+    ])->assertRedirect(route('admin.pengaturan.lokasi-absen.index'));
 
     expect(lokasiAbsenIsKosong())->toBeTrue();
     expect(Pengaturan::get('attendance_tolerance_meters'))->toBe('25');
@@ -86,8 +86,8 @@ test('lokasi absen stays kosong and is a safe no-op when deleting with nothing s
     $admin = lokasiAbsenSttAdmin();
     expect(lokasiAbsenIsKosong())->toBeTrue();
 
-    $this->actingAs($admin)->delete(route('admin.settings.attendance-location.destroy'))
-        ->assertRedirect(route('admin.settings.attendance-location.index'));
+    $this->actingAs($admin)->delete(route('admin.pengaturan.lokasi-absen.destroy'))
+        ->assertRedirect(route('admin.pengaturan.lokasi-absen.index'));
 
     expect(lokasiAbsenIsKosong())->toBeTrue();
 });

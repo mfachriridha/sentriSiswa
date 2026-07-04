@@ -29,7 +29,7 @@
             Hanya polygon yang akan dipakai sebagai area absensi.
         </p>
 
-        <form method="POST" action="{{ route('admin.settings.attendance-location.update') }}" enctype="multipart/form-data"
+        <form method="POST" action="{{ route('admin.pengaturan.lokasi-absen.update') }}" enctype="multipart/form-data"
               x-data="{ loading: false }" @submit="loading = true">
             @csrf
             @method('PUT')
@@ -65,7 +65,7 @@
 
         @if($geofenceData)
             <div class="mt-6 border-t border-gray-200 pt-6">
-                <form method="POST" action="{{ route('admin.settings.attendance-location.destroy') }}"
+                <form method="POST" action="{{ route('admin.pengaturan.lokasi-absen.destroy') }}"
                       onsubmit="return confirm('Hapus lokasi absen yang sudah disimpan?');">
                     @csrf
                     @method('DELETE')
@@ -88,7 +88,7 @@
                 Tambahkan toleransi di luar area polygon. Siswa yang berada di luar area tetapi dalam jarak toleransi masih bisa absen.
             </p>
 
-            <form method="POST" action="{{ route('admin.settings.attendance-location.tolerance') }}" class="flex flex-wrap items-end gap-4">
+            <form method="POST" action="{{ route('admin.pengaturan.lokasi-absen.tolerance') }}" class="flex flex-wrap items-end gap-4">
                 @csrf
                 @method('PUT')
 

@@ -16,7 +16,7 @@
 <div class="rounded-xl border border-gray-200 bg-white p-6">
     <h1 class="mb-6 text-2xl font-bold text-gray-900">Edit Kelas</h1>
 
-    <form method="POST" action="{{ route('admin.kelas.update', $class) }}" class="space-y-6"
+    <form method="POST" action="{{ route('admin.kelas.update', $kelas) }}" class="space-y-6"
           x-data="{ loading: false }" @submit="loading = true">
         @csrf
         @method('PUT')
@@ -28,9 +28,9 @@
                         class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                                focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                     <option value="">Pilih tingkat</option>
-                    <option value="10" {{ old('tingkat', $class->tingkat) === '10' ? 'selected' : '' }}>10</option>
-                    <option value="11" {{ old('tingkat', $class->tingkat) === '11' ? 'selected' : '' }}>11</option>
-                    <option value="12" {{ old('tingkat', $class->tingkat) === '12' ? 'selected' : '' }}>12</option>
+                    <option value="10" {{ old('tingkat', $kelas->tingkat) === '10' ? 'selected' : '' }}>10</option>
+                    <option value="11" {{ old('tingkat', $kelas->tingkat) === '11' ? 'selected' : '' }}>11</option>
+                    <option value="12" {{ old('tingkat', $kelas->tingkat) === '12' ? 'selected' : '' }}>12</option>
                 </select>
                 @error('tingkat')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
@@ -57,7 +57,7 @@
                     <option value="">Pilih wali kelas</option>
                     @foreach ($homeroomTeachers as $teacher)
                         <option value="{{ $teacher->id }}"
-                            {{ old('wali_kelas_id', $class->wali_kelas_id) == $teacher->id ? 'selected' : '' }}>
+                            {{ old('wali_kelas_id', $kelas->wali_kelas_id) == $teacher->id ? 'selected' : '' }}>
                             {{ $teacher->nama }}
                         </option>
                     @endforeach

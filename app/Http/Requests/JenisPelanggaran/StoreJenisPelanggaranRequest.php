@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Requests\ViolationType;
+namespace App\Http\Requests\JenisPelanggaran;
 
 use App\Models\JenisPelanggaran;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
-class UpdateViolationTypeRequest extends FormRequest
+class StoreJenisPelanggaranRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -19,10 +19,8 @@ class UpdateViolationTypeRequest extends FormRequest
      */
     public function rules(): array
     {
-        $violationType = $this->route('violationType');
-
         return [
-            'nama' => ['required', 'string', 'max:255', Rule::unique('jenis_pelanggaran', 'nama')->ignore($violationType)],
+            'nama' => ['required', 'string', 'max:255', 'unique:jenis_pelanggaran,nama'],
             'kategori' => ['required', Rule::in(array_keys(JenisPelanggaran::categoryLabels()))],
             'pengurangan_poin' => ['required', 'integer', 'min:5', 'max:100'],
             'keterangan' => ['nullable', 'string'],

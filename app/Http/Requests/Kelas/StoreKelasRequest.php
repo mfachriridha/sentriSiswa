@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Class;
+namespace App\Http\Requests\Kelas;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateClassRequest extends FormRequest
+class StoreKelasRequest extends FormRequest
 {
     public function authorize(): bool
     {

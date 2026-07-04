@@ -32,7 +32,7 @@
     </div>
 </div>
 
-<form method="POST" action="{{ route('admin.settings.attendance-time.update') }}" class="space-y-6"
+<form method="POST" action="{{ route('admin.pengaturan.waktu-absen.update') }}" class="space-y-6"
       x-data="{
           loading: false,
           startHour: @js(old('attendance_start_hour', $startHour)),

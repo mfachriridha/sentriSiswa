@@ -62,7 +62,7 @@
                         Kirim ulang dalam <span class="font-bold text-primary" x-text="formatTime(timeLeft)"></span>
                     </span>
                     <span x-show="timeLeft === 0" x-cloak>
-                        <form method="POST" action="{{ route('otp.resend') }}" class="inline">
+                        <form method="POST" action="{{ route('otp.kirim-ulang') }}" class="inline">
                             @csrf
                             <button type="submit" class="font-bold text-primary hover:text-primary-dark hover:underline transition-colors cursor-pointer">
                                 Kirim Ulang Kode

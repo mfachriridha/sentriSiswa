@@ -2,6 +2,6 @@
 
 namespace App\Http\Controllers\Kesiswaan;
 
-use App\Http\Controllers\Guru\StudentViolationController;
+use App\Http\Controllers\Guru\PelanggaranSiswaController as GuruPelanggaranSiswaController;
 
-class PelanggaranSiswaController extends StudentViolationController {}
+class PelanggaranSiswaController extends GuruPelanggaranSiswaController {}

@@ -16,7 +16,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-class ViolationReportController extends Controller
+class LaporanPelanggaranController extends Controller
 {
     public function index(ViolationReportFilterRequest $request): View
     {

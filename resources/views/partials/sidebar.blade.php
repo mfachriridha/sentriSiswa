@@ -63,9 +63,9 @@
                 </li>
 
                     <li>
-                        <a href="{{ route('admin.settings.attendance-time.index') }}"
+                        <a href="{{ route('admin.pengaturan.waktu-absen.index') }}"
                            class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
-                                  {{ request()->routeIs('admin.settings.attendance-time.*') ? 'bg-gradient-to-r from-primary to-primary-dark text-white shadow-md shadow-primary/10 font-semibold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors' }}">
+                                  {{ request()->routeIs('admin.pengaturan.waktu-absen.*') ? 'bg-gradient-to-r from-primary to-primary-dark text-white shadow-md shadow-primary/10 font-semibold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors' }}">
                             <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -75,9 +75,9 @@
                     </li>
 
                     <li>
-                        <a href="{{ route('admin.settings.attendance-location.index') }}"
+                        <a href="{{ route('admin.pengaturan.lokasi-absen.index') }}"
                            class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
-                                  {{ request()->routeIs('admin.settings.attendance-location.*') ? 'bg-gradient-to-r from-primary to-primary-dark text-white shadow-md shadow-primary/10 font-semibold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors' }}">
+                                  {{ request()->routeIs('admin.pengaturan.lokasi-absen.*') ? 'bg-gradient-to-r from-primary to-primary-dark text-white shadow-md shadow-primary/10 font-semibold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors' }}">
                             <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"/>
@@ -89,9 +89,9 @@
                     </li>
 
                     <li>
-                        <a href="{{ route('admin.settings.whatsapp.index') }}"
+                        <a href="{{ route('admin.pengaturan.whatsapp.index') }}"
                            class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
-                                  {{ request()->routeIs('admin.settings.whatsapp.*') ? 'bg-gradient-to-r from-primary to-primary-dark text-white shadow-md shadow-primary/10 font-semibold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors' }}">
+                                  {{ request()->routeIs('admin.pengaturan.whatsapp.*') ? 'bg-gradient-to-r from-primary to-primary-dark text-white shadow-md shadow-primary/10 font-semibold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors' }}">
                             <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>

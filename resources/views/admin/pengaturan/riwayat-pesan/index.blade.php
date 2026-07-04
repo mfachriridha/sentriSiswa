@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="mb-6 flex items-center gap-4">
-    <a href="{{ route('admin.settings.whatsapp.index') }}" class="text-gray-400 hover:text-gray-600">
+    <a href="{{ route('admin.pengaturan.whatsapp.index') }}" class="text-gray-400 hover:text-gray-600">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
         </svg>
@@ -42,7 +42,7 @@
     </div>
     <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-semibold hover:bg-primary/90">Filter</button>
     @if (request()->hasAny(['status', 'class_id', 'tanggal']))
-        <a href="{{ route('admin.settings.whatsapp.riwayat') }}" class="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50">Reset</a>
+        <a href="{{ route('admin.pengaturan.whatsapp.riwayat') }}" class="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50">Reset</a>
     @endif
 </form>
 
@@ -100,7 +100,7 @@
                         {{ $p->created_at->format('d/m/Y H:i') }}
                     </td>
                     <td class="px-4 py-3 text-right">
-                        <a href="{{ route('admin.settings.whatsapp.riwayat.show', $p) }}"
+                        <a href="{{ route('admin.pengaturan.whatsapp.riwayat.show', $p) }}"
                            class="inline-flex items-center rounded-lg border border-gray-300 px-2.5 py-1 text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Detail</a>
                     </td>
                 </tr>

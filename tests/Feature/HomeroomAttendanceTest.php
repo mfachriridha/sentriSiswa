@@ -170,7 +170,7 @@ test('homeroom teacher can download excel recap for selected range', function ()
     createStudentInClass($class, 'Ayu', '10001');
 
     $this->actingAs($teacher)
-        ->get(route('wali-kelas.absensi.export-excel', [
+        ->get(route('wali-kelas.absensi.ekspor-excel', [
             'mulai' => '2026-06-01',
             'selesai' => '2026-06-08',
         ]))

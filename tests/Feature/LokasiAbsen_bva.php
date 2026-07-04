@@ -36,16 +36,16 @@ function lokasiAbsenBvaKmlFile(int $bytes): UploadedFile
 test('admin can upload a kml file at exactly the maximum size', function () {
     $admin = lokasiAbsenBvaAdmin();
 
-    $this->actingAs($admin)->put(route('admin.settings.attendance-location.update'), [
+    $this->actingAs($admin)->put(route('admin.pengaturan.lokasi-absen.update'), [
         'kml_file' => lokasiAbsenBvaKmlFile(5120 * 1024),
-    ])->assertRedirect(route('admin.settings.attendance-location.index'));
+    ])->assertRedirect(route('admin.pengaturan.lokasi-absen.index'));
 });
 
 // TS.LokasiAbsen.007 / TC.LokasiAbsen.007.001 — file size 1 byte above the 5120 KB maximum (invalid)
 test('admin cannot upload a kml file above the maximum size', function () {
     $admin = lokasiAbsenBvaAdmin();
 
-    $this->actingAs($admin)->put(route('admin.settings.attendance-location.update'), [
+    $this->actingAs($admin)->put(route('admin.pengaturan.lokasi-absen.update'), [
         'kml_file' => lokasiAbsenBvaKmlFile(5120 * 1024 + 1),
     ])->assertSessionHasErrors('kml_file');
 });
@@ -56,7 +56,7 @@ test('admin cannot upload a kml file above the maximum size', function () {
 test('admin cannot save a tolerance of -1', function () {
     $admin = lokasiAbsenBvaAdmin();
 
-    $this->actingAs($admin)->put(route('admin.settings.attendance-location.tolerance'), [
+    $this->actingAs($admin)->put(route('admin.pengaturan.lokasi-absen.tolerance'), [
         'tolerance_meters' => '-1',
     ])->assertSessionHasErrors('tolerance_meters');
 });
@@ -65,9 +65,9 @@ test('admin cannot save a tolerance of -1', function () {
 test('admin can save a tolerance of exactly 0', function () {
     $admin = lokasiAbsenBvaAdmin();
 
-    $this->actingAs($admin)->put(route('admin.settings.attendance-location.tolerance'), [
+    $this->actingAs($admin)->put(route('admin.pengaturan.lokasi-absen.tolerance'), [
         'tolerance_meters' => '0',
-    ])->assertRedirect(route('admin.settings.attendance-location.index'));
+    ])->assertRedirect(route('admin.pengaturan.lokasi-absen.index'));
 
     expect(Pengaturan::get('attendance_tolerance_meters'))->toBe('0');
 });
@@ -76,9 +76,9 @@ test('admin can save a tolerance of exactly 0', function () {
 test('admin can save a tolerance of exactly 500', function () {
     $admin = lokasiAbsenBvaAdmin();
 
-    $this->actingAs($admin)->put(route('admin.settings.attendance-location.tolerance'), [
+    $this->actingAs($admin)->put(route('admin.pengaturan.lokasi-absen.tolerance'), [
         'tolerance_meters' => '500',
-    ])->assertRedirect(route('admin.settings.attendance-location.index'));
+    ])->assertRedirect(route('admin.pengaturan.lokasi-absen.index'));
 
     expect(Pengaturan::get('attendance_tolerance_meters'))->toBe('500');
 });
@@ -87,7 +87,7 @@ test('admin can save a tolerance of exactly 500', function () {
 test('admin cannot save a tolerance of 501', function () {
     $admin = lokasiAbsenBvaAdmin();
 
-    $this->actingAs($admin)->put(route('admin.settings.attendance-location.tolerance'), [
+    $this->actingAs($admin)->put(route('admin.pengaturan.lokasi-absen.tolerance'), [
         'tolerance_meters' => '501',
     ])->assertSessionHasErrors('tolerance_meters');
 });

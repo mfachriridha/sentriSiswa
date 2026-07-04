@@ -11,7 +11,7 @@
         </svg>
         Kembali
     </a>
-    <a href="{{ route('admin.kelas.edit', $class) }}"
+    <a href="{{ route('admin.kelas.edit', $kelas) }}"
        class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm
               hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors">
         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -24,11 +24,11 @@
 
 <div class="rounded-xl border border-gray-200 bg-white p-6">
     <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-900">{{ $class->nama }}</h1>
+        <h1 class="text-2xl font-bold text-gray-900">{{ $kelas->nama }}</h1>
         <p class="mt-1 text-sm text-gray-500">
-            @if ($class->tingkat === '10')
+            @if ($kelas->tingkat === '10')
                 <span class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">Tingkat 10</span>
-            @elseif ($class->tingkat === '11')
+            @elseif ($kelas->tingkat === '11')
                 <span class="inline-flex items-center rounded-full bg-green-50 px-3 py-1 text-sm font-medium text-green-700">Tingkat 11</span>
             @else
                 <span class="inline-flex items-center rounded-full bg-purple-50 px-3 py-1 text-sm font-medium text-purple-700">Tingkat 12</span>
@@ -40,9 +40,9 @@
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">Tingkat</p>
             <p class="mt-1.5">
-                @if ($class->tingkat === '10')
+                @if ($kelas->tingkat === '10')
                     <span class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">Tingkat 10</span>
-                @elseif ($class->tingkat === '11')
+                @elseif ($kelas->tingkat === '11')
                     <span class="inline-flex items-center rounded-full bg-green-50 px-3 py-1 text-sm font-medium text-green-700">Tingkat 11</span>
                 @else
                     <span class="inline-flex items-center rounded-full bg-purple-50 px-3 py-1 text-sm font-medium text-purple-700">Tingkat 12</span>
@@ -53,10 +53,10 @@
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">Wali Kelas</p>
             <p class="mt-1.5 text-sm text-gray-900">
-                @if ($class->waliKelas)
-                    <a href="{{ route('admin.guru.show', $class->waliKelas) }}"
+                @if ($kelas->waliKelas)
+                    <a href="{{ route('admin.guru.show', $kelas->waliKelas) }}"
                        class="text-primary hover:underline">
-                        {{ $class->waliKelas->nama }}
+                        {{ $kelas->waliKelas->nama }}
                     </a>
                 @else
                     -
@@ -66,7 +66,7 @@
 
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">Jumlah Siswa</p>
-            <p class="mt-1.5 text-sm text-gray-900">{{ $class->siswa_count }}</p>
+            <p class="mt-1.5 text-sm text-gray-900">{{ $kelas->siswa_count }}</p>
         </div>
     </div>
 </div>

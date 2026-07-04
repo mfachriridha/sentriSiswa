@@ -32,9 +32,9 @@ function whatsappApiBvaFakeSuccess(): void
 test('admin can save a token with exactly 255 characters', function () {
     $token255 = str_repeat('a', 255);
 
-    $this->actingAs(whatsappApiBvaAdmin())->put(route('admin.settings.whatsapp.update'), [
+    $this->actingAs(whatsappApiBvaAdmin())->put(route('admin.pengaturan.whatsapp.update'), [
         'fonnte_token' => $token255,
-    ])->assertRedirect(route('admin.settings.whatsapp.index'));
+    ])->assertRedirect(route('admin.pengaturan.whatsapp.index'));
 
     expect(Pengaturan::get('fonnte_token'))->toBe($token255);
 });
@@ -43,7 +43,7 @@ test('admin can save a token with exactly 255 characters', function () {
 test('admin cannot save a token with 256 characters', function () {
     $token256 = str_repeat('a', 256);
 
-    $this->actingAs(whatsappApiBvaAdmin())->put(route('admin.settings.whatsapp.update'), [
+    $this->actingAs(whatsappApiBvaAdmin())->put(route('admin.pengaturan.whatsapp.update'), [
         'fonnte_token' => $token256,
     ])->assertSessionHasErrors('fonnte_token');
 });
@@ -57,7 +57,7 @@ test('admin can send a test message with a 20 character phone', function () {
     whatsappApiBvaFakeSuccess();
     $phone20 = str_repeat('0', 20);
 
-    $this->actingAs($admin)->postJson(route('admin.settings.whatsapp.test'), [
+    $this->actingAs($admin)->postJson(route('admin.pengaturan.whatsapp.test'), [
         'phone' => $phone20,
         'message' => 'Test batas nomor',
     ])->assertSuccessful();
@@ -69,7 +69,7 @@ test('admin cannot send a test message with a 21 character phone', function () {
     Pengaturan::set('fonnte_token', 'fonnte-test-token');
     $phone21 = str_repeat('0', 21);
 
-    $this->actingAs($admin)->postJson(route('admin.settings.whatsapp.test'), [
+    $this->actingAs($admin)->postJson(route('admin.pengaturan.whatsapp.test'), [
         'phone' => $phone21,
         'message' => 'Test batas nomor',
     ])->assertStatus(422)
@@ -85,7 +85,7 @@ test('admin can send a test message with exactly 500 characters', function () {
     whatsappApiBvaFakeSuccess();
     $message500 = str_repeat('a', 500);
 
-    $this->actingAs($admin)->postJson(route('admin.settings.whatsapp.test'), [
+    $this->actingAs($admin)->postJson(route('admin.pengaturan.whatsapp.test'), [
         'phone' => '08123456780',
         'message' => $message500,
     ])->assertSuccessful();
@@ -97,7 +97,7 @@ test('admin cannot send a test message with 501 characters', function () {
     Pengaturan::set('fonnte_token', 'fonnte-test-token');
     $message501 = str_repeat('a', 501);
 
-    $this->actingAs($admin)->postJson(route('admin.settings.whatsapp.test'), [
+    $this->actingAs($admin)->postJson(route('admin.pengaturan.whatsapp.test'), [
         'phone' => '08123456781',
         'message' => $message501,
     ])->assertStatus(422)

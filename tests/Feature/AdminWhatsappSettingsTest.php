@@ -11,22 +11,22 @@ test('admin can save fonnte token without sending a message', function () {
     $admin = Pengguna::factory()->admin()->create(['status' => 'registered']);
 
     $this->actingAs($admin)
-        ->get(route('admin.settings.whatsapp.index'))
+        ->get(route('admin.pengaturan.whatsapp.index'))
         ->assertSuccessful()
         ->assertSee('WhatsApp API')
         ->assertSee('Token Fonnte')
         ->assertSee('Belum tersimpan');
 
     $this->actingAs($admin)
-        ->put(route('admin.settings.whatsapp.update'), [
+        ->put(route('admin.pengaturan.whatsapp.update'), [
             'fonnte_token' => 'fonnte-test-token',
         ])
-        ->assertRedirect(route('admin.settings.whatsapp.index'));
+        ->assertRedirect(route('admin.pengaturan.whatsapp.index'));
 
     expect(Pengaturan::get('fonnte_token'))->toBe('fonnte-test-token');
 
     $this->actingAs($admin)
-        ->get(route('admin.settings.whatsapp.index'))
+        ->get(route('admin.pengaturan.whatsapp.index'))
         ->assertSuccessful()
         ->assertSee('********oken');
 });
@@ -36,10 +36,10 @@ test('admin can clear stored fonnte token', function () {
     Pengaturan::set('fonnte_token', 'fonnte-test-token');
 
     $this->actingAs($admin)
-        ->put(route('admin.settings.whatsapp.update'), [
+        ->put(route('admin.pengaturan.whatsapp.update'), [
             'clear_fonnte_token' => '1',
         ])
-        ->assertRedirect(route('admin.settings.whatsapp.index'));
+        ->assertRedirect(route('admin.pengaturan.whatsapp.index'));
 
     expect(Pengaturan::get('fonnte_token'))->toBe('');
 });
@@ -59,7 +59,7 @@ test('admin can send fonnte test message and repeated target is rate limited', f
     ]);
 
     $this->actingAs($admin)
-        ->postJson(route('admin.settings.whatsapp.test'), [
+        ->postJson(route('admin.pengaturan.whatsapp.test'), [
             'phone' => '08123456789',
             'message' => 'Test pesan',
         ])
@@ -84,7 +84,7 @@ test('admin can send fonnte test message and repeated target is rate limited', f
     });
 
     $this->actingAs($admin)
-        ->postJson(route('admin.settings.whatsapp.test'), [
+        ->postJson(route('admin.pengaturan.whatsapp.test'), [
             'phone' => '+628123456789',
             'message' => 'Test kedua',
         ])
@@ -102,7 +102,7 @@ test('fonnte test returns error when provider connection fails', function () {
     ]);
 
     $this->actingAs($admin)
-        ->postJson(route('admin.settings.whatsapp.test'), [
+        ->postJson(route('admin.pengaturan.whatsapp.test'), [
             'phone' => '08123450000',
             'message' => 'Test pesan',
         ])

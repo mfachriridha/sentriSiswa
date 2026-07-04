@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Teacher;
+namespace App\Http\Requests\Guru;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateTeacherRequest extends FormRequest
+class UpdateGuruRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -13,7 +13,7 @@ class UpdateTeacherRequest extends FormRequest
 
     public function rules(): array
     {
-        $user = $this->route('teacher');
+        $user = $this->route('guru');
 
         return [
             'nama' => ['required', 'string', 'min:3', 'max:100', "regex:/^[\pL\s.\'-]+$/u"],

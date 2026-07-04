@@ -56,7 +56,7 @@ class RiwayatPesanController extends Controller
 
         SendWhatsAppNotification::dispatch($pesanWhatsapp);
 
-        return redirect()->route('admin.settings.whatsapp.riwayat.show', $pesanWhatsapp)
+        return redirect()->route('admin.pengaturan.whatsapp.riwayat.show', $pesanWhatsapp)
             ->with('success', 'Pesan sedang diproses ulang.');
     }
 }

@@ -2,6 +2,6 @@
 
 namespace App\Http\Controllers\Kesiswaan;
 
-use App\Http\Controllers\Guru\ViolationReportController;
+use App\Http\Controllers\Guru\LaporanPelanggaranController;
 
-class LaporanController extends ViolationReportController {}
+class LaporanController extends LaporanPelanggaranController {}

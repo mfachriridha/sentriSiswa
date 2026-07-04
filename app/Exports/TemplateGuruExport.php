@@ -5,7 +5,7 @@ namespace App\Exports;
 use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
-class TeacherTemplateExport implements FromArray, WithHeadings
+class TemplateGuruExport implements FromArray, WithHeadings
 {
     public function headings(): array
     {

@@ -93,7 +93,7 @@ test('violation reports and attendance pdf routes render downloads for allowed r
         ->assertSee('Rekap Absensi');
 
     $this->actingAs($counselor)
-        ->get(route('bk.laporan.export-excel'))
+        ->get(route('bk.laporan.ekspor-excel'))
         ->assertSuccessful();
 
     $this->actingAs($studentAffairs)
@@ -102,7 +102,7 @@ test('violation reports and attendance pdf routes render downloads for allowed r
         ->assertSee('Laporan Kesiswaan');
 
     $this->actingAs($studentAffairs)
-        ->get(route('kesiswaan.laporan.export-excel'))
+        ->get(route('kesiswaan.laporan.ekspor-excel'))
         ->assertSuccessful();
 
     $this->actingAs($homeroom)
@@ -110,7 +110,7 @@ test('violation reports and attendance pdf routes render downloads for allowed r
         ->assertSuccessful();
 
     $this->actingAs($homeroom)
-        ->get(route('wali-kelas.absensi.export-pdf'))
+        ->get(route('wali-kelas.absensi.ekspor-pdf'))
         ->assertSuccessful()
         ->assertHeader('content-type', 'application/pdf');
 });

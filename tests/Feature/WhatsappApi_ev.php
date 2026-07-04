@@ -30,9 +30,9 @@ function whatsappApiFakeSuccess(): void
 test('admin can save a new fonnte token', function () {
     $admin = whatsappApiAdmin();
 
-    $this->actingAs($admin)->put(route('admin.settings.whatsapp.update'), [
+    $this->actingAs($admin)->put(route('admin.pengaturan.whatsapp.update'), [
         'fonnte_token' => 'token-baru-123',
-    ])->assertRedirect(route('admin.settings.whatsapp.index'));
+    ])->assertRedirect(route('admin.pengaturan.whatsapp.index'));
 
     expect(Pengaturan::get('fonnte_token'))->toBe('token-baru-123');
 });
@@ -41,7 +41,7 @@ test('admin can save a new fonnte token', function () {
 test('admin cannot send a test message when no token is configured', function () {
     $admin = whatsappApiAdmin();
 
-    $this->actingAs($admin)->postJson(route('admin.settings.whatsapp.test'), [
+    $this->actingAs($admin)->postJson(route('admin.pengaturan.whatsapp.test'), [
         'phone' => '08123456789',
         'message' => 'Test tanpa token',
     ])->assertUnprocessable()
@@ -55,12 +55,12 @@ test('sending a test message to the same number twice within 60 seconds is rate 
     Pengaturan::set('fonnte_token', 'fonnte-test-token');
     whatsappApiFakeSuccess();
 
-    $this->actingAs($admin)->postJson(route('admin.settings.whatsapp.test'), [
+    $this->actingAs($admin)->postJson(route('admin.pengaturan.whatsapp.test'), [
         'phone' => '08199988877',
         'message' => 'Pesan pertama',
     ])->assertSuccessful();
 
-    $this->actingAs($admin)->postJson(route('admin.settings.whatsapp.test'), [
+    $this->actingAs($admin)->postJson(route('admin.pengaturan.whatsapp.test'), [
         'phone' => '08199988877',
         'message' => 'Pesan kedua',
     ])->assertTooManyRequests()
@@ -75,7 +75,7 @@ test('test message reports an error when the provider connection fails', functio
     Pengaturan::set('fonnte_token', 'fonnte-test-token');
     Http::fake(['api.fonnte.com/*' => Http::failedConnection()]);
 
-    $this->actingAs($admin)->postJson(route('admin.settings.whatsapp.test'), [
+    $this->actingAs($admin)->postJson(route('admin.pengaturan.whatsapp.test'), [
         'phone' => '08155566677',
         'message' => 'Test koneksi gagal',
     ])->assertUnprocessable()

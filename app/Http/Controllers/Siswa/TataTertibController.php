@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\TataTertib;
 use Illuminate\View\View;
 
-class SchoolRuleController extends Controller
+class TataTertibController extends Controller
 {
     public function index(): View
     {

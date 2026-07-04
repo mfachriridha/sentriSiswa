@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Requests\StudentViolation;
+namespace App\Http\Requests\PelanggaranSiswa;
 
 use App\Models\JenisPelanggaran;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
-class StoreStudentViolationRequest extends FormRequest
+class StorePelanggaranSiswaRequest extends FormRequest
 {
     public function authorize(): bool
     {

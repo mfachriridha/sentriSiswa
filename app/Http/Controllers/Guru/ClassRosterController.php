@@ -95,11 +95,11 @@ class ClassRosterController extends Controller
         return response()->json(compact('stats', 'rows'));
     }
 
-    public function updateAttendance(UpdateDailyAttendanceRequest $request, ProfilSiswa $studentProfile): RedirectResponse
+    public function updateAttendance(UpdateDailyAttendanceRequest $request, ProfilSiswa $profilSiswa): RedirectResponse
     {
         $class = Auth::user()->kelasWali;
 
-        if (! $class || $studentProfile->kelas_id !== $class->id) {
+        if (! $class || $profilSiswa->kelas_id !== $class->id) {
             abort(403);
         }
 
@@ -108,13 +108,13 @@ class ClassRosterController extends Controller
         }
 
         $attendance = Absensi::query()
-            ->where('profil_siswa_id', $studentProfile->nisn)
+            ->where('profil_siswa_id', $profilSiswa->nisn)
             ->whereDate('tanggal', now()->toDateString())
             ->first();
 
         if (! $attendance) {
             $attendance = new Absensi([
-                'profil_siswa_id' => $studentProfile->nisn,
+                'profil_siswa_id' => $profilSiswa->nisn,
                 'tanggal' => now()->toDateString(),
             ]);
         }
@@ -125,15 +125,15 @@ class ClassRosterController extends Controller
         return redirect()->route('wali-kelas.kelas-saya')->with('success', 'Status absensi hari ini berhasil diperbarui.');
     }
 
-    public function show(ProfilSiswa $studentProfile, AbsenceWarningService $absenceWarning): View
+    public function show(ProfilSiswa $profilSiswa, AbsenceWarningService $absenceWarning): View
     {
         $class = Auth::user()->kelasWali;
 
-        if (! $class || $studentProfile->kelas_id !== $class->id) {
+        if (! $class || $profilSiswa->kelas_id !== $class->id) {
             abort(403);
         }
 
-        $studentProfile->load([
+        $profilSiswa->load([
             'pengguna',
             'kelas',
             'biodata',
@@ -142,11 +142,11 @@ class ClassRosterController extends Controller
         ]);
 
         return view('kesiswaan.monitoring.show', [
-            'student' => $studentProfile,
+            'student' => $profilSiswa,
             'backRoute' => route('wali-kelas.kelas-saya'),
             'backLabel' => 'Kembali ke Kelas Saya',
             'createViolationRoute' => null,
-            'alphaWarningCount' => $absenceWarning->alphaCountForStudentId($studentProfile->nisn),
+            'alphaWarningCount' => $absenceWarning->alphaCountForStudentId($profilSiswa->nisn),
             'warningThreshold' => AbsenceWarningService::Threshold,
         ]);
     }

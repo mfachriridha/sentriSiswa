@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
-class ViolationHistoryController extends Controller
+class RiwayatPelanggaranController extends Controller
 {
     public function index(Request $request): View
     {

@@ -2,6 +2,6 @@
 
 namespace App\Http\Controllers\WaliKelas;
 
-use App\Http\Controllers\Guru\AttendanceRecapController;
+use App\Http\Controllers\Guru\RekapAbsensiController;
 
-class AbsensiController extends AttendanceRecapController {}
+class AbsensiController extends RekapAbsensiController {}

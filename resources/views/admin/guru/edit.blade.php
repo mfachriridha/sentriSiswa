@@ -16,7 +16,7 @@
 <div class="rounded-xl border border-gray-200 bg-white p-6">
     <h1 class="mb-6 text-2xl font-bold text-gray-900">Edit Guru</h1>
 
-    <form method="POST" action="{{ route('admin.guru.update', $teacher) }}" class="space-y-6"
+    <form method="POST" action="{{ route('admin.guru.update', $guru) }}" class="space-y-6"
           x-data="{ loading: false }" @submit="loading = true">
         @csrf
         @method('PUT')
@@ -24,7 +24,7 @@
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
                 <label for="name" class="block text-sm font-medium text-gray-700">Nama <span class="text-red-500">*</span></label>
-                <input id="name" type="text" name="nama" value="{{ old('nama', $teacher->nama) }}" required
+                <input id="name" type="text" name="nama" value="{{ old('nama', $guru->nama) }}" required
                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                               placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20
                               transition-colors">
@@ -35,7 +35,7 @@
 
             <div>
                 <label for="nip" class="block text-sm font-medium text-gray-700">NIP</label>
-                <input id="nip" type="text" name="nip" value="{{ old('nip', $teacher->profilGuru?->nip) }}"
+                <input id="nip" type="text" name="nip" value="{{ old('nip', $guru->profilGuru?->nip) }}"
                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                               placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20
                               transition-colors">
@@ -44,7 +44,7 @@
                 @enderror
             </div>
 
-            <div x-data="{ role: '{{ old('peran', $teacher->peran) }}' }">
+            <div x-data="{ role: '{{ old('peran', $guru->peran) }}' }">
                 <div>
                     <label for="role" class="block text-sm font-medium text-gray-700">Role <span class="text-red-500">*</span></label>
                     <select id="role" name="peran" required x-model="role"
@@ -66,9 +66,9 @@
                             class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                                    focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                         <option value="">Pilih tingkatan</option>
-                        <option value="10" {{ old('tingkat', $teacher->profilGuru?->tingkat) === '10' ? 'selected' : '' }}>10</option>
-                        <option value="11" {{ old('tingkat', $teacher->profilGuru?->tingkat) === '11' ? 'selected' : '' }}>11</option>
-                        <option value="12" {{ old('tingkat', $teacher->profilGuru?->tingkat) === '12' ? 'selected' : '' }}>12</option>
+                        <option value="10" {{ old('tingkat', $guru->profilGuru?->tingkat) === '10' ? 'selected' : '' }}>10</option>
+                        <option value="11" {{ old('tingkat', $guru->profilGuru?->tingkat) === '11' ? 'selected' : '' }}>11</option>
+                        <option value="12" {{ old('tingkat', $guru->profilGuru?->tingkat) === '12' ? 'selected' : '' }}>12</option>
                     </select>
                     @error('tingkat')
                         <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
@@ -78,7 +78,7 @@
 
             <div>
                 <label for="phone" class="block text-sm font-medium text-gray-700">Telepon</label>
-                <input id="phone" type="text" name="telepon" value="{{ old('telepon', $teacher->profilGuru?->telepon) }}"
+                <input id="phone" type="text" name="telepon" value="{{ old('telepon', $guru->profilGuru?->telepon) }}"
                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                               placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20
                               transition-colors">

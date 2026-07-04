@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Student;
+namespace App\Http\Requests\Siswa;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateStudentRequest extends FormRequest
+class StoreSiswaRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -13,12 +13,10 @@ class UpdateStudentRequest extends FormRequest
 
     public function rules(): array
     {
-        $user = $this->route('student');
-
         return [
             'nama' => ['required', 'string', 'min:3', 'max:100', "regex:/^[\pL\s.\'-]+$/u"],
-            'nisn' => ['required', 'digits:10', "unique:profil_siswa,nisn,{$user->profilSiswa?->nisn},nisn"],
-            'nis' => ['required', 'string', 'max:20', "unique:profil_siswa,nis,{$user->profilSiswa?->nis},nis"],
+            'nisn' => ['required', 'digits:10', 'unique:profil_siswa,nisn'],
+            'nis' => ['required', 'string', 'max:20', 'unique:profil_siswa,nis'],
             'kelas_id' => ['nullable', 'string', 'exists:kelas,id'],
             'telepon' => ['nullable', 'string', 'min:10', 'max:20', 'regex:/^[0-9+\-\s()]*$/'],
             'alamat' => ['nullable', 'string'],

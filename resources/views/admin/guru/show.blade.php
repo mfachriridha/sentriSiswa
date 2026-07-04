@@ -11,7 +11,7 @@
         </svg>
         Kembali
     </a>
-    <a href="{{ route('admin.guru.edit', $teacher) }}"
+    <a href="{{ route('admin.guru.edit', $guru) }}"
        class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm
               hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors">
         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -25,16 +25,16 @@
 <div class="rounded-xl border border-gray-200 bg-white p-6">
     <div class="mb-6 flex items-center gap-5">
         <div class="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 text-2xl font-bold text-primary">
-            {{ strtoupper(substr($teacher->nama, 0, 1)) }}
+            {{ strtoupper(substr($guru->nama, 0, 1)) }}
         </div>
         <div>
-            <h1 class="text-2xl font-bold text-gray-900">{{ $teacher->nama }}</h1>
+            <h1 class="text-2xl font-bold text-gray-900">{{ $guru->nama }}</h1>
             <p class="mt-1 text-sm text-gray-500">
-                @if ($teacher->isWaliKelas())
+                @if ($guru->isWaliKelas())
                     Wali Kelas
-                @elseif ($teacher->isBk())
+                @elseif ($guru->isBk())
                     BK
-                @elseif ($teacher->isKesiswaan())
+                @elseif ($guru->isKesiswaan())
                     Kesiswaan
                 @else
                     Guru
@@ -46,22 +46,22 @@
     <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">Email</p>
-            <p class="mt-1.5 text-sm text-gray-900">{{ $teacher->email }}</p>
+            <p class="mt-1.5 text-sm text-gray-900">{{ $guru->email }}</p>
         </div>
 
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">NIP</p>
-            <p class="mt-1.5 text-sm text-gray-900">{{ $teacher->profilGuru?->nip ?? '-' }}</p>
+            <p class="mt-1.5 text-sm text-gray-900">{{ $guru->profilGuru?->nip ?? '-' }}</p>
         </div>
 
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">Role</p>
             <p class="mt-1.5">
-                @if ($teacher->isWaliKelas())
+                @if ($guru->isWaliKelas())
                     <span class="inline-flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">Wali Kelas</span>
-                @elseif ($teacher->isBk())
+                @elseif ($guru->isBk())
                     <span class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-3 py-1 text-sm font-medium text-amber-700">BK</span>
-                @elseif ($teacher->isKesiswaan())
+                @elseif ($guru->isKesiswaan())
                     <span class="inline-flex items-center gap-1 rounded-full bg-green-50 px-3 py-1 text-sm font-medium text-green-700">Kesiswaan</span>
                 @else
                     <span class="text-sm text-gray-400">-</span>
@@ -71,19 +71,19 @@
 
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">Telepon</p>
-            <p class="mt-1.5 text-sm text-gray-900">{{ $teacher->profilGuru?->telepon ?? '-' }}</p>
+            <p class="mt-1.5 text-sm text-gray-900">{{ $guru->profilGuru?->telepon ?? '-' }}</p>
         </div>
 
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">Kelas yang Diampu</p>
             <p class="mt-1.5 text-sm">
-                @if ($teacher->kelasWali)
-                    <a href="{{ route('admin.kelas.show', $teacher->kelasWali) }}" class="text-primary hover:underline">
-                        {{ $teacher->kelasWali->nama }}
+                @if ($guru->kelasWali)
+                    <a href="{{ route('admin.kelas.show', $guru->kelasWali) }}" class="text-primary hover:underline">
+                        {{ $guru->kelasWali->nama }}
                     </a>
-                @elseif ($teacher->profilGuru?->tingkat)
+                @elseif ($guru->profilGuru?->tingkat)
                     <span class="inline-flex items-center gap-1 rounded-full bg-teal-50 px-3 py-1 text-sm font-medium text-teal-700">
-                        Tingkat {{ $teacher->profilGuru->tingkat }}
+                        Tingkat {{ $guru->profilGuru->tingkat }}
                     </span>
                 @else
                     <span class="text-gray-400">-</span>

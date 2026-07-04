@@ -12,7 +12,7 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
-class StudentImport implements ToCollection, WithChunkReading, WithHeadingRow
+class ImporSiswa implements ToCollection, WithChunkReading, WithHeadingRow
 {
     public int $studentsCreated = 0;
 
