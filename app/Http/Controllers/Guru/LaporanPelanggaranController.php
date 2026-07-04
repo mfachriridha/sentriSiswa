@@ -95,7 +95,7 @@ class LaporanPelanggaranController extends Controller
             ->when($filters['selesai'] ?? null, fn ($query, $date) => $query->whereDate('tanggal_pelanggaran', '<=', $date))
             ->when($filters['kelas_id'] ?? null, fn ($query, $classId) => $query->whereHas('profilSiswa', fn ($studentQuery) => $studentQuery->where('kelas_id', $classId)))
             ->when($filters['tingkat'] ?? null, fn ($query, $grade) => $query->whereHas('profilSiswa.kelas', fn ($classQuery) => $classQuery->where('tingkat', $grade)))
-            ->when($filters['category'] ?? null, fn ($query, $category) => $query->where('kategori_pelanggaran', $category))
+            ->when($filters['kategori'] ?? null, fn ($query, $kategori) => $query->where('kategori_pelanggaran', $kategori))
             ->when($filters['status'] ?? null, fn ($query, $status) => $query->where('status', $status));
 
         if ($user->isBk()) {

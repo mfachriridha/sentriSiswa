@@ -21,7 +21,7 @@ class PelanggaranSiswaController extends Controller
     {
         $search = $request->get('search', '');
         $filterClass = $request->get('kelas_id', '');
-        $filterCategory = $request->get('category', '');
+        $filterCategory = $request->get('kategori', '');
         $filterViolationType = $request->get('jenis_pelanggaran_id', '');
         $filterDate = $request->get('tanggal_pelanggaran', '');
         $filterStatus = $request->get('status', $request->route('status', ''));
@@ -75,7 +75,7 @@ class PelanggaranSiswaController extends Controller
         $studentViolations = $studentViolations->paginate(25)->appends([
             'search' => $search,
             'kelas_id' => $filterClass,
-            'category' => $filterCategory,
+            'kategori' => $filterCategory,
             'jenis_pelanggaran_id' => $filterViolationType,
             'tanggal_pelanggaran' => $filterDate,
             'status' => $filterStatus,

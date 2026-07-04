@@ -18,7 +18,7 @@
         <select name="kategori" class="rounded-lg border border-gray-300 px-3 py-2 text-sm">
             <option value="">Semua Kategori</option>
             @foreach ($categoryLabels as $value => $label)
-                <option value="{{ $value }}" {{ ($filters['category'] ?? '') === $value ? 'selected' : '' }}>{{ $label }}</option>
+                <option value="{{ $value }}" {{ ($filters['kategori'] ?? '') === $value ? 'selected' : '' }}>{{ $label }}</option>
             @endforeach
         </select>
         <select name="status" class="rounded-lg border border-gray-300 px-3 py-2 text-sm">
