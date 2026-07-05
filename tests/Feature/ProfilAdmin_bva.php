@@ -37,7 +37,7 @@ function profilAdminBvaImageOfSize(int $bytes): UploadedFile
 
 // ── Boundary: whatsapp_number length, min:10 / max:20 ─────────────────────
 
-// TS.ProfilAdmin.010 / TC.ProfilAdmin.010.001 — whatsapp_number with 9 characters (just below the minimum of 10, invalid)
+// TS.PAD.010 / TC.PAD.010.001 — whatsapp_number with 9 characters (just below the minimum of 10, invalid)
 test('admin cannot update profile with a 9 character whatsapp number', function () {
     $admin = profilAdminBvaUser();
 
@@ -47,7 +47,7 @@ test('admin cannot update profile with a 9 character whatsapp number', function 
     ])->assertSessionHasErrors('whatsapp_number');
 });
 
-// TS.ProfilAdmin.011 / TC.ProfilAdmin.011.001 — whatsapp_number with exactly 10 characters (at the minimum, valid)
+// TS.PAD.011 / TC.PAD.011.001 — whatsapp_number with exactly 10 characters (at the minimum, valid)
 test('admin can update profile with a 10 character whatsapp number', function () {
     $admin = profilAdminBvaUser();
 
@@ -59,7 +59,7 @@ test('admin can update profile with a 10 character whatsapp number', function ()
     expect($admin->fresh()->nomor_wa)->toBe('0812345678');
 });
 
-// TS.ProfilAdmin.012 / TC.ProfilAdmin.012.001 — whatsapp_number with exactly 20 characters (at the maximum, valid)
+// TS.PAD.012 / TC.PAD.012.001 — whatsapp_number with exactly 20 characters (at the maximum, valid)
 test('admin can update profile with a 20 character whatsapp number', function () {
     $admin = profilAdminBvaUser();
     $nomor20 = str_repeat('0', 20);
@@ -72,7 +72,7 @@ test('admin can update profile with a 20 character whatsapp number', function ()
     expect($admin->fresh()->nomor_wa)->toBe($nomor20);
 });
 
-// TS.ProfilAdmin.013 / TC.ProfilAdmin.013.001 — whatsapp_number with 21 characters (just above the maximum, invalid)
+// TS.PAD.013 / TC.PAD.013.001 — whatsapp_number with 21 characters (just above the maximum, invalid)
 test('admin cannot update profile with a 21 character whatsapp number', function () {
     $admin = profilAdminBvaUser();
     $nomor21 = str_repeat('0', 21);
@@ -85,7 +85,7 @@ test('admin cannot update profile with a 21 character whatsapp number', function
 
 // ── Boundary: set-sandi-baru password length, min:8 ───────────────────────
 
-// TS.ProfilAdmin.014 / TC.ProfilAdmin.014.001 — new password with 7 characters (just below the minimum of 8, invalid)
+// TS.PAD.014 / TC.PAD.014.001 — new password with 7 characters (just below the minimum of 8, invalid)
 test('admin cannot set a new password with 7 characters', function () {
     $admin = profilAdminBvaUser();
     session(['password_change_verified' => true]);
@@ -96,7 +96,7 @@ test('admin cannot set a new password with 7 characters', function () {
     ])->assertSessionHasErrors('password');
 });
 
-// TS.ProfilAdmin.015 / TC.ProfilAdmin.015.001 — new password with exactly 8 characters (at the minimum, valid)
+// TS.PAD.015 / TC.PAD.015.001 — new password with exactly 8 characters (at the minimum, valid)
 test('admin can set a new password with exactly 8 characters', function () {
     $admin = profilAdminBvaUser();
     session(['password_change_verified' => true]);
@@ -111,7 +111,7 @@ test('admin can set a new password with exactly 8 characters', function () {
 
 // ── Boundary: photo size, max:2048 KB ─────────────────────────────────────
 
-// TS.ProfilAdmin.016 / TC.ProfilAdmin.016.001 — photo size exactly 2048 KB (at the maximum, valid)
+// TS.PAD.016 / TC.PAD.016.001 — photo size exactly 2048 KB (at the maximum, valid)
 test('admin can upload a profile photo at exactly the maximum size', function () {
     $admin = profilAdminBvaUser();
 
@@ -121,7 +121,7 @@ test('admin can upload a profile photo at exactly the maximum size', function ()
     ])->assertRedirect(route('admin.profil'));
 });
 
-// TS.ProfilAdmin.017 / TC.ProfilAdmin.017.001 — photo size 1 byte above the 2048 KB maximum (invalid)
+// TS.PAD.017 / TC.PAD.017.001 — photo size 1 byte above the 2048 KB maximum (invalid)
 test('admin cannot upload a profile photo above the maximum size', function () {
     $admin = profilAdminBvaUser();
 

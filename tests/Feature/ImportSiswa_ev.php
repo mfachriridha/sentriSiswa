@@ -37,7 +37,7 @@ function importSiswaUploadAndGetPath(Pengguna $admin, array $rows): string
     return session('import_siswa_file_path');
 }
 
-// TS.ImportSiswa.001 / TC.ImportSiswa.001.001 — upload valid xlsx then import creates new students (positive)
+// TS.IMS.001 / TC.IMS.001.001 — upload valid xlsx then import creates new students (positive)
 test('admin can upload a valid xlsx and import new students', function () {
     $admin = importSiswaAdmin();
     $path = importSiswaUploadAndGetPath($admin, [
@@ -56,7 +56,7 @@ test('admin can upload a valid xlsx and import new students', function () {
     $this->assertDatabaseHas('profil_siswa', ['pengguna_id' => $student->id, 'nisn' => '0011122233']);
 });
 
-// TS.ImportSiswa.002 / TC.ImportSiswa.002.001 — upload a file that is not xlsx/xls (negative)
+// TS.IMS.002 / TC.IMS.002.001 — upload a file that is not xlsx/xls (negative)
 test('admin cannot upload a non-spreadsheet file for student import', function () {
     $admin = importSiswaAdmin();
 
@@ -65,7 +65,7 @@ test('admin cannot upload a non-spreadsheet file for student import', function (
     ])->assertSessionHasErrors('file');
 });
 
-// TS.ImportSiswa.003 / TC.ImportSiswa.003.001 — submit upload without any file (negative)
+// TS.IMS.003 / TC.IMS.003.001 — submit upload without any file (negative)
 test('admin cannot submit student import without a file', function () {
     $admin = importSiswaAdmin();
 
@@ -73,7 +73,7 @@ test('admin cannot submit student import without a file', function () {
         ->assertSessionHasErrors('file');
 });
 
-// TS.ImportSiswa.004 / TC.ImportSiswa.004.001 — a row with an empty name is skipped and reported (negative)
+// TS.IMS.004 / TC.IMS.004.001 — a row with an empty name is skipped and reported (negative)
 test('student import skips a row with an empty name', function () {
     $admin = importSiswaAdmin();
     $path = importSiswaUploadAndGetPath($admin, [
@@ -86,7 +86,7 @@ test('student import skips a row with an empty name', function () {
     expect(Pengguna::where('peran', 'siswa')->count())->toBe(0);
 });
 
-// TS.ImportSiswa.005 / TC.ImportSiswa.005.001 — a row with an empty nisn is skipped and reported (negative)
+// TS.IMS.005 / TC.IMS.005.001 — a row with an empty nisn is skipped and reported (negative)
 test('student import skips a row with an empty nisn', function () {
     $admin = importSiswaAdmin();
     $path = importSiswaUploadAndGetPath($admin, [
@@ -99,7 +99,7 @@ test('student import skips a row with an empty nisn', function () {
     expect(Pengguna::where('peran', 'siswa')->count())->toBe(0);
 });
 
-// TS.ImportSiswa.006 / TC.ImportSiswa.006.001 — a row with an empty nis is skipped and reported (negative)
+// TS.IMS.006 / TC.IMS.006.001 — a row with an empty nis is skipped and reported (negative)
 test('student import skips a row with an empty nis', function () {
     $admin = importSiswaAdmin();
     $path = importSiswaUploadAndGetPath($admin, [
@@ -112,7 +112,7 @@ test('student import skips a row with an empty nis', function () {
     expect(Pengguna::where('peran', 'siswa')->count())->toBe(0);
 });
 
-// TS.ImportSiswa.007 / TC.ImportSiswa.007.001 — a row whose nisn already exists updates the existing profile instead of duplicating (positive)
+// TS.IMS.007 / TC.IMS.007.001 — a row whose nisn already exists updates the existing profile instead of duplicating (positive)
 test('student import treats an existing nisn as an update, not a duplicate', function () {
     $admin = importSiswaAdmin();
     $existing = Pengguna::factory()->student()->create(['nama' => 'Siswa Lama']);
@@ -129,7 +129,7 @@ test('student import treats an existing nisn as an update, not a duplicate', fun
     expect($existing->fresh()->profilSiswa->nis)->toBe('20999');
 });
 
-// TS.ImportSiswa.008 / TC.ImportSiswa.008.001 — a row referencing a class that does not exist yet creates it automatically (positive)
+// TS.IMS.008 / TC.IMS.008.001 — a row referencing a class that does not exist yet creates it automatically (positive)
 test('student import automatically creates a class that does not exist yet', function () {
     $admin = importSiswaAdmin();
     $path = importSiswaUploadAndGetPath($admin, [
@@ -142,7 +142,7 @@ test('student import automatically creates a class that does not exist yet', fun
     $this->assertDatabaseHas('kelas', ['nama' => '10. Baru', 'tingkat' => '10']);
 });
 
-// TS.ImportSiswa.009 / TC.ImportSiswa.009.001 — accessing the preview page without uploading a file first redirects back (negative)
+// TS.IMS.009 / TC.IMS.009.001 — accessing the preview page without uploading a file first redirects back (negative)
 test('student import preview redirects back when no file was uploaded first', function () {
     $admin = importSiswaAdmin();
 

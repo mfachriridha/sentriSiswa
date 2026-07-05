@@ -28,7 +28,7 @@ function lokasiAbsenIsKosong(): bool
 
 // State machine under test: Kosong ⇄ Tersimpan (attendance_geofence_data empty vs filled)
 
-// TS.LokasiAbsen.012 / TC.LokasiAbsen.012.001 — Kosong → upload valid KML → Tersimpan (positive)
+// TS.LKA.012 / TC.LKA.012.001 — Kosong → upload valid KML → Tersimpan (positive)
 test('lokasi absen transitions from kosong to tersimpan after a valid upload', function () {
     $admin = lokasiAbsenSttAdmin();
     expect(lokasiAbsenIsKosong())->toBeTrue();
@@ -40,7 +40,7 @@ test('lokasi absen transitions from kosong to tersimpan after a valid upload', f
     expect(lokasiAbsenIsKosong())->toBeFalse();
 });
 
-// TS.LokasiAbsen.013 / TC.LokasiAbsen.013.001 — Tersimpan → upload new KML → stays Tersimpan, data replaced (positive)
+// TS.LKA.013 / TC.LKA.013.001 — Tersimpan → upload new KML → stays Tersimpan, data replaced (positive)
 test('lokasi absen stays tersimpan and replaces data when uploading again', function () {
     $admin = lokasiAbsenSttAdmin();
     Pengaturan::set('attendance_geofence_data', json_encode(['coordinates' => [['lat' => 1, 'lng' => 1], ['lat' => 2, 'lng' => 2], ['lat' => 3, 'lng' => 3]]]));
@@ -54,7 +54,7 @@ test('lokasi absen stays tersimpan and replaces data when uploading again', func
     expect(Pengaturan::get('attendance_geofence_data'))->not->toBe($oldData);
 });
 
-// TS.LokasiAbsen.014 / TC.LokasiAbsen.014.001 — Tersimpan → hapus → Kosong (positive)
+// TS.LKA.014 / TC.LKA.014.001 — Tersimpan → hapus → Kosong (positive)
 test('lokasi absen transitions from tersimpan to kosong after delete', function () {
     $admin = lokasiAbsenSttAdmin();
     Pengaturan::set('attendance_geofence_data', json_encode(['coordinates' => [['lat' => 1, 'lng' => 1], ['lat' => 2, 'lng' => 2], ['lat' => 3, 'lng' => 3]]]));
@@ -68,7 +68,7 @@ test('lokasi absen transitions from tersimpan to kosong after delete', function 
     expect(Pengaturan::get('attendance_tolerance_meters'))->toBe('0');
 });
 
-// TS.LokasiAbsen.015 / TC.LokasiAbsen.015.001 — Kosong → set tolerance without a geofence first → stays Kosong, tolerance still saved (positive, documented quirk)
+// TS.LKA.015 / TC.LKA.015.001 — Kosong → set tolerance without a geofence first → stays Kosong, tolerance still saved (positive, documented quirk)
 test('lokasi absen stays kosong but still saves tolerance when set before any upload', function () {
     $admin = lokasiAbsenSttAdmin();
     expect(lokasiAbsenIsKosong())->toBeTrue();
@@ -81,7 +81,7 @@ test('lokasi absen stays kosong but still saves tolerance when set before any up
     expect(Pengaturan::get('attendance_tolerance_meters'))->toBe('25');
 });
 
-// TS.LokasiAbsen.016 / TC.LokasiAbsen.016.001 — Kosong → hapus (belum ada apa-apa) → stays Kosong, safe no-op (positive)
+// TS.LKA.016 / TC.LKA.016.001 — Kosong → hapus (belum ada apa-apa) → stays Kosong, safe no-op (positive)
 test('lokasi absen stays kosong and is a safe no-op when deleting with nothing saved', function () {
     $admin = lokasiAbsenSttAdmin();
     expect(lokasiAbsenIsKosong())->toBeTrue();

@@ -20,7 +20,7 @@ function rekapAbsensiBvaHomeroom(string $className = '10. Rekap BVA 1'): array
 
 // ── Boundary: selesai vs mulai, rule after_or_equal:mulai ─────────────────
 
-// TS.RekapAbsensi.012 / TC.RekapAbsensi.012.001 — selesai sama dengan mulai (tepat di batas, diperbolehkan)
+// TS.REA.012 / TC.REA.012.001 — selesai sama dengan mulai (tepat di batas, diperbolehkan)
 test('rekap absensi accepts selesai equal to mulai', function () {
     [$teacher, $class] = rekapAbsensiBvaHomeroom();
 
@@ -31,7 +31,7 @@ test('rekap absensi accepts selesai equal to mulai', function () {
         ->assertSessionDoesntHaveErrors('selesai');
 });
 
-// TS.RekapAbsensi.013 / TC.RekapAbsensi.013.001 — selesai 1 hari sebelum mulai (tepat di bawah batas, ditolak)
+// TS.REA.013 / TC.REA.013.001 — selesai 1 hari sebelum mulai (tepat di bawah batas, ditolak)
 test('rekap absensi rejects selesai one day before mulai', function () {
     [$teacher, $class] = rekapAbsensiBvaHomeroom();
 

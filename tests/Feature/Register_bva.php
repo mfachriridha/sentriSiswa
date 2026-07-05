@@ -54,7 +54,7 @@ function bvaRegisterTeacherSession(): Pengguna
 
 // ── Boundary: password length, min:8 ──────────────────────────────────────
 
-// TS.Reg.019 / TC.Reg.019.001 — password with 7 characters (just below the minimum of 8, invalid)
+// TS.REG.019 / TC.REG.019.001 — password with 7 characters (just below the minimum of 8, invalid)
 test('register store rejects password with 7 characters', function () {
     bvaRegisterStudentSession();
 
@@ -65,7 +65,7 @@ test('register store rejects password with 7 characters', function () {
     ])->assertSessionHasErrors('password');
 });
 
-// TS.Reg.020 / TC.Reg.020.001 — password with exactly 8 characters (at the minimum, valid)
+// TS.REG.020 / TC.REG.020.001 — password with exactly 8 characters (at the minimum, valid)
 test('register store accepts password with exactly 8 characters', function () {
     $student = bvaRegisterStudentSession();
 
@@ -80,7 +80,7 @@ test('register store accepts password with exactly 8 characters', function () {
 
 // ── Boundary: teacher telepon length, min:10 / max:20 ─────────────────────
 
-// TS.Reg.021 / TC.Reg.021.001 — telepon with 9 characters (just below the minimum of 10, invalid)
+// TS.REG.021 / TC.REG.021.001 — telepon with 9 characters (just below the minimum of 10, invalid)
 test('register store rejects teacher telepon with 9 characters', function () {
     bvaRegisterTeacherSession();
 
@@ -92,7 +92,7 @@ test('register store rejects teacher telepon with 9 characters', function () {
     ])->assertSessionHasErrors('telepon');
 });
 
-// TS.Reg.022 / TC.Reg.022.001 — telepon with exactly 10 characters (at the minimum, valid)
+// TS.REG.022 / TC.REG.022.001 — telepon with exactly 10 characters (at the minimum, valid)
 test('register store accepts teacher telepon with exactly 10 characters', function () {
     $teacher = bvaRegisterTeacherSession();
 
@@ -106,7 +106,7 @@ test('register store accepts teacher telepon with exactly 10 characters', functi
     expect($teacher->fresh()->profilGuru->telepon)->toBe('0812345678');
 });
 
-// TS.Reg.023 / TC.Reg.023.001 — telepon with exactly 20 characters (at the maximum, valid)
+// TS.REG.023 / TC.REG.023.001 — telepon with exactly 20 characters (at the maximum, valid)
 test('register store accepts teacher telepon with exactly 20 characters', function () {
     $teacher = bvaRegisterTeacherSession();
     $telepon20 = str_repeat('0', 20);
@@ -121,7 +121,7 @@ test('register store accepts teacher telepon with exactly 20 characters', functi
     expect($teacher->fresh()->profilGuru->telepon)->toBe($telepon20);
 });
 
-// TS.Reg.024 / TC.Reg.024.001 — telepon with 21 characters (just above the maximum, invalid)
+// TS.REG.024 / TC.REG.024.001 — telepon with 21 characters (just above the maximum, invalid)
 test('register store rejects teacher telepon with 21 characters', function () {
     bvaRegisterTeacherSession();
     $telepon21 = str_repeat('0', 21);
@@ -136,7 +136,7 @@ test('register store rejects teacher telepon with 21 characters', function () {
 
 // ── Boundary: email length, max:255 ───────────────────────────────────────
 
-// TS.Reg.025 / TC.Reg.025.001 — email with exactly 255 characters (at the maximum, valid)
+// TS.REG.025 / TC.REG.025.001 — email with exactly 255 characters (at the maximum, valid)
 test('register store accepts email with exactly 255 characters', function () {
     $student = bvaRegisterStudentSession();
     $email255 = bvaEmailOfLength(255);
@@ -150,7 +150,7 @@ test('register store accepts email with exactly 255 characters', function () {
     expect($student->fresh()->email)->toBe($email255);
 });
 
-// TS.Reg.026 / TC.Reg.026.001 — email with 256 characters (just above the maximum, invalid)
+// TS.REG.026 / TC.REG.026.001 — email with 256 characters (just above the maximum, invalid)
 test('register store rejects email with 256 characters', function () {
     bvaRegisterStudentSession();
     $email256 = bvaEmailOfLength(256);

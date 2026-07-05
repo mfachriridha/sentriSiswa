@@ -36,7 +36,7 @@ function monitorAbsensiStudent(Kelas $class, string $name, string $nis): ProfilS
     ]);
 }
 
-// TS.MonitorAbsensi.001 / TC.MonitorAbsensi.001.001 — index tampil status + daftar siswa kelas sendiri hari ini (positive)
+// TS.MOA.001 / TC.MOA.001.001 — index tampil status + daftar siswa kelas sendiri hari ini (positive)
 test('kelas saya index shows status and student list for own class today', function () {
     Carbon::setTestNow('2026-06-01 08:00:00');
     [$teacher, $class] = monitorAbsensiHomeroom();
@@ -49,7 +49,7 @@ test('kelas saya index shows status and student list for own class today', funct
         ->assertViewHas('stats', fn (array $stats): bool => $stats['hadir'] === 1);
 });
 
-// TS.MonitorAbsensi.002 / TC.MonitorAbsensi.002.001 — guru tanpa kelas wali, index tetap tampil kosong (positive)
+// TS.MOA.002 / TC.MOA.002.001 — guru tanpa kelas wali, index tetap tampil kosong (positive)
 test('kelas saya index shows empty view when teacher has no homeroom class', function () {
     $teacher = Pengguna::factory()->homeroom()->create(['status' => 'registered']);
     $teacher->profilGuru()->create(['nip' => fake()->unique()->numerify('19################'), 'tipe_guru' => 'homeroom']);
@@ -58,7 +58,7 @@ test('kelas saya index shows empty view when teacher has no homeroom class', fun
         ->assertSuccessful();
 });
 
-// TS.MonitorAbsensi.003 / TC.MonitorAbsensi.003.001 — update status siswa sendiri berhasil membuat record baru (positive)
+// TS.MOA.003 / TC.MOA.003.001 — update status siswa sendiri berhasil membuat record baru (positive)
 test('homeroom teacher can create a new attendance record for own student', function () {
     Carbon::setTestNow('2026-06-01 08:00:00');
     [$teacher, $class] = monitorAbsensiHomeroom();
@@ -71,7 +71,7 @@ test('homeroom teacher can create a new attendance record for own student', func
     expect(Absensi::where('profil_siswa_id', $student->nisn)->first()->status)->toBe('hadir');
 });
 
-// TS.MonitorAbsensi.004 / TC.MonitorAbsensi.004.001 — update ulang siswa yang record hari ini sudah ada, replace bukan duplikat (positive)
+// TS.MOA.004 / TC.MOA.004.001 — update ulang siswa yang record hari ini sudah ada, replace bukan duplikat (positive)
 test('homeroom teacher updating an existing attendance record replaces it instead of duplicating', function () {
     Carbon::setTestNow('2026-06-01 08:00:00');
     [$teacher, $class] = monitorAbsensiHomeroom();
@@ -86,7 +86,7 @@ test('homeroom teacher updating an existing attendance record replaces it instea
     expect(Absensi::where('profil_siswa_id', $student->nisn)->first()->status)->toBe('izin');
 });
 
-// TS.MonitorAbsensi.005 / TC.MonitorAbsensi.005.001 — update siswa dari kelas lain ditolak (negative)
+// TS.MOA.005 / TC.MOA.005.001 — update siswa dari kelas lain ditolak (negative)
 test('homeroom teacher cannot update attendance for a student outside own class', function () {
     Carbon::setTestNow('2026-06-01 08:00:00');
     [$teacher] = monitorAbsensiHomeroom();
@@ -98,7 +98,7 @@ test('homeroom teacher cannot update attendance for a student outside own class'
     ])->assertForbidden();
 });
 
-// TS.MonitorAbsensi.006 / TC.MonitorAbsensi.006.001 — update pas hari weekend ditolak dengan flash error (negative)
+// TS.MOA.006 / TC.MOA.006.001 — update pas hari weekend ditolak dengan flash error (negative)
 test('homeroom teacher cannot update attendance on a weekend day', function () {
     Carbon::setTestNow('2026-06-06 08:00:00');
     [$teacher, $class] = monitorAbsensiHomeroom();
@@ -112,7 +112,7 @@ test('homeroom teacher cannot update attendance on a weekend day', function () {
     expect(Absensi::where('profil_siswa_id', $student->nisn)->exists())->toBeFalse();
 });
 
-// TS.MonitorAbsensi.007 / TC.MonitorAbsensi.007.001 — status yang bukan salah satu dari 5 opsi ditolak (negative)
+// TS.MOA.007 / TC.MOA.007.001 — status yang bukan salah satu dari 5 opsi ditolak (negative)
 test('homeroom teacher cannot set an invalid attendance status', function () {
     Carbon::setTestNow('2026-06-01 08:00:00');
     [$teacher, $class] = monitorAbsensiHomeroom();
@@ -123,7 +123,7 @@ test('homeroom teacher cannot set an invalid attendance status', function () {
     ])->assertSessionHasErrors('status');
 });
 
-// TS.MonitorAbsensi.008 / TC.MonitorAbsensi.008.001 — lihat detail siswa sendiri berhasil (positive)
+// TS.MOA.008 / TC.MOA.008.001 — lihat detail siswa sendiri berhasil (positive)
 test('homeroom teacher can view own student detail', function () {
     [$teacher, $class] = monitorAbsensiHomeroom();
     $student = monitorAbsensiStudent($class, 'Ayu', '20007');
@@ -132,7 +132,7 @@ test('homeroom teacher can view own student detail', function () {
         ->assertSuccessful();
 });
 
-// TS.MonitorAbsensi.009 / TC.MonitorAbsensi.009.001 — lihat detail siswa kelas lain ditolak (negative)
+// TS.MOA.009 / TC.MOA.009.001 — lihat detail siswa kelas lain ditolak (negative)
 test('homeroom teacher cannot view another class student detail', function () {
     [$teacher] = monitorAbsensiHomeroom();
     [, $otherClass] = monitorAbsensiHomeroom('10. Monitor 3');
@@ -142,7 +142,7 @@ test('homeroom teacher cannot view another class student detail', function () {
         ->assertForbidden();
 });
 
-// TS.MonitorAbsensi.010 / TC.MonitorAbsensi.010.001 — endpoint status-absensi (JSON) mengembalikan data yang benar (positive)
+// TS.MOA.010 / TC.MOA.010.001 — endpoint status-absensi (JSON) mengembalikan data yang benar (positive)
 test('status absensi endpoint returns correct json stats and rows', function () {
     Carbon::setTestNow('2026-06-01 08:00:00');
     [$teacher, $class] = monitorAbsensiHomeroom();

@@ -8,7 +8,7 @@ use Laravel\Socialite\Facades\Socialite;
 
 uses(RefreshDatabase::class);
 
-// TS.Log.001 / TC.Log.001.001 — valid email + correct password (positive)
+// TS.LOG.001 / TC.LOG.001.001 — valid email + correct password (positive)
 test('login succeeds with registered email and correct password', function () {
     $user = Pengguna::factory()->student()->create([
         'email' => 'siswa.valid@example.com',
@@ -26,7 +26,7 @@ test('login succeeds with registered email and correct password', function () {
     expect(Auth::id())->toBe($user->id);
 });
 
-// TS.Log.002 / TC.Log.002.001 — valid email format, wrong password (negative)
+// TS.LOG.002 / TC.LOG.002.001 — valid email format, wrong password (negative)
 test('login fails with registered email and wrong password', function () {
     Pengguna::factory()->student()->create([
         'email' => 'siswa.salah@example.com',
@@ -41,7 +41,7 @@ test('login fails with registered email and wrong password', function () {
     expect(Auth::check())->toBeFalse();
 });
 
-// TS.Log.003 / TC.Log.003.001 — email valid format but not registered (negative)
+// TS.LOG.003 / TC.LOG.003.001 — email valid format but not registered (negative)
 test('login fails with email that does not exist', function () {
     $this->post(route('login'), [
         'email' => 'tidak.terdaftar@example.com',
@@ -51,7 +51,7 @@ test('login fails with email that does not exist', function () {
     expect(Auth::check())->toBeFalse();
 });
 
-// TS.Log.004 / TC.Log.004.001 — invalid email format (negative)
+// TS.LOG.004 / TC.LOG.004.001 — invalid email format (negative)
 test('login fails with invalid email format', function () {
     $this->post(route('login'), [
         'email' => 'bukan-email',
@@ -61,7 +61,7 @@ test('login fails with invalid email format', function () {
     expect(Auth::check())->toBeFalse();
 });
 
-// TS.Log.005 / TC.Log.005.001 — empty email (negative)
+// TS.LOG.005 / TC.LOG.005.001 — empty email (negative)
 test('login fails when email is empty', function () {
     $this->post(route('login'), [
         'email' => '',
@@ -71,7 +71,7 @@ test('login fails when email is empty', function () {
     expect(Auth::check())->toBeFalse();
 });
 
-// TS.Log.006 / TC.Log.006.001 — empty password (negative)
+// TS.LOG.006 / TC.LOG.006.001 — empty password (negative)
 test('login fails when password is empty', function () {
     Pengguna::factory()->student()->create([
         'email' => 'siswa.kosongpass@example.com',
@@ -86,7 +86,7 @@ test('login fails when password is empty', function () {
     expect(Auth::check())->toBeFalse();
 });
 
-// TS.Log.009 / TC.Log.009.001 — login via Google with an account already linked (positive)
+// TS.LOG.009 / TC.LOG.009.001 — login via Google with an account already linked (positive)
 test('login succeeds via google when account is already linked', function () {
     $user = Pengguna::factory()->student()->create([
         'status' => 'registered',
@@ -113,7 +113,7 @@ test('login succeeds via google when account is already linked', function () {
     expect(Auth::id())->toBe($user->id);
 });
 
-// TS.Log.010 / TC.Log.010.001 — login via Google with an account that is not registered (negative)
+// TS.LOG.010 / TC.LOG.010.001 — login via Google with an account that is not registered (negative)
 test('login fails via google when account is not registered', function () {
     $abstractUser = Mockery::mock('Laravel\Socialite\Two\User');
     $abstractUser->shouldReceive('getId')->andReturn('google-id-login-999');

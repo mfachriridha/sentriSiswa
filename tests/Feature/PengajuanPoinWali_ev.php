@@ -31,7 +31,7 @@ function pengajuanPoinWaliStudent(Kelas $class, string $nis): ProfilSiswa
     ]);
 }
 
-// TS.PengajuanPoinWali.001 / TC.PengajuanPoinWali.001.001 — ajukan penambahan poin untuk siswa kelas sendiri berhasil (positive)
+// TS.PGP.001 / TC.PGP.001.001 — ajukan penambahan poin untuk siswa kelas sendiri berhasil (positive)
 test('homeroom teacher can submit a point-addition request for own class student', function () {
     [$teacher, $class] = pengajuanPoinWaliHomeroom();
     $student = pengajuanPoinWaliStudent($class, '60001');
@@ -47,7 +47,7 @@ test('homeroom teacher can submit a point-addition request for own class student
     expect($student->fresh()->poin)->toBe(100);
 });
 
-// TS.PengajuanPoinWali.002 / TC.PengajuanPoinWali.002.001 — ajukan untuk siswa kelas lain ditolak (negative)
+// TS.PGP.002 / TC.PGP.002.001 — ajukan untuk siswa kelas lain ditolak (negative)
 test('homeroom teacher cannot submit a point-addition request for another class student', function () {
     [$teacher] = pengajuanPoinWaliHomeroom();
     [, $otherClass] = pengajuanPoinWaliHomeroom('10. Pengajuan 2');
@@ -59,7 +59,7 @@ test('homeroom teacher cannot submit a point-addition request for another class 
     ])->assertForbidden();
 });
 
-// TS.PengajuanPoinWali.003 / TC.PengajuanPoinWali.003.001 — alasan kosong ditolak (negative)
+// TS.PGP.003 / TC.PGP.003.001 — alasan kosong ditolak (negative)
 test('homeroom teacher cannot submit a point-addition request with an empty alasan', function () {
     [$teacher, $class] = pengajuanPoinWaliHomeroom();
     $student = pengajuanPoinWaliStudent($class, '60003');
@@ -70,7 +70,7 @@ test('homeroom teacher cannot submit a point-addition request with an empty alas
     ])->assertSessionHasErrors('alasan');
 });
 
-// TS.PengajuanPoinWali.004 / TC.PengajuanPoinWali.004.001 — profil_siswa_id (nisn) yang tidak ada ditolak (negative)
+// TS.PGP.004 / TC.PGP.004.001 — profil_siswa_id (nisn) yang tidak ada ditolak (negative)
 test('homeroom teacher cannot submit a point-addition request for a non-existent nisn', function () {
     [$teacher, $class] = pengajuanPoinWaliHomeroom();
 
@@ -80,7 +80,7 @@ test('homeroom teacher cannot submit a point-addition request for a non-existent
     ])->assertSessionHasErrors('profil_siswa_id');
 });
 
-// TS.PengajuanPoinWali.005 / TC.PengajuanPoinWali.005.001 — profil_siswa_id kosong ditolak (negative)
+// TS.PGP.005 / TC.PGP.005.001 — profil_siswa_id kosong ditolak (negative)
 test('homeroom teacher cannot submit a point-addition request without a profil_siswa_id', function () {
     [$teacher, $class] = pengajuanPoinWaliHomeroom();
 
@@ -90,7 +90,7 @@ test('homeroom teacher cannot submit a point-addition request without a profil_s
     ])->assertSessionHasErrors('profil_siswa_id');
 });
 
-// TS.PengajuanPoinWali.006 / TC.PengajuanPoinWali.006.001 — index cuma nampilin pengajuan milik sendiri (positive)
+// TS.PGP.006 / TC.PGP.006.001 — index cuma nampilin pengajuan milik sendiri (positive)
 test('pengajuan poin index only shows submissions made by the logged in teacher', function () {
     [$teacherA, $classA] = pengajuanPoinWaliHomeroom();
     [$teacherB, $classB] = pengajuanPoinWaliHomeroom('10. Pengajuan 3');
@@ -106,7 +106,7 @@ test('pengajuan poin index only shows submissions made by the logged in teacher'
         ->assertDontSee('Pengajuan B');
 });
 
-// TS.PengajuanPoinWali.007 / TC.PengajuanPoinWali.007.001 — index filter berdasarkan status (positive)
+// TS.PGP.007 / TC.PGP.007.001 — index filter berdasarkan status (positive)
 test('pengajuan poin index filters by status', function () {
     [$teacher, $class] = pengajuanPoinWaliHomeroom();
     $student = pengajuanPoinWaliStudent($class, '60006');
@@ -120,7 +120,7 @@ test('pengajuan poin index filters by status', function () {
         ->assertDontSee('Sudah disetujui');
 });
 
-// TS.PengajuanPoinWali.008 / TC.PengajuanPoinWali.008.001 — guru tanpa kelas wali, daftar siswa di create() kosong (positive)
+// TS.PGP.008 / TC.PGP.008.001 — guru tanpa kelas wali, daftar siswa di create() kosong (positive)
 test('create form shows an empty student list when teacher has no homeroom class', function () {
     $teacher = Pengguna::factory()->homeroom()->create(['status' => 'registered']);
     $teacher->profilGuru()->create(['nip' => fake()->unique()->numerify('19################'), 'tipe_guru' => 'homeroom']);
@@ -130,7 +130,7 @@ test('create form shows an empty student list when teacher has no homeroom class
         ->assertViewHas('students', fn ($students) => $students->isEmpty());
 });
 
-// TS.PengajuanPoinWali.009 / TC.PengajuanPoinWali.009.001 — submit tanpa mengisi jumlah_poin (memang tidak ada field-nya) tetap tersimpan null (positive, dokumentasi penambahan bukan pengurangan)
+// TS.PGP.009 / TC.PGP.009.001 — submit tanpa mengisi jumlah_poin (memang tidak ada field-nya) tetap tersimpan null (positive, dokumentasi penambahan bukan pengurangan)
 test('submitting a jumlah_poin field directly is ignored since the form has none', function () {
     [$teacher, $class] = pengajuanPoinWaliHomeroom();
     $student = pengajuanPoinWaliStudent($class, '60007');

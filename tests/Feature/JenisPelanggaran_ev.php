@@ -20,7 +20,7 @@ function jenisPelanggaranKesiswaan(): Pengguna
     return $studentAffairs;
 }
 
-// TS.JenisPelanggaran.001 / TC.JenisPelanggaran.001.001 — buat jenis pelanggaran baru berhasil (positive)
+// TS.JNP.001 / TC.JNP.001.001 — buat jenis pelanggaran baru berhasil (positive)
 test('student affairs can create a new violation type', function () {
     $kesiswaan = jenisPelanggaranKesiswaan();
 
@@ -40,7 +40,7 @@ test('student affairs can create a new violation type', function () {
     ]);
 });
 
-// TS.JenisPelanggaran.002 / TC.JenisPelanggaran.002.001 — nama duplikat ditolak (negative)
+// TS.JNP.002 / TC.JNP.002.001 — nama duplikat ditolak (negative)
 test('student affairs cannot create a violation type with a duplicate name', function () {
     $kesiswaan = jenisPelanggaranKesiswaan();
     JenisPelanggaran::factory()->create(['nama' => 'Membolos', 'kategori' => 'medium', 'pengurangan_poin' => 30]);
@@ -53,7 +53,7 @@ test('student affairs cannot create a violation type with a duplicate name', fun
     ])->assertSessionHasErrors('nama');
 });
 
-// TS.JenisPelanggaran.003 / TC.JenisPelanggaran.003.001 — kategori tidak valid ditolak (negative)
+// TS.JNP.003 / TC.JNP.003.001 — kategori tidak valid ditolak (negative)
 test('student affairs cannot create a violation type with an invalid category', function () {
     $kesiswaan = jenisPelanggaranKesiswaan();
 
@@ -65,7 +65,7 @@ test('student affairs cannot create a violation type with an invalid category', 
     ])->assertSessionHasErrors('kategori');
 });
 
-// TS.JenisPelanggaran.004 / TC.JenisPelanggaran.004.001 — poin di luar rentang kategori ditolak (negative)
+// TS.JNP.004 / TC.JNP.004.001 — poin di luar rentang kategori ditolak (negative)
 test('student affairs cannot create a violation type with points outside the category range', function () {
     $kesiswaan = jenisPelanggaranKesiswaan();
 
@@ -77,7 +77,7 @@ test('student affairs cannot create a violation type with points outside the cat
     ])->assertSessionHasErrors('pengurangan_poin');
 });
 
-// TS.JenisPelanggaran.005 / TC.JenisPelanggaran.005.001 — update berhasil (positive)
+// TS.JNP.005 / TC.JNP.005.001 — update berhasil (positive)
 test('student affairs can update a violation type', function () {
     $kesiswaan = jenisPelanggaranKesiswaan();
     $type = JenisPelanggaran::factory()->create(['nama' => 'Seragam tidak lengkap', 'kategori' => 'light', 'pengurangan_poin' => 10]);
@@ -93,7 +93,7 @@ test('student affairs can update a violation type', function () {
     expect($type->fresh()->pengurangan_poin)->toBe(15);
 });
 
-// TS.JenisPelanggaran.006 / TC.JenisPelanggaran.006.001 — update nama jadi duplikat milik jenis lain ditolak (negative)
+// TS.JNP.006 / TC.JNP.006.001 — update nama jadi duplikat milik jenis lain ditolak (negative)
 test('student affairs cannot update a violation type name to one already used by another type', function () {
     $kesiswaan = jenisPelanggaranKesiswaan();
     JenisPelanggaran::factory()->create(['nama' => 'Merokok di area sekolah', 'kategori' => 'heavy', 'pengurangan_poin' => 60]);
@@ -107,7 +107,7 @@ test('student affairs cannot update a violation type name to one already used by
     ])->assertSessionHasErrors('nama');
 });
 
-// TS.JenisPelanggaran.007 / TC.JenisPelanggaran.007.001 — nonaktifkan lewat update, bukan dihapus (positive)
+// TS.JNP.007 / TC.JNP.007.001 — nonaktifkan lewat update, bukan dihapus (positive)
 test('student affairs can deactivate a violation type via update instead of deleting it', function () {
     $kesiswaan = jenisPelanggaranKesiswaan();
     $type = JenisPelanggaran::factory()->create(['nama' => 'Tidak membawa buku', 'kategori' => 'light', 'pengurangan_poin' => 5, 'aktif' => true]);
@@ -123,7 +123,7 @@ test('student affairs can deactivate a violation type via update instead of dele
     $this->assertDatabaseHas('jenis_pelanggaran', ['id' => $type->id]);
 });
 
-// TS.JenisPelanggaran.008 / TC.JenisPelanggaran.008.001 — hapus yang belum pernah dipakai berhasil (positive)
+// TS.JNP.008 / TC.JNP.008.001 — hapus yang belum pernah dipakai berhasil (positive)
 test('student affairs can delete a violation type that has never been used', function () {
     $kesiswaan = jenisPelanggaranKesiswaan();
     $type = JenisPelanggaran::factory()->create(['nama' => 'Tidak memakai atribut', 'kategori' => 'light', 'pengurangan_poin' => 5]);
@@ -134,7 +134,7 @@ test('student affairs can delete a violation type that has never been used', fun
     $this->assertDatabaseMissing('jenis_pelanggaran', ['id' => $type->id]);
 });
 
-// TS.JenisPelanggaran.009 / TC.JenisPelanggaran.009.001 — hapus yang sudah dipakai ditolak (negative)
+// TS.JNP.009 / TC.JNP.009.001 — hapus yang sudah dipakai ditolak (negative)
 test('student affairs cannot delete a violation type already used in a violation record', function () {
     $kesiswaan = jenisPelanggaranKesiswaan();
     $type = JenisPelanggaran::factory()->create(['nama' => 'Bullying', 'kategori' => 'severe', 'pengurangan_poin' => 80]);
@@ -153,7 +153,7 @@ test('student affairs cannot delete a violation type already used in a violation
     $this->assertDatabaseHas('jenis_pelanggaran', ['id' => $type->id]);
 });
 
-// TS.JenisPelanggaran.010 / TC.JenisPelanggaran.010.001 — filter index berdasarkan kategori (positive)
+// TS.JNP.010 / TC.JNP.010.001 — filter index berdasarkan kategori (positive)
 test('violation type index filters by category', function () {
     $kesiswaan = jenisPelanggaranKesiswaan();
     JenisPelanggaran::factory()->create(['nama' => 'Ringan A', 'kategori' => 'light', 'pengurangan_poin' => 10]);
@@ -165,7 +165,7 @@ test('violation type index filters by category', function () {
         ->assertDontSee('Berat B');
 });
 
-// TS.JenisPelanggaran.011 / TC.JenisPelanggaran.011.001 — filter index berdasarkan status aktif/nonaktif (positive)
+// TS.JNP.011 / TC.JNP.011.001 — filter index berdasarkan status aktif/nonaktif (positive)
 test('violation type index filters by active status', function () {
     $kesiswaan = jenisPelanggaranKesiswaan();
     JenisPelanggaran::factory()->create(['nama' => 'Masih Aktif', 'kategori' => 'light', 'pengurangan_poin' => 10, 'aktif' => true]);

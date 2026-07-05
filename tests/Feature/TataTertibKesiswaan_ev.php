@@ -19,7 +19,7 @@ function tataTertibKesiswaanActor(): Pengguna
     return $studentAffairs;
 }
 
-// TS.TataTertibKesiswaan.001 / TC.TataTertibKesiswaan.001.001 — upload PDF baru berhasil (positive)
+// TS.TTK.001 / TC.TTK.001.001 — upload PDF baru berhasil (positive)
 test('student affairs can upload a new school rule pdf', function () {
     Storage::fake('public');
     $kesiswaan = tataTertibKesiswaanActor();
@@ -34,7 +34,7 @@ test('student affairs can upload a new school rule pdf', function () {
     Storage::disk('public')->assertExists($rule->path_file);
 });
 
-// TS.TataTertibKesiswaan.002 / TC.TataTertibKesiswaan.002.001 — upload tanpa judul ditolak (negative)
+// TS.TTK.002 / TC.TTK.002.001 — upload tanpa judul ditolak (negative)
 test('student affairs cannot upload a school rule pdf without a title', function () {
     Storage::fake('public');
     $kesiswaan = tataTertibKesiswaanActor();
@@ -45,7 +45,7 @@ test('student affairs cannot upload a school rule pdf without a title', function
     ])->assertSessionHasErrors('judul');
 });
 
-// TS.TataTertibKesiswaan.003 / TC.TataTertibKesiswaan.003.001 — upload file bukan PDF ditolak (negative)
+// TS.TTK.003 / TC.TTK.003.001 — upload file bukan PDF ditolak (negative)
 test('student affairs cannot upload a non-pdf file as a school rule', function () {
     Storage::fake('public');
     $kesiswaan = tataTertibKesiswaanActor();
@@ -56,7 +56,7 @@ test('student affairs cannot upload a non-pdf file as a school rule', function (
     ])->assertSessionHasErrors('file_pdf');
 });
 
-// TS.TataTertibKesiswaan.004 / TC.TataTertibKesiswaan.004.001 — upload tanpa file ditolak (negative)
+// TS.TTK.004 / TC.TTK.004.001 — upload tanpa file ditolak (negative)
 test('student affairs cannot upload a school rule without a file', function () {
     $kesiswaan = tataTertibKesiswaanActor();
 
@@ -65,7 +65,7 @@ test('student affairs cannot upload a school rule without a file', function () {
     ])->assertSessionHasErrors('file_pdf');
 });
 
-// TS.TataTertibKesiswaan.005 / TC.TataTertibKesiswaan.005.001 — hapus tata tertib berhasil termasuk file storage (positive)
+// TS.TTK.005 / TC.TTK.005.001 — hapus tata tertib berhasil termasuk file storage (positive)
 test('student affairs can delete a school rule including its stored file', function () {
     Storage::fake('public');
     $kesiswaan = tataTertibKesiswaanActor();
@@ -84,7 +84,7 @@ test('student affairs can delete a school rule including its stored file', funct
     Storage::disk('public')->assertMissing($path);
 });
 
-// TS.TataTertibKesiswaan.006 / TC.TataTertibKesiswaan.006.001 — index nampilin daftar tata tertib (positive)
+// TS.TTK.006 / TC.TTK.006.001 — index nampilin daftar tata tertib (positive)
 test('school rule index displays the list of uploaded rules', function () {
     $kesiswaan = tataTertibKesiswaanActor();
     TataTertib::create([

@@ -12,7 +12,7 @@ function kelasBvaAdmin(): Pengguna
 
 // ── Boundary: identifier (nama field before composition) length, max:20 ───
 
-// TS.Kelas.008 / TC.Kelas.008.001 — identifier with exactly 20 characters (at the maximum, valid)
+// TS.KEL.008 / TC.KEL.008.001 — identifier with exactly 20 characters (at the maximum, valid)
 test('admin can create a class with a 20 character identifier', function () {
     $identifier20 = str_repeat('A', 20);
 
@@ -27,7 +27,7 @@ test('admin can create a class with a 20 character identifier', function () {
     ]);
 });
 
-// TS.Kelas.009 / TC.Kelas.009.001 — identifier with 21 characters (just above the maximum, invalid)
+// TS.KEL.009 / TC.KEL.009.001 — identifier with 21 characters (just above the maximum, invalid)
 test('admin cannot create a class with a 21 character identifier', function () {
     $identifier21 = str_repeat('A', 21);
 

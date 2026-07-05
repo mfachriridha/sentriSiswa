@@ -21,7 +21,7 @@ function tataTertibBvaActor(): Pengguna
 
 // ── Boundary: judul max:200 ─────────────────────────────────────────────────
 
-// TS.TataTertibKesiswaan.007 / TC.TataTertibKesiswaan.007.001 — judul tepat 200 karakter (diperbolehkan)
+// TS.TTK.007 / TC.TTK.007.001 — judul tepat 200 karakter (diperbolehkan)
 test('school rule accepts a title with exactly 200 characters', function () {
     Storage::fake('public');
     $kesiswaan = tataTertibBvaActor();
@@ -35,7 +35,7 @@ test('school rule accepts a title with exactly 200 characters', function () {
     $this->assertDatabaseHas('tata_tertib', ['judul' => $judul200]);
 });
 
-// TS.TataTertibKesiswaan.008 / TC.TataTertibKesiswaan.008.001 — judul 201 karakter (ditolak)
+// TS.TTK.008 / TC.TTK.008.001 — judul 201 karakter (ditolak)
 test('school rule rejects a title with 201 characters', function () {
     Storage::fake('public');
     $kesiswaan = tataTertibBvaActor();
@@ -49,7 +49,7 @@ test('school rule rejects a title with 201 characters', function () {
 
 // ── Boundary: file_pdf max:10240 KB ─────────────────────────────────────────
 
-// TS.TataTertibKesiswaan.009 / TC.TataTertibKesiswaan.009.001 — file tepat 10240 KB (diperbolehkan)
+// TS.TTK.009 / TC.TTK.009.001 — file tepat 10240 KB (diperbolehkan)
 test('school rule accepts a pdf file with exactly 10240 KB', function () {
     Storage::fake('public');
     $kesiswaan = tataTertibBvaActor();
@@ -62,7 +62,7 @@ test('school rule accepts a pdf file with exactly 10240 KB', function () {
     $this->assertDatabaseHas('tata_tertib', ['judul' => 'Tata Tertib File Batas Atas']);
 });
 
-// TS.TataTertibKesiswaan.010 / TC.TataTertibKesiswaan.010.001 — file 10241 KB (ditolak)
+// TS.TTK.010 / TC.TTK.010.001 — file 10241 KB (ditolak)
 test('school rule rejects a pdf file with 10241 KB', function () {
     Storage::fake('public');
     $kesiswaan = tataTertibBvaActor();

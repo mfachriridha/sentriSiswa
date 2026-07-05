@@ -31,7 +31,7 @@ function poinPelanggaranStudent(Kelas $class, string $nis): ProfilSiswa
     ]);
 }
 
-// TS.PoinPelanggaran.001 / TC.PoinPelanggaran.001.001 — index tampil pelanggaran approved kelas sendiri (positive)
+// TS.PPW.001 / TC.PPW.001.001 — index tampil pelanggaran approved kelas sendiri (positive)
 test('pelanggaran index shows approved violations for own class', function () {
     [$teacher, $class] = poinPelanggaranHomeroom();
     $student = poinPelanggaranStudent($class, '50001');
@@ -46,7 +46,7 @@ test('pelanggaran index shows approved violations for own class', function () {
         ->assertSee('Terlambat masuk kelas');
 });
 
-// TS.PoinPelanggaran.002 / TC.PoinPelanggaran.002.001 — guru tanpa kelas wali, index tetap tampil kosong (positive)
+// TS.PPW.002 / TC.PPW.002.001 — guru tanpa kelas wali, index tetap tampil kosong (positive)
 test('pelanggaran index shows empty view when teacher has no homeroom class', function () {
     $teacher = Pengguna::factory()->homeroom()->create(['status' => 'registered']);
     $teacher->profilGuru()->create(['nip' => fake()->unique()->numerify('19################'), 'tipe_guru' => 'homeroom']);
@@ -55,7 +55,7 @@ test('pelanggaran index shows empty view when teacher has no homeroom class', fu
         ->assertSuccessful();
 });
 
-// TS.PoinPelanggaran.003 / TC.PoinPelanggaran.003.001 — filter berdasarkan profil_siswa_id (positive)
+// TS.PPW.003 / TC.PPW.003.001 — filter berdasarkan profil_siswa_id (positive)
 test('pelanggaran index filters by profil_siswa_id', function () {
     [$teacher, $class] = poinPelanggaranHomeroom();
     $studentA = poinPelanggaranStudent($class, '50002');
@@ -69,7 +69,7 @@ test('pelanggaran index filters by profil_siswa_id', function () {
         ->assertDontSee('Pelanggaran B');
 });
 
-// TS.PoinPelanggaran.004 / TC.PoinPelanggaran.004.001 — filter berdasarkan category (positive)
+// TS.PPW.004 / TC.PPW.004.001 — filter berdasarkan category (positive)
 test('pelanggaran index filters by category', function () {
     [$teacher, $class] = poinPelanggaranHomeroom();
     $student = poinPelanggaranStudent($class, '50004');
@@ -82,7 +82,7 @@ test('pelanggaran index filters by category', function () {
         ->assertDontSee('Pelanggaran Berat');
 });
 
-// TS.PoinPelanggaran.005 / TC.PoinPelanggaran.005.001 — filter berdasarkan date_from/date_to (positive)
+// TS.PPW.005 / TC.PPW.005.001 — filter berdasarkan date_from/date_to (positive)
 test('pelanggaran index filters by date_from and date_to', function () {
     [$teacher, $class] = poinPelanggaranHomeroom();
     $student = poinPelanggaranStudent($class, '50005');
@@ -97,7 +97,7 @@ test('pelanggaran index filters by date_from and date_to', function () {
         ->assertDontSee('Pelanggaran Lama');
 });
 
-// TS.PoinPelanggaran.006 / TC.PoinPelanggaran.006.001 — pelanggaran pending/rejected tidak ikut muncul (positive, dokumentasi scoping disetujui())
+// TS.PPW.006 / TC.PPW.006.001 — pelanggaran pending/rejected tidak ikut muncul (positive, dokumentasi scoping disetujui())
 test('pelanggaran index only shows approved violations, not pending or rejected', function () {
     [$teacher, $class] = poinPelanggaranHomeroom();
     $student = poinPelanggaranStudent($class, '50006');
@@ -112,7 +112,7 @@ test('pelanggaran index only shows approved violations, not pending or rejected'
         ->assertDontSee('Pelanggaran Ditolak');
 });
 
-// TS.PoinPelanggaran.007 / TC.PoinPelanggaran.007.001 — pelanggaran kelas lain tidak ikut muncul (positive, dokumentasi cross-class isolation)
+// TS.PPW.007 / TC.PPW.007.001 — pelanggaran kelas lain tidak ikut muncul (positive, dokumentasi cross-class isolation)
 test('pelanggaran index does not show violations from another class', function () {
     [$teacher, $class] = poinPelanggaranHomeroom();
     [, $otherClass] = poinPelanggaranHomeroom('10. Poin 2');
@@ -127,7 +127,7 @@ test('pelanggaran index does not show violations from another class', function (
         ->assertDontSee('Pelanggaran Kelas Lain');
 });
 
-// TS.PoinPelanggaran.008 / TC.PoinPelanggaran.008.001 — daftar pelanggaran dipaginasi 25 per halaman (positive)
+// TS.PPW.008 / TC.PPW.008.001 — daftar pelanggaran dipaginasi 25 per halaman (positive)
 test('pelanggaran index paginates at 25 per page', function () {
     [$teacher, $class] = poinPelanggaranHomeroom();
     $student = poinPelanggaranStudent($class, '50009');

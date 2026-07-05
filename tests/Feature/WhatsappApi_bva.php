@@ -28,7 +28,7 @@ function whatsappApiBvaFakeSuccess(): void
 
 // ── Boundary: fonnte_token length, max:255 ────────────────────────────────
 
-// TS.WhatsappApi.005 / TC.WhatsappApi.005.001 — token with exactly 255 characters (at the maximum, valid)
+// TS.WAP.005 / TC.WAP.005.001 — token with exactly 255 characters (at the maximum, valid)
 test('admin can save a token with exactly 255 characters', function () {
     $token255 = str_repeat('a', 255);
 
@@ -39,7 +39,7 @@ test('admin can save a token with exactly 255 characters', function () {
     expect(Pengaturan::get('fonnte_token'))->toBe($token255);
 });
 
-// TS.WhatsappApi.006 / TC.WhatsappApi.006.001 — token with 256 characters (just above the maximum, invalid)
+// TS.WAP.006 / TC.WAP.006.001 — token with 256 characters (just above the maximum, invalid)
 test('admin cannot save a token with 256 characters', function () {
     $token256 = str_repeat('a', 256);
 
@@ -50,7 +50,7 @@ test('admin cannot save a token with 256 characters', function () {
 
 // ── Boundary: test message phone length, max:20 ───────────────────────────
 
-// TS.WhatsappApi.007 / TC.WhatsappApi.007.001 — phone with exactly 20 characters (at the maximum, valid)
+// TS.WAP.007 / TC.WAP.007.001 — phone with exactly 20 characters (at the maximum, valid)
 test('admin can send a test message with a 20 character phone', function () {
     $admin = whatsappApiBvaAdmin();
     Pengaturan::set('fonnte_token', 'fonnte-test-token');
@@ -63,7 +63,7 @@ test('admin can send a test message with a 20 character phone', function () {
     ])->assertSuccessful();
 });
 
-// TS.WhatsappApi.008 / TC.WhatsappApi.008.001 — phone with 21 characters (just above the maximum, invalid)
+// TS.WAP.008 / TC.WAP.008.001 — phone with 21 characters (just above the maximum, invalid)
 test('admin cannot send a test message with a 21 character phone', function () {
     $admin = whatsappApiBvaAdmin();
     Pengaturan::set('fonnte_token', 'fonnte-test-token');
@@ -78,7 +78,7 @@ test('admin cannot send a test message with a 21 character phone', function () {
 
 // ── Boundary: test message length, max:500 ────────────────────────────────
 
-// TS.WhatsappApi.009 / TC.WhatsappApi.009.001 — message with exactly 500 characters (at the maximum, valid)
+// TS.WAP.009 / TC.WAP.009.001 — message with exactly 500 characters (at the maximum, valid)
 test('admin can send a test message with exactly 500 characters', function () {
     $admin = whatsappApiBvaAdmin();
     Pengaturan::set('fonnte_token', 'fonnte-test-token');
@@ -91,7 +91,7 @@ test('admin can send a test message with exactly 500 characters', function () {
     ])->assertSuccessful();
 });
 
-// TS.WhatsappApi.010 / TC.WhatsappApi.010.001 — message with 501 characters (just above the maximum, invalid)
+// TS.WAP.010 / TC.WAP.010.001 — message with 501 characters (just above the maximum, invalid)
 test('admin cannot send a test message with 501 characters', function () {
     $admin = whatsappApiBvaAdmin();
     Pengaturan::set('fonnte_token', 'fonnte-test-token');

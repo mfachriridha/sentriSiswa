@@ -21,7 +21,7 @@ function tataTertibSttActor(): Pengguna
 
 // State: Draft <-> Published — hanya boleh 1 tata tertib published dalam satu waktu.
 
-// TS.TataTertibKesiswaan.011 / TC.TataTertibKesiswaan.011.001 — upload baru dengan dipublikasikan=true langsung published dan meng-unpublish yang lain
+// TS.TTK.011 / TC.TTK.011.001 — upload baru dengan dipublikasikan=true langsung published dan meng-unpublish yang lain
 test('uploading a new rule as published auto-unpublishes the previously published rule', function () {
     Storage::fake('public');
     $kesiswaan = tataTertibSttActor();
@@ -43,7 +43,7 @@ test('uploading a new rule as published auto-unpublishes the previously publishe
     expect($newRule->dipublikasikan)->toBeTrue();
 });
 
-// TS.TataTertibKesiswaan.012 / TC.TataTertibKesiswaan.012.001 — publish salah satu draft membuatnya published dan meng-unpublish yang lain
+// TS.TTK.012 / TC.TTK.012.001 — publish salah satu draft membuatnya published dan meng-unpublish yang lain
 test('publishing a draft rule makes it published and unpublishes the other one', function () {
     $kesiswaan = tataTertibSttActor();
     $currentlyPublished = TataTertib::create([
@@ -66,7 +66,7 @@ test('publishing a draft rule makes it published and unpublishes the other one',
     expect($currentlyPublished->fresh()->dipublikasikan)->toBeFalse();
 });
 
-// TS.TataTertibKesiswaan.013 / TC.TataTertibKesiswaan.013.001 — unpublish yang published balik jadi draft
+// TS.TTK.013 / TC.TTK.013.001 — unpublish yang published balik jadi draft
 test('unpublishing a published rule reverts it back to draft', function () {
     $kesiswaan = tataTertibSttActor();
     $published = TataTertib::create([
@@ -82,7 +82,7 @@ test('unpublishing a published rule reverts it back to draft', function () {
     expect($published->fresh()->dipublikasikan)->toBeFalse();
 });
 
-// TS.TataTertibKesiswaan.014 / TC.TataTertibKesiswaan.014.001 — upload baru dengan dipublikasikan=false tetap draft, published lama gak terganggu
+// TS.TTK.014 / TC.TTK.014.001 — upload baru dengan dipublikasikan=false tetap draft, published lama gak terganggu
 test('uploading a new rule as draft leaves the existing published rule untouched', function () {
     Storage::fake('public');
     $kesiswaan = tataTertibSttActor();

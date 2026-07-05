@@ -13,7 +13,7 @@ function siswaAdmin(): Pengguna
     return Pengguna::factory()->admin()->create(['status' => 'registered']);
 }
 
-// TS.Siswa.001 / TC.Siswa.001.001 — create student with valid data, password always defaults to "password" (positive)
+// TS.SIS.001 / TC.SIS.001.001 — create student with valid data, password always defaults to "password" (positive)
 test('admin can create a student with valid data', function () {
     $admin = siswaAdmin();
     $class = Kelas::create(['nama' => '10. 1', 'tingkat' => '10']);
@@ -38,7 +38,7 @@ test('admin can create a student with valid data', function () {
     ]);
 });
 
-// TS.Siswa.002 / TC.Siswa.002.001 — create student with a duplicate nisn (negative)
+// TS.SIS.002 / TC.SIS.002.001 — create student with a duplicate nisn (negative)
 test('admin cannot create a student with duplicate nisn', function () {
     $admin = siswaAdmin();
     $existing = Pengguna::factory()->student()->create();
@@ -51,7 +51,7 @@ test('admin cannot create a student with duplicate nisn', function () {
     ])->assertSessionHasErrors('nisn');
 });
 
-// TS.Siswa.003 / TC.Siswa.003.001 — create student with a duplicate nis (negative)
+// TS.SIS.003 / TC.SIS.003.001 — create student with a duplicate nis (negative)
 test('admin cannot create a student with duplicate nis', function () {
     $admin = siswaAdmin();
     $existing = Pengguna::factory()->student()->create();
@@ -64,7 +64,7 @@ test('admin cannot create a student with duplicate nis', function () {
     ])->assertSessionHasErrors('nis');
 });
 
-// TS.Siswa.004 / TC.Siswa.004.001 — create student with nama containing digits, fails the letters-only regex (negative)
+// TS.SIS.004 / TC.SIS.004.001 — create student with nama containing digits, fails the letters-only regex (negative)
 test('admin cannot create a student with a name containing digits', function () {
     $admin = siswaAdmin();
 
@@ -75,7 +75,7 @@ test('admin cannot create a student with a name containing digits', function () 
     ])->assertSessionHasErrors('nama');
 });
 
-// TS.Siswa.005 / TC.Siswa.005.001 — create student with a kelas_id that does not exist (negative)
+// TS.SIS.005 / TC.SIS.005.001 — create student with a kelas_id that does not exist (negative)
 test('admin cannot create a student with a non-existent kelas_id', function () {
     $admin = siswaAdmin();
 
@@ -87,7 +87,7 @@ test('admin cannot create a student with a non-existent kelas_id', function () {
     ])->assertSessionHasErrors('kelas_id');
 });
 
-// TS.Siswa.006 / TC.Siswa.006.001 — submitting a password field directly is ignored, saved password stays the default (positive, dead-field robustness)
+// TS.SIS.006 / TC.SIS.006.001 — submitting a password field directly is ignored, saved password stays the default (positive, dead-field robustness)
 test('admin submitted password field is ignored when creating a student', function () {
     $admin = siswaAdmin();
 
@@ -103,7 +103,7 @@ test('admin submitted password field is ignored when creating a student', functi
     expect(Hash::check('Secret123', $student->password))->toBeFalse();
 });
 
-// TS.Siswa.007 / TC.Siswa.007.001 — update student succeeds (positive)
+// TS.SIS.007 / TC.SIS.007.001 — update student succeeds (positive)
 test('admin can update a student', function () {
     $admin = siswaAdmin();
     $student = Pengguna::factory()->student()->create(['nama' => 'Nama Lama']);
@@ -120,7 +120,7 @@ test('admin can update a student', function () {
     expect($student->fresh()->profilSiswa->telepon)->toBe('081200000007');
 });
 
-// TS.Siswa.008 / TC.Siswa.008.001 — delete student succeeds (positive)
+// TS.SIS.008 / TC.SIS.008.001 — delete student succeeds (positive)
 test('admin can delete a student', function () {
     $admin = siswaAdmin();
     $student = Pengguna::factory()->student()->create();
@@ -132,7 +132,7 @@ test('admin can delete a student', function () {
     $this->assertDatabaseMissing('pengguna', ['id' => $student->id]);
 });
 
-// TS.Siswa.009 / TC.Siswa.009.001 — unregistered student is blocked from the siswa dashboard (negative)
+// TS.SIS.009 / TC.SIS.009.001 — unregistered student is blocked from the siswa dashboard (negative)
 test('unregistered student is blocked from siswa dashboard', function () {
     $student = Pengguna::factory()->student()->create([
         'status' => 'unregistered',
@@ -148,7 +148,7 @@ test('unregistered student is blocked from siswa dashboard', function () {
     $this->assertGuest();
 });
 
-// TS.Siswa.010 / TC.Siswa.010.001 — admin filters student index by registration status (positive)
+// TS.SIS.010 / TC.SIS.010.001 — admin filters student index by registration status (positive)
 test('admin can filter students by registration status', function () {
     $admin = siswaAdmin();
     $registered = Pengguna::factory()->student()->create(['nama' => 'Siswa Terdaftar', 'status' => 'registered']);

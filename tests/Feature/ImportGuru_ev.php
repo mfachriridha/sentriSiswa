@@ -37,7 +37,7 @@ function importGuruUploadAndGetPath(Pengguna $admin, array $headings, array $row
     return session('import_guru_file_path');
 }
 
-// TS.ImportGuru.001 / TC.ImportGuru.001.001 — upload valid xlsx (new format) then import creates new teachers with the right peran (positive)
+// TS.IMG.001 / TC.IMG.001.001 — upload valid xlsx (new format) then import creates new teachers with the right peran (positive)
 test('admin can upload a valid xlsx and import new teachers', function () {
     $admin = importGuruAdmin();
     $path = importGuruUploadAndGetPath($admin, ['Nama', 'NIP', 'Tipe', 'Kelas'], [
@@ -56,7 +56,7 @@ test('admin can upload a valid xlsx and import new teachers', function () {
     $this->assertDatabaseHas('profil_guru', ['pengguna_id' => $teacher->id, 'nip' => '198601011000000001']);
 });
 
-// TS.ImportGuru.002 / TC.ImportGuru.002.001 — upload a file that is not xlsx/xls (negative)
+// TS.IMG.002 / TC.IMG.002.001 — upload a file that is not xlsx/xls (negative)
 test('admin cannot upload a non-spreadsheet file for teacher import', function () {
     $admin = importGuruAdmin();
 
@@ -65,7 +65,7 @@ test('admin cannot upload a non-spreadsheet file for teacher import', function (
     ])->assertSessionHasErrors('file');
 });
 
-// TS.ImportGuru.003 / TC.ImportGuru.003.001 — submit upload without any file (negative)
+// TS.IMG.003 / TC.IMG.003.001 — submit upload without any file (negative)
 test('admin cannot submit teacher import without a file', function () {
     $admin = importGuruAdmin();
 
@@ -73,7 +73,7 @@ test('admin cannot submit teacher import without a file', function () {
         ->assertSessionHasErrors('file');
 });
 
-// TS.ImportGuru.004 / TC.ImportGuru.004.001 — a row with an empty name is skipped and reported (negative)
+// TS.IMG.004 / TC.IMG.004.001 — a row with an empty name is skipped and reported (negative)
 test('teacher import skips a row with an empty name', function () {
     $admin = importGuruAdmin();
     $path = importGuruUploadAndGetPath($admin, ['Nama', 'NIP', 'Tipe', 'Kelas'], [
@@ -86,7 +86,7 @@ test('teacher import skips a row with an empty name', function () {
     expect(Pengguna::whereIn('peran', ['wali_kelas', 'bk', 'kesiswaan'])->count())->toBe(0);
 });
 
-// TS.ImportGuru.005 / TC.ImportGuru.005.001 — a row with an empty nip is skipped and reported (negative)
+// TS.IMG.005 / TC.IMG.005.001 — a row with an empty nip is skipped and reported (negative)
 test('teacher import skips a row with an empty nip', function () {
     $admin = importGuruAdmin();
     $path = importGuruUploadAndGetPath($admin, ['Nama', 'NIP', 'Tipe', 'Kelas'], [
@@ -99,7 +99,7 @@ test('teacher import skips a row with an empty nip', function () {
     expect(Pengguna::whereIn('peran', ['wali_kelas', 'bk', 'kesiswaan'])->count())->toBe(0);
 });
 
-// TS.ImportGuru.006 / TC.ImportGuru.006.001 — a row whose nip already exists is treated as existing, not duplicated (positive)
+// TS.IMG.006 / TC.IMG.006.001 — a row whose nip already exists is treated as existing, not duplicated (positive)
 test('teacher import treats an existing nip as existing, not a duplicate', function () {
     $admin = importGuruAdmin();
     $existing = Pengguna::factory()->homeroom()->create(['nama' => 'Guru Lama']);
@@ -115,7 +115,7 @@ test('teacher import treats an existing nip as existing, not a duplicate', funct
     expect(Pengguna::whereIn('peran', ['wali_kelas', 'bk', 'kesiswaan'])->count())->toBe(1);
 });
 
-// TS.ImportGuru.007 / TC.ImportGuru.007.001 — a wali kelas row assigns the teacher as the class's homeroom teacher (positive)
+// TS.IMG.007 / TC.IMG.007.001 — a wali kelas row assigns the teacher as the class's homeroom teacher (positive)
 test('teacher import assigns a homeroom teacher to their class', function () {
     $admin = importGuruAdmin();
     $path = importGuruUploadAndGetPath($admin, ['Nama', 'NIP', 'Tipe', 'Kelas'], [
@@ -129,7 +129,7 @@ test('teacher import assigns a homeroom teacher to their class', function () {
     $this->assertDatabaseHas('kelas', ['nama' => '10. Wali', 'wali_kelas_id' => (string) $teacher->id]);
 });
 
-// TS.ImportGuru.008 / TC.ImportGuru.008.001 — the legacy "Walas" column format is still recognized and imported as wali_kelas (positive)
+// TS.IMG.008 / TC.IMG.008.001 — the legacy "Walas" column format is still recognized and imported as wali_kelas (positive)
 test('teacher import recognizes the legacy walas column format', function () {
     $admin = importGuruAdmin();
     $path = importGuruUploadAndGetPath($admin, ['Walas', 'NIP', 'Kelas'], [
@@ -143,7 +143,7 @@ test('teacher import recognizes the legacy walas column format', function () {
     expect($teacher->peran)->toBe('wali_kelas');
 });
 
-// TS.ImportGuru.009 / TC.ImportGuru.009.001 — accessing the preview page without uploading a file first redirects back (negative)
+// TS.IMG.009 / TC.IMG.009.001 — accessing the preview page without uploading a file first redirects back (negative)
 test('teacher import preview redirects back when no file was uploaded first', function () {
     $admin = importGuruAdmin();
 

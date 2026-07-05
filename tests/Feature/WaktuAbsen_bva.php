@@ -13,7 +13,7 @@ function waktuAbsenBvaAdmin(): Pengguna
 
 // ── Boundary: late tolerance vs attendance duration (start 06:00, end 07:00 → duration 60 minutes) ──
 
-// TS.WaktuAbsen.007 / TC.WaktuAbsen.007.001 — tolerance exactly equal to the duration (at the upper bound, valid)
+// TS.WKA.007 / TC.WKA.007.001 — tolerance exactly equal to the duration (at the upper bound, valid)
 test('admin can save a late tolerance equal to the attendance duration', function () {
     $admin = waktuAbsenBvaAdmin();
 
@@ -28,7 +28,7 @@ test('admin can save a late tolerance equal to the attendance duration', functio
     expect(Pengaturan::get('attendance_late_tolerance_minutes'))->toBe('60');
 });
 
-// TS.WaktuAbsen.008 / TC.WaktuAbsen.008.001 — tolerance greater than the duration (just above the upper bound, invalid)
+// TS.WKA.008 / TC.WKA.008.001 — tolerance greater than the duration (just above the upper bound, invalid)
 test('admin cannot save a late tolerance greater than the attendance duration', function () {
     $admin = waktuAbsenBvaAdmin();
 

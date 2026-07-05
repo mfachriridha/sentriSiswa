@@ -11,7 +11,7 @@ function kelasAdmin(): Pengguna
     return Pengguna::factory()->admin()->create(['status' => 'registered']);
 }
 
-// TS.Kelas.001 / TC.Kelas.001.001 — create class with a wali kelas assigned (positive)
+// TS.KEL.001 / TC.KEL.001.001 — create class with a wali kelas assigned (positive)
 test('admin can create a class with a homeroom teacher', function () {
     $admin = kelasAdmin();
     $wali = Pengguna::factory()->homeroom()->create();
@@ -29,7 +29,7 @@ test('admin can create a class with a homeroom teacher', function () {
     ]);
 });
 
-// TS.Kelas.002 / TC.Kelas.002.001 — create class with a duplicate nama+tingkat combination (negative)
+// TS.KEL.002 / TC.KEL.002.001 — create class with a duplicate nama+tingkat combination (negative)
 test('admin cannot create a class with a duplicate nama and tingkat combination', function () {
     $admin = kelasAdmin();
     Kelas::create(['nama' => '10. 2', 'tingkat' => '10']);
@@ -42,7 +42,7 @@ test('admin cannot create a class with a duplicate nama and tingkat combination'
     expect(Kelas::where('nama', '10. 2')->where('tingkat', '10')->count())->toBe(1);
 });
 
-// TS.Kelas.003 / TC.Kelas.003.001 — create class with an invalid tingkat (negative)
+// TS.KEL.003 / TC.KEL.003.001 — create class with an invalid tingkat (negative)
 test('admin cannot create a class with an invalid tingkat', function () {
     $admin = kelasAdmin();
 
@@ -52,7 +52,7 @@ test('admin cannot create a class with an invalid tingkat', function () {
     ])->assertSessionHasErrors('tingkat');
 });
 
-// TS.Kelas.004 / TC.Kelas.004.001 — create class with a wali_kelas_id that does not exist (negative)
+// TS.KEL.004 / TC.KEL.004.001 — create class with a wali_kelas_id that does not exist (negative)
 test('admin cannot create a class with a non-existent wali kelas', function () {
     $admin = kelasAdmin();
 
@@ -63,7 +63,7 @@ test('admin cannot create a class with a non-existent wali kelas', function () {
     ])->assertSessionHasErrors('wali_kelas_id');
 });
 
-// TS.Kelas.005 / TC.Kelas.005.001 — create class without a wali kelas, saved as null (positive, nullable)
+// TS.KEL.005 / TC.KEL.005.001 — create class without a wali kelas, saved as null (positive, nullable)
 test('admin can create a class without a homeroom teacher', function () {
     $admin = kelasAdmin();
 
@@ -79,7 +79,7 @@ test('admin can create a class without a homeroom teacher', function () {
     ]);
 });
 
-// TS.Kelas.006 / TC.Kelas.006.001 — update class succeeds (positive)
+// TS.KEL.006 / TC.KEL.006.001 — update class succeeds (positive)
 test('admin can update a class', function () {
     $admin = kelasAdmin();
     $class = Kelas::create(['nama' => '10. 6', 'tingkat' => '10']);
@@ -96,7 +96,7 @@ test('admin can update a class', function () {
     expect($class->fresh()->wali_kelas_id)->toEqual($wali->id);
 });
 
-// TS.Kelas.007 / TC.Kelas.007.001 — delete class succeeds (positive)
+// TS.KEL.007 / TC.KEL.007.001 — delete class succeeds (positive)
 test('admin can delete a class', function () {
     $admin = kelasAdmin();
     $class = Kelas::create(['nama' => '10. 7', 'tingkat' => '10']);

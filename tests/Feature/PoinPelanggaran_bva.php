@@ -33,7 +33,7 @@ function poinPelanggaranBvaStudent(Kelas $class, string $nis): ProfilSiswa
 
 // ── Boundary: date_to, after_or_equal:date_from ────────────────────────────
 
-// TS.PoinPelanggaran.009 / TC.PoinPelanggaran.009.001 — date_to sama dengan date_from (tepat di batas, diperbolehkan)
+// TS.PPW.009 / TC.PPW.009.001 — date_to sama dengan date_from (tepat di batas, diperbolehkan)
 test('pelanggaran index accepts date_to equal to date_from', function () {
     [$teacher, $class] = poinPelanggaranBvaHomeroom();
     $student = poinPelanggaranBvaStudent($class, '50010');
@@ -51,7 +51,7 @@ test('pelanggaran index accepts date_to equal to date_from', function () {
         ->assertSee('Pelanggaran Batas Sama');
 });
 
-// TS.PoinPelanggaran.010 / TC.PoinPelanggaran.010.001 — date_to 1 hari sebelum date_from (di bawah batas, ditolak)
+// TS.PPW.010 / TC.PPW.010.001 — date_to 1 hari sebelum date_from (di bawah batas, ditolak)
 test('pelanggaran index rejects date_to 1 day before date_from', function () {
     [$teacher, $class] = poinPelanggaranBvaHomeroom();
 

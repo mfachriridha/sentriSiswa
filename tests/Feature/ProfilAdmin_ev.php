@@ -16,7 +16,7 @@ function profilAdminUser(): Pengguna
     ]);
 }
 
-// TS.ProfilAdmin.001 / TC.ProfilAdmin.001.001 — update profile with valid data (positive)
+// TS.PAD.001 / TC.PAD.001.001 — update profile with valid data (positive)
 test('admin can update profile with valid data', function () {
     $admin = profilAdminUser();
 
@@ -30,7 +30,7 @@ test('admin can update profile with valid data', function () {
     expect($admin->nomor_wa)->toBe('081234567890');
 });
 
-// TS.ProfilAdmin.002 / TC.ProfilAdmin.002.001 — email already used by another account (negative)
+// TS.PAD.002 / TC.PAD.002.001 — email already used by another account (negative)
 test('admin cannot update profile with an email already used by another account', function () {
     $admin = profilAdminUser();
     Pengguna::factory()->create(['email' => 'dipakai@example.com']);
@@ -40,7 +40,7 @@ test('admin cannot update profile with an email already used by another account'
     ])->assertSessionHasErrors('email');
 });
 
-// TS.ProfilAdmin.003 / TC.ProfilAdmin.003.001 — photo with a disallowed format (gif) is rejected (negative)
+// TS.PAD.003 / TC.PAD.003.001 — photo with a disallowed format (gif) is rejected (negative)
 test('admin cannot update profile photo with a gif format', function () {
     $admin = profilAdminUser();
 
@@ -50,7 +50,7 @@ test('admin cannot update profile photo with a gif format', function () {
     ])->assertSessionHasErrors('photo');
 });
 
-// TS.ProfilAdmin.004 / TC.ProfilAdmin.004.001 — whatsapp_number with invalid characters is rejected (negative)
+// TS.PAD.004 / TC.PAD.004.001 — whatsapp_number with invalid characters is rejected (negative)
 test('admin cannot update profile with an invalid whatsapp number format', function () {
     $admin = profilAdminUser();
 
@@ -60,7 +60,7 @@ test('admin cannot update profile with an invalid whatsapp number format', funct
     ])->assertSessionHasErrors('whatsapp_number');
 });
 
-// TS.ProfilAdmin.005 / TC.ProfilAdmin.005.001 — submitting a password on this form has no real effect (positive, dead-validation documented)
+// TS.PAD.005 / TC.PAD.005.001 — submitting a password on this form has no real effect (positive, dead-validation documented)
 test('submitting a password on the profile form does not change the real password', function () {
     $admin = profilAdminUser();
 
@@ -73,7 +73,7 @@ test('submitting a password on the profile form does not change the real passwor
     expect(Hash::check('BypassPass1', $admin->fresh()->password))->toBeFalse();
 });
 
-// TS.ProfilAdmin.006 / TC.ProfilAdmin.006.001 — requesting a password change redirects to the OTP screen (positive)
+// TS.PAD.006 / TC.PAD.006.001 — requesting a password change redirects to the OTP screen (positive)
 test('admin requesting password change is redirected to otp screen', function () {
     $admin = profilAdminUser();
 
@@ -81,7 +81,7 @@ test('admin requesting password change is redirected to otp screen', function ()
         ->assertRedirect(route('otp.show'));
 });
 
-// TS.ProfilAdmin.007 / TC.ProfilAdmin.007.001 — submitting a new password without a verified session is rejected (negative)
+// TS.PAD.007 / TC.PAD.007.001 — submitting a new password without a verified session is rejected (negative)
 test('admin cannot set a new password without a verified otp session', function () {
     $admin = profilAdminUser();
 
@@ -93,7 +93,7 @@ test('admin cannot set a new password without a verified otp session', function 
     expect(Hash::check('OldPassw0rd', $admin->fresh()->password))->toBeTrue();
 });
 
-// TS.ProfilAdmin.008 / TC.ProfilAdmin.008.001 — submitting a new password with a verified session succeeds (positive)
+// TS.PAD.008 / TC.PAD.008.001 — submitting a new password with a verified session succeeds (positive)
 test('admin can set a new password with a verified otp session', function () {
     $admin = profilAdminUser();
     session(['password_change_verified' => true]);
@@ -106,7 +106,7 @@ test('admin can set a new password with a verified otp session', function () {
     expect(Hash::check('NewPassw0rd', $admin->fresh()->password))->toBeTrue();
 });
 
-// TS.ProfilAdmin.009 / TC.ProfilAdmin.009.001 — password confirmation mismatch is rejected (negative)
+// TS.PAD.009 / TC.PAD.009.001 — password confirmation mismatch is rejected (negative)
 test('admin cannot set a new password when confirmation does not match', function () {
     $admin = profilAdminUser();
     session(['password_change_verified' => true]);

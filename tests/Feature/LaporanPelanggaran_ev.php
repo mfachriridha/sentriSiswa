@@ -47,7 +47,7 @@ function laporanPelanggaranRecord(ProfilSiswa $student, string $namaPelanggaran,
     ]);
 }
 
-// TS.LaporanPelanggaran.001 / TC.LaporanPelanggaran.001.001 — index nampilin semua pelanggaran seluruh sekolah tanpa batas tingkat (positive)
+// TS.LAP.001 / TC.LAP.001.001 — index nampilin semua pelanggaran seluruh sekolah tanpa batas tingkat (positive)
 test('violation report index shows violations from every grade level school-wide', function () {
     $kesiswaan = laporanPelanggaranActor();
     $studentGradeTen = laporanPelanggaranStudent('10', '10. Laporan 1', '95001');
@@ -61,7 +61,7 @@ test('violation report index shows violations from every grade level school-wide
         ->assertSee('Berkelahi Laporan');
 });
 
-// TS.LaporanPelanggaran.002 / TC.LaporanPelanggaran.002.001 — filter tanggal mulai/selesai (positive)
+// TS.LAP.002 / TC.LAP.002.001 — filter tanggal mulai/selesai (positive)
 test('violation report filters by mulai and selesai date range', function () {
     $kesiswaan = laporanPelanggaranActor();
     $student = laporanPelanggaranStudent('10', '10. Laporan 2', '95003');
@@ -74,7 +74,7 @@ test('violation report filters by mulai and selesai date range', function () {
         ->assertDontSee('Luar Rentang');
 });
 
-// TS.LaporanPelanggaran.003 / TC.LaporanPelanggaran.003.001 — filter berdasarkan kelas_id (positive)
+// TS.LAP.003 / TC.LAP.003.001 — filter berdasarkan kelas_id (positive)
 test('violation report filters by kelas_id', function () {
     $kesiswaan = laporanPelanggaranActor();
     $studentA = laporanPelanggaranStudent('10', '10. Laporan 3', '95004');
@@ -88,7 +88,7 @@ test('violation report filters by kelas_id', function () {
         ->assertDontSee('Kelas B Laporan');
 });
 
-// TS.LaporanPelanggaran.004 / TC.LaporanPelanggaran.004.001 — filter berdasarkan tingkat (positive)
+// TS.LAP.004 / TC.LAP.004.001 — filter berdasarkan tingkat (positive)
 test('violation report filters by tingkat', function () {
     $kesiswaan = laporanPelanggaranActor();
     $studentTen = laporanPelanggaranStudent('10', '10. Laporan 5', '95006');
@@ -102,7 +102,7 @@ test('violation report filters by tingkat', function () {
         ->assertDontSee('Tingkat Sebelas');
 });
 
-// TS.LaporanPelanggaran.005 / TC.LaporanPelanggaran.005.001 — filter berdasarkan kategori (positive)
+// TS.LAP.005 / TC.LAP.005.001 — filter berdasarkan kategori (positive)
 test('violation report filters by kategori', function () {
     $kesiswaan = laporanPelanggaranActor();
     $student = laporanPelanggaranStudent('10', '10. Laporan 6', '95008');
@@ -115,7 +115,7 @@ test('violation report filters by kategori', function () {
         ->assertDontSee('Kategori Ringan Laporan');
 });
 
-// TS.LaporanPelanggaran.006 / TC.LaporanPelanggaran.006.001 — filter berdasarkan status (positive)
+// TS.LAP.006 / TC.LAP.006.001 — filter berdasarkan status (positive)
 test('violation report filters by status', function () {
     $kesiswaan = laporanPelanggaranActor();
     $student = laporanPelanggaranStudent('10', '10. Laporan 7', '95009');
@@ -142,7 +142,7 @@ test('violation report filters by status', function () {
         ->assertDontSee('Status Rejected Laporan');
 });
 
-// TS.LaporanPelanggaran.007 / TC.LaporanPelanggaran.007.001 — kelas_id yang tidak ada ditolak (negative)
+// TS.LAP.007 / TC.LAP.007.001 — kelas_id yang tidak ada ditolak (negative)
 test('violation report rejects a non-existent kelas_id', function () {
     $kesiswaan = laporanPelanggaranActor();
 
@@ -150,7 +150,7 @@ test('violation report rejects a non-existent kelas_id', function () {
         ->assertSessionHasErrors('kelas_id');
 });
 
-// TS.LaporanPelanggaran.008 / TC.LaporanPelanggaran.008.001 — tingkat tidak valid ditolak (negative)
+// TS.LAP.008 / TC.LAP.008.001 — tingkat tidak valid ditolak (negative)
 test('violation report rejects an invalid tingkat', function () {
     $kesiswaan = laporanPelanggaranActor();
 
@@ -158,7 +158,7 @@ test('violation report rejects an invalid tingkat', function () {
         ->assertSessionHasErrors('tingkat');
 });
 
-// TS.LaporanPelanggaran.009 / TC.LaporanPelanggaran.009.001 — selesai sebelum mulai ditolak (negative)
+// TS.LAP.009 / TC.LAP.009.001 — selesai sebelum mulai ditolak (negative)
 test('violation report rejects selesai before mulai', function () {
     $kesiswaan = laporanPelanggaranActor();
 
@@ -168,7 +168,7 @@ test('violation report rejects selesai before mulai', function () {
     ]))->assertSessionHasErrors('selesai');
 });
 
-// TS.LaporanPelanggaran.010 / TC.LaporanPelanggaran.010.001 — ekspor excel berhasil (positive)
+// TS.LAP.010 / TC.LAP.010.001 — ekspor excel berhasil (positive)
 test('violation report excel export succeeds', function () {
     $kesiswaan = laporanPelanggaranActor();
     $student = laporanPelanggaranStudent('10', '10. Laporan 8', '95010');
@@ -178,7 +178,7 @@ test('violation report excel export succeeds', function () {
         ->assertDownload();
 });
 
-// TS.LaporanPelanggaran.011 / TC.LaporanPelanggaran.011.001 — ekspor pdf berhasil (positive)
+// TS.LAP.011 / TC.LAP.011.001 — ekspor pdf berhasil (positive)
 test('violation report pdf export succeeds', function () {
     $kesiswaan = laporanPelanggaranActor();
     $student = laporanPelanggaranStudent('10', '10. Laporan 9', '95011');

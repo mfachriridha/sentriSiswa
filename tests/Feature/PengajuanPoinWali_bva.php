@@ -32,7 +32,7 @@ function pengajuanPoinWaliBvaStudent(Kelas $class, string $nis): ProfilSiswa
 
 // ── Boundary: alasan length, max:1000 ─────────────────────────────────────
 
-// TS.PengajuanPoinWali.010 / TC.PengajuanPoinWali.010.001 — alasan 1001 karakter (tepat di atas batas maksimum, ditolak)
+// TS.PGP.010 / TC.PGP.010.001 — alasan 1001 karakter (tepat di atas batas maksimum, ditolak)
 test('homeroom teacher cannot submit a point-addition request with 1001 character alasan', function () {
     [$teacher, $class] = pengajuanPoinWaliBvaHomeroom();
     $student = pengajuanPoinWaliBvaStudent($class, '70001');
@@ -44,7 +44,7 @@ test('homeroom teacher cannot submit a point-addition request with 1001 characte
     ])->assertSessionHasErrors('alasan');
 });
 
-// TS.PengajuanPoinWali.011 / TC.PengajuanPoinWali.011.001 — alasan tepat 1000 karakter (tepat di batas maksimum, diperbolehkan)
+// TS.PGP.011 / TC.PGP.011.001 — alasan tepat 1000 karakter (tepat di batas maksimum, diperbolehkan)
 test('homeroom teacher can submit a point-addition request with exactly 1000 character alasan', function () {
     [$teacher, $class] = pengajuanPoinWaliBvaHomeroom();
     $student = pengajuanPoinWaliBvaStudent($class, '70002');

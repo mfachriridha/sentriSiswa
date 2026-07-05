@@ -36,7 +36,7 @@ function rekapAbsensiStudent(Kelas $class, string $nis): ProfilSiswa
     ]);
 }
 
-// TS.RekapAbsensi.001 / TC.RekapAbsensi.001.001 — index tampil rekap dengan rentang default (positive)
+// TS.REA.001 / TC.REA.001.001 — index tampil rekap dengan rentang default (positive)
 test('rekap absensi index shows recap with default date range', function () {
     Carbon::setTestNow('2026-06-08 08:00:00');
     [$teacher, $class] = rekapAbsensiHomeroom();
@@ -48,7 +48,7 @@ test('rekap absensi index shows recap with default date range', function () {
         ->assertViewHas('stats', fn (array $stats) => $stats[$student->nisn]['hadir'] === 1);
 });
 
-// TS.RekapAbsensi.002 / TC.RekapAbsensi.002.001 — filter month meng-override mulai/selesai (positive)
+// TS.REA.002 / TC.REA.002.001 — filter month meng-override mulai/selesai (positive)
 test('rekap absensi filter by month overrides mulai and selesai', function () {
     Carbon::setTestNow('2026-06-08 08:00:00');
     [$teacher, $class] = rekapAbsensiHomeroom();
@@ -63,7 +63,7 @@ test('rekap absensi filter by month overrides mulai and selesai', function () {
         ->assertViewHas('stats', fn (array $stats) => $stats[$student->nisn]['hadir'] === 1);
 });
 
-// TS.RekapAbsensi.003 / TC.RekapAbsensi.003.001 — filter profil_siswa_id spesifik (positive)
+// TS.REA.003 / TC.REA.003.001 — filter profil_siswa_id spesifik (positive)
 test('rekap absensi filters to a specific student', function () {
     Carbon::setTestNow('2026-06-08 08:00:00');
     [$teacher, $class] = rekapAbsensiHomeroom();
@@ -76,7 +76,7 @@ test('rekap absensi filters to a specific student', function () {
         ->assertViewHas('students', fn ($students) => $students->count() === 1 && $students->first()->is($studentA));
 });
 
-// TS.RekapAbsensi.004 / TC.RekapAbsensi.004.001 — filter status (positive)
+// TS.REA.004 / TC.REA.004.001 — filter status (positive)
 test('rekap absensi filters students by status', function () {
     Carbon::setTestNow('2026-06-08 08:00:00');
     [$teacher, $class] = rekapAbsensiHomeroom();
@@ -89,7 +89,7 @@ test('rekap absensi filters students by status', function () {
         ->assertViewHas('students', fn ($students) => $students->count() === 1 && $students->first()->is($studentA));
 });
 
-// TS.RekapAbsensi.005 / TC.RekapAbsensi.005.001 — guru tanpa kelas wali, ekspor excel ditolak (negative)
+// TS.REA.005 / TC.REA.005.001 — guru tanpa kelas wali, ekspor excel ditolak (negative)
 test('rekap absensi export excel is forbidden without a homeroom class', function () {
     $teacher = Pengguna::factory()->homeroom()->create(['status' => 'registered']);
     $teacher->profilGuru()->create(['nip' => fake()->unique()->numerify('19################'), 'tipe_guru' => 'homeroom']);
@@ -98,7 +98,7 @@ test('rekap absensi export excel is forbidden without a homeroom class', functio
         ->assertForbidden();
 });
 
-// TS.RekapAbsensi.006 / TC.RekapAbsensi.006.001 — guru tanpa kelas wali, ekspor pdf ditolak (negative)
+// TS.REA.006 / TC.REA.006.001 — guru tanpa kelas wali, ekspor pdf ditolak (negative)
 test('rekap absensi export pdf is forbidden without a homeroom class', function () {
     $teacher = Pengguna::factory()->homeroom()->create(['status' => 'registered']);
     $teacher->profilGuru()->create(['nip' => fake()->unique()->numerify('19################'), 'tipe_guru' => 'homeroom']);
@@ -107,7 +107,7 @@ test('rekap absensi export pdf is forbidden without a homeroom class', function 
         ->assertForbidden();
 });
 
-// TS.RekapAbsensi.007 / TC.RekapAbsensi.007.001 — tanggal selesai sebelum mulai ditolak (negative)
+// TS.REA.007 / TC.REA.007.001 — tanggal selesai sebelum mulai ditolak (negative)
 test('rekap absensi rejects selesai before mulai', function () {
     [$teacher, $class] = rekapAbsensiHomeroom();
 
@@ -117,7 +117,7 @@ test('rekap absensi rejects selesai before mulai', function () {
     ]))->assertSessionHasErrors('selesai');
 });
 
-// TS.RekapAbsensi.008 / TC.RekapAbsensi.008.001 — format tanggal salah ditolak (negative)
+// TS.REA.008 / TC.REA.008.001 — format tanggal salah ditolak (negative)
 test('rekap absensi rejects an invalid date format', function () {
     [$teacher, $class] = rekapAbsensiHomeroom();
 
@@ -126,7 +126,7 @@ test('rekap absensi rejects an invalid date format', function () {
     ]))->assertSessionHasErrors('mulai');
 });
 
-// TS.RekapAbsensi.009 / TC.RekapAbsensi.009.001 — profil_siswa_id yang tidak ada ditolak (negative)
+// TS.REA.009 / TC.REA.009.001 — profil_siswa_id yang tidak ada ditolak (negative)
 test('rekap absensi rejects a non-existent profil_siswa_id', function () {
     [$teacher, $class] = rekapAbsensiHomeroom();
 
@@ -135,7 +135,7 @@ test('rekap absensi rejects a non-existent profil_siswa_id', function () {
     ]))->assertSessionHasErrors('profil_siswa_id');
 });
 
-// TS.RekapAbsensi.010 / TC.RekapAbsensi.010.001 — ekspor excel berhasil (positive)
+// TS.REA.010 / TC.REA.010.001 — ekspor excel berhasil (positive)
 test('rekap absensi export excel succeeds', function () {
     Carbon::setTestNow('2026-06-08 08:00:00');
     [$teacher, $class] = rekapAbsensiHomeroom();
@@ -147,7 +147,7 @@ test('rekap absensi export excel succeeds', function () {
     ]))->assertDownload();
 });
 
-// TS.RekapAbsensi.011 / TC.RekapAbsensi.011.001 — ekspor pdf berhasil (positive)
+// TS.REA.011 / TC.REA.011.001 — ekspor pdf berhasil (positive)
 test('rekap absensi export pdf succeeds', function () {
     Carbon::setTestNow('2026-06-08 08:00:00');
     [$teacher, $class] = rekapAbsensiHomeroom();

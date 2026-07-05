@@ -30,7 +30,7 @@ function monitoringSiswaStudent(string $tingkat, string $className, string $nama
     ]);
 }
 
-// TS.MonitoringSiswa.001 / TC.MonitoringSiswa.001.001 — index nampilin siswa dari seluruh sekolah tanpa batas kelas/tingkat (positive)
+// TS.MOS.001 / TC.MOS.001.001 — index nampilin siswa dari seluruh sekolah tanpa batas kelas/tingkat (positive)
 test('monitoring index shows students from every grade level school-wide', function () {
     $kesiswaan = monitoringSiswaKesiswaan();
     monitoringSiswaStudent('10', '10. Monitoring 1', 'Siswa Sepuluh', '80001');
@@ -42,7 +42,7 @@ test('monitoring index shows students from every grade level school-wide', funct
         ->assertSee('Siswa Dua Belas');
 });
 
-// TS.MonitoringSiswa.002 / TC.MonitoringSiswa.002.001 — filter search berdasarkan nama (positive)
+// TS.MOS.002 / TC.MOS.002.001 — filter search berdasarkan nama (positive)
 test('monitoring index filters by student name search', function () {
     $kesiswaan = monitoringSiswaKesiswaan();
     monitoringSiswaStudent('10', '10. Monitoring 2', 'Ahmad Fauzi', '80003');
@@ -54,7 +54,7 @@ test('monitoring index filters by student name search', function () {
         ->assertDontSee('Budi Santoso');
 });
 
-// TS.MonitoringSiswa.003 / TC.MonitoringSiswa.003.001 — filter berdasarkan kelas_id (positive)
+// TS.MOS.003 / TC.MOS.003.001 — filter berdasarkan kelas_id (positive)
 test('monitoring index filters by kelas_id', function () {
     $kesiswaan = monitoringSiswaKesiswaan();
     $studentA = monitoringSiswaStudent('11', '11. Monitoring 4', 'Citra Dewi', '80005');
@@ -66,7 +66,7 @@ test('monitoring index filters by kelas_id', function () {
         ->assertDontSee('Doni Prakoso');
 });
 
-// TS.MonitoringSiswa.004 / TC.MonitoringSiswa.004.001 — show detail nampilin agregat poin dan absensi (positive)
+// TS.MOS.004 / TC.MOS.004.001 — show detail nampilin agregat poin dan absensi (positive)
 test('monitoring show displays student detail with aggregated points and attendance', function () {
     $kesiswaan = monitoringSiswaKesiswaan();
     $student = monitoringSiswaStudent('10', '10. Monitoring 6', 'Eka Wulandari', '80007');
@@ -76,7 +76,7 @@ test('monitoring show displays student detail with aggregated points and attenda
         ->assertSee('Eka Wulandari');
 });
 
-// TS.MonitoringSiswa.005 / TC.MonitoringSiswa.005.001 — show detail sedia link untuk catat pelanggaran baru (positive)
+// TS.MOS.005 / TC.MOS.005.001 — show detail sedia link untuk catat pelanggaran baru (positive)
 test('monitoring show provides a link to record a new violation for the student', function () {
     $kesiswaan = monitoringSiswaKesiswaan();
     $student = monitoringSiswaStudent('10', '10. Monitoring 7', 'Fajar Nugroho', '80008');

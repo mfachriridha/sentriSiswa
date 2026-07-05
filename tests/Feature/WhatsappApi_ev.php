@@ -26,7 +26,7 @@ function whatsappApiFakeSuccess(): void
     ]);
 }
 
-// TS.WhatsappApi.001 / TC.WhatsappApi.001.001 — admin saves a new fonnte token (positive)
+// TS.WAP.001 / TC.WAP.001.001 — admin saves a new fonnte token (positive)
 test('admin can save a new fonnte token', function () {
     $admin = whatsappApiAdmin();
 
@@ -37,7 +37,7 @@ test('admin can save a new fonnte token', function () {
     expect(Pengaturan::get('fonnte_token'))->toBe('token-baru-123');
 });
 
-// TS.WhatsappApi.002 / TC.WhatsappApi.002.001 — sending a test message without any token configured fails (negative)
+// TS.WAP.002 / TC.WAP.002.001 — sending a test message without any token configured fails (negative)
 test('admin cannot send a test message when no token is configured', function () {
     $admin = whatsappApiAdmin();
 
@@ -49,7 +49,7 @@ test('admin cannot send a test message when no token is configured', function ()
         ->assertJsonPath('error', 'Token Fonnte belum dikonfigurasi. Isi token di pengaturan WhatsApp.');
 });
 
-// TS.WhatsappApi.003 / TC.WhatsappApi.003.001 — sending to the same number twice within 60 seconds is rate limited on the second attempt (negative)
+// TS.WAP.003 / TC.WAP.003.001 — sending to the same number twice within 60 seconds is rate limited on the second attempt (negative)
 test('sending a test message to the same number twice within 60 seconds is rate limited', function () {
     $admin = whatsappApiAdmin();
     Pengaturan::set('fonnte_token', 'fonnte-test-token');
@@ -69,7 +69,7 @@ test('sending a test message to the same number twice within 60 seconds is rate 
     Http::assertSentCount(1);
 });
 
-// TS.WhatsappApi.004 / TC.WhatsappApi.004.001 — provider connection failure is reported as an error (negative)
+// TS.WAP.004 / TC.WAP.004.001 — provider connection failure is reported as an error (negative)
 test('test message reports an error when the provider connection fails', function () {
     $admin = whatsappApiAdmin();
     Pengaturan::set('fonnte_token', 'fonnte-test-token');

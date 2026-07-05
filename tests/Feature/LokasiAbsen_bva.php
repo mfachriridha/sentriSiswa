@@ -32,7 +32,7 @@ function lokasiAbsenBvaKmlFile(int $bytes): UploadedFile
 
 // ── Boundary: kml_file size, max:5120 KB ──────────────────────────────────
 
-// TS.LokasiAbsen.006 / TC.LokasiAbsen.006.001 — file size exactly 5120 KB (at the maximum, valid)
+// TS.LKA.006 / TC.LKA.006.001 — file size exactly 5120 KB (at the maximum, valid)
 test('admin can upload a kml file at exactly the maximum size', function () {
     $admin = lokasiAbsenBvaAdmin();
 
@@ -41,7 +41,7 @@ test('admin can upload a kml file at exactly the maximum size', function () {
     ])->assertRedirect(route('admin.pengaturan.lokasi-absen.index'));
 });
 
-// TS.LokasiAbsen.007 / TC.LokasiAbsen.007.001 — file size 1 byte above the 5120 KB maximum (invalid)
+// TS.LKA.007 / TC.LKA.007.001 — file size 1 byte above the 5120 KB maximum (invalid)
 test('admin cannot upload a kml file above the maximum size', function () {
     $admin = lokasiAbsenBvaAdmin();
 
@@ -52,7 +52,7 @@ test('admin cannot upload a kml file above the maximum size', function () {
 
 // ── Boundary: tolerance_meters, min:0 / max:500 ────────────────────────────
 
-// TS.LokasiAbsen.008 / TC.LokasiAbsen.008.001 — tolerance of -1 (just below the minimum of 0, invalid)
+// TS.LKA.008 / TC.LKA.008.001 — tolerance of -1 (just below the minimum of 0, invalid)
 test('admin cannot save a tolerance of -1', function () {
     $admin = lokasiAbsenBvaAdmin();
 
@@ -61,7 +61,7 @@ test('admin cannot save a tolerance of -1', function () {
     ])->assertSessionHasErrors('tolerance_meters');
 });
 
-// TS.LokasiAbsen.009 / TC.LokasiAbsen.009.001 — tolerance of exactly 0 (at the minimum, valid)
+// TS.LKA.009 / TC.LKA.009.001 — tolerance of exactly 0 (at the minimum, valid)
 test('admin can save a tolerance of exactly 0', function () {
     $admin = lokasiAbsenBvaAdmin();
 
@@ -72,7 +72,7 @@ test('admin can save a tolerance of exactly 0', function () {
     expect(Pengaturan::get('attendance_tolerance_meters'))->toBe('0');
 });
 
-// TS.LokasiAbsen.010 / TC.LokasiAbsen.010.001 — tolerance of exactly 500 (at the maximum, valid)
+// TS.LKA.010 / TC.LKA.010.001 — tolerance of exactly 500 (at the maximum, valid)
 test('admin can save a tolerance of exactly 500', function () {
     $admin = lokasiAbsenBvaAdmin();
 
@@ -83,7 +83,7 @@ test('admin can save a tolerance of exactly 500', function () {
     expect(Pengaturan::get('attendance_tolerance_meters'))->toBe('500');
 });
 
-// TS.LokasiAbsen.011 / TC.LokasiAbsen.011.001 — tolerance of 501 (just above the maximum, invalid)
+// TS.LKA.011 / TC.LKA.011.001 — tolerance of 501 (just above the maximum, invalid)
 test('admin cannot save a tolerance of 501', function () {
     $admin = lokasiAbsenBvaAdmin();
 

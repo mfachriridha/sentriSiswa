@@ -13,7 +13,7 @@ function whatsappApiSttAdmin(): Pengguna
 
 // State machine under test: TokenKosong ⇄ TokenTersimpan (fonnte_token empty vs filled)
 
-// TS.WhatsappApi.011 / TC.WhatsappApi.011.001 — TokenKosong → simpan token → TokenTersimpan (positive)
+// TS.WAP.011 / TC.WAP.011.001 — TokenKosong → simpan token → TokenTersimpan (positive)
 test('whatsapp token transitions from kosong to tersimpan after saving', function () {
     $admin = whatsappApiSttAdmin();
     expect(Pengaturan::get('fonnte_token', ''))->toBe('');
@@ -25,7 +25,7 @@ test('whatsapp token transitions from kosong to tersimpan after saving', functio
     expect(Pengaturan::get('fonnte_token'))->toBe('token-pertama');
 });
 
-// TS.WhatsappApi.012 / TC.WhatsappApi.012.001 — TokenTersimpan → submit blank without checking clear → stays TokenTersimpan, old token kept (positive, no-op)
+// TS.WAP.012 / TC.WAP.012.001 — TokenTersimpan → submit blank without checking clear → stays TokenTersimpan, old token kept (positive, no-op)
 test('whatsapp token stays tersimpan when submitting blank without the clear checkbox', function () {
     $admin = whatsappApiSttAdmin();
     Pengaturan::set('fonnte_token', 'token-lama');
@@ -37,7 +37,7 @@ test('whatsapp token stays tersimpan when submitting blank without the clear che
     expect(Pengaturan::get('fonnte_token'))->toBe('token-lama');
 });
 
-// TS.WhatsappApi.013 / TC.WhatsappApi.013.001 — TokenTersimpan → centang clear → TokenKosong (positive)
+// TS.WAP.013 / TC.WAP.013.001 — TokenTersimpan → centang clear → TokenKosong (positive)
 test('whatsapp token transitions from tersimpan to kosong when the clear checkbox is checked', function () {
     $admin = whatsappApiSttAdmin();
     Pengaturan::set('fonnte_token', 'token-lama');
@@ -49,7 +49,7 @@ test('whatsapp token transitions from tersimpan to kosong when the clear checkbo
     expect(Pengaturan::get('fonnte_token'))->toBe('');
 });
 
-// TS.WhatsappApi.014 / TC.WhatsappApi.014.001 — TokenKosong → submit blank (no token at all) → stays TokenKosong, explicit overwrite branch (positive)
+// TS.WAP.014 / TC.WAP.014.001 — TokenKosong → submit blank (no token at all) → stays TokenKosong, explicit overwrite branch (positive)
 test('whatsapp token stays kosong when submitting blank while nothing was ever saved', function () {
     $admin = whatsappApiSttAdmin();
     expect(Pengaturan::get('fonnte_token', ''))->toBe('');

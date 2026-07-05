@@ -28,7 +28,7 @@ function lokasiAbsenKmlFile(string $filename = 'area.kml', ?string $content = nu
     return new UploadedFile($path, $filename, null, null, true);
 }
 
-// TS.LokasiAbsen.001 / TC.LokasiAbsen.001.001 — upload a valid KML polygon file (positive)
+// TS.LKA.001 / TC.LKA.001.001 — upload a valid KML polygon file (positive)
 test('admin can upload a valid kml file', function () {
     $admin = lokasiAbsenAdmin();
 
@@ -40,7 +40,7 @@ test('admin can upload a valid kml file', function () {
     expect($geofence['coordinates'])->toHaveCount(4);
 });
 
-// TS.LokasiAbsen.002 / TC.LokasiAbsen.002.001 — upload a file that is not a valid KML format (negative)
+// TS.LKA.002 / TC.LKA.002.001 — upload a file that is not a valid KML format (negative)
 test('admin cannot upload a file with an invalid kml format', function () {
     $admin = lokasiAbsenAdmin();
 
@@ -49,7 +49,7 @@ test('admin cannot upload a file with an invalid kml format', function () {
     ])->assertSessionHasErrors('kml_file');
 });
 
-// TS.LokasiAbsen.003 / TC.LokasiAbsen.003.001 — submit the form without a file at all (negative)
+// TS.LKA.003 / TC.LKA.003.001 — submit the form without a file at all (negative)
 test('admin cannot save attendance location without a kml file', function () {
     $admin = lokasiAbsenAdmin();
 
@@ -57,7 +57,7 @@ test('admin cannot save attendance location without a kml file', function () {
         ->assertSessionHasErrors('kml_file');
 });
 
-// TS.LokasiAbsen.004 / TC.LokasiAbsen.004.001 — set a tolerance value within the valid 0-500 range (positive)
+// TS.LKA.004 / TC.LKA.004.001 — set a tolerance value within the valid 0-500 range (positive)
 test('admin can save a tolerance within the valid range', function () {
     $admin = lokasiAbsenAdmin();
 
@@ -68,7 +68,7 @@ test('admin can save a tolerance within the valid range', function () {
     expect(Pengaturan::get('attendance_tolerance_meters'))->toBe('50');
 });
 
-// TS.LokasiAbsen.005 / TC.LokasiAbsen.005.001 — delete the saved location clears the geofence and resets tolerance (positive)
+// TS.LKA.005 / TC.LKA.005.001 — delete the saved location clears the geofence and resets tolerance (positive)
 test('admin can delete the saved attendance location', function () {
     $admin = lokasiAbsenAdmin();
     Pengaturan::set('attendance_geofence_data', json_encode(['coordinates' => [['lat' => 1, 'lng' => 1]]]));

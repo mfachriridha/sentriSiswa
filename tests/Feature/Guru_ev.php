@@ -12,7 +12,7 @@ function guruAdmin(): Pengguna
     return Pengguna::factory()->admin()->create(['status' => 'registered']);
 }
 
-// TS.Guru.001 / TC.Guru.001.001 — create teacher with valid data, password always defaults to "password" (positive)
+// TS.GUR.001 / TC.GUR.001.001 — create teacher with valid data, password always defaults to "password" (positive)
 test('admin can create a teacher with valid data', function () {
     $admin = guruAdmin();
 
@@ -34,7 +34,7 @@ test('admin can create a teacher with valid data', function () {
     ]);
 });
 
-// TS.Guru.002 / TC.Guru.002.001 — create teacher with a duplicate nip (negative)
+// TS.GUR.002 / TC.GUR.002.001 — create teacher with a duplicate nip (negative)
 test('admin cannot create a teacher with duplicate nip', function () {
     $admin = guruAdmin();
     $existing = Pengguna::factory()->homeroom()->create();
@@ -47,7 +47,7 @@ test('admin cannot create a teacher with duplicate nip', function () {
     ])->assertSessionHasErrors('nip');
 });
 
-// TS.Guru.003 / TC.Guru.003.001 — create teacher with nama containing digits, fails the letters-only regex (negative)
+// TS.GUR.003 / TC.GUR.003.001 — create teacher with nama containing digits, fails the letters-only regex (negative)
 test('admin cannot create a teacher with a name containing digits', function () {
     $admin = guruAdmin();
 
@@ -58,7 +58,7 @@ test('admin cannot create a teacher with a name containing digits', function () 
     ])->assertSessionHasErrors('nama');
 });
 
-// TS.Guru.004 / TC.Guru.004.001 — create teacher with an invalid peran value (negative)
+// TS.GUR.004 / TC.GUR.004.001 — create teacher with an invalid peran value (negative)
 test('admin cannot create a teacher with an invalid peran', function () {
     $admin = guruAdmin();
 
@@ -69,7 +69,7 @@ test('admin cannot create a teacher with an invalid peran', function () {
     ])->assertSessionHasErrors('peran');
 });
 
-// TS.Guru.005 / TC.Guru.005.001 — tingkat submitted while peran is not bk is forced to null, not an error (positive, business rule)
+// TS.GUR.005 / TC.GUR.005.001 — tingkat submitted while peran is not bk is forced to null, not an error (positive, business rule)
 test('tingkat is forced to null when creating a teacher whose peran is not bk', function () {
     $admin = guruAdmin();
 
@@ -84,7 +84,7 @@ test('tingkat is forced to null when creating a teacher whose peran is not bk', 
     expect($teacher->profilGuru->tingkat)->toBeNull();
 });
 
-// TS.Guru.006 / TC.Guru.006.001 — submitting a password field directly is ignored, saved password stays the default (positive, dead-field robustness)
+// TS.GUR.006 / TC.GUR.006.001 — submitting a password field directly is ignored, saved password stays the default (positive, dead-field robustness)
 test('admin submitted password field is ignored when creating a teacher', function () {
     $admin = guruAdmin();
 
@@ -100,7 +100,7 @@ test('admin submitted password field is ignored when creating a teacher', functi
     expect(Hash::check('Secret123', $teacher->password))->toBeFalse();
 });
 
-// TS.Guru.007 / TC.Guru.007.001 — update teacher succeeds (positive)
+// TS.GUR.007 / TC.GUR.007.001 — update teacher succeeds (positive)
 test('admin can update a teacher', function () {
     $admin = guruAdmin();
     $teacher = Pengguna::factory()->homeroom()->create(['nama' => 'Nama Lama']);
@@ -117,7 +117,7 @@ test('admin can update a teacher', function () {
     expect($teacher->fresh()->profilGuru->telepon)->toBe('081200000007');
 });
 
-// TS.Guru.008 / TC.Guru.008.001 — delete teacher succeeds (positive)
+// TS.GUR.008 / TC.GUR.008.001 — delete teacher succeeds (positive)
 test('admin can delete a teacher', function () {
     $admin = guruAdmin();
     $teacher = Pengguna::factory()->homeroom()->create();
@@ -129,7 +129,7 @@ test('admin can delete a teacher', function () {
     $this->assertDatabaseMissing('pengguna', ['id' => $teacher->id]);
 });
 
-// TS.Guru.009 / TC.Guru.009.001 — unregistered teacher is blocked from the guru dashboard (negative)
+// TS.GUR.009 / TC.GUR.009.001 — unregistered teacher is blocked from the guru dashboard (negative)
 test('unregistered teacher is blocked from guru dashboard', function () {
     $teacher = Pengguna::factory()->homeroom()->create([
         'status' => 'unregistered',
@@ -145,7 +145,7 @@ test('unregistered teacher is blocked from guru dashboard', function () {
     $this->assertGuest();
 });
 
-// TS.Guru.010 / TC.Guru.010.001 — admin filters teacher index by registration status (positive)
+// TS.GUR.010 / TC.GUR.010.001 — admin filters teacher index by registration status (positive)
 test('admin can filter teachers by registration status', function () {
     $admin = guruAdmin();
     $registered = Pengguna::factory()->homeroom()->create(['nama' => 'Guru Terdaftar', 'status' => 'registered']);

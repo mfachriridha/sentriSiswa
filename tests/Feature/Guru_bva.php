@@ -12,7 +12,7 @@ function guruBvaAdmin(): Pengguna
 
 // ── Boundary: nama length, min:3 / max:100 ────────────────────────────────
 
-// TS.Guru.011 / TC.Guru.011.001 — nama with 2 characters (just below the minimum of 3, invalid)
+// TS.GUR.011 / TC.GUR.011.001 — nama with 2 characters (just below the minimum of 3, invalid)
 test('admin cannot create a teacher with a 2 character name', function () {
     $this->actingAs(guruBvaAdmin())->post(route('admin.guru.store'), [
         'nama' => 'Ab',
@@ -21,7 +21,7 @@ test('admin cannot create a teacher with a 2 character name', function () {
     ])->assertSessionHasErrors('nama');
 });
 
-// TS.Guru.012 / TC.Guru.012.001 — nama with exactly 3 characters (at the minimum, valid)
+// TS.GUR.012 / TC.GUR.012.001 — nama with exactly 3 characters (at the minimum, valid)
 test('admin can create a teacher with a 3 character name', function () {
     $this->actingAs(guruBvaAdmin())->post(route('admin.guru.store'), [
         'nama' => 'Abi',
@@ -30,7 +30,7 @@ test('admin can create a teacher with a 3 character name', function () {
     ])->assertRedirect(route('admin.guru.index'));
 });
 
-// TS.Guru.013 / TC.Guru.013.001 — nama with exactly 100 characters (at the maximum, valid)
+// TS.GUR.013 / TC.GUR.013.001 — nama with exactly 100 characters (at the maximum, valid)
 test('admin can create a teacher with a 100 character name', function () {
     $nama100 = str_repeat('a', 100);
 
@@ -41,7 +41,7 @@ test('admin can create a teacher with a 100 character name', function () {
     ])->assertRedirect(route('admin.guru.index'));
 });
 
-// TS.Guru.014 / TC.Guru.014.001 — nama with 101 characters (just above the maximum, invalid)
+// TS.GUR.014 / TC.GUR.014.001 — nama with 101 characters (just above the maximum, invalid)
 test('admin cannot create a teacher with a 101 character name', function () {
     $nama101 = str_repeat('a', 101);
 
@@ -54,7 +54,7 @@ test('admin cannot create a teacher with a 101 character name', function () {
 
 // ── Boundary: nip length, max:30 ──────────────────────────────────────────
 
-// TS.Guru.015 / TC.Guru.015.001 — nip with exactly 30 characters (at the maximum, valid)
+// TS.GUR.015 / TC.GUR.015.001 — nip with exactly 30 characters (at the maximum, valid)
 test('admin can create a teacher with a 30 character nip', function () {
     $nip30 = str_repeat('9', 30);
 
@@ -65,7 +65,7 @@ test('admin can create a teacher with a 30 character nip', function () {
     ])->assertRedirect(route('admin.guru.index'));
 });
 
-// TS.Guru.016 / TC.Guru.016.001 — nip with 31 characters (just above the maximum, invalid)
+// TS.GUR.016 / TC.GUR.016.001 — nip with 31 characters (just above the maximum, invalid)
 test('admin cannot create a teacher with a 31 character nip', function () {
     $nip31 = str_repeat('9', 31);
 
@@ -78,7 +78,7 @@ test('admin cannot create a teacher with a 31 character nip', function () {
 
 // ── Boundary: telepon length, min:10 / max:20 ─────────────────────────────
 
-// TS.Guru.017 / TC.Guru.017.001 — telepon with 9 characters (just below the minimum of 10, invalid)
+// TS.GUR.017 / TC.GUR.017.001 — telepon with 9 characters (just below the minimum of 10, invalid)
 test('admin cannot create a teacher with a 9 character telepon', function () {
     $this->actingAs(guruBvaAdmin())->post(route('admin.guru.store'), [
         'nama' => 'Guru Telepon Sembilan',
@@ -88,7 +88,7 @@ test('admin cannot create a teacher with a 9 character telepon', function () {
     ])->assertSessionHasErrors('telepon');
 });
 
-// TS.Guru.018 / TC.Guru.018.001 — telepon with exactly 10 characters (at the minimum, valid)
+// TS.GUR.018 / TC.GUR.018.001 — telepon with exactly 10 characters (at the minimum, valid)
 test('admin can create a teacher with a 10 character telepon', function () {
     $this->actingAs(guruBvaAdmin())->post(route('admin.guru.store'), [
         'nama' => 'Guru Telepon Sepuluh',
@@ -98,7 +98,7 @@ test('admin can create a teacher with a 10 character telepon', function () {
     ])->assertRedirect(route('admin.guru.index'));
 });
 
-// TS.Guru.019 / TC.Guru.019.001 — telepon with exactly 20 characters (at the maximum, valid)
+// TS.GUR.019 / TC.GUR.019.001 — telepon with exactly 20 characters (at the maximum, valid)
 test('admin can create a teacher with a 20 character telepon', function () {
     $telepon20 = str_repeat('0', 20);
 
@@ -110,7 +110,7 @@ test('admin can create a teacher with a 20 character telepon', function () {
     ])->assertRedirect(route('admin.guru.index'));
 });
 
-// TS.Guru.020 / TC.Guru.020.001 — telepon with 21 characters (just above the maximum, invalid)
+// TS.GUR.020 / TC.GUR.020.001 — telepon with 21 characters (just above the maximum, invalid)
 test('admin cannot create a teacher with a 21 character telepon', function () {
     $telepon21 = str_repeat('0', 21);
 

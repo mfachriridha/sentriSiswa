@@ -33,7 +33,7 @@ function pelanggaranKesiswaanBvaStudent(string $className, string $nisn): Profil
 
 // ── Boundary: tanggal_pelanggaran, before_or_equal:today ───────────────────
 
-// TS.PelanggaranSiswaKesiswaan.010 / TC.PelanggaranSiswaKesiswaan.010.001 — tanggal hari ini (tepat di batas atas, diperbolehkan)
+// TS.PSK.010 / TC.PSK.010.001 — tanggal hari ini (tepat di batas atas, diperbolehkan)
 test('violation record accepts a date exactly at today, the upper boundary', function () {
     $kesiswaan = pelanggaranKesiswaanBvaActor();
     $student = pelanggaranKesiswaanBvaStudent('10. Pelanggaran BVA 1', '91001');
@@ -48,7 +48,7 @@ test('violation record accepts a date exactly at today, the upper boundary', fun
     $this->assertDatabaseHas('pelanggaran_siswa', ['profil_siswa_id' => $student->nisn]);
 });
 
-// TS.PelanggaranSiswaKesiswaan.011 / TC.PelanggaranSiswaKesiswaan.011.001 — tanggal besok (1 hari di atas batas, ditolak)
+// TS.PSK.011 / TC.PSK.011.001 — tanggal besok (1 hari di atas batas, ditolak)
 test('violation record rejects a date 1 day above today, the upper boundary', function () {
     $kesiswaan = pelanggaranKesiswaanBvaActor();
     $student = pelanggaranKesiswaanBvaStudent('10. Pelanggaran BVA 2', '91002');

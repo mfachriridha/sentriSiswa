@@ -43,7 +43,7 @@ function monitorAbsensiSttIsKosong(string $nisn): bool
 
 // State machine under test: RekapHariIniKosong ⇄ RekapHariIniAda (record absensi hari ini untuk 1 siswa)
 
-// TS.MonitorAbsensi.011 / TC.MonitorAbsensi.011.001 — Kosong → update valid → jadi Ada (record baru dibuat) (positive)
+// TS.MOA.011 / TC.MOA.011.001 — Kosong → update valid → jadi Ada (record baru dibuat) (positive)
 test('attendance record transitions from kosong to ada after a valid update', function () {
     Carbon::setTestNow('2026-06-01 08:00:00');
     [$teacher, $class] = monitorAbsensiSttHomeroom();
@@ -57,7 +57,7 @@ test('attendance record transitions from kosong to ada after a valid update', fu
     expect(monitorAbsensiSttIsKosong($student->nisn))->toBeFalse();
 });
 
-// TS.MonitorAbsensi.012 / TC.MonitorAbsensi.012.001 — Ada (status A) → update ke status B → tetap Ada, tapi status ke-replace (positive)
+// TS.MOA.012 / TC.MOA.012.001 — Ada (status A) → update ke status B → tetap Ada, tapi status ke-replace (positive)
 test('attendance record stays ada and replaces status when updated again', function () {
     Carbon::setTestNow('2026-06-01 08:00:00');
     [$teacher, $class] = monitorAbsensiSttHomeroom();
@@ -73,7 +73,7 @@ test('attendance record stays ada and replaces status when updated again', funct
     expect(Absensi::where('profil_siswa_id', $student->nisn)->first()->status)->toBe('sakit');
 });
 
-// TS.MonitorAbsensi.013 / TC.MonitorAbsensi.013.001 — Ada → percobaan update saat weekend → tetap Ada, tidak berubah (positive, blocked no-op)
+// TS.MOA.013 / TC.MOA.013.001 — Ada → percobaan update saat weekend → tetap Ada, tidak berubah (positive, blocked no-op)
 test('attendance record stays ada and unchanged when update is attempted on a weekend', function () {
     Carbon::setTestNow('2026-06-01 08:00:00');
     [$teacher, $class] = monitorAbsensiSttHomeroom();
@@ -90,7 +90,7 @@ test('attendance record stays ada and unchanged when update is attempted on a we
     expect(Absensi::where('profil_siswa_id', $student->nisn)->first()->status)->toBe('hadir');
 });
 
-// TS.MonitorAbsensi.014 / TC.MonitorAbsensi.014.001 — Kosong → percobaan update saat weekend → tetap Kosong, tidak berubah (positive, blocked no-op)
+// TS.MOA.014 / TC.MOA.014.001 — Kosong → percobaan update saat weekend → tetap Kosong, tidak berubah (positive, blocked no-op)
 test('attendance record stays kosong when update is attempted on a weekend', function () {
     Carbon::setTestNow('2026-06-06 08:00:00');
     [$teacher, $class] = monitorAbsensiSttHomeroom();

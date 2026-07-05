@@ -18,7 +18,7 @@ function laporanPelanggaranBvaActor(): Pengguna
 
 // ── Boundary: selesai, after_or_equal:mulai ─────────────────────────────────
 
-// TS.LaporanPelanggaran.012 / TC.LaporanPelanggaran.012.001 — selesai sama dengan mulai (tepat di batas, diperbolehkan)
+// TS.LAP.012 / TC.LAP.012.001 — selesai sama dengan mulai (tepat di batas, diperbolehkan)
 test('violation report accepts selesai equal to mulai', function () {
     $kesiswaan = laporanPelanggaranBvaActor();
 
@@ -28,7 +28,7 @@ test('violation report accepts selesai equal to mulai', function () {
     ]))->assertSuccessful()->assertSessionHasNoErrors();
 });
 
-// TS.LaporanPelanggaran.013 / TC.LaporanPelanggaran.013.001 — selesai 1 hari sebelum mulai (di bawah batas, ditolak)
+// TS.LAP.013 / TC.LAP.013.001 — selesai 1 hari sebelum mulai (di bawah batas, ditolak)
 test('violation report rejects selesai 1 day before mulai', function () {
     $kesiswaan = laporanPelanggaranBvaActor();
 

@@ -32,7 +32,7 @@ function pelanggaranKesiswaanStudent(string $className, string $nisn): ProfilSis
     ]);
 }
 
-// TS.PelanggaranSiswaKesiswaan.001 / TC.PelanggaranSiswaKesiswaan.001.001 — catat pelanggaran siswa manapun tanpa batas kelas, langsung approved (positive)
+// TS.PSK.001 / TC.PSK.001.001 — catat pelanggaran siswa manapun tanpa batas kelas, langsung approved (positive)
 test('student affairs can record a violation for any student regardless of class and it is auto-approved', function () {
     $kesiswaan = pelanggaranKesiswaanActor();
     $student = pelanggaranKesiswaanStudent('10. Pelanggaran K 1', '90001');
@@ -50,7 +50,7 @@ test('student affairs can record a violation for any student regardless of class
     expect($violation->disetujui_oleh_id)->toBe($kesiswaan->id);
 });
 
-// TS.PelanggaranSiswaKesiswaan.002 / TC.PelanggaranSiswaKesiswaan.002.001 — jenis pelanggaran nonaktif ditolak (negative)
+// TS.PSK.002 / TC.PSK.002.001 — jenis pelanggaran nonaktif ditolak (negative)
 test('student affairs cannot record a violation using an inactive violation type', function () {
     $kesiswaan = pelanggaranKesiswaanActor();
     $student = pelanggaranKesiswaanStudent('10. Pelanggaran K 2', '90002');
@@ -63,7 +63,7 @@ test('student affairs cannot record a violation using an inactive violation type
     ])->assertSessionHasErrors('jenis_pelanggaran_id');
 });
 
-// TS.PelanggaranSiswaKesiswaan.003 / TC.PelanggaranSiswaKesiswaan.003.001 — jenis_pelanggaran_id tidak ada ditolak (negative)
+// TS.PSK.003 / TC.PSK.003.001 — jenis_pelanggaran_id tidak ada ditolak (negative)
 test('student affairs cannot record a violation with a non-existent violation type id', function () {
     $kesiswaan = pelanggaranKesiswaanActor();
     $student = pelanggaranKesiswaanStudent('10. Pelanggaran K 3', '90003');
@@ -75,7 +75,7 @@ test('student affairs cannot record a violation with a non-existent violation ty
     ])->assertSessionHasErrors('jenis_pelanggaran_id');
 });
 
-// TS.PelanggaranSiswaKesiswaan.004 / TC.PelanggaranSiswaKesiswaan.004.001 — profil_siswa_id (nisn) tidak ada ditolak (negative)
+// TS.PSK.004 / TC.PSK.004.001 — profil_siswa_id (nisn) tidak ada ditolak (negative)
 test('student affairs cannot record a violation for a non-existent student nisn', function () {
     $kesiswaan = pelanggaranKesiswaanActor();
     $type = JenisPelanggaran::factory()->create(['aktif' => true]);
@@ -87,7 +87,7 @@ test('student affairs cannot record a violation for a non-existent student nisn'
     ])->assertSessionHasErrors('profil_siswa_id');
 });
 
-// TS.PelanggaranSiswaKesiswaan.005 / TC.PelanggaranSiswaKesiswaan.005.001 — tanggal di masa depan ditolak (negative)
+// TS.PSK.005 / TC.PSK.005.001 — tanggal di masa depan ditolak (negative)
 test('student affairs cannot record a violation with a future date', function () {
     $kesiswaan = pelanggaranKesiswaanActor();
     $student = pelanggaranKesiswaanStudent('10. Pelanggaran K 4', '90004');
@@ -100,7 +100,7 @@ test('student affairs cannot record a violation with a future date', function ()
     ])->assertSessionHasErrors('tanggal_pelanggaran');
 });
 
-// TS.PelanggaranSiswaKesiswaan.006 / TC.PelanggaranSiswaKesiswaan.006.001 — update berhasil (positive)
+// TS.PSK.006 / TC.PSK.006.001 — update berhasil (positive)
 test('student affairs can update an existing violation record', function () {
     $kesiswaan = pelanggaranKesiswaanActor();
     $student = pelanggaranKesiswaanStudent('10. Pelanggaran K 5', '90005');
@@ -121,7 +121,7 @@ test('student affairs can update an existing violation record', function () {
     expect($violation->fresh()->catatan)->toBe('Catatan baru');
 });
 
-// TS.PelanggaranSiswaKesiswaan.007 / TC.PelanggaranSiswaKesiswaan.007.001 — update tetap boleh pertahankan jenis pelanggaran nonaktif yang sedang dipakai (positive)
+// TS.PSK.007 / TC.PSK.007.001 — update tetap boleh pertahankan jenis pelanggaran nonaktif yang sedang dipakai (positive)
 test('student affairs can keep the currently assigned inactive violation type when updating', function () {
     $kesiswaan = pelanggaranKesiswaanActor();
     $student = pelanggaranKesiswaanStudent('10. Pelanggaran K 6', '90006');
@@ -142,7 +142,7 @@ test('student affairs can keep the currently assigned inactive violation type wh
     expect($violation->fresh()->catatan)->toBe('Tetap pakai jenis nonaktif ini');
 });
 
-// TS.PelanggaranSiswaKesiswaan.008 / TC.PelanggaranSiswaKesiswaan.008.001 — hapus catatan pelanggaran berhasil (positive)
+// TS.PSK.008 / TC.PSK.008.001 — hapus catatan pelanggaran berhasil (positive)
 test('student affairs can delete a violation record', function () {
     $kesiswaan = pelanggaranKesiswaanActor();
     $student = pelanggaranKesiswaanStudent('10. Pelanggaran K 7', '90007');
@@ -154,7 +154,7 @@ test('student affairs can delete a violation record', function () {
     $this->assertDatabaseMissing('pelanggaran_siswa', ['id' => $violation->id]);
 });
 
-// TS.PelanggaranSiswaKesiswaan.009 / TC.PelanggaranSiswaKesiswaan.009.001 — filter index berdasarkan kelas, kategori, jenis, tanggal, status (positive)
+// TS.PSK.009 / TC.PSK.009.001 — filter index berdasarkan kelas, kategori, jenis, tanggal, status (positive)
 test('violation record index filters by class, category, type, date, and status', function () {
     $kesiswaan = pelanggaranKesiswaanActor();
     $class = Kelas::create(['nama' => '10. Pelanggaran K 8', 'tingkat' => '10']);
