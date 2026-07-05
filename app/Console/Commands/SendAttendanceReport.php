@@ -78,7 +78,7 @@ class SendAttendanceReport extends Command
 
             $alreadySent = PesanWhatsapp::where('kelas_id', $kelas->id)
                 ->where('tipe_pesan', 'attendance_report')
-                ->whereDate('created_at', $today)
+                ->whereDate('dibuat_pada', $today)
                 ->whereIn('status', ['pending', 'processing', 'sent'])
                 ->exists();
 

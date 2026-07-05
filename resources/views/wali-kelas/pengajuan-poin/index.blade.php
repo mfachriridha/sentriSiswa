@@ -35,7 +35,7 @@
             <tbody class="divide-y divide-gray-100">
                 @forelse ($pengajuanPoin as $pengajuan)
                     <tr>
-                        <td class="px-4 py-3">{{ $pengajuan->created_at->translatedFormat('d F Y') }}</td>
+                        <td class="px-4 py-3">{{ $pengajuan->dibuat_pada->translatedFormat('d F Y') }}</td>
                         <td class="px-4 py-3">{{ $pengajuan->profilSiswa?->pengguna?->nama ?? '-' }}<div class="text-xs text-gray-500">{{ $pengajuan->profilSiswa?->kelas?->nama ?? '-' }}</div></td>
                         <td class="px-4 py-3">{{ $pengajuan->alasan }}</td>
                         <td class="px-4 py-3 font-semibold text-green-600">{{ $pengajuan->jumlah_poin !== null ? '+'.$pengajuan->jumlah_poin : '-' }}</td>

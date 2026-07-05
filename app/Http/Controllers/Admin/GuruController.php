@@ -22,10 +22,10 @@ class GuruController extends Controller
         $filterRole = $request->get('peran', '');
         $filterGrade = $request->get('tingkat', '');
         $filterStatus = $request->get('status', '');
-        $sort = $request->get('sort', 'created_at');
+        $sort = $request->get('sort', 'dibuat_pada');
         $direction = $request->get('direction', 'desc');
-        $allowed = ['nama', 'email', 'created_at', 'nip', 'peran', 'telepon', 'class_name'];
-        $sort = in_array($sort, $allowed) ? $sort : 'created_at';
+        $allowed = ['nama', 'email', 'dibuat_pada', 'nip', 'peran', 'telepon', 'class_name'];
+        $sort = in_array($sort, $allowed) ? $sort : 'dibuat_pada';
         $direction = in_array($direction, ['asc', 'desc']) ? $direction : 'desc';
 
         $teachers = Pengguna::whereIn('peran', ['wali_kelas', 'bk', 'kesiswaan'])

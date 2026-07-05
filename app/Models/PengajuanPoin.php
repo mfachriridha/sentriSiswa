@@ -15,6 +15,10 @@ class PengajuanPoin extends Model
 
     protected $table = 'pengajuan_poin';
 
+    const CREATED_AT = 'dibuat_pada';
+
+    const UPDATED_AT = 'diperbarui_pada';
+
     public function profilSiswa(): BelongsTo
     {
         return $this->belongsTo(ProfilSiswa::class, 'profil_siswa_id');

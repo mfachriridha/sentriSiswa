@@ -12,6 +12,10 @@ class TokenOtp extends Model
 {
     protected $table = 'token_otp';
 
+    const CREATED_AT = 'dibuat_pada';
+
+    const UPDATED_AT = 'diperbarui_pada';
+
     protected function casts(): array
     {
         return [

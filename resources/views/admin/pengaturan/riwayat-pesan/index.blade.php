@@ -97,7 +97,7 @@
                         {{ $p->dikirim_pada ? $p->dikirim_pada->format('d/m/Y H:i') : '-' }}
                     </td>
                     <td class="px-4 py-3 text-gray-500 text-xs">
-                        {{ $p->created_at->format('d/m/Y H:i') }}
+                        {{ $p->dibuat_pada->format('d/m/Y H:i') }}
                     </td>
                     <td class="px-4 py-3 text-right">
                         <a href="{{ route('admin.pengaturan.whatsapp.riwayat.show', $p) }}"

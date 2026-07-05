@@ -19,7 +19,7 @@ class KelasController extends Controller
         $filterGrade = $request->get('tingkat', '');
         $sort = $request->get('sort', 'nama');
         $direction = $request->get('direction', 'asc');
-        $allowed = ['nama', 'tingkat', 'created_at'];
+        $allowed = ['nama', 'tingkat', 'dibuat_pada'];
         $sort = in_array($sort, $allowed) ? $sort : 'nama';
         $direction = in_array($direction, ['asc', 'desc']) ? $direction : 'asc';
 

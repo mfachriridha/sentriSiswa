@@ -15,6 +15,10 @@ class TataTertib extends Model
 
     protected $table = 'tata_tertib';
 
+    const CREATED_AT = 'dibuat_pada';
+
+    const UPDATED_AT = 'diperbarui_pada';
+
     public function diunggahOleh(): BelongsTo
     {
         return $this->belongsTo(Pengguna::class, 'diunggah_oleh_id');

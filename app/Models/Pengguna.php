@@ -18,6 +18,10 @@ class Pengguna extends Authenticatable
 
     protected $table = 'pengguna';
 
+    const CREATED_AT = 'dibuat_pada';
+
+    const UPDATED_AT = 'diperbarui_pada';
+
     protected function casts(): array
     {
         return [

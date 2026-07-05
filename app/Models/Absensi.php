@@ -11,6 +11,10 @@ class Absensi extends Model
 {
     protected $table = 'absensi';
 
+    const CREATED_AT = 'dibuat_pada';
+
+    const UPDATED_AT = 'diperbarui_pada';
+
     protected function casts(): array
     {
         return [

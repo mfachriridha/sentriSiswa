@@ -25,7 +25,7 @@ class RiwayatPesanController extends Controller
         }
 
         if ($request->filled('tanggal')) {
-            $query->whereDate('created_at', $request->tanggal);
+            $query->whereDate('dibuat_pada', $request->tanggal);
         }
 
         $pesan = $query->paginate(20)->withQueryString();

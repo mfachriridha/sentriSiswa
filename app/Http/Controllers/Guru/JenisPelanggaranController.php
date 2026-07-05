@@ -19,7 +19,7 @@ class JenisPelanggaranController extends Controller
         $filterStatus = $request->get('status', '');
         $sort = $request->get('sort', 'kategori');
         $direction = $request->get('direction', 'asc');
-        $allowed = ['nama', 'kategori', 'pengurangan_poin', 'aktif', 'created_at'];
+        $allowed = ['nama', 'kategori', 'pengurangan_poin', 'aktif', 'dibuat_pada'];
         $sort = in_array($sort, $allowed) ? $sort : 'kategori';
         $direction = in_array($direction, ['asc', 'desc']) ? $direction : 'asc';
 

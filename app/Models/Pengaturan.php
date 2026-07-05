@@ -10,6 +10,10 @@ class Pengaturan extends Model
 {
     protected $table = 'pengaturan';
 
+    const CREATED_AT = 'dibuat_pada';
+
+    const UPDATED_AT = 'diperbarui_pada';
+
     public static function get(string $kunci, mixed $default = null): mixed
     {
         return cache()->remember("pengaturan:{$kunci}", now()->addDay(), fn () => static::where('kunci', $kunci)->value('nilai')) ?? $default;

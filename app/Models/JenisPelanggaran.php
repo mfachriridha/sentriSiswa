@@ -15,6 +15,10 @@ class JenisPelanggaran extends Model
 
     protected $table = 'jenis_pelanggaran';
 
+    const CREATED_AT = 'dibuat_pada';
+
+    const UPDATED_AT = 'diperbarui_pada';
+
     public const string CATEGORY_LIGHT = 'ringan';
 
     public const string CATEGORY_MEDIUM = 'sedang';

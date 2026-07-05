@@ -60,7 +60,7 @@
         </div>
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">Terakhir Diubah</p>
-            <p class="mt-1.5 text-sm text-gray-900">{{ $jenisPelanggaran->updated_at?->translatedFormat('d F Y H:i') ?? '-' }}</p>
+            <p class="mt-1.5 text-sm text-gray-900">{{ $jenisPelanggaran->diperbarui_pada?->translatedFormat('d F Y H:i') ?? '-' }}</p>
         </div>
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5 md:col-span-2">
             <p class="text-sm font-medium text-gray-500">Keterangan</p>

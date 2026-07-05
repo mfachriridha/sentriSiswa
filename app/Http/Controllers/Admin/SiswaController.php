@@ -21,10 +21,10 @@ class SiswaController extends Controller
         $search = $request->get('search', '');
         $filterGrade = $request->get('tingkat', '');
         $filterStatus = $request->get('status', '');
-        $sort = $request->get('sort', 'created_at');
+        $sort = $request->get('sort', 'dibuat_pada');
         $direction = $request->get('direction', 'desc');
-        $allowed = ['nama', 'email', 'created_at', 'nisn', 'nis', 'class_name'];
-        $sort = in_array($sort, $allowed) ? $sort : 'created_at';
+        $allowed = ['nama', 'email', 'dibuat_pada', 'nisn', 'nis', 'class_name'];
+        $sort = in_array($sort, $allowed) ? $sort : 'dibuat_pada';
         $direction = in_array($direction, ['asc', 'desc']) ? $direction : 'desc';
 
         $students = Pengguna::where('peran', 'siswa')

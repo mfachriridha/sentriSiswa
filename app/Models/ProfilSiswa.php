@@ -17,6 +17,10 @@ class ProfilSiswa extends Model
 
     protected $table = 'profil_siswa';
 
+    const CREATED_AT = 'dibuat_pada';
+
+    const UPDATED_AT = 'diperbarui_pada';
+
     protected $primaryKey = 'nisn';
 
     public $incrementing = false;

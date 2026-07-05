@@ -1,4 +1,4 @@
-@props(['label', 'column', 'sort' => 'created_at', 'direction' => 'desc'])
+@props(['label', 'column', 'sort' => 'dibuat_pada', 'direction' => 'desc'])
 
 @php
     $isActive = $sort === $column;

@@ -58,7 +58,7 @@
                                 {{ $tataTertib->dipublikasikan ? 'Aktif' : 'Draft' }}
                             </x-badge>
                         </td>
-                        <td class="px-4 py-3 text-gray-600">{{ $tataTertib->diunggahOleh?->nama ?? '-' }} · {{ $tataTertib->created_at->translatedFormat('d F Y') }}</td>
+                        <td class="px-4 py-3 text-gray-600">{{ $tataTertib->diunggahOleh?->nama ?? '-' }} · {{ $tataTertib->dibuat_pada->translatedFormat('d F Y') }}</td>
                         <td class="px-4 py-3">
                             <div class="flex justify-end gap-2">
                                 @if ($tataTertib->dipublikasikan)

@@ -84,8 +84,8 @@ class ImporGuru implements ToCollection, WithChunkReading, WithHeadingRow
                 'status' => 'unregistered',
                 'password' => $this->defaultPassword,
                 'email' => null,
-                'created_at' => now(),
-                'updated_at' => now(),
+                'dibuat_pada' => now(),
+                'diperbarui_pada' => now(),
             ];
 
             $profileRows[] = [
@@ -162,8 +162,8 @@ class ImporGuru implements ToCollection, WithChunkReading, WithHeadingRow
                     'pengguna_id' => $penggunaId,
                     'nip' => $nip,
                     'tingkat' => $profile['tingkat'],
-                    'created_at' => now(),
-                    'updated_at' => now(),
+                    'dibuat_pada' => now(),
+                    'diperbarui_pada' => now(),
                 ];
 
                 if ($profile['peran'] === 'wali_kelas' && $className && isset($this->classCache[$className]) && $penggunaId) {
@@ -173,7 +173,7 @@ class ImporGuru implements ToCollection, WithChunkReading, WithHeadingRow
             }
 
             foreach (array_chunk($inserts, 500) as $chunk) {
-                ProfilGuru::upsert($chunk, ['nip'], ['pengguna_id', 'tingkat', 'updated_at']);
+                ProfilGuru::upsert($chunk, ['nip'], ['pengguna_id', 'tingkat', 'diperbarui_pada']);
             }
         });
     }

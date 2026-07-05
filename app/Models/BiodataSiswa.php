@@ -9,6 +9,10 @@ class BiodataSiswa extends Model
 {
     protected $table = 'biodata_siswa';
 
+    const CREATED_AT = 'dibuat_pada';
+
+    const UPDATED_AT = 'diperbarui_pada';
+
     protected $fillable = [
         'profil_siswa_id',
         'tempat_lahir',

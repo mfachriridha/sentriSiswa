@@ -12,6 +12,10 @@ class Kelas extends Model
 {
     protected $table = 'kelas';
 
+    const CREATED_AT = 'dibuat_pada';
+
+    const UPDATED_AT = 'diperbarui_pada';
+
     public function waliKelas(): BelongsTo
     {
         return $this->belongsTo(Pengguna::class, 'wali_kelas_id');

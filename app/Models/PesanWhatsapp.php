@@ -9,6 +9,10 @@ class PesanWhatsapp extends Model
 {
     protected $table = 'pesan_whatsapp';
 
+    const CREATED_AT = 'dibuat_pada';
+
+    const UPDATED_AT = 'diperbarui_pada';
+
     protected $fillable = [
         'kelas_id',
         'telepon_penerima',

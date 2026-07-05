@@ -27,7 +27,7 @@ class PelanggaranSiswaController extends Controller
         $filterStatus = $request->get('status', $request->route('status', ''));
         $sort = $request->get('sort', 'tanggal_pelanggaran');
         $direction = $request->get('direction', 'desc');
-        $allowed = ['tanggal_pelanggaran', 'nama_pelanggaran', 'kategori_pelanggaran', 'pengurangan_poin', 'created_at'];
+        $allowed = ['tanggal_pelanggaran', 'nama_pelanggaran', 'kategori_pelanggaran', 'pengurangan_poin', 'dibuat_pada'];
         $sort = in_array($sort, $allowed) ? $sort : 'tanggal_pelanggaran';
         $direction = in_array($direction, ['asc', 'desc']) ? $direction : 'desc';
 

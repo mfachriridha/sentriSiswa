@@ -16,6 +16,10 @@ class ProfilGuru extends Model
 
     protected $table = 'profil_guru';
 
+    const CREATED_AT = 'dibuat_pada';
+
+    const UPDATED_AT = 'diperbarui_pada';
+
     protected $primaryKey = 'nip';
 
     public $incrementing = false;

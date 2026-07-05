@@ -88,8 +88,8 @@ class ImporSiswa implements ToCollection, WithChunkReading, WithHeadingRow
                 'status' => 'unregistered',
                 'password' => $this->defaultPassword,
                 'email' => null,
-                'created_at' => now(),
-                'updated_at' => now(),
+                'dibuat_pada' => now(),
+                'diperbarui_pada' => now(),
             ];
 
             $profileRows[] = [
@@ -138,7 +138,7 @@ class ImporSiswa implements ToCollection, WithChunkReading, WithHeadingRow
                         'nisn' => $nisn,
                         'nis' => $profile['nis'],
                         'kelas_id' => $profile['kelas_id'],
-                        'updated_at' => now(),
+                        'diperbarui_pada' => now(),
                     ];
                 } else {
                     $freshUsers[] = $newUsers[$i];
@@ -181,8 +181,8 @@ class ImporSiswa implements ToCollection, WithChunkReading, WithHeadingRow
                         'nisn' => $profile['nisn'],
                         'nis' => $profile['nis'],
                         'kelas_id' => $profile['kelas_id'],
-                        'created_at' => now(),
-                        'updated_at' => now(),
+                        'dibuat_pada' => now(),
+                        'diperbarui_pada' => now(),
                     ];
                 } else {
                     $inserts[] = [
@@ -190,13 +190,13 @@ class ImporSiswa implements ToCollection, WithChunkReading, WithHeadingRow
                         'nisn' => $profile['nisn'],
                         'nis' => $profile['nis'],
                         'kelas_id' => $profile['kelas_id'],
-                        'updated_at' => now(),
+                        'diperbarui_pada' => now(),
                     ];
                 }
             }
 
             foreach (array_chunk($inserts, 500) as $chunk) {
-                ProfilSiswa::upsert($chunk, ['nisn'], ['pengguna_id', 'nis', 'kelas_id', 'updated_at']);
+                ProfilSiswa::upsert($chunk, ['nisn'], ['pengguna_id', 'nis', 'kelas_id', 'diperbarui_pada']);
             }
         });
     }

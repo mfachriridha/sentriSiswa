@@ -10,6 +10,10 @@ class TokenAksesAbsensi extends Model
 {
     protected $table = 'token_akses_absensi';
 
+    const CREATED_AT = 'dibuat_pada';
+
+    const UPDATED_AT = 'diperbarui_pada';
+
     protected $fillable = ['token', 'kelas_id', 'tanggal', 'kadaluwarsa_pada'];
 
     protected $casts = ['tanggal' => 'date', 'kadaluwarsa_pada' => 'datetime'];

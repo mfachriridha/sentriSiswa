@@ -16,6 +16,10 @@ class PelanggaranSiswa extends Model
 
     protected $table = 'pelanggaran_siswa';
 
+    const CREATED_AT = 'dibuat_pada';
+
+    const UPDATED_AT = 'diperbarui_pada';
+
     public function profilSiswa(): BelongsTo
     {
         return $this->belongsTo(ProfilSiswa::class, 'profil_siswa_id');

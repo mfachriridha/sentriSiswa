@@ -74,7 +74,7 @@
                 </div>
                 <div class="flex justify-between gap-4">
                     <dt class="text-gray-500">Dibuat</dt>
-                    <dd class="text-gray-700 text-right">{{ $pesanWhatsapp->created_at->format('d/m/Y H:i:s') }}</dd>
+                    <dd class="text-gray-700 text-right">{{ $pesanWhatsapp->dibuat_pada->format('d/m/Y H:i:s') }}</dd>
                 </div>
                 @if ($pesanWhatsapp->id_pesan_provider)
                 <div class="flex justify-between gap-4 border-t border-gray-100 pt-3">

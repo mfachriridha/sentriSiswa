@@ -29,7 +29,7 @@
             <tbody class="divide-y divide-gray-100">
                 @forelse ($pending as $pengajuan)
                     <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-3 text-gray-700">{{ $pengajuan->created_at->translatedFormat('d F Y') }}</td>
+                        <td class="px-4 py-3 text-gray-700">{{ $pengajuan->dibuat_pada->translatedFormat('d F Y') }}</td>
                         <td class="px-4 py-3">
                             <p class="font-medium text-gray-900">{{ $pengajuan->profilSiswa?->pengguna?->nama ?? '-' }}</p>
                             <p class="mt-1 text-xs text-gray-500">NIS: {{ $pengajuan->profilSiswa?->nis ?? '-' }}</p>
