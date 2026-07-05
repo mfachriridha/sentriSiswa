@@ -31,14 +31,11 @@ class AbsensiRecapController extends Controller
         $classes = Kelas::where('tingkat', $bkGrade)->orderBy('nama')->get();
         [$startDate, $endDate] = $this->dateRange($request);
         $validated = $request->validated();
-        $selectedClassId = $request->query('kelas_id', '');
         $statusFilter = $validated['status'] ?? '';
         $selectedStudent = $validated['profil_siswa_id'] ?? '';
         $selectedMonth = $validated['month'] ?? '';
 
-        $classIds = filled($selectedClassId)
-            ? [(int) $selectedClassId]
-            : $classes->pluck('id')->toArray();
+        [$classIds, $selectedClassId] = $this->resolveClassIds($request, $classes);
 
         $filterStudents = $this->gradeStudents($classIds);
         $students = $this->gradeStudents($classIds, $validated['profil_siswa_id'] ?? null);
@@ -63,8 +60,7 @@ class AbsensiRecapController extends Controller
         $classes = Kelas::where('tingkat', $bkGrade)->orderBy('nama')->get();
         [$startDate, $endDate] = $this->dateRange($request);
         $validated = $request->validated();
-        $selectedClassId = $request->query('kelas_id', '');
-        $classIds = filled($selectedClassId) ? [(int) $selectedClassId] : $classes->pluck('id')->toArray();
+        [$classIds] = $this->resolveClassIds($request, $classes);
 
         $students = $this->gradeStudents($classIds, $validated['profil_siswa_id'] ?? null);
         $stats = $this->calculateStats($students, $this->attendancesByStudent($students, $startDate, $endDate));
@@ -105,8 +101,7 @@ class AbsensiRecapController extends Controller
         $classes = Kelas::where('tingkat', $bkGrade)->orderBy('nama')->get();
         [$startDate, $endDate] = $this->dateRange($request);
         $validated = $request->validated();
-        $selectedClassId = $request->query('kelas_id', '');
-        $classIds = filled($selectedClassId) ? [(int) $selectedClassId] : $classes->pluck('id')->toArray();
+        [$classIds] = $this->resolveClassIds($request, $classes);
 
         $students = $this->gradeStudents($classIds, $validated['profil_siswa_id'] ?? null);
         $stats = $this->calculateStats($students, $this->attendancesByStudent($students, $startDate, $endDate));
@@ -122,6 +117,22 @@ class AbsensiRecapController extends Controller
         ])->setPaper('a4', 'portrait');
 
         return $pdf->download("rekap-absensi-tingkat-{$bkGrade}-{$startDate}-sampai-{$endDate}.pdf");
+    }
+
+    /**
+     * @param  Collection<int, Kelas>  $classes
+     * @return array{0: list<int>, 1: string}
+     */
+    private function resolveClassIds(AttendanceRecapFilterRequest $request, Collection $classes): array
+    {
+        $ownClassIds = $classes->pluck('id')->toArray();
+        $selectedClassId = $request->query('kelas_id', '');
+
+        if (filled($selectedClassId) && in_array((int) $selectedClassId, $ownClassIds, true)) {
+            return [[(int) $selectedClassId], $selectedClassId];
+        }
+
+        return [$ownClassIds, ''];
     }
 
     /**
