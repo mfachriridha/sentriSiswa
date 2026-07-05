@@ -10,8 +10,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\View\View;
-use Intervention\Image\Drivers\Gd\Driver;
-use Intervention\Image\ImageManager;
 
 class BiodataSiswaController extends Controller
 {
@@ -58,20 +56,50 @@ class BiodataSiswaController extends Controller
             }
         }
 
-        $filename = $siswa->id.'.'.$file->getClientOriginalExtension();
+        $filename = $siswa->id.'.jpg';
         $path = 'photos/students/'.$filename;
         $realPath = $file->getRealPath();
 
         abort_if($realPath === false, 422);
 
-        $manager = new ImageManager(new Driver);
-        $image = $manager->read($realPath);
-        $image->cover(300, 400);
-        $image->toJpeg(85)->save(storage_path('app/public/'.$path));
+        $this->resizeAndCoverToJpeg($realPath, storage_path('app/public/'.$path), 300, 400, $file->getMimeType());
 
         $profile->update(['foto' => $path]);
 
         return response()->json(['url' => asset('storage/'.$path)]);
+    }
+
+    private function resizeAndCoverToJpeg(string $sourcePath, string $destPath, int $targetWidth, int $targetHeight, ?string $mimeType): void
+    {
+        $source = match ($mimeType) {
+            'image/png' => imagecreatefrompng($sourcePath),
+            'image/webp' => imagecreatefromwebp($sourcePath),
+            default => imagecreatefromjpeg($sourcePath),
+        };
+
+        $sourceWidth = imagesx($source);
+        $sourceHeight = imagesy($source);
+        $sourceRatio = $sourceWidth / $sourceHeight;
+        $targetRatio = $targetWidth / $targetHeight;
+
+        if ($sourceRatio > $targetRatio) {
+            $cropHeight = $sourceHeight;
+            $cropWidth = (int) round($sourceHeight * $targetRatio);
+            $cropX = (int) round(($sourceWidth - $cropWidth) / 2);
+            $cropY = 0;
+        } else {
+            $cropWidth = $sourceWidth;
+            $cropHeight = (int) round($sourceWidth / $targetRatio);
+            $cropX = 0;
+            $cropY = (int) round(($sourceHeight - $cropHeight) / 2);
+        }
+
+        $canvas = imagecreatetruecolor($targetWidth, $targetHeight);
+        imagecopyresampled($canvas, $source, 0, 0, $cropX, $cropY, $targetWidth, $targetHeight, $cropWidth, $cropHeight);
+        imagejpeg($canvas, $destPath, 85);
+
+        imagedestroy($source);
+        imagedestroy($canvas);
     }
 
     public function deletePhoto(Pengguna $siswa): JsonResponse
