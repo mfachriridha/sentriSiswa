@@ -7,8 +7,10 @@ use App\Http\Requests\Kelas\StoreKelasRequest;
 use App\Http\Requests\Kelas\UpdateKelasRequest;
 use App\Models\Kelas;
 use App\Models\Pengguna;
+use App\Models\ProfilSiswa;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class KelasController extends Controller
@@ -57,13 +59,17 @@ class KelasController extends Controller
     {
         $homeroomTeachers = Pengguna::where('peran', 'wali_kelas')
             ->get();
+        $availableSiswa = ProfilSiswa::whereNull('kelas_id')->with('pengguna')->get();
 
-        return view('admin.kelas.create', compact('homeroomTeachers'));
+        return view('admin.kelas.create', compact('homeroomTeachers', 'availableSiswa'));
     }
 
     public function store(StoreKelasRequest $request): RedirectResponse
     {
         $data = $request->validated();
+        $siswaNisn = $data['siswa_nisn'] ?? [];
+        unset($data['siswa_nisn']);
+
         $pengenal = $data['nama'];
         $separator = is_numeric($pengenal) ? '. ' : ' ';
         $data['nama'] = $data['tingkat'].$separator.$pengenal;
@@ -72,7 +78,13 @@ class KelasController extends Controller
             return back()->withErrors(['nama' => 'Kelas dengan kombinasi ini sudah ada.'])->withInput();
         }
 
-        Kelas::create($data);
+        DB::transaction(function () use ($data, $siswaNisn) {
+            $kelas = Kelas::create($data);
+
+            if ($siswaNisn) {
+                ProfilSiswa::whereIn('nisn', $siswaNisn)->update(['kelas_id' => $kelas->id]);
+            }
+        });
 
         return redirect()->route('admin.kelas.index')->with('success', 'Kelas berhasil ditambahkan.');
     }
@@ -91,13 +103,18 @@ class KelasController extends Controller
         $identifier = trim((string) str_replace($kelas->tingkat, '', $kelas->nama));
         $homeroomTeachers = Pengguna::where('peran', 'wali_kelas')
             ->get();
+        $availableSiswa = ProfilSiswa::where(fn ($q) => $q->whereNull('kelas_id')->orWhere('kelas_id', $kelas->id))
+            ->with('pengguna')->get();
 
-        return view('admin.kelas.edit', compact('kelas', 'identifier', 'homeroomTeachers'));
+        return view('admin.kelas.edit', compact('kelas', 'identifier', 'homeroomTeachers', 'availableSiswa'));
     }
 
     public function update(UpdateKelasRequest $request, Kelas $kelas): RedirectResponse
     {
         $data = $request->validated();
+        $siswaNisn = $data['siswa_nisn'] ?? [];
+        unset($data['siswa_nisn']);
+
         $pengenal = $data['nama'];
         $separator = is_numeric($pengenal) ? '. ' : ' ';
         $data['nama'] = $data['tingkat'].$separator.$pengenal;
@@ -110,7 +127,15 @@ class KelasController extends Controller
             return back()->withErrors(['nama' => 'Kelas dengan kombinasi ini sudah ada.'])->withInput();
         }
 
-        $kelas->update($data);
+        DB::transaction(function () use ($data, $siswaNisn, $kelas) {
+            $kelas->update($data);
+
+            ProfilSiswa::where('kelas_id', $kelas->id)->whereNotIn('nisn', $siswaNisn)->update(['kelas_id' => null]);
+
+            if ($siswaNisn) {
+                ProfilSiswa::whereIn('nisn', $siswaNisn)->update(['kelas_id' => $kelas->id]);
+            }
+        });
 
         return redirect()->route('admin.kelas.index')->with('success', 'Kelas berhasil diperbarui.');
     }

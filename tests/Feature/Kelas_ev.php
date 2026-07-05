@@ -2,6 +2,7 @@
 
 use App\Models\Kelas;
 use App\Models\Pengguna;
+use App\Models\ProfilSiswa;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -105,4 +106,62 @@ test('admin can delete a class', function () {
         ->assertRedirect(route('admin.kelas.index'));
 
     $this->assertDatabaseMissing('kelas', ['id' => $class->id]);
+});
+
+// TS.KEL.008 / TC.KEL.008.001 — admin assigns multiple unassigned students to a new class at once (positive)
+test('admin can bulk-assign multiple unassigned students while creating a class', function () {
+    $admin = kelasAdmin();
+    $siswaA = Pengguna::factory()->student()->create();
+    $profilA = ProfilSiswa::factory()->create(['pengguna_id' => $siswaA->id, 'nisn' => '1111111181', 'kelas_id' => null]);
+    $siswaB = Pengguna::factory()->student()->create();
+    $profilB = ProfilSiswa::factory()->create(['pengguna_id' => $siswaB->id, 'nisn' => '1111111182', 'kelas_id' => null]);
+
+    $this->actingAs($admin)->post(route('admin.kelas.store'), [
+        'nama' => '8',
+        'tingkat' => '10',
+        'siswa_nisn' => [$profilA->nisn, $profilB->nisn],
+    ])->assertRedirect(route('admin.kelas.index'));
+
+    $kelas = Kelas::where('nama', '10. 8')->firstOrFail();
+    expect($profilA->fresh()->kelas_id)->toBe($kelas->id);
+    expect($profilB->fresh()->kelas_id)->toBe($kelas->id);
+});
+
+// TS.KEL.009 / TC.KEL.009.001 — admin cannot bulk-assign a student who already belongs to another class (negative)
+test('admin cannot bulk-assign a student who already has a class', function () {
+    $admin = kelasAdmin();
+    $existingKelas = Kelas::create(['nama' => '10. 9a', 'tingkat' => '10']);
+    $siswa = Pengguna::factory()->student()->create();
+    $profil = ProfilSiswa::factory()->create(['pengguna_id' => $siswa->id, 'nisn' => '1111111183', 'kelas_id' => $existingKelas->id]);
+
+    $this->actingAs($admin)->post(route('admin.kelas.store'), [
+        'nama' => '9b',
+        'tingkat' => '10',
+        'siswa_nisn' => [$profil->nisn],
+    ])->assertSessionHasErrors('siswa_nisn.0');
+
+    expect($profil->fresh()->kelas_id)->toBe($existingKelas->id);
+});
+
+// TS.KEL.010 / TC.KEL.010.001 — updating a class releases unchecked students and keeps only the checked ones (positive)
+test('admin can add and remove students when updating a class', function () {
+    $admin = kelasAdmin();
+    $kelas = Kelas::create(['nama' => '10. 10', 'tingkat' => '10']);
+
+    $siswaStay = Pengguna::factory()->student()->create();
+    $profilStay = ProfilSiswa::factory()->create(['pengguna_id' => $siswaStay->id, 'nisn' => '1111111184', 'kelas_id' => $kelas->id]);
+    $siswaRemoved = Pengguna::factory()->student()->create();
+    $profilRemoved = ProfilSiswa::factory()->create(['pengguna_id' => $siswaRemoved->id, 'nisn' => '1111111185', 'kelas_id' => $kelas->id]);
+    $siswaAdded = Pengguna::factory()->student()->create();
+    $profilAdded = ProfilSiswa::factory()->create(['pengguna_id' => $siswaAdded->id, 'nisn' => '1111111186', 'kelas_id' => null]);
+
+    $this->actingAs($admin)->put(route('admin.kelas.update', $kelas), [
+        'nama' => '10',
+        'tingkat' => '10',
+        'siswa_nisn' => [$profilStay->nisn, $profilAdded->nisn],
+    ])->assertRedirect(route('admin.kelas.index'));
+
+    expect($profilStay->fresh()->kelas_id)->toBe($kelas->id);
+    expect($profilAdded->fresh()->kelas_id)->toBe($kelas->id);
+    expect($profilRemoved->fresh()->kelas_id)->toBeNull();
 });

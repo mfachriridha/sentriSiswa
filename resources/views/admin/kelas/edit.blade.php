@@ -66,6 +66,30 @@
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
+
+            @php $selectedSiswa = old('siswa_nisn', $availableSiswa->where('kelas_id', $kelas->id)->pluck('nisn')->all()); @endphp
+            <div class="md:col-span-2" x-data="{ search: '' }">
+                <label class="block text-sm font-medium text-gray-700">Siswa (belum punya kelas + yang sudah di kelas ini)</label>
+                <input type="text" x-model="search" placeholder="Cari nama atau NISN..."
+                       class="mt-1.5 mb-2 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-900 shadow-sm
+                              placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
+                <div class="max-h-64 overflow-y-auto rounded-lg border border-gray-200 divide-y divide-gray-100">
+                    @forelse ($availableSiswa as $siswa)
+                        <label x-show="search === '' || '{{ Str::lower(($siswa->pengguna?->nama ?? '').' '.$siswa->nisn) }}'.includes(search.toLowerCase())"
+                               class="flex items-center gap-3 px-4 py-2 text-sm cursor-pointer hover:bg-gray-50">
+                            <input type="checkbox" name="siswa_nisn[]" value="{{ $siswa->nisn }}"
+                                   {{ in_array($siswa->nisn, $selectedSiswa) ? 'checked' : '' }}
+                                   class="rounded border-gray-300 text-primary focus:ring-primary/30">
+                            <span>{{ $siswa->pengguna?->nama }} <span class="text-gray-400">({{ $siswa->nisn }})</span></span>
+                        </label>
+                    @empty
+                        <p class="px-4 py-3 text-sm text-gray-500">Tidak ada siswa yang bisa ditambahkan.</p>
+                    @endforelse
+                </div>
+                @error('siswa_nisn')
+                    <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
         </div>
 
         <div class="flex items-center gap-4 pt-2">
