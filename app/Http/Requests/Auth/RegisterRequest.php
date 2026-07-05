@@ -19,7 +19,7 @@ class RegisterRequest extends FormRequest
         ];
 
         if (session('register_role') === 'teacher') {
-            $rules['telepon'] = ['required', 'string', 'min:10', 'max:20', 'regex:/^[0-9+\-\s()]*$/'];
+            $rules['telepon'] = ['required', 'string', 'min:10', 'max:15', 'regex:/^[0-9+\-\s()]*$/'];
         }
 
         return $rules;

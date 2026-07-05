@@ -42,7 +42,7 @@ class ImporSiswa implements ToCollection, WithChunkReading, WithHeadingRow
             $this->rowIndex++;
             $nama = trim((string) ($row['nama'] ?? ''));
             $nisRaw = isset($row['nis']) ? trim((string) $row['nis']) : null;
-            $nis = $nisRaw ? mb_substr($nisRaw, 0, 20) : null;
+            $nis = $nisRaw ? mb_substr($nisRaw, 0, 15) : null;
             $nisnRaw = isset($row['nisn']) ? trim((string) $row['nisn']) : null;
             $nisnRaw = is_numeric($nisnRaw) ? str_pad((string) $nisnRaw, 10, '0', STR_PAD_LEFT) : $nisnRaw;
             $nisn = $nisnRaw ? mb_substr((string) $nisnRaw, 0, 10) : null;

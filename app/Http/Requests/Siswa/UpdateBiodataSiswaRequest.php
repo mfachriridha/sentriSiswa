@@ -27,11 +27,11 @@ class UpdateBiodataSiswaRequest extends FormRequest
             'nama_ibu' => ['nullable', 'string', 'max:100'],
             'pekerjaan_ibu' => ['nullable', 'string', 'max:100'],
             'alamat_ortu' => ['nullable', 'string'],
-            'telepon_ortu' => ['nullable', 'string', 'max:20'],
+            'telepon_ortu' => ['nullable', 'string', 'max:15'],
             'nama_wali' => ['nullable', 'string', 'max:100'],
             'pekerjaan_wali' => ['nullable', 'string', 'max:100'],
             'alamat_wali' => ['nullable', 'string'],
-            'telepon_wali' => ['nullable', 'string', 'max:20'],
+            'telepon_wali' => ['nullable', 'string', 'max:15'],
         ];
     }
 }

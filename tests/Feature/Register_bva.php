@@ -78,7 +78,7 @@ test('register store accepts password with exactly 8 characters', function () {
     expect($student->fresh()->status)->toBe('registered');
 });
 
-// ── Boundary: teacher telepon length, min:10 / max:20 ─────────────────────
+// ── Boundary: teacher telepon length, min:10 / max:15 ─────────────────────
 
 // TS.REG.021 / TC.REG.021.001 — telepon with 9 characters (just below the minimum of 10, invalid)
 test('register store rejects teacher telepon with 9 characters', function () {
@@ -106,31 +106,31 @@ test('register store accepts teacher telepon with exactly 10 characters', functi
     expect($teacher->fresh()->profilGuru->telepon)->toBe('0812345678');
 });
 
-// TS.REG.023 / TC.REG.023.001 — telepon with exactly 20 characters (at the maximum, valid)
-test('register store accepts teacher telepon with exactly 20 characters', function () {
+// TS.REG.023 / TC.REG.023.001 — telepon with exactly 15 characters (at the maximum, valid)
+test('register store accepts teacher telepon with exactly 15 characters', function () {
     $teacher = bvaRegisterTeacherSession();
-    $telepon20 = str_repeat('0', 20);
+    $telepon15 = str_repeat('0', 15);
 
     $this->post(route('register.store'), [
-        'email' => 'boundary.tel20@example.com',
+        'email' => 'boundary.tel15@example.com',
         'password' => 'Passw0rd',
         'password_confirmation' => 'Passw0rd',
-        'telepon' => $telepon20,
+        'telepon' => $telepon15,
     ])->assertRedirect(route('login'));
 
-    expect($teacher->fresh()->profilGuru->telepon)->toBe($telepon20);
+    expect($teacher->fresh()->profilGuru->telepon)->toBe($telepon15);
 });
 
-// TS.REG.024 / TC.REG.024.001 — telepon with 21 characters (just above the maximum, invalid)
-test('register store rejects teacher telepon with 21 characters', function () {
+// TS.REG.024 / TC.REG.024.001 — telepon with 16 characters (just above the maximum, invalid)
+test('register store rejects teacher telepon with 16 characters', function () {
     bvaRegisterTeacherSession();
-    $telepon21 = str_repeat('0', 21);
+    $telepon16 = str_repeat('0', 16);
 
     $this->post(route('register.store'), [
-        'email' => 'boundary.tel21@example.com',
+        'email' => 'boundary.tel16@example.com',
         'password' => 'Passw0rd',
         'password_confirmation' => 'Passw0rd',
-        'telepon' => $telepon21,
+        'telepon' => $telepon16,
     ])->assertSessionHasErrors('telepon');
 });
 

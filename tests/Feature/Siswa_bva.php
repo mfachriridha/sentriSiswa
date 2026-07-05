@@ -81,31 +81,31 @@ test('admin cannot create a student with an 11 digit nisn', function () {
     ])->assertSessionHasErrors('nisn');
 });
 
-// ── Boundary: nis length, max:20 ──────────────────────────────────────────
+// ── Boundary: nis length, max:15 ──────────────────────────────────────────
 
-// TS.SIS.018 / TC.SIS.018.001 — nis with exactly 20 characters (at the maximum, valid)
-test('admin can create a student with a 20 character nis', function () {
-    $nis20 = str_repeat('9', 20);
+// TS.SIS.018 / TC.SIS.018.001 — nis with exactly 15 characters (at the maximum, valid)
+test('admin can create a student with a 15 character nis', function () {
+    $nis15 = str_repeat('9', 15);
 
     $this->actingAs(siswaBvaAdmin())->post(route('admin.siswa.store'), [
-        'nama' => 'Siswa Nis Duapuluh',
+        'nama' => 'Siswa Nis Limabelas',
         'nisn' => '1111111108',
-        'nis' => $nis20,
+        'nis' => $nis15,
     ])->assertRedirect(route('admin.siswa.index'));
 });
 
-// TS.SIS.019 / TC.SIS.019.001 — nis with 21 characters (just above the maximum, invalid)
-test('admin cannot create a student with a 21 character nis', function () {
-    $nis21 = str_repeat('9', 21);
+// TS.SIS.019 / TC.SIS.019.001 — nis with 16 characters (just above the maximum, invalid)
+test('admin cannot create a student with a 16 character nis', function () {
+    $nis16 = str_repeat('9', 16);
 
     $this->actingAs(siswaBvaAdmin())->post(route('admin.siswa.store'), [
-        'nama' => 'Siswa Nis Duapuluhsatu',
+        'nama' => 'Siswa Nis Enambelas',
         'nisn' => '1111111109',
-        'nis' => $nis21,
+        'nis' => $nis16,
     ])->assertSessionHasErrors('nis');
 });
 
-// ── Boundary: telepon length, min:10 / max:20 ─────────────────────────────
+// ── Boundary: telepon length, min:10 / max:15 ─────────────────────────────
 
 // TS.SIS.020 / TC.SIS.020.001 — telepon with 9 characters (just below the minimum of 10, invalid)
 test('admin cannot create a student with a 9 character telepon', function () {
@@ -127,26 +127,26 @@ test('admin can create a student with a 10 character telepon', function () {
     ])->assertRedirect(route('admin.siswa.index'));
 });
 
-// TS.SIS.022 / TC.SIS.022.001 — telepon with exactly 20 characters (at the maximum, valid)
-test('admin can create a student with a 20 character telepon', function () {
-    $telepon20 = str_repeat('0', 20);
+// TS.SIS.022 / TC.SIS.022.001 — telepon with exactly 15 characters (at the maximum, valid)
+test('admin can create a student with a 15 character telepon', function () {
+    $telepon15 = str_repeat('0', 15);
 
     $this->actingAs(siswaBvaAdmin())->post(route('admin.siswa.store'), [
-        'nama' => 'Siswa Telepon Duapuluh',
+        'nama' => 'Siswa Telepon Limabelas',
         'nisn' => '1111111112',
         'nis' => '90012',
-        'telepon' => $telepon20,
+        'telepon' => $telepon15,
     ])->assertRedirect(route('admin.siswa.index'));
 });
 
-// TS.SIS.023 / TC.SIS.023.001 — telepon with 21 characters (just above the maximum, invalid)
-test('admin cannot create a student with a 21 character telepon', function () {
-    $telepon21 = str_repeat('0', 21);
+// TS.SIS.023 / TC.SIS.023.001 — telepon with 16 characters (just above the maximum, invalid)
+test('admin cannot create a student with a 16 character telepon', function () {
+    $telepon16 = str_repeat('0', 16);
 
     $this->actingAs(siswaBvaAdmin())->post(route('admin.siswa.store'), [
-        'nama' => 'Siswa Telepon Duapuluhsatu',
+        'nama' => 'Siswa Telepon Enambelas',
         'nisn' => '1111111113',
         'nis' => '90013',
-        'telepon' => $telepon21,
+        'telepon' => $telepon16,
     ])->assertSessionHasErrors('telepon');
 });

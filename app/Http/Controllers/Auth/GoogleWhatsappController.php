@@ -24,7 +24,7 @@ class GoogleWhatsappController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'telepon' => ['required', 'string', 'max:20', 'regex:/^(\+62|62|0)[0-9]{8,13}$/'],
+            'telepon' => ['required', 'string', 'max:15', 'regex:/^(\+62|62|0)[0-9]{8,13}$/'],
         ], [
             'telepon.required' => 'Nomor WhatsApp wajib diisi.',
             'telepon.regex' => 'Format nomor WhatsApp tidak valid. Gunakan format 08xx, 628xx, atau +628xx.',

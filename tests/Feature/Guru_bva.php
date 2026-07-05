@@ -76,7 +76,7 @@ test('admin cannot create a teacher with a 31 character nip', function () {
     ])->assertSessionHasErrors('nip');
 });
 
-// ── Boundary: telepon length, min:10 / max:20 ─────────────────────────────
+// ── Boundary: telepon length, min:10 / max:15 ─────────────────────────────
 
 // TS.GUR.017 / TC.GUR.017.001 — telepon with 9 characters (just below the minimum of 10, invalid)
 test('admin cannot create a teacher with a 9 character telepon', function () {
@@ -98,26 +98,26 @@ test('admin can create a teacher with a 10 character telepon', function () {
     ])->assertRedirect(route('admin.guru.index'));
 });
 
-// TS.GUR.019 / TC.GUR.019.001 — telepon with exactly 20 characters (at the maximum, valid)
-test('admin can create a teacher with a 20 character telepon', function () {
-    $telepon20 = str_repeat('0', 20);
+// TS.GUR.019 / TC.GUR.019.001 — telepon with exactly 15 characters (at the maximum, valid)
+test('admin can create a teacher with a 15 character telepon', function () {
+    $telepon15 = str_repeat('0', 15);
 
     $this->actingAs(guruBvaAdmin())->post(route('admin.guru.store'), [
-        'nama' => 'Guru Telepon Duapuluh',
+        'nama' => 'Guru Telepon Limabelas',
         'nip' => '198601012020121112',
         'peran' => 'wali_kelas',
-        'telepon' => $telepon20,
+        'telepon' => $telepon15,
     ])->assertRedirect(route('admin.guru.index'));
 });
 
-// TS.GUR.020 / TC.GUR.020.001 — telepon with 21 characters (just above the maximum, invalid)
-test('admin cannot create a teacher with a 21 character telepon', function () {
-    $telepon21 = str_repeat('0', 21);
+// TS.GUR.020 / TC.GUR.020.001 — telepon with 16 characters (just above the maximum, invalid)
+test('admin cannot create a teacher with a 16 character telepon', function () {
+    $telepon16 = str_repeat('0', 16);
 
     $this->actingAs(guruBvaAdmin())->post(route('admin.guru.store'), [
-        'nama' => 'Guru Telepon Duapuluhsatu',
+        'nama' => 'Guru Telepon Enambelas',
         'nip' => '198601012020121113',
         'peran' => 'wali_kelas',
-        'telepon' => $telepon21,
+        'telepon' => $telepon16,
     ])->assertSessionHasErrors('telepon');
 });

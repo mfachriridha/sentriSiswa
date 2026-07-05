@@ -22,7 +22,7 @@ class UpdateProfilRequest extends FormRequest
         return [
             'nama' => ['required', 'string', 'max:100'],
             'email' => ['nullable', 'email', 'max:255', "unique:pengguna,email,{$userId}"],
-            'telepon' => ['nullable', 'string', 'min:10', 'max:20', 'regex:/^[0-9+\-\s()]*$/'],
+            'telepon' => ['nullable', 'string', 'min:10', 'max:15', 'regex:/^[0-9+\-\s()]*$/'],
             'password' => ['nullable', 'string', 'min:8', 'regex:/[a-z]/i', 'regex:/[0-9]/'],
             'photo' => ['nullable', 'image', 'max:2048', 'mimes:jpg,jpeg,png'],
             'delete_photo' => ['nullable', 'boolean'],
@@ -41,7 +41,7 @@ class UpdateProfilRequest extends FormRequest
             'email.unique' => 'Email sudah digunakan.',
             'email.max' => 'Email tidak boleh lebih dari 255 karakter.',
             'telepon.min' => 'Nomor telepon minimal 10 digit.',
-            'telepon.max' => 'Nomor telepon maksimal 20 digit.',
+            'telepon.max' => 'Nomor telepon maksimal 15 digit.',
             'telepon.regex' => 'Format nomor telepon tidak valid.',
             'password.min' => 'Kata sandi minimal 8 karakter.',
             'password.regex' => 'Kata sandi harus memuat huruf dan angka.',
