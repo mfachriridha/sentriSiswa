@@ -88,15 +88,6 @@ class GuruController extends Controller
         return view('admin.guru.create');
     }
 
-    private function tipeGuru(string $peran): string
-    {
-        return match ($peran) {
-            'wali_kelas' => 'homeroom',
-            'bk'         => 'counselor',
-            default      => 'student_affairs',
-        };
-    }
-
     public function store(StoreGuruRequest $request): RedirectResponse
     {
         DB::transaction(function () use ($request) {
@@ -112,7 +103,7 @@ class GuruController extends Controller
             $user->profilGuru()->create([
                 'nip'      => $request->nip,
                 'telepon'  => $request->telepon,
-                'tipe_guru'=> $this->tipeGuru($request->peran),
+                'tipe_guru'=> $request->peran,
                 'tingkat'  => $request->peran === 'bk' ? $request->tingkat : null,
             ]);
         });
@@ -147,7 +138,7 @@ class GuruController extends Controller
                 [
                     'nip'       => $request->nip,
                     'telepon'   => $request->telepon,
-                    'tipe_guru' => $this->tipeGuru($request->peran),
+                    'tipe_guru' => $request->peran,
                     'tingkat'   => $request->peran === 'bk' ? $request->tingkat : null,
                 ],
             );

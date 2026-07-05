@@ -12,7 +12,7 @@ function monitoringSiswaKesiswaan(): Pengguna
     $studentAffairs = Pengguna::factory()->studentAffairs()->create(['status' => 'registered']);
     $studentAffairs->profilGuru()->create([
         'nip' => fake()->unique()->numerify('19################'),
-        'tipe_guru' => 'student_affairs',
+        'tipe_guru' => 'kesiswaan',
     ]);
 
     return $studentAffairs;

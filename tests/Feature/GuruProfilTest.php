@@ -16,7 +16,7 @@ test('registered teacher can view and update own profile', function () {
     $teacher->profilGuru()->create([
         'nip' => '198765432109876543',
         'telepon' => '081234567890',
-        'tipe_guru' => 'homeroom',
+        'tipe_guru' => 'wali_kelas',
         'tingkat' => null,
     ]);
 
@@ -43,7 +43,7 @@ test('registered teacher can view and update own profile', function () {
         'pengguna_id' => $teacher->id,
         'telepon' => '081298765432',
         'nip' => '198765432109876543',
-        'tipe_guru' => 'homeroom',
+        'tipe_guru' => 'wali_kelas',
     ]);
 });
 
@@ -55,7 +55,7 @@ test('guru dashboard shows shortcuts for available features', function () {
     $teacher->profilGuru()->create([
         'nip' => '198765432109876544',
         'telepon' => '081234567891',
-        'tipe_guru' => 'homeroom',
+        'tipe_guru' => 'wali_kelas',
         'tingkat' => null,
     ]);
 

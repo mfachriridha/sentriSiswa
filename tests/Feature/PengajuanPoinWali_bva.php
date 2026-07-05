@@ -12,7 +12,7 @@ function pengajuanPoinWaliBvaHomeroom(string $className = '10. Pengajuan BVA 1')
     $teacher = Pengguna::factory()->homeroom()->create(['status' => 'registered']);
     $teacher->profilGuru()->create([
         'nip' => fake()->unique()->numerify('19################'),
-        'tipe_guru' => 'homeroom',
+        'tipe_guru' => 'wali_kelas',
     ]);
     $class = Kelas::create(['nama' => $className, 'tingkat' => '10', 'wali_kelas_id' => $teacher->id]);
 

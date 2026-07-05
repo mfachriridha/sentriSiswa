@@ -21,7 +21,7 @@ function createHomeroomTeacherWithClass(string $className = 'X IPA 1'): array
 
     $teacher->profilGuru()->create([
         'nip' => fake()->unique()->numerify('19################'),
-        'tipe_guru' => 'homeroom',
+        'tipe_guru' => 'wali_kelas',
     ]);
 
     $class = Kelas::create([

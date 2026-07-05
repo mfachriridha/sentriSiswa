@@ -18,7 +18,7 @@ function rekapAbsensiHomeroom(string $className = '10. Rekap 1'): array
     $teacher = Pengguna::factory()->homeroom()->create(['status' => 'registered']);
     $teacher->profilGuru()->create([
         'nip' => fake()->unique()->numerify('19################'),
-        'tipe_guru' => 'homeroom',
+        'tipe_guru' => 'wali_kelas',
     ]);
     $class = Kelas::create(['nama' => $className, 'tingkat' => '10', 'wali_kelas_id' => $teacher->id]);
 
@@ -92,7 +92,7 @@ test('rekap absensi filters students by status', function () {
 // TS.REA.005 / TC.REA.005.001 — guru tanpa kelas wali, ekspor excel ditolak (negative)
 test('rekap absensi export excel is forbidden without a homeroom class', function () {
     $teacher = Pengguna::factory()->homeroom()->create(['status' => 'registered']);
-    $teacher->profilGuru()->create(['nip' => fake()->unique()->numerify('19################'), 'tipe_guru' => 'homeroom']);
+    $teacher->profilGuru()->create(['nip' => fake()->unique()->numerify('19################'), 'tipe_guru' => 'wali_kelas']);
 
     $this->actingAs($teacher)->get(route('wali-kelas.absensi.ekspor-excel'))
         ->assertForbidden();
@@ -101,7 +101,7 @@ test('rekap absensi export excel is forbidden without a homeroom class', functio
 // TS.REA.006 / TC.REA.006.001 — guru tanpa kelas wali, ekspor pdf ditolak (negative)
 test('rekap absensi export pdf is forbidden without a homeroom class', function () {
     $teacher = Pengguna::factory()->homeroom()->create(['status' => 'registered']);
-    $teacher->profilGuru()->create(['nip' => fake()->unique()->numerify('19################'), 'tipe_guru' => 'homeroom']);
+    $teacher->profilGuru()->create(['nip' => fake()->unique()->numerify('19################'), 'tipe_guru' => 'wali_kelas']);
 
     $this->actingAs($teacher)->get(route('wali-kelas.absensi.ekspor-pdf'))
         ->assertForbidden();

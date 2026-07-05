@@ -13,7 +13,7 @@ function pengajuanPoinWaliHomeroom(string $className = '10. Pengajuan 1'): array
     $teacher = Pengguna::factory()->homeroom()->create(['status' => 'registered']);
     $teacher->profilGuru()->create([
         'nip' => fake()->unique()->numerify('19################'),
-        'tipe_guru' => 'homeroom',
+        'tipe_guru' => 'wali_kelas',
     ]);
     $class = Kelas::create(['nama' => $className, 'tingkat' => '10', 'wali_kelas_id' => $teacher->id]);
 
@@ -123,7 +123,7 @@ test('pengajuan poin index filters by status', function () {
 // TS.PGP.008 / TC.PGP.008.001 — guru tanpa kelas wali, daftar siswa di create() kosong (positive)
 test('create form shows an empty student list when teacher has no homeroom class', function () {
     $teacher = Pengguna::factory()->homeroom()->create(['status' => 'registered']);
-    $teacher->profilGuru()->create(['nip' => fake()->unique()->numerify('19################'), 'tipe_guru' => 'homeroom']);
+    $teacher->profilGuru()->create(['nip' => fake()->unique()->numerify('19################'), 'tipe_guru' => 'wali_kelas']);
 
     $this->actingAs($teacher)->get(route('wali-kelas.pengajuan-poin.create'))
         ->assertSuccessful()

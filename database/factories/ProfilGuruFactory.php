@@ -24,7 +24,7 @@ class ProfilGuruFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'nip' => fake()->unique()->numerify('19##########'),
             'telepon' => fake()->numerify('08##########'),
-            'tipe_guru' => 'homeroom',
+            'tipe_guru' => 'wali_kelas',
             'tingkat' => null,
         ]);
     }
@@ -34,7 +34,7 @@ class ProfilGuruFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'nip' => fake()->unique()->numerify('19##########'),
             'telepon' => fake()->numerify('08##########'),
-            'tipe_guru' => 'counselor',
+            'tipe_guru' => 'bk',
             'tingkat' => fake()->randomElement(['10', '11', '12']),
         ]);
     }

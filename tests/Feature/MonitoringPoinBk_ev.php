@@ -15,7 +15,7 @@ function monitoringPoinBkCounselor(string $tingkat): Pengguna
     $counselor = Pengguna::factory()->counselor()->create(['status' => 'registered']);
     $counselor->profilGuru()->create([
         'nip' => fake()->unique()->numerify('19################'),
-        'tipe_guru' => 'counselor',
+        'tipe_guru' => 'bk',
         'tingkat' => $tingkat,
     ]);
 

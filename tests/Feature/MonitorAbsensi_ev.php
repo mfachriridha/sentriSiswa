@@ -18,7 +18,7 @@ function monitorAbsensiHomeroom(string $className = '10. Monitor 1'): array
     $teacher = Pengguna::factory()->homeroom()->create(['status' => 'registered']);
     $teacher->profilGuru()->create([
         'nip' => fake()->unique()->numerify('19################'),
-        'tipe_guru' => 'homeroom',
+        'tipe_guru' => 'wali_kelas',
     ]);
     $class = Kelas::create(['nama' => $className, 'tingkat' => '10', 'wali_kelas_id' => $teacher->id]);
 
@@ -52,7 +52,7 @@ test('kelas saya index shows status and student list for own class today', funct
 // TS.MOA.002 / TC.MOA.002.001 — guru tanpa kelas wali, index tetap tampil kosong (positive)
 test('kelas saya index shows empty view when teacher has no homeroom class', function () {
     $teacher = Pengguna::factory()->homeroom()->create(['status' => 'registered']);
-    $teacher->profilGuru()->create(['nip' => fake()->unique()->numerify('19################'), 'tipe_guru' => 'homeroom']);
+    $teacher->profilGuru()->create(['nip' => fake()->unique()->numerify('19################'), 'tipe_guru' => 'wali_kelas']);
 
     $this->actingAs($teacher)->get(route('wali-kelas.kelas-saya'))
         ->assertSuccessful();

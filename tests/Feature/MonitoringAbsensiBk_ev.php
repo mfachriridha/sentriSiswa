@@ -13,7 +13,7 @@ function monitoringAbsensiBkCounselor(string $tingkat): Pengguna
     $counselor = Pengguna::factory()->counselor()->create(['status' => 'registered']);
     $counselor->profilGuru()->create([
         'nip' => fake()->unique()->numerify('19################'),
-        'tipe_guru' => 'counselor',
+        'tipe_guru' => 'bk',
         'tingkat' => $tingkat,
     ]);
 
@@ -103,7 +103,7 @@ test('bk monitoring index shows an empty list when the counselor has no grade le
     $counselor = Pengguna::factory()->counselor()->create(['status' => 'registered']);
     $counselor->profilGuru()->create([
         'nip' => fake()->unique()->numerify('19################'),
-        'tipe_guru' => 'counselor',
+        'tipe_guru' => 'bk',
         'tingkat' => null,
     ]);
     monitoringAbsensiBkStudent('10', '10. Monitoring Bk 8', 'Sartika Dewi', '70010');

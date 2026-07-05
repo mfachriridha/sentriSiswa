@@ -30,7 +30,7 @@ test('admin can create a teacher with valid data', function () {
     $this->assertDatabaseHas('profil_guru', [
         'pengguna_id' => $teacher->id,
         'nip' => '198501012020121001',
-        'tipe_guru' => 'homeroom',
+        'tipe_guru' => 'wali_kelas',
     ]);
 });
 

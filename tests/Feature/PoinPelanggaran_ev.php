@@ -13,7 +13,7 @@ function poinPelanggaranHomeroom(string $className = '10. Poin 1'): array
     $teacher = Pengguna::factory()->homeroom()->create(['status' => 'registered']);
     $teacher->profilGuru()->create([
         'nip' => fake()->unique()->numerify('19################'),
-        'tipe_guru' => 'homeroom',
+        'tipe_guru' => 'wali_kelas',
     ]);
     $class = Kelas::create(['nama' => $className, 'tingkat' => '10', 'wali_kelas_id' => $teacher->id]);
 
@@ -49,7 +49,7 @@ test('pelanggaran index shows approved violations for own class', function () {
 // TS.PPW.002 / TC.PPW.002.001 — guru tanpa kelas wali, index tetap tampil kosong (positive)
 test('pelanggaran index shows empty view when teacher has no homeroom class', function () {
     $teacher = Pengguna::factory()->homeroom()->create(['status' => 'registered']);
-    $teacher->profilGuru()->create(['nip' => fake()->unique()->numerify('19################'), 'tipe_guru' => 'homeroom']);
+    $teacher->profilGuru()->create(['nip' => fake()->unique()->numerify('19################'), 'tipe_guru' => 'wali_kelas']);
 
     $this->actingAs($teacher)->get(route('wali-kelas.pelanggaran'))
         ->assertSuccessful();

@@ -34,7 +34,7 @@ test('counselor can only monitor assigned grade', function () {
 
 test('student affairs can view student detail across classes', function () {
     [, $gradeTenStudent, $gradeElevenStudent] = actorWorkflowUsers();
-    $studentAffairs = createActorWorkflowTeacher('student_affairs');
+    $studentAffairs = createActorWorkflowTeacher('kesiswaan');
 
     $this->actingAs($studentAffairs)
         ->get(route('kesiswaan.monitoring.show', $gradeTenStudent))
@@ -50,7 +50,7 @@ test('student affairs can view student detail across classes', function () {
 test('school rule pdf can be uploaded by student affairs and viewed by student', function () {
     Storage::fake('public');
 
-    $studentAffairs = createActorWorkflowTeacher('student_affairs');
+    $studentAffairs = createActorWorkflowTeacher('kesiswaan');
     $studentUser = Pengguna::factory()->student()->create(['status' => 'registered']);
     ProfilSiswa::factory()->create(['pengguna_id' => $studentUser->id]);
 
@@ -76,8 +76,8 @@ test('school rule pdf can be uploaded by student affairs and viewed by student',
 
 test('violation reports and attendance pdf routes render downloads for allowed roles', function () {
     [$counselor, $student] = actorWorkflowUsers();
-    $studentAffairs = createActorWorkflowTeacher('student_affairs');
-    $homeroom = createActorWorkflowTeacher('homeroom');
+    $studentAffairs = createActorWorkflowTeacher('kesiswaan');
+    $homeroom = createActorWorkflowTeacher('wali_kelas');
     $class = $student->kelas;
     $class->update(['wali_kelas_id' => $homeroom->id]);
 
@@ -120,7 +120,7 @@ function actorWorkflowUsers(): array
     $classTen = Kelas::create(['nama' => 'X RPL 1', 'tingkat' => '10']);
     $classEleven = Kelas::create(['nama' => 'XI RPL 1', 'tingkat' => '11']);
 
-    $counselor = createActorWorkflowTeacher('counselor', '10');
+    $counselor = createActorWorkflowTeacher('bk', '10');
     $gradeTenStudent = createActorWorkflowStudentInClass($classTen);
     $gradeElevenStudent = createActorWorkflowStudentInClass($classEleven);
 
@@ -129,14 +129,14 @@ function actorWorkflowUsers(): array
 
 function createActorWorkflowTeacher(string $teacherType, ?string $grade = null): Pengguna
 {
-    if ($teacherType === 'student_affairs') {
+    if ($teacherType === 'kesiswaan') {
         DB::statement('PRAGMA ignore_check_constraints = ON');
     }
 
     $factoryState = match ($teacherType) {
-        'counselor'       => 'counselor',
-        'student_affairs' => 'studentAffairs',
-        default           => 'homeroom',
+        'bk'        => 'counselor',
+        'kesiswaan' => 'studentAffairs',
+        default     => 'homeroom',
     };
 
     $teacher = Pengguna::factory()->{$factoryState}()->create(['status' => 'registered']);
@@ -147,7 +147,7 @@ function createActorWorkflowTeacher(string $teacherType, ?string $grade = null):
         'tingkat'  => $grade,
     ]);
 
-    if ($teacherType === 'student_affairs') {
+    if ($teacherType === 'kesiswaan') {
         DB::statement('PRAGMA ignore_check_constraints = OFF');
     }
 

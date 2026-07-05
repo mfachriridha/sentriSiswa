@@ -208,7 +208,7 @@ class ImporGuru implements ToCollection, WithChunkReading, WithHeadingRow
 
         $typeRaw = trim((string) ($row['tipe'] ?? ''));
         $peran = in_array(strtolower($typeRaw), ['bk', 'guru bk'], true) ? 'bk'
-            : (in_array(strtolower($typeRaw), ['kesiswaan', 'student_affairs'], true) ? 'kesiswaan' : 'wali_kelas');
+            : (strtolower($typeRaw) === 'kesiswaan' ? 'kesiswaan' : 'wali_kelas');
 
         $tingkat = null;
         if ($peran === 'bk' && ! empty($typeRaw)) {

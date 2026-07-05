@@ -15,7 +15,7 @@ function createPengajuanPoinHomeroom(string $className = 'X IPA 1'): array
 
     $teacher->profilGuru()->create([
         'nip' => fake()->unique()->numerify('19################'),
-        'tipe_guru' => 'homeroom',
+        'tipe_guru' => 'wali_kelas',
     ]);
 
     $class = Kelas::create(['nama' => $className, 'tingkat' => '10']);
@@ -41,7 +41,7 @@ function createPengajuanPoinStudentAffairs(): Pengguna
     $teacher = Pengguna::factory()->studentAffairs()->create(['status' => 'registered']);
     $teacher->profilGuru()->create([
         'nip' => fake()->unique()->numerify('19################'),
-        'tipe_guru' => 'student_affairs',
+        'tipe_guru' => 'kesiswaan',
     ]);
 
     DB::statement('PRAGMA ignore_check_constraints = OFF');

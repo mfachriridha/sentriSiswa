@@ -73,7 +73,7 @@ class ImporGuruController extends Controller
                 $typeRaw = trim((string) ($row['tipe'] ?? ''));
                 $type = match (true) {
                     in_array(strtolower($typeRaw), ['bk', 'guru bk']) => 'BK',
-                    in_array(strtolower($typeRaw), ['kesiswaan', 'student_affairs']) => 'Kesiswaan',
+                    strtolower($typeRaw) === 'kesiswaan' => 'Kesiswaan',
                     default => 'Wali Kelas',
                 };
             }

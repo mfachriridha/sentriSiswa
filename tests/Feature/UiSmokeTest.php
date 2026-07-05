@@ -29,7 +29,7 @@ test('admin dashboard renders responsive shell and management shortcuts', functi
 });
 
 test('homeroom dashboard renders attendance shortcuts', function () {
-    $teacher = createDashboardTeacher('homeroom');
+    $teacher = createDashboardTeacher('wali_kelas');
 
     $this->actingAs($teacher)
         ->get(route('wali-kelas.dashboard'))
@@ -43,7 +43,7 @@ test('homeroom dashboard renders attendance shortcuts', function () {
 test('student affairs dashboard renders monitoring shortcuts', function () {
     // The production-only enum migration cannot alter SQLite's original check constraint.
     DB::statement('PRAGMA ignore_check_constraints = ON');
-    $teacher = createDashboardTeacher('student_affairs');
+    $teacher = createDashboardTeacher('kesiswaan');
     DB::statement('PRAGMA ignore_check_constraints = OFF');
 
     $this->actingAs($teacher)
@@ -58,7 +58,7 @@ test('student affairs dashboard renders monitoring shortcuts', function () {
 });
 
 test('counselor dashboard renders bk shortcuts', function () {
-    $teacher = createDashboardTeacher('counselor', '10');
+    $teacher = createDashboardTeacher('bk', '10');
 
     $this->actingAs($teacher)
         ->get(route('bk.dashboard'))
@@ -95,9 +95,9 @@ test('student dashboard and attendance page render existing primary actions', fu
 function createDashboardTeacher(string $teacherType, ?string $grade = null): Pengguna
 {
     $factoryState = match ($teacherType) {
-        'counselor'       => 'counselor',
-        'student_affairs' => 'studentAffairs',
-        default           => 'homeroom',
+        'bk'        => 'counselor',
+        'kesiswaan' => 'studentAffairs',
+        default     => 'homeroom',
     };
 
     $teacher = Pengguna::factory()->{$factoryState}()->create([

@@ -64,7 +64,7 @@ class DemoSchoolSeeder extends Seeder
             $profil = $guru->profilGuru()->create([
                 'nip' => sprintf('197%02d0000000000', $nip++),
                 'telepon' => sprintf('628121%05d', $nip),
-                'tipe_guru' => 'homeroom',
+                'tipe_guru' => 'wali_kelas',
                 'tingkat' => $tingkat,
             ]);
 
@@ -98,7 +98,7 @@ class DemoSchoolSeeder extends Seeder
             $profil = $guru->profilGuru()->create([
                 'nip' => "19{$tingkat}9000000000",
                 'telepon' => "62813{$tingkat}000000",
-                'tipe_guru' => 'counselor',
+                'tipe_guru' => 'bk',
                 'tingkat' => $tingkat,
             ]);
 
@@ -120,7 +120,7 @@ class DemoSchoolSeeder extends Seeder
         $profil = $guru->profilGuru()->create([
             'nip' => '19990000000000',
             'telepon' => '6281399000000',
-            'tipe_guru' => 'student_affairs',
+            'tipe_guru' => 'kesiswaan',
         ]);
 
         $photoPath = $this->generateTeacherPhoto($guru->id, $guru->nama);

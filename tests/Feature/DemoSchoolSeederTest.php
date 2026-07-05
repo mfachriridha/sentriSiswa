@@ -22,9 +22,9 @@ test('demo school seeder creates requested actor and class composition', functio
     $this->seed();
 
     expect(Pengguna::where('peran', 'admin')->count())->toBe(1);
-    expect(Pengguna::where('peran', 'wali_kelas')->whereHas('profilGuru', fn ($query) => $query->where('tipe_guru', 'homeroom'))->count())->toBe(3);
-    expect(Pengguna::where('peran', 'bk')->whereHas('profilGuru', fn ($query) => $query->where('tipe_guru', 'counselor'))->count())->toBe(3);
-    expect(Pengguna::where('peran', 'kesiswaan')->whereHas('profilGuru', fn ($query) => $query->where('tipe_guru', 'student_affairs'))->count())->toBe(1);
+    expect(Pengguna::where('peran', 'wali_kelas')->whereHas('profilGuru', fn ($query) => $query->where('tipe_guru', 'wali_kelas'))->count())->toBe(3);
+    expect(Pengguna::where('peran', 'bk')->whereHas('profilGuru', fn ($query) => $query->where('tipe_guru', 'bk'))->count())->toBe(3);
+    expect(Pengguna::where('peran', 'kesiswaan')->whereHas('profilGuru', fn ($query) => $query->where('tipe_guru', 'kesiswaan'))->count())->toBe(1);
 
     expect(Kelas::count())->toBe(3);
     expect(Kelas::where('tingkat', '10')->count())->toBe(1);
