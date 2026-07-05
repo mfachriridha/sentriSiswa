@@ -52,6 +52,7 @@ class DemoSchoolSeeder extends Seeder
         $nip = 1;
 
         foreach ($teacherData as $tingkat => $nama) {
+            $tingkat = (string) $tingkat;
             $guru = Pengguna::create([
                 'nama' => $nama,
                 'email' => "wali{$tingkat}@sentrisiswa.test",
