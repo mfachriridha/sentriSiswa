@@ -24,8 +24,7 @@ test('counselor can only monitor assigned grade', function () {
     $this->actingAs($counselor)
         ->get(route('bk.monitoring.show', $gradeTenStudent))
         ->assertSuccessful()
-        ->assertSee('Detail Siswa')
-        ->assertSee('Biodata Lengkap');
+        ->assertSee('Detail Siswa');
 
     $this->actingAs($counselor)
         ->get(route('bk.monitoring.show', $gradeElevenStudent))

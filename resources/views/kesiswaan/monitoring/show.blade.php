@@ -4,7 +4,6 @@
 
 @section('content')
 @php
-    $biodata = $student->biodata;
     $backLabel = $backLabel ?? 'Kembali ke Monitoring';
     $statusLabels = [
         'hadir' => ['Hadir', 'bg-green-50 text-green-700'],
@@ -13,26 +12,6 @@
         'izin' => ['Izin', 'bg-indigo-50 text-indigo-700'],
         'alpha' => ['Alpha', 'bg-red-50 text-red-700'],
         'belum_absen' => ['Belum Absen', 'bg-gray-100 text-gray-600'],
-    ];
-    $biodataRows = [
-        ['Tempat Lahir', $biodata?->tempat_lahir],
-        ['Tanggal Lahir', $biodata?->tanggal_lahir?->translatedFormat('d F Y')],
-        ['Jenis Kelamin', $biodata?->jenis_kelamin === 'L' ? 'Laki-laki' : ($biodata?->jenis_kelamin === 'P' ? 'Perempuan' : null)],
-        ['Agama', $biodata?->agama],
-        ['Status Keluarga', $biodata?->status_keluarga],
-        ['Anak Ke', $biodata?->anak_ke],
-        ['Asal Sekolah', $biodata?->asal_sekolah],
-        ['Tanggal Masuk', $biodata?->tanggal_masuk?->translatedFormat('d F Y')],
-        ['Ayah', $biodata?->nama_ayah],
-        ['Pekerjaan Ayah', $biodata?->pekerjaan_ayah],
-        ['Ibu', $biodata?->nama_ibu],
-        ['Pekerjaan Ibu', $biodata?->pekerjaan_ibu],
-        ['Alamat Orang Tua', $biodata?->alamat_ortu],
-        ['Telepon Orang Tua', $biodata?->telepon_ortu],
-        ['Wali', $biodata?->nama_wali],
-        ['Pekerjaan Wali', $biodata?->pekerjaan_wali],
-        ['Alamat Wali', $biodata?->alamat_wali],
-        ['Telepon Wali', $biodata?->telepon_wali],
     ];
 @endphp
 
@@ -107,18 +86,6 @@
                     <span class="mt-1 block text-sm text-gray-900">{{ $student->alamat ?? '-' }}</span>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <div class="rounded-xl border border-gray-200 bg-white p-6">
-        <h2 class="text-lg font-semibold text-gray-900">Biodata Lengkap</h2>
-        <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            @foreach($biodataRows as [$label, $value])
-                <div class="rounded-lg border border-gray-100 bg-gray-50 p-4">
-                    <p class="text-xs font-medium uppercase tracking-wide text-gray-500">{{ $label }}</p>
-                    <p class="mt-1 text-sm text-gray-900">{{ filled($value) ? $value : '-' }}</p>
-                </div>
-            @endforeach
         </div>
     </div>
 

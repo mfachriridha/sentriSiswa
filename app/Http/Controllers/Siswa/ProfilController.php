@@ -31,7 +31,7 @@ class ProfilController extends Controller
     public function show(): View
     {
         $student = Auth::user();
-        $student->load(['profilSiswa.kelas', 'profilSiswa.biodata']);
+        $student->load(['profilSiswa.kelas']);
 
         return view('siswa.profil', compact('student'));
     }

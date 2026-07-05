@@ -117,7 +117,6 @@ test('homeroom teacher can view own student detail but not another class detail'
         ->get(route('wali-kelas.kelas-saya.show', $student))
         ->assertSuccessful()
         ->assertSee('Detail Siswa')
-        ->assertSee('Biodata Lengkap')
         ->assertSee($student->pengguna->nama);
 
     $this->actingAs($teacher)

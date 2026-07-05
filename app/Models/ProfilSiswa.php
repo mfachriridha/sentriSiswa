@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 #[Fillable(['nisn', 'nis', 'kelas_id', 'telepon', 'alamat', 'foto'])]
 class ProfilSiswa extends Model
@@ -35,11 +34,6 @@ class ProfilSiswa extends Model
     public function kelas(): BelongsTo
     {
         return $this->belongsTo(Kelas::class, 'kelas_id');
-    }
-
-    public function biodata(): HasOne
-    {
-        return $this->hasOne(BiodataSiswa::class, 'profil_siswa_id');
     }
 
     public function absensi(): HasMany

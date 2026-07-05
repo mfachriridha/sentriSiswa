@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\BiodataSiswa;
 use App\Models\Kelas;
 use App\Models\Pengguna;
 use App\Models\ProfilSiswa;
@@ -43,32 +42,4 @@ test('demo school seeder uses human names without numbers', function () {
     $this->seed();
 
     expect(Pengguna::pluck('nama')->filter(fn (string $name): bool => preg_match('/\d/', $name) === 1)->count())->toBe(0);
-    expect(BiodataSiswa::pluck('nama_ayah')->filter(fn (string $name): bool => preg_match('/\d/', $name) === 1)->count())->toBe(0);
-    expect(BiodataSiswa::pluck('nama_ibu')->filter(fn (string $name): bool => preg_match('/\d/', $name) === 1)->count())->toBe(0);
-    expect(BiodataSiswa::pluck('nama_wali')->filter(fn (string $name): bool => preg_match('/\d/', $name) === 1)->count())->toBe(0);
-});
-
-test('demo school seeder creates complete biodata for every student', function () {
-    $this->seed();
-
-    expect(BiodataSiswa::count())->toBe(9);
-    expect(BiodataSiswa::get()->every(fn (BiodataSiswa $biodata): bool => filled($biodata->tempat_lahir)
-        && filled($biodata->tanggal_lahir)
-        && filled($biodata->jenis_kelamin)
-        && filled($biodata->agama)
-        && filled($biodata->status_keluarga)
-        && filled($biodata->anak_ke)
-        && filled($biodata->asal_sekolah)
-        && filled($biodata->tanggal_masuk)
-        && filled($biodata->nama_ayah)
-        && filled($biodata->pekerjaan_ayah)
-        && filled($biodata->nama_ibu)
-        && filled($biodata->pekerjaan_ibu)
-        && filled($biodata->alamat_ortu)
-        && filled($biodata->telepon_ortu)
-        && filled($biodata->nama_wali)
-        && filled($biodata->pekerjaan_wali)
-        && filled($biodata->alamat_wali)
-        && filled($biodata->telepon_wali)
-    ))->toBeTrue();
 });

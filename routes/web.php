@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\Admin\Auth\LoginController as AdminLoginController;
-use App\Http\Controllers\Admin\BiodataSiswaController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\GuruController;
 use App\Http\Controllers\Admin\ImporGuruController;
@@ -124,10 +123,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/siswa/impor/unggah', [ImporSiswaController::class, 'upload'])->name('siswa.impor.unggah');
     Route::get('/siswa/impor/pratinjau', [ImporSiswaController::class, 'preview'])->name('siswa.impor.pratinjau');
     Route::post('/siswa/impor', [ImporSiswaController::class, 'store'])->name('siswa.impor.store');
-    Route::get('/siswa/{siswa}/biodata/edit', [BiodataSiswaController::class, 'edit'])->name('siswa.biodata.edit');
-    Route::put('/siswa/{siswa}/biodata', [BiodataSiswaController::class, 'update'])->name('siswa.biodata.update');
-    Route::post('/siswa/{siswa}/foto', [BiodataSiswaController::class, 'uploadPhoto'])->name('siswa.foto');
-    Route::delete('/siswa/{siswa}/foto', [BiodataSiswaController::class, 'deletePhoto'])->name('siswa.foto.hapus');
     Route::resource('siswa', SiswaController::class);
     Route::delete('/kelas/hapus-semua', [KelasController::class, 'deleteAll'])->name('kelas.hapus-semua');
     Route::resource('kelas', KelasController::class)->parameters(['kelas' => 'kelas']);

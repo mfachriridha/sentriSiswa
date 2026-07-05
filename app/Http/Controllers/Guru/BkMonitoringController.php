@@ -58,7 +58,6 @@ class BkMonitoringController extends Controller
         $monitoring->load([
             'pengguna',
             'kelas',
-            'biodata',
             'pelanggaranSiswa' => fn ($query) => $query->disetujui()->latest('tanggal_pelanggaran')->with(['dicatatOleh', 'jenisPelanggaran']),
             'absensi' => fn ($query) => $query->latest('tanggal')->take(30),
         ]);

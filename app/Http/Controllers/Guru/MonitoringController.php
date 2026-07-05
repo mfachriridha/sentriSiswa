@@ -56,7 +56,6 @@ class MonitoringController extends Controller
         $monitoring->load([
             'pengguna',
             'kelas',
-            'biodata',
             'pelanggaranSiswa' => fn ($q) => $q->disetujui()->latest('tanggal_pelanggaran')->with(['dicatatOleh', 'jenisPelanggaran']),
             'absensi' => fn ($q) => $q->latest('tanggal')->take(30),
         ]);

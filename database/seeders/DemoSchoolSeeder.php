@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Absensi;
-use App\Models\BiodataSiswa;
 use App\Models\JenisPelanggaran;
 use App\Models\Kelas;
 use App\Models\PelanggaranSiswa;
@@ -170,9 +169,7 @@ class DemoSchoolSeeder extends Seeder
             'Intan Pratiwi', 'Iqbal Firmansyah', 'Jihan Azzahra',
         ];
 
-        $birthPlaces = ['Jakarta', 'Bandung', 'Bogor', 'Depok', 'Bekasi', 'Tangerang'];
         $streets = ['Jalan Melati Raya', 'Jalan Kenanga Indah', 'Jalan Cempaka Putih', 'Jalan Mawar Asri', 'Jalan Anggrek Timur', 'Jalan Flamboyan'];
-        $occupations = ['Karyawan', 'Wiraswasta', 'Guru', 'Perawat', 'Pedagang', 'Pegawai Negeri'];
 
         $nameIndex = 0;
 
@@ -197,28 +194,6 @@ class DemoSchoolSeeder extends Seeder
                     'kelas_id' => $kelas->id,
                     'telepon' => "0812{$nis}",
                     'alamat' => $street.', Kelurahan Sentri',
-                ]);
-
-                BiodataSiswa::create([
-                    'profil_siswa_id' => $profil->nisn,
-                    'tempat_lahir' => $birthPlaces[($sequence - 1) % count($birthPlaces)],
-                    'tanggal_lahir' => now()->subYears(16)->subDays($sequence)->toDateString(),
-                    'jenis_kelamin' => $slot % 2 === 0 ? 'P' : 'L',
-                    'agama' => 'Islam',
-                    'status_keluarga' => 'Kandung',
-                    'anak_ke' => $slot,
-                    'asal_sekolah' => 'SMP Nusantara',
-                    'tanggal_masuk' => now()->subYear()->startOfMonth()->toDateString(),
-                    'nama_ayah' => "Bapak dari {$nama}",
-                    'pekerjaan_ayah' => $occupations[($sequence - 1) % count($occupations)],
-                    'nama_ibu' => "Ibu dari {$nama}",
-                    'pekerjaan_ibu' => 'Ibu Rumah Tangga',
-                    'alamat_ortu' => $street.', Kelurahan Sentri',
-                    'telepon_ortu' => "0821{$nis}",
-                    'nama_wali' => "Wali dari {$nama}",
-                    'pekerjaan_wali' => $occupations[$sequence % count($occupations)],
-                    'alamat_wali' => $street.', Kelurahan Sentri',
-                    'telepon_wali' => "0831{$nis}",
                 ]);
 
                 $photoPath = $this->generateStudentPhoto($nis, $nama);
