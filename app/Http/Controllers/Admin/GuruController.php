@@ -85,7 +85,9 @@ class GuruController extends Controller
 
     public function create(): View
     {
-        return view('admin.guru.create');
+        $availableKelas = Kelas::whereNull('wali_kelas_id')->orderBy('tingkat')->orderBy('nama')->get();
+
+        return view('admin.guru.create', compact('availableKelas'));
     }
 
     public function store(StoreGuruRequest $request): RedirectResponse
@@ -106,6 +108,10 @@ class GuruController extends Controller
                 'tipe_guru'=> $request->peran,
                 'tingkat'  => $request->peran === 'bk' ? $request->tingkat : null,
             ]);
+
+            if ($request->peran === 'wali_kelas' && $request->kelas_id) {
+                Kelas::where('id', $request->kelas_id)->update(['wali_kelas_id' => $user->id]);
+            }
         });
 
         return redirect()->route('admin.guru.index')->with('success', 'Guru berhasil ditambahkan.');
@@ -120,9 +126,12 @@ class GuruController extends Controller
 
     public function edit(Pengguna $guru): View
     {
-        $guru->load('profilGuru');
+        $guru->load(['profilGuru', 'kelasWali']);
 
-        return view('admin.guru.edit', compact('guru'));
+        $availableKelas = Kelas::where(fn ($q) => $q->whereNull('wali_kelas_id')->orWhere('wali_kelas_id', $guru->id))
+            ->orderBy('tingkat')->orderBy('nama')->get();
+
+        return view('admin.guru.edit', compact('guru', 'availableKelas'));
     }
 
     public function update(UpdateGuruRequest $request, Pengguna $guru): RedirectResponse
@@ -142,6 +151,12 @@ class GuruController extends Controller
                     'tingkat'   => $request->peran === 'bk' ? $request->tingkat : null,
                 ],
             );
+
+            Kelas::where('wali_kelas_id', $guru->id)->update(['wali_kelas_id' => null]);
+
+            if ($request->peran === 'wali_kelas' && $request->kelas_id) {
+                Kelas::where('id', $request->kelas_id)->update(['wali_kelas_id' => $guru->id]);
+            }
         });
 
         return redirect()->route('admin.guru.index')->with('success', 'Guru berhasil diperbarui.');

@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Kelas;
 use App\Models\Pengguna;
 use App\Models\ProfilGuru;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -158,4 +159,55 @@ test('admin can filter teachers by registration status', function () {
         ->assertSuccessful()
         ->assertSee('Guru Terdaftar')
         ->assertDontSee('Guru Belum Daftar');
+});
+
+// TS.GUR.011 / TC.GUR.011.001 — admin assigns a kelas directly while creating a wali_kelas teacher (positive)
+test('admin can assign a kelas while creating a wali_kelas teacher', function () {
+    $admin = guruAdmin();
+    $kelas = Kelas::create(['nama' => '10 IPA', 'tingkat' => '10']);
+
+    $this->actingAs($admin)->post(route('admin.guru.store'), [
+        'nama' => 'Guru Wali Baru',
+        'nip' => '198501012020121011',
+        'peran' => 'wali_kelas',
+        'kelas_id' => $kelas->id,
+    ])->assertRedirect(route('admin.guru.index'));
+
+    $teacher = Pengguna::where('nama', 'Guru Wali Baru')->firstOrFail();
+    expect($kelas->fresh()->wali_kelas_id)->toBe($teacher->id);
+});
+
+// TS.GUR.012 / TC.GUR.012.001 — admin cannot assign a kelas that already has a wali kelas (negative)
+test('admin cannot assign a kelas that already has a wali kelas', function () {
+    $admin = guruAdmin();
+    $existingWali = Pengguna::factory()->homeroom()->create();
+    $kelas = Kelas::create(['nama' => '10 IPS', 'tingkat' => '10', 'wali_kelas_id' => $existingWali->id]);
+
+    $this->actingAs($admin)->post(route('admin.guru.store'), [
+        'nama' => 'Guru Rebutan Kelas',
+        'nip' => '198501012020121012',
+        'peran' => 'wali_kelas',
+        'kelas_id' => $kelas->id,
+    ])->assertSessionHasErrors('kelas_id');
+
+    expect($kelas->fresh()->wali_kelas_id)->toBe($existingWali->id);
+});
+
+// TS.GUR.013 / TC.GUR.013.001 — updating a teacher's kelas releases the old one and assigns the new one (positive)
+test('admin can change a wali_kelas teacher kelas assignment on update', function () {
+    $admin = guruAdmin();
+    $teacher = Pengguna::factory()->homeroom()->create();
+    ProfilGuru::factory()->create(['pengguna_id' => $teacher->id, 'nip' => '198501012020121013']);
+    $kelasLama = Kelas::create(['nama' => '11 IPA', 'tingkat' => '11', 'wali_kelas_id' => $teacher->id]);
+    $kelasBaru = Kelas::create(['nama' => '12 IPA', 'tingkat' => '12']);
+
+    $this->actingAs($admin)->put(route('admin.guru.update', $teacher), [
+        'nama' => $teacher->nama,
+        'nip' => '198501012020121013',
+        'peran' => 'wali_kelas',
+        'kelas_id' => $kelasBaru->id,
+    ])->assertRedirect(route('admin.guru.index'));
+
+    expect($kelasLama->fresh()->wali_kelas_id)->toBeNull();
+    expect($kelasBaru->fresh()->wali_kelas_id)->toBe($teacher->id);
 });

@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Guru;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateGuruRequest extends FormRequest
 {
@@ -21,6 +22,12 @@ class UpdateGuruRequest extends FormRequest
             'telepon' => ['nullable', 'string', 'min:10', 'max:15', 'regex:/^[0-9+\-\s()]*$/'],
             'peran' => ['required', 'in:wali_kelas,bk,kesiswaan'],
             'tingkat' => ['nullable', 'required_if:peran,bk', 'in:10,11,12'],
+            'kelas_id' => [
+                'nullable',
+                Rule::exists('kelas', 'id')->where(
+                    fn ($query) => $query->whereNull('wali_kelas_id')->orWhere('wali_kelas_id', $user->id)
+                ),
+            ],
         ];
     }
 }

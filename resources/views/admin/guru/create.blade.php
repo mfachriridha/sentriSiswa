@@ -71,6 +71,22 @@
                         <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
+
+                <div x-show="role === 'wali_kelas'" x-cloak class="mt-6">
+                    <label for="kelas_id" class="block text-sm font-medium text-gray-700">Kelas Perwalian</label>
+                    <select id="kelas_id" name="kelas_id"
+                            class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
+                                   focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
+                        <option value="">Pilih kelas (opsional)</option>
+                        @foreach ($availableKelas as $kelas)
+                            <option value="{{ $kelas->id }}" {{ old('kelas_id') == $kelas->id ? 'selected' : '' }}>{{ $kelas->nama }}</option>
+                        @endforeach
+                    </select>
+                    <p class="mt-1.5 text-xs text-gray-500">Cuma kelas yang belum ada wali kelasnya yang muncul di sini.</p>
+                    @error('kelas_id')
+                        <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
 
             <div>
