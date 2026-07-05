@@ -39,32 +39,22 @@ class DemoSchoolSeeder extends Seeder
         $this->createSchoolRule();
     }
 
-    /** @return array<string, Pengguna> keyed by slug e.g. "10.ipa1" */
+    /** @return array<string, Pengguna> keyed by tingkat e.g. "10" */
     private function createHomeroomTeachers(): array
     {
         $teacherData = [
-            '10.ipa1' => ['Raka Pradipta', '10'],
-            '10.ipa2' => ['Nadia Lestari', '10'],
-            '10.ips1' => ['Bagas Wiratama', '10'],
-            '10.ips2' => ['Maya Permatasari', '10'],
-            '11.ipa1' => ['Dimas Mahendra', '11'],
-            '11.ipa2' => ['Sinta Rahmawati', '11'],
-            '11.ips1' => ['Fajar Nugroho', '11'],
-            '11.ips2' => ['Dewi Anjani', '11'],
-            '12.ipa1' => ['Hendra Kusuma', '12'],
-            '12.ipa2' => ['Lina Wulandari', '12'],
-            '12.ips1' => ['Agus Santoso', '12'],
-            '12.ips2' => ['Rina Marlina', '12'],
+            '10' => 'Raka Pradipta',
+            '11' => 'Dimas Mahendra',
+            '12' => 'Hendra Kusuma',
         ];
 
         $teachers = [];
         $nip = 1;
 
-        foreach ($teacherData as $slug => [$nama, $tingkat]) {
-            $emailSlug = str_replace('.', '-', $slug);
+        foreach ($teacherData as $tingkat => $nama) {
             $guru = Pengguna::create([
                 'nama' => $nama,
-                'email' => "wali.{$emailSlug}@sentrisiswa.test",
+                'email' => "wali{$tingkat}@sentrisiswa.test",
                 'password' => Hash::make('password'),
                 'peran' => 'wali_kelas',
                 'status' => 'registered',
@@ -80,7 +70,7 @@ class DemoSchoolSeeder extends Seeder
             $photoPath = $this->generateTeacherPhoto($guru->id, $nama);
             $profil->update(['foto' => $photoPath]);
 
-            $teachers[$slug] = $guru;
+            $teachers[$tingkat] = $guru;
         }
 
         return $teachers;
@@ -143,27 +133,18 @@ class DemoSchoolSeeder extends Seeder
     private function createClasses(array $homerooms): array
     {
         $classConfig = [
-            ['10', 'X', 'IPA', '1', '10.ipa1'],
-            ['10', 'X', 'IPA', '2', '10.ipa2'],
-            ['10', 'X', 'IPS', '1', '10.ips1'],
-            ['10', 'X', 'IPS', '2', '10.ips2'],
-            ['11', 'XI', 'IPA', '1', '11.ipa1'],
-            ['11', 'XI', 'IPA', '2', '11.ipa2'],
-            ['11', 'XI', 'IPS', '1', '11.ips1'],
-            ['11', 'XI', 'IPS', '2', '11.ips2'],
-            ['12', 'XII', 'IPA', '1', '12.ipa1'],
-            ['12', 'XII', 'IPA', '2', '12.ipa2'],
-            ['12', 'XII', 'IPS', '1', '12.ips1'],
-            ['12', 'XII', 'IPS', '2', '12.ips2'],
+            ['10', 'IPA'],
+            ['11', 'IPS'],
+            ['12', 'IPA'],
         ];
 
         $classes = [];
 
-        foreach ($classConfig as [$tingkat, $roman, $jurusan, $nomor, $slug]) {
+        foreach ($classConfig as [$tingkat, $jurusan]) {
             $classes[] = Kelas::create([
-                'nama' => "{$roman} {$jurusan} {$nomor}",
+                'nama' => "{$tingkat} {$jurusan}",
                 'tingkat' => $tingkat,
-                'wali_kelas_id' => $homerooms[$slug]->id,
+                'wali_kelas_id' => $homerooms[$tingkat]->id,
             ]);
         }
 
@@ -180,30 +161,12 @@ class DemoSchoolSeeder extends Seeder
         $sequence = 1;
 
         $names = [
-            // Kelas 10 IPA 1 (3 siswa)
+            // Kelas 10 IPA
             'Aditya Pratama', 'Aisyah Nurhaliza', 'Akbar Maulana',
-            // Kelas 10 IPA 2
-            'Amelia Putri', 'Ananda Rizky', 'Andika Saputra',
-            // Kelas 10 IPS 1
-            'Aulia Rahmadani', 'Bagus Setiawan', 'Bintang Ramadhan',
-            // Kelas 10 IPS 2
-            'Cahya Maharani', 'Citra Anggraini', 'Daffa Fadillah',
-            // Kelas 11 IPA 1
-            'Dewi Kartika', 'Dina Maharani', 'Eka Purnama',
-            // Kelas 11 IPA 2
-            'Elisa Febriani', 'Fajar Hidayat', 'Farhan Maulana',
-            // Kelas 11 IPS 1
+            // Kelas 11 IPS
             'Fitri Lestari', 'Galang Prasetyo', 'Gilang Ramadhan',
-            // Kelas 11 IPS 2
-            'Hana Safitri', 'Hanif Nugraha', 'Indah Permatasari',
-            // Kelas 12 IPA 1
+            // Kelas 12 IPA
             'Intan Pratiwi', 'Iqbal Firmansyah', 'Jihan Azzahra',
-            // Kelas 12 IPA 2
-            'Kania Maharani', 'Kevin Saputra', 'Kurnia Sari',
-            // Kelas 12 IPS 1
-            'Laila Rahma', 'Lukman Hakim', 'Maya Salsabila',
-            // Kelas 12 IPS 2
-            'Miftah Fauzan', 'Nabila Khairunnisa', 'Nadia Amalia',
         ];
 
         $birthPlaces = ['Jakarta', 'Bandung', 'Bogor', 'Depok', 'Bekasi', 'Tangerang'];
@@ -217,14 +180,13 @@ class DemoSchoolSeeder extends Seeder
                 $nis = sprintf('%05d', $sequence);
                 $nama = $names[$nameIndex] ?? "Siswa {$sequence}";
                 $street = $streets[($sequence - 1) % count($streets)];
-                $isUnregistered = $slot === 3;
 
                 $pengguna = Pengguna::create([
                     'nama' => $nama,
-                    'email' => $isUnregistered ? null : "siswa{$nis}@sentrisiswa.test",
+                    'email' => "siswa{$nis}@sentrisiswa.test",
                     'password' => Hash::make('password'),
                     'peran' => 'siswa',
-                    'status' => $isUnregistered ? 'unregistered' : 'registered',
+                    'status' => 'registered',
                 ]);
 
                 $profil = ProfilSiswa::create([
@@ -233,7 +195,7 @@ class DemoSchoolSeeder extends Seeder
                     'nis' => $nis,
                     'kelas_id' => $kelas->id,
                     'telepon' => "0812{$nis}",
-                    'alamat' => $street . ', Kelurahan Sentri',
+                    'alamat' => $street.', Kelurahan Sentri',
                 ]);
 
                 BiodataSiswa::create([
@@ -250,11 +212,11 @@ class DemoSchoolSeeder extends Seeder
                     'pekerjaan_ayah' => $occupations[($sequence - 1) % count($occupations)],
                     'nama_ibu' => "Ibu dari {$nama}",
                     'pekerjaan_ibu' => 'Ibu Rumah Tangga',
-                    'alamat_ortu' => $street . ', Kelurahan Sentri',
+                    'alamat_ortu' => $street.', Kelurahan Sentri',
                     'telepon_ortu' => "0821{$nis}",
                     'nama_wali' => "Wali dari {$nama}",
                     'pekerjaan_wali' => $occupations[$sequence % count($occupations)],
-                    'alamat_wali' => $street . ', Kelurahan Sentri',
+                    'alamat_wali' => $street.', Kelurahan Sentri',
                     'telepon_wali' => "0831{$nis}",
                 ]);
 
