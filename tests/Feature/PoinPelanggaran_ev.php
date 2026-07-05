@@ -76,7 +76,7 @@ test('pelanggaran index filters by category', function () {
     PelanggaranSiswa::factory()->create(['profil_siswa_id' => $student->nisn, 'status' => 'approved', 'kategori_pelanggaran' => 'light', 'nama_pelanggaran' => 'Pelanggaran Ringan']);
     PelanggaranSiswa::factory()->create(['profil_siswa_id' => $student->nisn, 'status' => 'approved', 'kategori_pelanggaran' => 'heavy', 'nama_pelanggaran' => 'Pelanggaran Berat']);
 
-    $this->actingAs($teacher)->get(route('wali-kelas.pelanggaran', ['category' => 'light']))
+    $this->actingAs($teacher)->get(route('wali-kelas.pelanggaran', ['kategori' => 'light']))
         ->assertSuccessful()
         ->assertSee('Pelanggaran Ringan')
         ->assertDontSee('Pelanggaran Berat');

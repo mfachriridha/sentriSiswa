@@ -36,13 +36,13 @@
 
         <div>
             <label class="block text-sm font-medium text-gray-700">Dari Tanggal</label>
-            <input type="date" name="date_from" value="{{ request('date_from') }}"
+            <input id="date_from" type="date" name="date_from" value="{{ request('date_from') }}"
                    class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
         </div>
 
         <div>
             <label class="block text-sm font-medium text-gray-700">Sampai Tanggal</label>
-            <input type="date" name="date_to" value="{{ request('date_to') }}"
+            <input id="date_to" type="date" name="date_to" value="{{ request('date_to') }}"
                    class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
         </div>
 
@@ -124,3 +124,22 @@
     @endif
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    (function () {
+        const startInput = document.getElementById('date_from');
+        const endInput = document.getElementById('date_to');
+        if (!startInput || !endInput) return;
+
+        function syncBounds() {
+            endInput.min = startInput.value || '';
+            startInput.max = endInput.value || '';
+        }
+
+        startInput.addEventListener('change', syncBounds);
+        endInput.addEventListener('change', syncBounds);
+        syncBounds();
+    })();
+</script>
+@endpush
