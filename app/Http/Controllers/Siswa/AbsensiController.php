@@ -20,7 +20,7 @@ class AbsensiController extends Controller
         $profile = $student->profilSiswa;
 
         $today = now()->toDateString();
-        $todayAttendance = $profile?->absensi()->where('tanggal', $today)->first();
+        $todayAttendance = $profile?->absensi()->whereDate('tanggal', $today)->first();
 
         $startTime = Pengaturan::get('attendance_start_time', '06:30');
         $endTime = Pengaturan::get('attendance_end_time', '07:00');
@@ -72,7 +72,7 @@ class AbsensiController extends Controller
     public function statusHariIni(): JsonResponse
     {
         $profile = Auth::user()->profilSiswa;
-        $absensi = $profile?->absensi()->where('tanggal', now()->toDateString())->first();
+        $absensi = $profile?->absensi()->whereDate('tanggal', now()->toDateString())->first();
 
         return response()->json([
             'sudah_absen' => $absensi && $absensi->status !== 'belum_absen',
@@ -291,10 +291,8 @@ class AbsensiController extends Controller
         $month = Carbon::createFromFormat('Y-m', $selectedMonth)->startOfMonth();
 
         $attendances = $profile?->absensi()
-            ->whereBetween('tanggal', [
-                $month->toDateString(),
-                $month->copy()->endOfMonth()->toDateString(),
-            ])
+            ->whereDate('tanggal', '>=', $month->toDateString())
+            ->whereDate('tanggal', '<=', $month->copy()->endOfMonth()->toDateString())
             ->latest('tanggal')
             ->get() ?? collect();
 
