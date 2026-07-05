@@ -27,10 +27,10 @@
             <label class="block text-sm font-medium text-gray-700">Kategori</label>
             <select name="kategori" class="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
                 <option value="">Semua Kategori</option>
-                <option value="light" {{ request('kategori') === 'light' ? 'selected' : '' }}>Ringan</option>
-                <option value="medium" {{ request('kategori') === 'medium' ? 'selected' : '' }}>Sedang</option>
-                <option value="heavy" {{ request('kategori') === 'heavy' ? 'selected' : '' }}>Berat</option>
-                <option value="severe" {{ request('kategori') === 'severe' ? 'selected' : '' }}>Sangat Berat</option>
+                <option value="ringan" {{ request('kategori') === 'ringan' ? 'selected' : '' }}>Ringan</option>
+                <option value="sedang" {{ request('kategori') === 'sedang' ? 'selected' : '' }}>Sedang</option>
+                <option value="berat" {{ request('kategori') === 'berat' ? 'selected' : '' }}>Berat</option>
+                <option value="sangat_berat" {{ request('kategori') === 'sangat_berat' ? 'selected' : '' }}>Sangat Berat</option>
             </select>
         </div>
 

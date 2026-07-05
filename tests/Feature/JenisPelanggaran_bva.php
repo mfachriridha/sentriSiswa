@@ -24,7 +24,7 @@ test('violation type rejects points 1 below the light category minimum', functio
 
     $this->actingAs($kesiswaan)->post(route('kesiswaan.jenis-pelanggaran.store'), [
         'nama' => 'Boundary Light Bawah 1',
-        'kategori' => 'light',
+        'kategori' => 'ringan',
         'pengurangan_poin' => 4,
         'aktif' => '1',
     ])->assertSessionHasErrors('pengurangan_poin');
@@ -36,7 +36,7 @@ test('violation type accepts points exactly at the light category minimum', func
 
     $this->actingAs($kesiswaan)->post(route('kesiswaan.jenis-pelanggaran.store'), [
         'nama' => 'Boundary Light Bawah 2',
-        'kategori' => 'light',
+        'kategori' => 'ringan',
         'pengurangan_poin' => 5,
         'aktif' => '1',
     ])->assertRedirect(route('kesiswaan.jenis-pelanggaran.index'));
@@ -50,7 +50,7 @@ test('violation type accepts points exactly at the light category maximum', func
 
     $this->actingAs($kesiswaan)->post(route('kesiswaan.jenis-pelanggaran.store'), [
         'nama' => 'Boundary Light Atas 1',
-        'kategori' => 'light',
+        'kategori' => 'ringan',
         'pengurangan_poin' => 25,
         'aktif' => '1',
     ])->assertRedirect(route('kesiswaan.jenis-pelanggaran.index'));
@@ -64,7 +64,7 @@ test('violation type rejects points 1 above the light category maximum', functio
 
     $this->actingAs($kesiswaan)->post(route('kesiswaan.jenis-pelanggaran.store'), [
         'nama' => 'Boundary Light Atas 2',
-        'kategori' => 'light',
+        'kategori' => 'ringan',
         'pengurangan_poin' => 26,
         'aktif' => '1',
     ])->assertSessionHasErrors('pengurangan_poin');
@@ -79,7 +79,7 @@ test('violation type accepts a name with exactly 255 characters', function () {
 
     $this->actingAs($kesiswaan)->post(route('kesiswaan.jenis-pelanggaran.store'), [
         'nama' => $nama255,
-        'kategori' => 'light',
+        'kategori' => 'ringan',
         'pengurangan_poin' => 10,
         'aktif' => '1',
     ])->assertRedirect(route('kesiswaan.jenis-pelanggaran.index'));
@@ -94,7 +94,7 @@ test('violation type rejects a name with 256 characters', function () {
 
     $this->actingAs($kesiswaan)->post(route('kesiswaan.jenis-pelanggaran.store'), [
         'nama' => $nama256,
-        'kategori' => 'light',
+        'kategori' => 'ringan',
         'pengurangan_poin' => 10,
         'aktif' => '1',
     ])->assertSessionHasErrors('nama');

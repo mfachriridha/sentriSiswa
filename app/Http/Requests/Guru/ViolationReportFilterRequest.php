@@ -22,7 +22,7 @@ class ViolationReportFilterRequest extends FormRequest
             'selesai' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:mulai'],
             'kelas_id' => ['nullable', 'integer', Rule::exists('kelas', 'id')],
             'tingkat' => ['nullable', Rule::in(['10', '11', '12'])],
-            'kategori' => ['nullable', Rule::in(['light', 'medium', 'heavy', 'severe'])],
+            'kategori' => ['nullable', Rule::in(['ringan', 'sedang', 'berat', 'sangat_berat'])],
             'status' => ['nullable', Rule::in(['pending', 'approved', 'rejected'])],
         ];
     }

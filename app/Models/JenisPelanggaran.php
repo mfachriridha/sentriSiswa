@@ -15,13 +15,13 @@ class JenisPelanggaran extends Model
 
     protected $table = 'jenis_pelanggaran';
 
-    public const string CATEGORY_LIGHT = 'light';
+    public const string CATEGORY_LIGHT = 'ringan';
 
-    public const string CATEGORY_MEDIUM = 'medium';
+    public const string CATEGORY_MEDIUM = 'sedang';
 
-    public const string CATEGORY_HEAVY = 'heavy';
+    public const string CATEGORY_HEAVY = 'berat';
 
-    public const string CATEGORY_SEVERE = 'severe';
+    public const string CATEGORY_SEVERE = 'sangat_berat';
 
     public static function categoryLabels(): array
     {
@@ -29,7 +29,7 @@ class JenisPelanggaran extends Model
             self::CATEGORY_LIGHT => 'Sanksi Ringan',
             self::CATEGORY_MEDIUM => 'Sanksi Sedang',
             self::CATEGORY_HEAVY => 'Sanksi Berat',
-            self::CATEGORY_SEVERE => 'Sanksi Amat Berat',
+            self::CATEGORY_SEVERE => 'Sanksi Sangat Berat',
         ];
     }
 

@@ -44,7 +44,7 @@ class JenisPelanggaranController extends Controller
 
         if ($sort === 'kategori') {
             $violationTypes = $violationTypes
-                ->orderByRaw("CASE kategori WHEN 'light' THEN 1 WHEN 'medium' THEN 2 WHEN 'heavy' THEN 3 WHEN 'severe' THEN 4 ELSE 5 END {$direction}")
+                ->orderByRaw("CASE kategori WHEN 'ringan' THEN 1 WHEN 'sedang' THEN 2 WHEN 'berat' THEN 3 WHEN 'sangat_berat' THEN 4 ELSE 5 END {$direction}")
                 ->orderBy('pengurangan_poin', $direction)
                 ->orderBy('nama');
         } else {

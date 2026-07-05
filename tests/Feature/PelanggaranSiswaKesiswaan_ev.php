@@ -36,7 +36,7 @@ function pelanggaranKesiswaanStudent(string $className, string $nisn): ProfilSis
 test('student affairs can record a violation for any student regardless of class and it is auto-approved', function () {
     $kesiswaan = pelanggaranKesiswaanActor();
     $student = pelanggaranKesiswaanStudent('10. Pelanggaran K 1', '90001');
-    $type = JenisPelanggaran::factory()->create(['kategori' => 'light', 'pengurangan_poin' => 10, 'aktif' => true]);
+    $type = JenisPelanggaran::factory()->create(['kategori' => 'ringan', 'pengurangan_poin' => 10, 'aktif' => true]);
 
     $this->actingAs($kesiswaan)->post(route('kesiswaan.pelanggaran-siswa.store'), [
         'profil_siswa_id' => $student->nisn,
@@ -160,12 +160,12 @@ test('violation record index filters by class, category, type, date, and status'
     $class = Kelas::create(['nama' => '10. Pelanggaran K 8', 'tingkat' => '10']);
     $studentUserA = Pengguna::factory()->student()->create(['status' => 'registered', 'nama' => 'Gilang Ramadhan']);
     $studentA = ProfilSiswa::factory()->create(['pengguna_id' => $studentUserA->id, 'kelas_id' => $class->id, 'nisn' => '90008']);
-    $typeA = JenisPelanggaran::factory()->create(['nama' => 'Terlambat Filter', 'kategori' => 'light', 'pengurangan_poin' => 10]);
+    $typeA = JenisPelanggaran::factory()->create(['nama' => 'Terlambat Filter', 'kategori' => 'ringan', 'pengurangan_poin' => 10]);
     PelanggaranSiswa::factory()->create([
         'profil_siswa_id' => $studentA->nisn,
         'jenis_pelanggaran_id' => $typeA->id,
         'nama_pelanggaran' => $typeA->nama,
-        'kategori_pelanggaran' => 'light',
+        'kategori_pelanggaran' => 'ringan',
         'pengurangan_poin' => 10,
         'tanggal_pelanggaran' => '2026-01-10',
         'status' => 'approved',
@@ -174,12 +174,12 @@ test('violation record index filters by class, category, type, date, and status'
     $otherClass = Kelas::create(['nama' => '11. Pelanggaran K 9', 'tingkat' => '11']);
     $studentUserB = Pengguna::factory()->student()->create(['status' => 'registered', 'nama' => 'Hesti Purnama']);
     $studentB = ProfilSiswa::factory()->create(['pengguna_id' => $studentUserB->id, 'kelas_id' => $otherClass->id, 'nisn' => '90009']);
-    $typeB = JenisPelanggaran::factory()->create(['nama' => 'Bullying Filter', 'kategori' => 'severe', 'pengurangan_poin' => 80]);
+    $typeB = JenisPelanggaran::factory()->create(['nama' => 'Bullying Filter', 'kategori' => 'sangat_berat', 'pengurangan_poin' => 80]);
     PelanggaranSiswa::factory()->create([
         'profil_siswa_id' => $studentB->nisn,
         'jenis_pelanggaran_id' => $typeB->id,
         'nama_pelanggaran' => $typeB->nama,
-        'kategori_pelanggaran' => 'severe',
+        'kategori_pelanggaran' => 'sangat_berat',
         'pengurangan_poin' => 80,
         'tanggal_pelanggaran' => '2026-02-15',
         'status' => 'approved',
@@ -189,7 +189,7 @@ test('violation record index filters by class, category, type, date, and status'
     $this->actingAs($kesiswaan)->get(route('kesiswaan.pelanggaran-siswa.index', ['kelas_id' => $class->id]))
         ->assertSuccessful()->assertSee('Gilang Ramadhan')->assertDontSee('Hesti Purnama');
 
-    $this->actingAs($kesiswaan)->get(route('kesiswaan.pelanggaran-siswa.index', ['kategori' => 'severe']))
+    $this->actingAs($kesiswaan)->get(route('kesiswaan.pelanggaran-siswa.index', ['kategori' => 'sangat_berat']))
         ->assertSuccessful()->assertSee('Hesti Purnama')->assertDontSee('Gilang Ramadhan');
 
     $this->actingAs($kesiswaan)->get(route('kesiswaan.pelanggaran-siswa.index', ['jenis_pelanggaran_id' => $typeA->id]))

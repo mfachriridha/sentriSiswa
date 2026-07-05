@@ -20,7 +20,7 @@ class RiwayatPelanggaranFilterRequest extends FormRequest
     {
         return [
             'profil_siswa_id' => ['nullable', 'string', Rule::exists('profil_siswa', 'nisn')],
-            'kategori' => ['nullable', Rule::in(['light', 'medium', 'heavy', 'severe'])],
+            'kategori' => ['nullable', Rule::in(['ringan', 'sedang', 'berat', 'sangat_berat'])],
             'date_from' => ['nullable', 'date_format:Y-m-d'],
             'date_to' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:date_from'],
         ];

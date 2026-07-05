@@ -65,7 +65,7 @@ class PelanggaranSiswaController extends Controller
 
         if ($sort === 'kategori_pelanggaran') {
             $studentViolations = $studentViolations
-                ->orderByRaw("CASE kategori_pelanggaran WHEN 'light' THEN 1 WHEN 'medium' THEN 2 WHEN 'heavy' THEN 3 WHEN 'severe' THEN 4 ELSE 5 END {$direction}")
+                ->orderByRaw("CASE kategori_pelanggaran WHEN 'ringan' THEN 1 WHEN 'sedang' THEN 2 WHEN 'berat' THEN 3 WHEN 'sangat_berat' THEN 4 ELSE 5 END {$direction}")
                 ->orderBy('pengurangan_poin', $direction)
                 ->orderBy('nama_pelanggaran');
         } else {
@@ -170,7 +170,7 @@ class PelanggaranSiswaController extends Controller
         }
 
         return $query
-            ->orderByRaw("CASE kategori WHEN 'light' THEN 1 WHEN 'medium' THEN 2 WHEN 'heavy' THEN 3 WHEN 'severe' THEN 4 ELSE 5 END")
+            ->orderByRaw("CASE kategori WHEN 'ringan' THEN 1 WHEN 'sedang' THEN 2 WHEN 'berat' THEN 3 WHEN 'sangat_berat' THEN 4 ELSE 5 END")
             ->orderBy('pengurangan_poin')
             ->orderBy('nama')
             ->get();

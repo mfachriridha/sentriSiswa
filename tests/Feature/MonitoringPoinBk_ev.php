@@ -49,7 +49,7 @@ test('bk monitoring index shows the default remaining points for a student with 
 test('bk monitoring index computes remaining points from approved violations and point additions', function () {
     $counselor = monitoringPoinBkCounselor('10');
     $student = monitoringPoinBkStudent('10', '10. Monitoring Poin Bk 2', 'Gita Purnama', '71002');
-    $type = JenisPelanggaran::factory()->create(['kategori' => 'medium', 'pengurangan_poin' => 30]);
+    $type = JenisPelanggaran::factory()->create(['kategori' => 'sedang', 'pengurangan_poin' => 30]);
     PelanggaranSiswa::factory()->create([
         'profil_siswa_id' => $student->nisn,
         'jenis_pelanggaran_id' => $type->id,
@@ -71,7 +71,7 @@ test('bk monitoring index computes remaining points from approved violations and
 test('bk monitoring show displays the aggregated point information for a student in own grade level', function () {
     $counselor = monitoringPoinBkCounselor('10');
     $student = monitoringPoinBkStudent('10', '10. Monitoring Poin Bk 3', 'Hasan Nur', '71003');
-    $type = JenisPelanggaran::factory()->create(['kategori' => 'light', 'pengurangan_poin' => 15, 'nama' => 'Terlambat Poin Bk']);
+    $type = JenisPelanggaran::factory()->create(['kategori' => 'ringan', 'pengurangan_poin' => 15, 'nama' => 'Terlambat Poin Bk']);
     PelanggaranSiswa::factory()->create([
         'profil_siswa_id' => $student->nisn,
         'jenis_pelanggaran_id' => $type->id,

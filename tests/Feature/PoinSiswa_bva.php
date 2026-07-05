@@ -21,7 +21,7 @@ function poinSiswaBvaStudent(): Pengguna
 
 function poinSiswaBvaDeduct(Pengguna $student, int $pengurangan): void
 {
-    $type = JenisPelanggaran::factory()->create(['kategori' => 'medium', 'pengurangan_poin' => $pengurangan]);
+    $type = JenisPelanggaran::factory()->create(['kategori' => 'sedang', 'pengurangan_poin' => $pengurangan]);
     PelanggaranSiswa::factory()->create([
         'profil_siswa_id' => $student->profilSiswa->nisn,
         'jenis_pelanggaran_id' => $type->id,

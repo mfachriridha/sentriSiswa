@@ -23,7 +23,7 @@ function poinSiswaStudent(): Pengguna
 // TS.POS.001 / TC.POS.001.001 — index cuma nampilin pelanggaran yang sudah disetujui (positive)
 test('poin siswa index shows only approved violations', function () {
     $student = poinSiswaStudent();
-    $type = JenisPelanggaran::factory()->create(['kategori' => 'light', 'pengurangan_poin' => 10]);
+    $type = JenisPelanggaran::factory()->create(['kategori' => 'ringan', 'pengurangan_poin' => 10]);
     PelanggaranSiswa::factory()->create([
         'profil_siswa_id' => $student->profilSiswa->nisn,
         'jenis_pelanggaran_id' => $type->id,
@@ -39,8 +39,8 @@ test('poin siswa index shows only approved violations', function () {
 // TS.POS.002 / TC.POS.002.001 — pelanggaran pending/ditolak tidak ikut tampil (negative, dokumentasi scoping)
 test('poin siswa index does not show pending or rejected violations', function () {
     $student = poinSiswaStudent();
-    $typePending = JenisPelanggaran::factory()->create(['kategori' => 'light', 'pengurangan_poin' => 10]);
-    $typeRejected = JenisPelanggaran::factory()->create(['kategori' => 'light', 'pengurangan_poin' => 10]);
+    $typePending = JenisPelanggaran::factory()->create(['kategori' => 'ringan', 'pengurangan_poin' => 10]);
+    $typeRejected = JenisPelanggaran::factory()->create(['kategori' => 'ringan', 'pengurangan_poin' => 10]);
     PelanggaranSiswa::factory()->create([
         'profil_siswa_id' => $student->profilSiswa->nisn,
         'jenis_pelanggaran_id' => $typePending->id,
@@ -63,7 +63,7 @@ test('poin siswa index does not show pending or rejected violations', function (
 // TS.POS.003 / TC.POS.003.001 — sisa poin dihitung dari pelanggaran disetujui dikurangi ditambah pengajuan poin disetujui (positive)
 test('poin siswa index computes remaining points from approved violations and point additions', function () {
     $student = poinSiswaStudent();
-    $type = JenisPelanggaran::factory()->create(['kategori' => 'medium', 'pengurangan_poin' => 30]);
+    $type = JenisPelanggaran::factory()->create(['kategori' => 'sedang', 'pengurangan_poin' => 30]);
     PelanggaranSiswa::factory()->create([
         'profil_siswa_id' => $student->profilSiswa->nisn,
         'jenis_pelanggaran_id' => $type->id,
@@ -95,7 +95,7 @@ test('poin siswa index shows default 100 points and an empty message when there 
 test('poin siswa index only shows the logged in student own violations', function () {
     $studentA = poinSiswaStudent();
     $studentB = poinSiswaStudent();
-    $type = JenisPelanggaran::factory()->create(['kategori' => 'light', 'pengurangan_poin' => 10]);
+    $type = JenisPelanggaran::factory()->create(['kategori' => 'ringan', 'pengurangan_poin' => 10]);
     PelanggaranSiswa::factory()->create([
         'profil_siswa_id' => $studentB->profilSiswa->nisn,
         'jenis_pelanggaran_id' => $type->id,

@@ -58,8 +58,8 @@
                         <td class="px-4 py-3 font-medium text-gray-900">{{ $violation->nama_pelanggaran }}</td>
                         <td class="hidden px-4 py-3 md:table-cell">
                             @php
-                                $catLabels = ['light' => 'Ringan', 'medium' => 'Sedang', 'heavy' => 'Berat', 'severe' => 'Sangat Berat'];
-                                $catBadges = ['light' => 'bg-green-50 text-green-700', 'medium' => 'bg-amber-50 text-amber-700', 'heavy' => 'bg-orange-50 text-orange-700', 'severe' => 'bg-red-50 text-red-700'];
+                                $catLabels = ['ringan' => 'Ringan', 'sedang' => 'Sedang', 'berat' => 'Berat', 'sangat_berat' => 'Sangat Berat'];
+                                $catBadges = ['ringan' => 'bg-green-50 text-green-700', 'sedang' => 'bg-amber-50 text-amber-700', 'berat' => 'bg-orange-50 text-orange-700', 'sangat_berat' => 'bg-red-50 text-red-700'];
                                 $cat = $violation->kategori_pelanggaran;
                             @endphp
                             <span class="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium {{ $catBadges[$cat] ?? 'bg-gray-50 text-gray-700' }}">
