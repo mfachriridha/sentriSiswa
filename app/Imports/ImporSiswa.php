@@ -69,6 +69,13 @@ class ImporSiswa implements ToCollection, WithChunkReading, WithHeadingRow
                 continue;
             }
 
+            if (! ctype_digit($nis)) {
+                $this->errors++;
+                $this->errorDetails[] = ['row' => $this->rowIndex, 'nama' => $nama, 'reason' => 'NIS harus berupa angka ('.$nis.')'];
+
+                continue;
+            }
+
             $kelasId = null;
             if ($kelas) {
                 if (! isset($this->classCache[$kelas])) {
