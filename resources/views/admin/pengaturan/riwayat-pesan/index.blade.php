@@ -100,8 +100,15 @@
                         {{ $p->dibuat_pada->format('d/m/Y H:i') }}
                     </td>
                     <td class="px-4 py-3 text-right">
-                        <a href="{{ route('admin.pengaturan.whatsapp.riwayat.show', $p) }}"
-                           class="inline-flex items-center rounded-lg border border-gray-300 px-2.5 py-1 text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Detail</a>
+                        <div class="inline-flex items-center gap-2">
+                            <a href="{{ route('admin.pengaturan.whatsapp.riwayat.show', $p) }}"
+                               class="inline-flex items-center rounded-lg border border-gray-300 px-2.5 py-1 text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Detail</a>
+                            <form method="POST" action="{{ route('admin.pengaturan.whatsapp.riwayat.kirim-ulang', $p) }}">
+                                @csrf
+                                <button type="submit"
+                                        class="inline-flex items-center rounded-lg border border-red-300 bg-white px-2.5 py-1 text-xs font-semibold text-red-700 hover:bg-red-50 transition-colors">Kirim Ulang</button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
                 @empty

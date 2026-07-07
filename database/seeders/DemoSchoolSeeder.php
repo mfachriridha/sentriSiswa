@@ -62,7 +62,7 @@ class DemoSchoolSeeder extends Seeder
 
             $profil = $guru->profilGuru()->create([
                 'nip' => sprintf('197%02d0000000000', $nip++),
-                'telepon' => sprintf('628121%05d', $nip),
+                'telepon' => sprintf('000000%05d', $nip),
                 'tipe_guru' => 'wali_kelas',
                 'tingkat' => $tingkat,
             ]);
@@ -96,7 +96,7 @@ class DemoSchoolSeeder extends Seeder
 
             $profil = $guru->profilGuru()->create([
                 'nip' => "19{$tingkat}9000000000",
-                'telepon' => "62813{$tingkat}000000",
+                'telepon' => "00000{$tingkat}000000",
                 'tipe_guru' => 'bk',
                 'tingkat' => $tingkat,
             ]);
@@ -118,7 +118,7 @@ class DemoSchoolSeeder extends Seeder
 
         $profil = $guru->profilGuru()->create([
             'nip' => '19990000000000',
-            'telepon' => '6281399000000',
+            'telepon' => '0000099000000',
             'tipe_guru' => 'kesiswaan',
         ]);
 
@@ -192,7 +192,7 @@ class DemoSchoolSeeder extends Seeder
                     'nisn' => sprintf('00%08d', $sequence),
                     'nis' => $nis,
                     'kelas_id' => $kelas->id,
-                    'telepon' => "0812{$nis}",
+                    'telepon' => "0000{$nis}",
                     'alamat' => $street.', Kelurahan Sentri',
                 ]);
 

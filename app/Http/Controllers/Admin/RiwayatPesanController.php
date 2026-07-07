@@ -43,10 +43,6 @@ class RiwayatPesanController extends Controller
 
     public function resend(PesanWhatsapp $pesanWhatsapp): RedirectResponse
     {
-        if ($pesanWhatsapp->status !== 'failed') {
-            return back()->with('error', 'Hanya pesan gagal yang bisa dikirim ulang.');
-        }
-
         $pesanWhatsapp->update([
             'status' => 'pending',
             'percobaan' => 0,

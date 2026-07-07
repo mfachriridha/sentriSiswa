@@ -85,9 +85,7 @@
             </dl>
         </div>
 
-        @if ($pesanWhatsapp->status === 'failed')
-        <div class="rounded-xl border border-red-100 bg-red-50 p-4">
-            <p class="text-sm font-medium text-red-800 mb-3">Pengiriman gagal. Cek respons API di bawah untuk detail error.</p>
+        <div class="rounded-xl border border-gray-200 bg-white p-4">
             <form method="POST" action="{{ route('admin.pengaturan.whatsapp.riwayat.kirim-ulang', $pesanWhatsapp) }}">
                 @csrf
                 <button type="submit"
@@ -99,7 +97,6 @@
                 </button>
             </form>
         </div>
-        @endif
 
         @if ($pesanWhatsapp->respons)
         <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
