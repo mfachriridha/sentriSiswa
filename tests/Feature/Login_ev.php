@@ -4,7 +4,6 @@ use App\Models\Pengguna;
 use App\Models\ProfilSiswa;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
-use Laravel\Socialite\Facades\Socialite;
 
 uses(RefreshDatabase::class);
 
@@ -82,52 +81,6 @@ test('login fails when password is empty', function () {
         'email' => 'siswa.kosongpass@example.com',
         'password' => '',
     ])->assertSessionHasErrors('password');
-
-    expect(Auth::check())->toBeFalse();
-});
-
-// TS.LOG.009 / TC.LOG.009.001 — login via Google with an account already linked (positive)
-test('login succeeds via google when account is already linked', function () {
-    $user = Pengguna::factory()->student()->create([
-        'status' => 'registered',
-        'email' => 'siswa.google@example.com',
-        'id_google' => 'google-id-login-001',
-    ]);
-    ProfilSiswa::factory()->create(['pengguna_id' => $user->id]);
-
-    $abstractUser = Mockery::mock('Laravel\Socialite\Two\User');
-    $abstractUser->shouldReceive('getId')->andReturn('google-id-login-001');
-    $abstractUser->shouldReceive('getEmail')->andReturn('siswa.google@example.com');
-
-    $provider = Mockery::mock('Laravel\Socialite\Two\GoogleProvider');
-    $provider->shouldReceive('user')->andReturn($abstractUser);
-
-    Socialite::shouldReceive('driver')->with('google')->andReturn($provider);
-
-    session(['google_oauth_mode' => 'login']);
-
-    $this->get(route('google.callback'))
-        ->assertRedirect(route($user->dashboardRouteName()));
-
-    expect(Auth::check())->toBeTrue();
-    expect(Auth::id())->toBe($user->id);
-});
-
-// TS.LOG.010 / TC.LOG.010.001 — login via Google with an account that is not registered (negative)
-test('login fails via google when account is not registered', function () {
-    $abstractUser = Mockery::mock('Laravel\Socialite\Two\User');
-    $abstractUser->shouldReceive('getId')->andReturn('google-id-login-999');
-    $abstractUser->shouldReceive('getEmail')->andReturn('belum.terdaftar@example.com');
-
-    $provider = Mockery::mock('Laravel\Socialite\Two\GoogleProvider');
-    $provider->shouldReceive('user')->andReturn($abstractUser);
-
-    Socialite::shouldReceive('driver')->with('google')->andReturn($provider);
-
-    session(['google_oauth_mode' => 'login']);
-
-    $this->get(route('google.callback'))
-        ->assertRedirect(route('register'));
 
     expect(Auth::check())->toBeFalse();
 });

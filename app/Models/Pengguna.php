@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['nama', 'email', 'password', 'peran', 'status', 'foto', 'nomor_wa', 'id_google'])]
+#[Fillable(['nama', 'email', 'password', 'peran', 'status', 'foto', 'nomor_wa'])]
 #[Hidden(['password', 'remember_token'])]
 class Pengguna extends Authenticatable
 {
@@ -34,11 +34,6 @@ class Pengguna extends Authenticatable
     public function isRegistered(): bool
     {
         return $this->status === 'registered';
-    }
-
-    public function hasGoogleLinked(): bool
-    {
-        return $this->id_google !== null;
     }
 
     public function hasPassword(): bool

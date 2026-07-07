@@ -13,7 +13,6 @@
         "barryvdh/laravel-dompdf": "*",
         "intervention/image": "*",
         "laravel/framework": "^13.8",
-        "laravel/socialite": "^5.28",
         "laravel/tinker": "^3.0",
         "maatwebsite/excel": "^3.1"
     },

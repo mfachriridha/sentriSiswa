@@ -5,7 +5,6 @@ use App\Models\ProfilGuru;
 use App\Models\ProfilSiswa;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
-use Laravel\Socialite\Facades\Socialite;
 
 uses(RefreshDatabase::class);
 
@@ -272,80 +271,3 @@ test('register store redirects to register when verification session is missing'
     ])->assertRedirect(route('register'));
 });
 
-// TS.REG.027 / TC.REG.027.001 — student completes registration via Google after identity verification (positive)
-test('register completes for student via google after identity verification', function () {
-    $student = Pengguna::factory()->student()->create(['status' => 'unregistered', 'email' => null]);
-    ProfilSiswa::factory()->create([
-        'pengguna_id' => $student->id,
-        'nisn' => '3333333330',
-        'nis' => '40001',
-    ]);
-
-    $abstractUser = Mockery::mock('Laravel\Socialite\Two\User');
-    $abstractUser->shouldReceive('getId')->andReturn('google-id-reg-student');
-    $abstractUser->shouldReceive('getEmail')->andReturn('siswa.google.baru@example.com');
-    $abstractUser->shouldReceive('getName')->andReturn($student->nama);
-
-    $provider = Mockery::mock('Laravel\Socialite\Two\GoogleProvider');
-    $provider->shouldReceive('user')->andReturn($abstractUser);
-
-    Socialite::shouldReceive('driver')->with('google')->andReturn($provider);
-
-    session([
-        'google_oauth_mode' => 'register',
-        'register_role' => 'student',
-        'register_user_id' => $student->id,
-        'register_identity' => '3333333330',
-        'register_name' => $student->nama,
-    ]);
-
-    $this->get(route('google.callback'))
-        ->assertRedirect(route('siswa.dashboard'));
-
-    expect(Auth::check())->toBeTrue();
-    $student->refresh();
-    expect($student->status)->toBe('registered');
-    expect($student->id_google)->toBe('google-id-reg-student');
-    expect($student->email)->toBe('siswa.google.baru@example.com');
-});
-
-// TS.REG.028 / TC.REG.028.001 — teacher completes registration via Google, then submits telepon (positive)
-test('register completes for teacher via google then submits telepon', function () {
-    $teacher = Pengguna::factory()->homeroom()->create(['status' => 'unregistered', 'email' => null]);
-    ProfilGuru::factory()->create([
-        'pengguna_id' => $teacher->id,
-        'nip' => '198501012020121077',
-    ]);
-
-    $abstractUser = Mockery::mock('Laravel\Socialite\Two\User');
-    $abstractUser->shouldReceive('getId')->andReturn('google-id-reg-teacher');
-    $abstractUser->shouldReceive('getEmail')->andReturn('guru.google.baru@example.com');
-    $abstractUser->shouldReceive('getName')->andReturn($teacher->nama);
-
-    $provider = Mockery::mock('Laravel\Socialite\Two\GoogleProvider');
-    $provider->shouldReceive('user')->andReturn($abstractUser);
-
-    Socialite::shouldReceive('driver')->with('google')->andReturn($provider);
-
-    session([
-        'google_oauth_mode' => 'register',
-        'register_role' => 'teacher',
-        'register_user_id' => $teacher->id,
-        'register_identity' => '198501012020121077',
-        'register_name' => $teacher->nama,
-    ]);
-
-    $this->get(route('google.callback'))
-        ->assertRedirect(route('google.whatsapp'));
-
-    expect(session('google_pending_whatsapp'))->toBeTrue();
-
-    $this->actingAs($teacher)
-        ->post(route('google.whatsapp.store'), ['telepon' => '081298765432'])
-        ->assertRedirect(route('wali-kelas.dashboard'));
-
-    $teacher->refresh();
-    expect($teacher->status)->toBe('registered');
-    expect($teacher->id_google)->toBe('google-id-reg-teacher');
-    expect($teacher->profilGuru->telepon)->toBe('081298765432');
-});

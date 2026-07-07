@@ -10,8 +10,6 @@ use App\Http\Controllers\Admin\PengaturanController;
 use App\Http\Controllers\Admin\ProfilController as AdminProfilController;
 use App\Http\Controllers\Admin\SiswaController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
-use App\Http\Controllers\Auth\GoogleController;
-use App\Http\Controllers\Auth\GoogleWhatsappController;
 use App\Http\Controllers\Auth\OtpController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ResetPasswordController;
@@ -76,13 +74,7 @@ Route::middleware('guest')->group(function () {
     Route::post('/lupa-sandi', [ForgotPasswordController::class, 'store'])->name('password.email');
     Route::get('/reset-sandi/{token}', [ResetPasswordController::class, 'create'])->name('password.reset');
     Route::post('/reset-sandi', [ResetPasswordController::class, 'store'])->name('password.update');
-
-    // Google OAuth (redirect only — callback is outside guest group to support link flow)
-    Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('google.redirect');
 });
-
-// Google OAuth callback — no auth/guest restriction, handles login/register/link modes
-Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('google.callback');
 
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AdminLoginController::class, 'destroy'])->name('logout');
@@ -91,14 +83,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/otp/verifikasi', [OtpController::class, 'show'])->name('otp.show');
     Route::post('/otp/verifikasi', [OtpController::class, 'verify'])->name('otp.verify');
     Route::post('/otp/kirim-ulang', [OtpController::class, 'resend'])->name('otp.kirim-ulang');
-
-    // Google OAuth — link existing account
-    Route::get('/auth/google/link', [GoogleController::class, 'linkRedirect'])->name('google.link');
-    Route::post('/auth/google/unlink', [GoogleController::class, 'unlink'])->name('google.unlink');
-
-    // Google WhatsApp step (guru setelah Google OAuth)
-    Route::get('/auth/google/whatsapp', [GoogleWhatsappController::class, 'create'])->name('google.whatsapp');
-    Route::post('/auth/google/whatsapp', [GoogleWhatsappController::class, 'store'])->name('google.whatsapp.store');
 });
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
