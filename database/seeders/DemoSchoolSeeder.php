@@ -6,6 +6,7 @@ use App\Models\Absensi;
 use App\Models\JenisPelanggaran;
 use App\Models\Kelas;
 use App\Models\PelanggaranSiswa;
+use App\Models\PengajuanPoin;
 use App\Models\Pengguna;
 use App\Models\ProfilSiswa;
 use App\Models\TataTertib;
@@ -35,6 +36,7 @@ class DemoSchoolSeeder extends Seeder
 
         $this->createAttendanceRecords($students);
         $this->createViolationRecords($students);
+        $this->createPengajuanPoinRecords($classes);
         $this->createSchoolRule();
     }
 
@@ -211,26 +213,48 @@ class DemoSchoolSeeder extends Seeder
     /** @param array<int, ProfilSiswa> $students */
     private function createAttendanceRecords(array $students): void
     {
-        $dates = collect(range(0, 20))
+        // 45 hari kalender ke belakang menjamin bulan berjalan (dan bulan
+        // sebelumnya) selalu keisi penuh, gak peduli tanggal berapa seeder
+        // ini dijalankan.
+        $dates = collect(range(0, 45))
             ->map(fn (int $d) => today()->subDays($d))
             ->filter(fn ($date) => $date->isWeekday())
-            ->take(10)
+            ->sortBy(fn ($date) => $date->toDateString())
             ->values();
 
         $patterns = [
-            ['hadir', 'hadir', 'hadir', 'hadir', 'hadir', 'hadir', 'hadir', 'terlambat', 'hadir', 'hadir'],
-            ['terlambat', 'hadir', 'terlambat', 'hadir', 'terlambat', 'hadir', 'terlambat', 'hadir', 'hadir', 'terlambat'],
-            ['izin', 'sakit', 'hadir', 'alpha', 'izin', 'hadir', 'sakit', 'hadir', 'izin', 'belum_absen'],
+            // Rajin: nyaris selalu hadir, sesekali terlambat.
+            ['hadir', 'hadir', 'hadir', 'hadir', 'terlambat', 'hadir', 'hadir'],
+            // Sering terlambat.
+            ['terlambat', 'hadir', 'terlambat', 'hadir', 'terlambat', 'hadir', 'hadir'],
+            // Rawan: campuran izin/sakit/alpha, alpha cukup sering biar kena ambang batas (>=3).
+            ['izin', 'sakit', 'alpha', 'hadir', 'alpha', 'izin', 'alpha', 'sakit', 'hadir', 'terlambat'],
         ];
+
+        $today = today()->toDateString();
 
         foreach ($students as $idx => $student) {
             $pattern = $patterns[$idx % count($patterns)];
-            foreach ($dates as $dayIdx => $date) {
-                $status = $pattern[$dayIdx] ?? 'hadir';
+
+            foreach ($dates as $date) {
+                $dayIdx = $date->dayOfYear;
+                $status = $pattern[$dayIdx % count($pattern)];
+
+                // Hari ini disamaratakan lintas pola biar dashboard/monitoring
+                // "hari ini" kelihatan hidup: ada yang udah hadir, ada yang
+                // masih belum absen.
+                if ($date->toDateString() === $today) {
+                    $status = match ($idx % 3) {
+                        0 => 'hadir',
+                        1 => 'terlambat',
+                        default => 'belum_absen',
+                    };
+                }
+
                 $selfiePath = null;
 
-                if (in_array($status, ['hadir', 'terlambat'])) {
-                    $selfiePath = $this->generateSelfiePhoto($student->nisn, $date->format('Y-m-d'));
+                if (in_array($status, ['hadir', 'terlambat'], true)) {
+                    $selfiePath = $this->generateSelfiePhoto($student->nisn, $date->toDateString());
                 }
 
                 Absensi::create([
@@ -251,26 +275,39 @@ class DemoSchoolSeeder extends Seeder
     /** @param array<int, ProfilSiswa> $students */
     private function createViolationRecords(array $students): void
     {
-        $violationTypes = JenisPelanggaran::orderBy('pengurangan_poin')->get();
         $recorders = Pengguna::whereIn('peran', ['wali_kelas', 'bk', 'kesiswaan'])->pluck('id');
+        $students = array_values($students);
 
-        foreach (array_values($students) as $index => $student) {
-            if ($index % 3 !== 0) {
+        // Sengaja beragam: nyentuh ke-4 kategori pelanggaran, ke-3 status,
+        // dan beberapa siswa dibiarin bersih buat kontras. Dua entri
+        // pending/rejected cuma buat demo tampilan status filter/badge -
+        // di alur sekarang kesiswaan langsung approved, tapi data lama
+        // dengan status itu tetap valid untuk ditampilkan (lihat CLAUDE.md).
+        $plan = [
+            ['student' => 0, 'nama' => 'Penampilan tidak rapi', 'status' => 'approved'],
+            ['student' => 2, 'nama' => 'Anggota tubuh bertato', 'status' => 'approved'],
+            ['student' => 2, 'nama' => 'Salah Kostum', 'status' => 'approved'],
+            ['student' => 3, 'nama' => 'Ber make up', 'status' => 'pending'],
+            ['student' => 5, 'nama' => 'Mesum di sekolah', 'status' => 'approved'],
+            ['student' => 6, 'nama' => 'Terlibat Narkoba', 'status' => 'approved'],
+            ['student' => 7, 'nama' => 'Melakukan penghinaan', 'status' => 'rejected'],
+        ];
+
+        foreach ($plan as $i => $item) {
+            $student = $students[$item['student']] ?? null;
+            $jenis = JenisPelanggaran::where('nama', $item['nama'])->first();
+
+            if (! $student || ! $jenis) {
                 continue;
             }
 
-            $jenis = $violationTypes[$index % $violationTypes->count()];
-            $status = match ($index % 9) {
-                0 => 'pending',
-                3 => 'rejected',
-                default => 'approved',
-            };
+            $status = $item['status'];
 
             PelanggaranSiswa::create([
                 'profil_siswa_id' => $student->nisn,
                 'jenis_pelanggaran_id' => $jenis->id,
-                'dicatat_oleh_id' => $recorders[$index % $recorders->count()],
-                'tanggal_pelanggaran' => today()->subDays($index % 20)->toDateString(),
+                'dicatat_oleh_id' => $recorders[$i % $recorders->count()],
+                'tanggal_pelanggaran' => today()->subDays(($i + 1) * 3)->toDateString(),
                 'nama_pelanggaran' => $jenis->nama,
                 'kategori_pelanggaran' => $jenis->kategori,
                 'pengurangan_poin' => $jenis->pengurangan_poin,
@@ -278,7 +315,45 @@ class DemoSchoolSeeder extends Seeder
                 'status' => $status,
                 'disetujui_oleh_id' => $status === 'pending' ? null : $recorders->last(),
                 'disetujui_pada' => $status === 'pending' ? null : now(),
-                'alasan_penolakan' => $status === 'rejected' ? 'Data demo ditolak.' : null,
+                'alasan_penolakan' => $status === 'rejected' ? 'Belum ada bukti pendukung, mohon lengkapi laporan.' : null,
+            ]);
+        }
+    }
+
+    /** @param array<int, Kelas> $classes */
+    private function createPengajuanPoinRecords(array $classes): void
+    {
+        $kesiswaan = Pengguna::where('peran', 'kesiswaan')->first();
+
+        // 1 pengajuan per kelas, cycling lewat status pending/approved/rejected
+        // biar kesiswaan (antrean persetujuan) dan wali kelas (riwayat sendiri)
+        // sama-sama punya data buat dilihat.
+        $plan = [
+            ['status' => 'pending', 'alasan' => 'Aktif membantu perpustakaan sekolah selama seminggu.'],
+            ['status' => 'approved', 'alasan' => 'Juara 1 lomba debat tingkat kota, mengharumkan nama sekolah.', 'jumlah_poin' => 15],
+            ['status' => 'rejected', 'alasan' => 'Menolong teman yang jatuh saat upacara.', 'alasan_penolakan' => 'Belum ada bukti pendukung, mohon lengkapi laporan.'],
+        ];
+
+        foreach (array_values($classes) as $idx => $kelas) {
+            $waliKelas = $kelas->waliKelas;
+            $student = $kelas->siswa()->first();
+
+            if (! $waliKelas || ! $student) {
+                continue;
+            }
+
+            $item = $plan[$idx % count($plan)];
+            $isPending = $item['status'] === 'pending';
+
+            PengajuanPoin::create([
+                'profil_siswa_id' => $student->nisn,
+                'diajukan_oleh_id' => $waliKelas->id,
+                'alasan' => $item['alasan'],
+                'status' => $item['status'],
+                'jumlah_poin' => $item['jumlah_poin'] ?? null,
+                'disetujui_oleh_id' => $isPending ? null : $kesiswaan?->id,
+                'disetujui_pada' => $isPending ? null : now(),
+                'alasan_penolakan' => $item['alasan_penolakan'] ?? null,
             ]);
         }
     }
