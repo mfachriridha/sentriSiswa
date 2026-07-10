@@ -3,17 +3,19 @@
 @section('title', 'Riwayat Pengajuan Poin')
 
 @section('content')
-<div class="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-center" x-data="{ detailAlasan: '', detailPenolakan: '', detailNama: '' }">
-    <div>
-        <h1 class="text-2xl font-bold text-gray-900">Riwayat Pengajuan Poin</h1>
-        <p class="mt-2 text-sm text-gray-500">Semua pengajuan penambahan poin yang sudah diproses maupun masih menunggu.</p>
+<div x-data="{ detailAlasan: '', detailPenolakan: '', detailNama: '' }">
+    <div class="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">Riwayat Pengajuan Poin</h1>
+            <p class="mt-2 text-sm text-gray-500">Semua pengajuan penambahan poin yang sudah diproses maupun masih menunggu.</p>
+        </div>
+        <a href="{{ route('kesiswaan.pengajuan-poin.persetujuan') }}"
+           class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">
+            Antrean Persetujuan
+        </a>
     </div>
-    <a href="{{ route('kesiswaan.pengajuan-poin.persetujuan') }}"
-       class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">
-        Antrean Persetujuan
-    </a>
 
-    <form method="GET" action="{{ route('kesiswaan.pengajuan-poin.riwayat') }}" class="flex flex-wrap items-center gap-2 basis-full">
+    <form method="GET" action="{{ route('kesiswaan.pengajuan-poin.riwayat') }}" class="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-gray-200 bg-white p-4">
         <select name="status" class="rounded-lg border border-gray-300 px-3 py-2 text-sm">
             <option value="">Semua Status</option>
             @foreach ($statusLabels as $value => $label)
@@ -23,7 +25,7 @@
         <button class="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-dark">Filter</button>
     </form>
 
-    <div class="overflow-hidden rounded-xl border border-gray-200 bg-white basis-full">
+    <div class="overflow-hidden rounded-xl border border-gray-200 bg-white">
         <div class="overflow-x-auto">
             <table class="min-w-full text-left text-sm">
                 <thead class="border-b border-gray-200 bg-gray-50">
@@ -48,20 +50,20 @@
                             };
                         @endphp
                         <tr class="hover:bg-gray-50">
-                            <td class="px-4 py-3 text-gray-700">{{ $pengajuan->dibuat_pada->translatedFormat('d F Y') }}</td>
+                            <td class="px-4 py-3 text-gray-700 whitespace-nowrap">{{ $pengajuan->dibuat_pada->translatedFormat('d F Y') }}</td>
                             <td class="px-4 py-3">
                                 <p class="font-medium text-gray-900">{{ $pengajuan->profilSiswa?->pengguna?->nama ?? '-' }}</p>
                                 <p class="mt-1 text-xs text-gray-500">NIS: {{ $pengajuan->profilSiswa?->nis ?? '-' }}</p>
                             </td>
-                            <td class="px-4 py-3 text-gray-700">{{ $pengajuan->profilSiswa?->kelas?->nama ?? '-' }}</td>
+                            <td class="px-4 py-3 text-gray-700 whitespace-nowrap">{{ $pengajuan->profilSiswa?->kelas?->nama ?? '-' }}</td>
                             <td class="px-4 py-3 font-semibold text-green-600">{{ $pengajuan->jumlah_poin !== null ? '+'.$pengajuan->jumlah_poin : '-' }}</td>
                             <td class="px-4 py-3">
                                 <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium {{ $badge }}">
                                     {{ $statusLabels[$pengajuan->status] ?? $pengajuan->status }}
                                 </span>
                             </td>
-                            <td class="px-4 py-3 text-gray-500">{{ $pengajuan->diajukanOleh?->nama ?? '-' }}</td>
-                            <td class="px-4 py-3 text-gray-500">{{ $pengajuan->disetujuiOleh?->nama ?? '-' }}</td>
+                            <td class="px-4 py-3 text-gray-500 whitespace-nowrap">{{ $pengajuan->diajukanOleh?->nama ?? '-' }}</td>
+                            <td class="px-4 py-3 text-gray-500 whitespace-nowrap">{{ $pengajuan->disetujuiOleh?->nama ?? '-' }}</td>
                             <td class="px-4 py-3">
                                 <button type="button"
                                         @click="detailAlasan = @js($pengajuan->alasan); detailPenolakan = @js($pengajuan->alasan_penolakan); detailNama = @js($pengajuan->profilSiswa?->pengguna?->nama ?? 'siswa ini'); $dispatch('open-modal', 'detail-pengajuan-poin')"
