@@ -122,6 +122,6 @@
 </div>
 
 <div class="mt-4">
-    {{ $pesan->links() }}
+    <x-pagination :paginator="$pesan" />
 </div>
 @endsection

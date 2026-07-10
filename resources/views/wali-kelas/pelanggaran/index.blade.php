@@ -119,7 +119,7 @@
         </div>
 
         <div class="mt-6">
-            {{ $violations->links() }}
+            <x-pagination :paginator="$violations" />
         </div>
     @endif
 </div>

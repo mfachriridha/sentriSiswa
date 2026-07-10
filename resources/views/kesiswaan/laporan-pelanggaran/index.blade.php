@@ -57,7 +57,7 @@
         </table>
     </div>
     @if ($violations->hasPages())
-        <div class="border-t border-gray-200 px-4 py-3">{{ $violations->links() }}</div>
+        <div class="border-t border-gray-200 px-4 py-3"><x-pagination :paginator="$violations" /></div>
     @endif
 </div>
 
@@ -92,7 +92,7 @@
         </table>
     </div>
     @if ($pengajuanPoin->hasPages())
-        <div class="border-t border-gray-200 px-4 py-3">{{ $pengajuanPoin->links() }}</div>
+        <div class="border-t border-gray-200 px-4 py-3"><x-pagination :paginator="$pengajuanPoin" /></div>
     @endif
 </div>
 @endsection

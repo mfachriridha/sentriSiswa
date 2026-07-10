@@ -91,7 +91,7 @@
         </table>
     </div>
     @if ($tataTertibs->hasPages())
-        <div class="border-t border-gray-200 px-4 py-3">{{ $tataTertibs->links() }}</div>
+        <div class="border-t border-gray-200 px-4 py-3"><x-pagination :paginator="$tataTertibs" /></div>
     @endif
 </div>
 @endsection

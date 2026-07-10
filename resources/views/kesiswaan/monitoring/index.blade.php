@@ -132,7 +132,7 @@
 
     @if ($students->hasPages())
         <div class="border-t border-gray-200 px-4 py-3">
-            {{ $students->links() }}
+            <x-pagination :paginator="$students" />
         </div>
     @endif
 </div>

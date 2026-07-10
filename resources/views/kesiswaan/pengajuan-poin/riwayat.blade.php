@@ -83,7 +83,7 @@
 
         @if ($pengajuanPoin->hasPages())
             <div class="border-t border-gray-200 px-4 py-3">
-                {{ $pengajuanPoin->links() }}
+                <x-pagination :paginator="$pengajuanPoin" />
             </div>
         @endif
     </div>
