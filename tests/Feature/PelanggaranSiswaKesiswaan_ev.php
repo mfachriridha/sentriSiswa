@@ -100,48 +100,6 @@ test('student affairs cannot record a violation with a future date', function ()
     ])->assertSessionHasErrors('tanggal_pelanggaran');
 });
 
-// TS.PSK.006 / TC.PSK.006.001 — update berhasil (positive)
-test('student affairs can update an existing violation record', function () {
-    $kesiswaan = pelanggaranKesiswaanActor();
-    $student = pelanggaranKesiswaanStudent('10. Pelanggaran K 5', '90005');
-    $type = JenisPelanggaran::factory()->create(['aktif' => true]);
-    $violation = PelanggaranSiswa::factory()->create([
-        'profil_siswa_id' => $student->nisn,
-        'jenis_pelanggaran_id' => $type->id,
-        'catatan' => 'Catatan lama',
-    ]);
-
-    $this->actingAs($kesiswaan)->put(route('kesiswaan.pelanggaran-siswa.update', $violation), [
-        'profil_siswa_id' => $student->nisn,
-        'jenis_pelanggaran_id' => $type->id,
-        'tanggal_pelanggaran' => now()->format('Y-m-d'),
-        'catatan' => 'Catatan baru',
-    ])->assertRedirect(route('kesiswaan.pelanggaran-siswa.index'));
-
-    expect($violation->fresh()->catatan)->toBe('Catatan baru');
-});
-
-// TS.PSK.007 / TC.PSK.007.001 — update tetap boleh pertahankan jenis pelanggaran nonaktif yang sedang dipakai (positive)
-test('student affairs can keep the currently assigned inactive violation type when updating', function () {
-    $kesiswaan = pelanggaranKesiswaanActor();
-    $student = pelanggaranKesiswaanStudent('10. Pelanggaran K 6', '90006');
-    $type = JenisPelanggaran::factory()->create(['aktif' => true]);
-    $violation = PelanggaranSiswa::factory()->create([
-        'profil_siswa_id' => $student->nisn,
-        'jenis_pelanggaran_id' => $type->id,
-    ]);
-    $type->update(['aktif' => false]);
-
-    $this->actingAs($kesiswaan)->put(route('kesiswaan.pelanggaran-siswa.update', $violation), [
-        'profil_siswa_id' => $student->nisn,
-        'jenis_pelanggaran_id' => $type->id,
-        'tanggal_pelanggaran' => now()->format('Y-m-d'),
-        'catatan' => 'Tetap pakai jenis nonaktif ini',
-    ])->assertRedirect(route('kesiswaan.pelanggaran-siswa.index'));
-
-    expect($violation->fresh()->catatan)->toBe('Tetap pakai jenis nonaktif ini');
-});
-
 // TS.PSK.008 / TC.PSK.008.001 — hapus catatan pelanggaran berhasil (positive)
 test('student affairs can delete a violation record', function () {
     $kesiswaan = pelanggaranKesiswaanActor();
@@ -197,7 +155,33 @@ test('violation record index filters by class, category, type, date, and status'
 
     $this->actingAs($kesiswaan)->get(route('kesiswaan.pelanggaran-siswa.index', ['tanggal_pelanggaran' => '2026-01-10']))
         ->assertSuccessful()->assertSee('Gilang Ramadhan')->assertDontSee('Hesti Purnama');
+});
 
-    $this->actingAs($kesiswaan)->get(route('kesiswaan.pelanggaran-siswa.index', ['status' => 'approved']))
-        ->assertSuccessful()->assertSee('Gilang Ramadhan')->assertSee('Hesti Purnama');
+// TS.PSK.010 / TC.PSK.010.001 — siswa belum terdaftar tidak muncul di daftar pilihan Catat Pelanggaran (positive)
+test('unregistered student does not appear in the create violation student picker', function () {
+    $kesiswaan = pelanggaranKesiswaanActor();
+    $class = Kelas::create(['nama' => '10. Pelanggaran K 10', 'tingkat' => '10']);
+    $unregisteredUser = Pengguna::factory()->student()->create(['status' => 'unregistered', 'nama' => 'Siswa Belum Daftar']);
+    ProfilSiswa::factory()->create(['pengguna_id' => $unregisteredUser->id, 'kelas_id' => $class->id, 'nisn' => '90010']);
+
+    $this->actingAs($kesiswaan)->get(route('kesiswaan.pelanggaran-siswa.create'))
+        ->assertSuccessful()
+        ->assertDontSee('Siswa Belum Daftar');
+});
+
+// TS.PSK.011 / TC.PSK.011.001 — tolak pencatatan pelanggaran untuk siswa yang belum terdaftar (negative)
+test('student affairs cannot record a violation for an unregistered student', function () {
+    $kesiswaan = pelanggaranKesiswaanActor();
+    $class = Kelas::create(['nama' => '10. Pelanggaran K 11', 'tingkat' => '10']);
+    $unregisteredUser = Pengguna::factory()->student()->create(['status' => 'unregistered']);
+    $student = ProfilSiswa::factory()->create(['pengguna_id' => $unregisteredUser->id, 'kelas_id' => $class->id, 'nisn' => '90011']);
+    $type = JenisPelanggaran::factory()->create(['kategori' => 'ringan', 'pengurangan_poin' => 10, 'aktif' => true]);
+
+    $this->actingAs($kesiswaan)->post(route('kesiswaan.pelanggaran-siswa.store'), [
+        'profil_siswa_id' => $student->nisn,
+        'jenis_pelanggaran_id' => $type->id,
+        'tanggal_pelanggaran' => now()->format('Y-m-d'),
+    ])->assertSessionHasErrors('profil_siswa_id');
+
+    expect(PelanggaranSiswa::where('profil_siswa_id', $student->nisn)->exists())->toBeFalse();
 });

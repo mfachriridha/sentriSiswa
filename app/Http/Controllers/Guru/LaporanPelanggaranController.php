@@ -8,6 +8,9 @@ use App\Http\Requests\Guru\ViolationReportFilterRequest;
 use App\Models\JenisPelanggaran;
 use App\Models\Kelas;
 use App\Models\PelanggaranSiswa;
+use App\Models\PengajuanPoin;
+use App\Models\Pengguna;
+use App\Models\ProfilSiswa;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
@@ -21,12 +24,15 @@ class LaporanPelanggaranController extends Controller
     public function index(ViolationReportFilterRequest $request): View
     {
         [$violations, $filters, $classes] = $this->reportData($request);
+        $user = Auth::user()->loadMissing('profilGuru');
+        $pengajuanPoin = $this->approvedPengajuanPoinQuery($filters, $user)
+            ->paginate(15, ['*'], 'pengajuan_page')
+            ->withQueryString();
         $categoryLabels = JenisPelanggaran::categoryLabels();
-        $statusLabels = PelanggaranSiswa::statusLabels();
-        $routeName = Auth::user()->isBk() ? 'bk.laporan' : 'kesiswaan.laporan';
-        $title = Auth::user()->isBk() ? 'Laporan BK' : 'Laporan Kesiswaan';
+        $routeName = $user->isBk() ? 'bk.laporan' : 'kesiswaan.laporan';
+        $title = $user->isBk() ? 'Laporan BK' : 'Laporan Kesiswaan';
 
-        return view('kesiswaan.laporan-pelanggaran.index', compact('violations', 'filters', 'classes', 'categoryLabels', 'statusLabels', 'routeName', 'title'));
+        return view('kesiswaan.laporan-pelanggaran.index', compact('violations', 'filters', 'classes', 'categoryLabels', 'pengajuanPoin', 'routeName', 'title'));
     }
 
     public function exportExcel(ViolationReportFilterRequest $request): BinaryFileResponse
@@ -46,7 +52,6 @@ class LaporanPelanggaranController extends Controller
                 $violation->nama_pelanggaran,
                 JenisPelanggaran::categoryLabels()[$violation->kategori_pelanggaran] ?? $violation->kategori_pelanggaran,
                 '-'.$violation->pengurangan_poin,
-                PelanggaranSiswa::statusLabels()[$violation->status] ?? $violation->status,
                 $violation->dicatatOleh?->nama ?? '-',
                 $sisaPoin,
                 $sisaPoin <= 50 ? 'Perhatian' : '-',
@@ -61,7 +66,6 @@ class LaporanPelanggaranController extends Controller
             'Pelanggaran',
             'Kategori',
             'Poin',
-            'Status',
             'Dicatat Oleh',
             'Sisa Poin Siswa',
             'Keterangan',
@@ -71,15 +75,16 @@ class LaporanPelanggaranController extends Controller
     public function exportPdf(ViolationReportFilterRequest $request): Response
     {
         [$violations, $filters] = $this->reportData($request, paginated: false);
-        $title = Auth::user()->isBk() ? 'Laporan BK' : 'Laporan Kesiswaan';
+        $user = Auth::user()->loadMissing('profilGuru');
+        $title = $user->isBk() ? 'Laporan BK' : 'Laporan Kesiswaan';
 
         $pdf = Pdf::loadView('exports.violation-report-pdf', [
             'title' => $title,
             'violations' => $violations,
             'filters' => $filters,
-            'pointsSummary' => $this->studentPointsSummary($violations),
+            'pengajuanPoin' => $this->approvedPengajuanPoinQuery($filters, $user)->get(),
+            'pointsSummary' => $this->allStudentsPointsSummary($filters, $user),
             'categoryLabels' => JenisPelanggaran::categoryLabels(),
-            'statusLabels' => PelanggaranSiswa::statusLabels(),
         ])->setPaper('a4', 'landscape');
 
         return $pdf->download('laporan-pelanggaran.pdf');
@@ -95,8 +100,7 @@ class LaporanPelanggaranController extends Controller
             ->when($filters['selesai'] ?? null, fn ($query, $date) => $query->whereDate('tanggal_pelanggaran', '<=', $date))
             ->when($filters['kelas_id'] ?? null, fn ($query, $classId) => $query->whereHas('profilSiswa', fn ($studentQuery) => $studentQuery->where('kelas_id', $classId)))
             ->when($filters['tingkat'] ?? null, fn ($query, $grade) => $query->whereHas('profilSiswa.kelas', fn ($classQuery) => $classQuery->where('tingkat', $grade)))
-            ->when($filters['kategori'] ?? null, fn ($query, $kategori) => $query->where('kategori_pelanggaran', $kategori))
-            ->when($filters['status'] ?? null, fn ($query, $status) => $query->where('status', $status));
+            ->when($filters['kategori'] ?? null, fn ($query, $kategori) => $query->where('kategori_pelanggaran', $kategori));
 
         if ($user->isBk()) {
             $query->whereHas('profilSiswa.kelas', fn (Builder $classQuery) => $classQuery->where('tingkat', $user->profilGuru?->tingkat));
@@ -128,24 +132,49 @@ class LaporanPelanggaranController extends Controller
     }
 
     /**
-     * @return list<array{nama: string, nis: string, kelas: string, total_terpotong: int, sisa_poin: int}>
+     * @return \Illuminate\Database\Eloquent\Builder<PengajuanPoin>
      */
-    private function studentPointsSummary(iterable $violations): array
+    private function approvedPengajuanPoinQuery(array $filters, Pengguna $user): Builder
     {
-        return collect($violations)
+        $query = PengajuanPoin::with(['profilSiswa.pengguna', 'profilSiswa.kelas', 'diajukanOleh', 'disetujuiOleh'])
             ->where('status', 'approved')
-            ->groupBy('profil_siswa_id')
-            ->map(function ($group) {
-                $first = $group->first();
+            ->when($filters['mulai'] ?? null, fn ($query, $date) => $query->whereDate('disetujui_pada', '>=', $date))
+            ->when($filters['selesai'] ?? null, fn ($query, $date) => $query->whereDate('disetujui_pada', '<=', $date))
+            ->when($filters['kelas_id'] ?? null, fn ($query, $classId) => $query->whereHas('profilSiswa', fn ($studentQuery) => $studentQuery->where('kelas_id', $classId)))
+            ->when($filters['tingkat'] ?? null, fn ($query, $grade) => $query->whereHas('profilSiswa.kelas', fn ($classQuery) => $classQuery->where('tingkat', $grade)));
 
-                return [
-                    'nama' => $first->profilSiswa?->pengguna?->nama ?? '-',
-                    'nis' => $first->profilSiswa?->nis ?? '-',
-                    'kelas' => $first->profilSiswa?->kelas?->nama ?? '-',
-                    'total_terpotong' => $group->sum('pengurangan_poin'),
-                    'sisa_poin' => $first->profilSiswa?->poin ?? 100,
-                ];
-            })
+        if ($user->isBk()) {
+            $query->whereHas('profilSiswa.kelas', fn (Builder $classQuery) => $classQuery->where('tingkat', $user->profilGuru?->tingkat));
+        }
+
+        return $query->latest('disetujui_pada');
+    }
+
+    /**
+     * Snapshot sisa poin SEMUA siswa (bukan cuma yang punya pelanggaran di filter tanggal/kategori
+     * yang lagi jalan) - discope ke kelas/tingkat aja, karena ini kondisi sekarang bukan riwayat kejadian.
+     *
+     * @return list<array{nama: string, nis: string, kelas: string, sisa_poin: int}>
+     */
+    private function allStudentsPointsSummary(array $filters, Pengguna $user): array
+    {
+        $query = ProfilSiswa::with(['pengguna', 'kelas'])
+            ->withSum(['pelanggaranSiswa' => fn ($query) => $query->disetujui()], 'pengurangan_poin')
+            ->withSum(['pengajuanPoin' => fn ($query) => $query->disetujui()], 'jumlah_poin')
+            ->when($filters['kelas_id'] ?? null, fn ($query, $classId) => $query->where('kelas_id', $classId))
+            ->when($filters['tingkat'] ?? null, fn ($query, $grade) => $query->whereHas('kelas', fn ($classQuery) => $classQuery->where('tingkat', $grade)));
+
+        if ($user->isBk()) {
+            $query->whereHas('kelas', fn (Builder $classQuery) => $classQuery->where('tingkat', $user->profilGuru?->tingkat));
+        }
+
+        return $query->get()
+            ->map(fn (ProfilSiswa $student): array => [
+                'nama' => $student->pengguna?->nama ?? '-',
+                'nis' => $student->nis ?? '-',
+                'kelas' => $student->kelas?->nama ?? '-',
+                'sisa_poin' => $student->poin,
+            ])
             ->sortBy('sisa_poin')
             ->values()
             ->all();

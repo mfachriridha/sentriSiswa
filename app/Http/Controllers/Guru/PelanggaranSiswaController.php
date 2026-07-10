@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Guru;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PelanggaranSiswa\StorePelanggaranSiswaRequest;
-use App\Http\Requests\PelanggaranSiswa\UpdatePelanggaranSiswaRequest;
 use App\Models\JenisPelanggaran;
 use App\Models\Kelas;
 use App\Models\PelanggaranSiswa;
@@ -24,7 +23,6 @@ class PelanggaranSiswaController extends Controller
         $filterCategory = $request->get('kategori', '');
         $filterViolationType = $request->get('jenis_pelanggaran_id', '');
         $filterDate = $request->get('tanggal_pelanggaran', '');
-        $filterStatus = $request->get('status', $request->route('status', ''));
         $sort = $request->get('sort', 'tanggal_pelanggaran');
         $direction = $request->get('direction', 'desc');
         $allowed = ['tanggal_pelanggaran', 'nama_pelanggaran', 'kategori_pelanggaran', 'pengurangan_poin', 'dibuat_pada'];
@@ -59,10 +57,6 @@ class PelanggaranSiswaController extends Controller
             $studentViolations->whereDate('tanggal_pelanggaran', $filterDate);
         }
 
-        if (array_key_exists($filterStatus, PelanggaranSiswa::statusLabels())) {
-            $studentViolations->where('status', $filterStatus);
-        }
-
         if ($sort === 'kategori_pelanggaran') {
             $studentViolations = $studentViolations
                 ->orderByRaw("CASE kategori_pelanggaran WHEN 'ringan' THEN 1 WHEN 'sedang' THEN 2 WHEN 'berat' THEN 3 WHEN 'sangat_berat' THEN 4 ELSE 5 END {$direction}")
@@ -78,7 +72,6 @@ class PelanggaranSiswaController extends Controller
             'kategori' => $filterCategory,
             'jenis_pelanggaran_id' => $filterViolationType,
             'tanggal_pelanggaran' => $filterDate,
-            'status' => $filterStatus,
             'sort' => $sort,
             'direction' => $direction,
         ]);
@@ -86,9 +79,8 @@ class PelanggaranSiswaController extends Controller
         $classes = Kelas::orderBy('tingkat')->orderBy('nama')->get();
         $violationTypes = $this->violationTypes();
         $categoryLabels = JenisPelanggaran::categoryLabels();
-        $statusLabels = PelanggaranSiswa::statusLabels();
 
-        return view('kesiswaan.pelanggaran-siswa.index', compact('studentViolations', 'classes', 'violationTypes', 'categoryLabels', 'statusLabels', 'sort', 'direction', 'search', 'filterClass', 'filterCategory', 'filterViolationType', 'filterDate', 'filterStatus'));
+        return view('kesiswaan.pelanggaran-siswa.index', compact('studentViolations', 'classes', 'violationTypes', 'categoryLabels', 'sort', 'direction', 'search', 'filterClass', 'filterCategory', 'filterViolationType', 'filterDate'));
     }
 
     public function create(): View
@@ -105,7 +97,7 @@ class PelanggaranSiswaController extends Controller
         $data = $request->validated();
         $violationType = JenisPelanggaran::findOrFail($data['jenis_pelanggaran_id']);
 
-        PelanggaranSiswa::create($this->violationData($data, $violationType, includeRecorder: true, approved: true));
+        PelanggaranSiswa::create($this->violationData($data, $violationType));
 
         return redirect()->route('kesiswaan.pelanggaran-siswa.index')->with('success', 'Pelanggaran siswa berhasil dicatat.');
     }
@@ -114,29 +106,8 @@ class PelanggaranSiswaController extends Controller
     {
         $pelanggaranSiswa->load(['profilSiswa.pengguna', 'profilSiswa.kelas', 'jenisPelanggaran', 'dicatatOleh', 'disetujuiOleh']);
         $categoryLabels = JenisPelanggaran::categoryLabels();
-        $statusLabels = PelanggaranSiswa::statusLabels();
 
-        return view('kesiswaan.pelanggaran-siswa.show', compact('pelanggaranSiswa', 'categoryLabels', 'statusLabels'));
-    }
-
-    public function edit(PelanggaranSiswa $pelanggaranSiswa): View
-    {
-        $pelanggaranSiswa->load(['profilSiswa.pengguna', 'profilSiswa.kelas', 'jenisPelanggaran']);
-        $students = $this->students();
-        $violationTypes = $this->violationTypes(activeOnly: true, currentViolationType: $pelanggaranSiswa->jenisPelanggaran);
-        $categoryLabels = JenisPelanggaran::categoryLabels();
-
-        return view('kesiswaan.pelanggaran-siswa.edit', compact('pelanggaranSiswa', 'students', 'violationTypes', 'categoryLabels'));
-    }
-
-    public function update(UpdatePelanggaranSiswaRequest $request, PelanggaranSiswa $pelanggaranSiswa): RedirectResponse
-    {
-        $data = $request->validated();
-        $violationType = JenisPelanggaran::findOrFail($data['jenis_pelanggaran_id']);
-
-        $pelanggaranSiswa->update($this->violationData($data, $violationType));
-
-        return redirect()->route('kesiswaan.pelanggaran-siswa.index')->with('success', 'Pelanggaran siswa berhasil diperbarui.');
+        return view('kesiswaan.pelanggaran-siswa.show', compact('pelanggaranSiswa', 'categoryLabels'));
     }
 
     public function destroy(PelanggaranSiswa $pelanggaranSiswa): RedirectResponse
@@ -149,7 +120,7 @@ class PelanggaranSiswaController extends Controller
     private function students(): Collection
     {
         return ProfilSiswa::with(['pengguna', 'kelas'])
-            ->whereHas('pengguna', fn ($query) => $query->where('peran', 'siswa'))
+            ->whereHas('pengguna', fn ($query) => $query->where('peran', 'siswa')->where('status', 'registered'))
             ->get()
             ->sortBy(fn (ProfilSiswa $profilSiswa) => $profilSiswa->pengguna?->nama ?? '')
             ->values();
@@ -180,9 +151,9 @@ class PelanggaranSiswaController extends Controller
      * @param  array{profil_siswa_id: int|string, jenis_pelanggaran_id: int|string, tanggal_pelanggaran: string, catatan?: string|null}  $data
      * @return array<string, mixed>
      */
-    private function violationData(array $data, JenisPelanggaran $violationType, bool $includeRecorder = false, bool $approved = false): array
+    private function violationData(array $data, JenisPelanggaran $violationType): array
     {
-        $violationData = [
+        return [
             'profil_siswa_id' => $data['profil_siswa_id'],
             'jenis_pelanggaran_id' => $violationType->id,
             'tanggal_pelanggaran' => $data['tanggal_pelanggaran'],
@@ -190,18 +161,10 @@ class PelanggaranSiswaController extends Controller
             'kategori_pelanggaran' => $violationType->kategori,
             'pengurangan_poin' => $violationType->pengurangan_poin,
             'catatan' => $data['catatan'] ?? null,
+            'dicatat_oleh_id' => Auth::id(),
+            'status' => 'approved',
+            'disetujui_oleh_id' => Auth::id(),
+            'disetujui_pada' => now(),
         ];
-
-        if ($includeRecorder) {
-            $violationData['dicatat_oleh_id'] = Auth::id();
-        }
-
-        if ($approved) {
-            $violationData['status'] = 'approved';
-            $violationData['disetujui_oleh_id'] = Auth::id();
-            $violationData['disetujui_pada'] = now();
-        }
-
-        return $violationData;
     }
 }

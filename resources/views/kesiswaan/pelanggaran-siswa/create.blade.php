@@ -20,17 +20,32 @@
         @csrf
 
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <div>
-                <label for="profil_siswa_id" class="block text-sm font-medium text-gray-700">Siswa <span class="text-red-500">*</span></label>
-                <select id="profil_siswa_id" name="profil_siswa_id" required
-                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
-                    <option value="">Pilih siswa</option>
-                    @foreach ($students as $student)
-                        <option value="{{ $student->nisn }}" {{ (string) old('profil_siswa_id', request('profil_siswa_id')) === (string) $student->nisn ? 'selected' : '' }}>
-                            {{ $student->pengguna?->nama }} - {{ $student->kelas?->nama ?? 'Tanpa kelas' }} - NISN {{ $student->nisn ?? '-' }}
-                        </option>
-                    @endforeach
-                </select>
+            @php
+                $preselectedSiswa = $students->firstWhere('nisn', old('profil_siswa_id', request('profil_siswa_id')));
+            @endphp
+            <div x-data="{ search: @js($preselectedSiswa?->pengguna?->nama ?? ''), open: false }" @click.outside="open = false">
+                <label for="siswa_search" class="block text-sm font-medium text-gray-700">Siswa <span class="text-red-500">*</span></label>
+                <div class="relative mt-1.5">
+                    <input id="siswa_search" type="text" x-model="search" @focus="open = true" autocomplete="off"
+                           placeholder="Cari nama, NIS, atau NISN siswa..."
+                           class="block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
+                    <input type="hidden" name="profil_siswa_id" x-ref="profilSiswaId" value="{{ old('profil_siswa_id', request('profil_siswa_id')) }}">
+
+                    <div x-show="open" x-cloak
+                         class="absolute z-10 mt-1 max-h-64 w-full overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg divide-y divide-gray-100">
+                        @forelse ($students as $student)
+                            <button type="button"
+                                    x-show="search === '' || @js(Str::lower(($student->pengguna?->nama ?? '').' '.$student->nis.' '.$student->nisn)).includes(search.toLowerCase())"
+                                    @click="search = @js($student->pengguna?->nama ?? ''); $refs.profilSiswaId.value = @js((string) $student->nisn); open = false"
+                                    class="block w-full px-4 py-2 text-left text-sm hover:bg-gray-50">
+                                {{ $student->pengguna?->nama }}
+                                <span class="text-gray-400">- {{ $student->kelas?->nama ?? 'Tanpa kelas' }} - NISN {{ $student->nisn ?? '-' }}</span>
+                            </button>
+                        @empty
+                            <p class="px-4 py-3 text-sm text-gray-500">Tidak ada siswa yang bisa dipilih.</p>
+                        @endforelse
+                    </div>
+                </div>
                 @error('profil_siswa_id')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror

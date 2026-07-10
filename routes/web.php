@@ -65,6 +65,7 @@ Route::middleware('guest')->group(function () {
     Route::get('/login', [AdminLoginController::class, 'create'])->name('login');
     Route::post('/login', [AdminLoginController::class, 'store']);
     Route::get('/daftar', [RegisterController::class, 'create'])->name('register');
+    Route::get('/daftar/verifikasi', fn () => redirect()->route('register'));
     Route::post('/daftar/verifikasi', [RegisterController::class, 'verify'])->name('register.verify');
     Route::get('/daftar/lengkapi', [RegisterController::class, 'showForm'])->name('register.step2');
     Route::post('/daftar/lengkapi', [RegisterController::class, 'store'])->name('register.store');
@@ -171,10 +172,12 @@ Route::middleware(['auth', 'registered', 'kesiswaan'])->prefix('kesiswaan')->nam
     Route::get('/monitoring', [KesiswaanMonitoringController::class, 'index'])->name('monitoring.index');
     Route::get('/monitoring/{monitoring}', [KesiswaanMonitoringController::class, 'show'])->name('monitoring.show');
     Route::resource('pelanggaran-siswa', PelanggaranSiswaController::class)
-        ->parameters(['pelanggaran-siswa' => 'pelanggaranSiswa']);
+        ->parameters(['pelanggaran-siswa' => 'pelanggaranSiswa'])
+        ->except(['edit', 'update']);
     Route::resource('jenis-pelanggaran', JenisPelanggaranController::class)
         ->parameters(['jenis-pelanggaran' => 'jenisPelanggaran']);
     Route::get('/pengajuan-poin', [KesiswaanPengajuanPoinController::class, 'persetujuan'])->name('pengajuan-poin.persetujuan');
+    Route::get('/pengajuan-poin/riwayat', [KesiswaanPengajuanPoinController::class, 'riwayat'])->name('pengajuan-poin.riwayat');
     Route::get('/pengajuan-poin/pending-count', [KesiswaanPengajuanPoinController::class, 'pendingCount'])->name('pengajuan-poin.pending-count');
     Route::put('/pengajuan-poin/{pengajuanPoin}/approve', [KesiswaanPengajuanPoinController::class, 'approve'])->name('pengajuan-poin.approve');
     Route::put('/pengajuan-poin/{pengajuanPoin}/reject', [KesiswaanPengajuanPoinController::class, 'reject'])->name('pengajuan-poin.reject');

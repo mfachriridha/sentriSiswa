@@ -8,6 +8,10 @@
         <h1 class="text-2xl font-bold text-gray-900">Antrean Persetujuan Poin</h1>
         <p class="mt-2 text-sm text-gray-500">Terima atau tolak pengajuan penambahan poin dari wali kelas.</p>
     </div>
+    <a href="{{ route('kesiswaan.pengajuan-poin.riwayat') }}"
+       class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">
+        Riwayat
+    </a>
 </div>
 
 <x-alert type="success" :message="session('success')" />

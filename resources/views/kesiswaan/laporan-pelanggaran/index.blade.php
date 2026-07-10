@@ -21,12 +21,6 @@
                 <option value="{{ $value }}" {{ ($filters['kategori'] ?? '') === $value ? 'selected' : '' }}>{{ $label }}</option>
             @endforeach
         </select>
-        <select name="status" class="rounded-lg border border-gray-300 px-3 py-2 text-sm">
-            <option value="">Semua Status</option>
-            @foreach ($statusLabels as $value => $label)
-                <option value="{{ $value }}" {{ ($filters['status'] ?? '') === $value ? 'selected' : '' }}>{{ $label }}</option>
-            @endforeach
-        </select>
         <button class="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white">Terapkan</button>
     </form>
     <div class="mt-3 flex flex-wrap gap-2">
@@ -45,7 +39,6 @@
                     <th class="px-4 py-3">Kelas</th>
                     <th class="px-4 py-3">Pelanggaran</th>
                     <th class="px-4 py-3">Poin</th>
-                    <th class="px-4 py-3">Status</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
@@ -56,16 +49,50 @@
                         <td class="px-4 py-3">{{ $violation->profilSiswa?->kelas?->nama ?? '-' }}</td>
                         <td class="px-4 py-3">{{ $violation->nama_pelanggaran }}</td>
                         <td class="px-4 py-3 font-semibold text-red-600">-{{ $violation->pengurangan_poin }}</td>
-                        <td class="px-4 py-3">{{ $statusLabels[$violation->status] ?? $violation->status }}</td>
                     </tr>
                 @empty
-                    <tr><td colspan="6" class="px-6 py-16 text-center text-sm text-gray-500">Tidak ada data laporan.</td></tr>
+                    <tr><td colspan="5" class="px-6 py-16 text-center text-sm text-gray-500">Tidak ada data laporan.</td></tr>
                 @endforelse
             </tbody>
         </table>
     </div>
     @if ($violations->hasPages())
         <div class="border-t border-gray-200 px-4 py-3">{{ $violations->links() }}</div>
+    @endif
+</div>
+
+<div class="mt-6 overflow-hidden rounded-xl border border-gray-200 bg-white">
+    <div class="border-b border-gray-200 p-4">
+        <h2 class="text-base font-semibold text-gray-900">Penambahan Poin (Disetujui)</h2>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="min-w-full text-left text-sm">
+            <thead class="bg-gray-50 text-xs uppercase text-gray-500">
+                <tr>
+                    <th class="px-4 py-3">Tanggal Disetujui</th>
+                    <th class="px-4 py-3">Siswa</th>
+                    <th class="px-4 py-3">Kelas</th>
+                    <th class="px-4 py-3">Alasan</th>
+                    <th class="px-4 py-3">Poin</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                @forelse ($pengajuanPoin as $pengajuan)
+                    <tr>
+                        <td class="px-4 py-3">{{ $pengajuan->disetujui_pada?->translatedFormat('d F Y') ?? '-' }}</td>
+                        <td class="px-4 py-3">{{ $pengajuan->profilSiswa?->pengguna?->nama ?? '-' }}</td>
+                        <td class="px-4 py-3">{{ $pengajuan->profilSiswa?->kelas?->nama ?? '-' }}</td>
+                        <td class="px-4 py-3">{{ $pengajuan->alasan }}</td>
+                        <td class="px-4 py-3 font-semibold text-green-600">+{{ $pengajuan->jumlah_poin }}</td>
+                    </tr>
+                @empty
+                    <tr><td colspan="5" class="px-6 py-16 text-center text-sm text-gray-500">Tidak ada penambahan poin disetujui pada rentang ini.</td></tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+    @if ($pengajuanPoin->hasPages())
+        <div class="border-t border-gray-200 px-4 py-3">{{ $pengajuanPoin->links() }}</div>
     @endif
 </div>
 @endsection

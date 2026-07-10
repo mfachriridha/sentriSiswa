@@ -8,6 +8,7 @@ use App\Http\Requests\PengajuanPoin\RejectPengajuanPoinRequest;
 use App\Models\PengajuanPoin;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
@@ -21,6 +22,21 @@ class PersetujuanPoinController extends Controller
             ->get();
 
         return view('kesiswaan.pengajuan-poin.persetujuan', compact('pending'));
+    }
+
+    public function riwayat(Request $request): View
+    {
+        $status = $request->get('status', '');
+
+        $pengajuanPoin = PengajuanPoin::with(['profilSiswa.pengguna', 'profilSiswa.kelas', 'diajukanOleh', 'disetujuiOleh'])
+            ->when($status, fn ($query) => $query->where('status', $status))
+            ->latest()
+            ->paginate(20)
+            ->withQueryString();
+
+        $statusLabels = PengajuanPoin::statusLabels();
+
+        return view('kesiswaan.pengajuan-poin.riwayat', compact('pengajuanPoin', 'status', 'statusLabels'));
     }
 
     public function approve(ApprovePengajuanPoinRequest $request, PengajuanPoin $pengajuanPoin): RedirectResponse

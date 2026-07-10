@@ -3,6 +3,7 @@
 namespace App\Http\Requests\PelanggaranSiswa;
 
 use App\Models\JenisPelanggaran;
+use App\Models\ProfilSiswa;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
@@ -38,6 +39,12 @@ class StorePelanggaranSiswaRequest extends FormRequest
 
                 if ($violationType && ! $violationType->aktif) {
                     $validator->errors()->add('jenis_pelanggaran_id', 'Jenis pelanggaran tidak aktif dan tidak dapat dipilih.');
+                }
+
+                $student = ProfilSiswa::with('pengguna')->find($this->input('profil_siswa_id'));
+
+                if ($student && $student->pengguna?->status !== 'registered') {
+                    $validator->errors()->add('profil_siswa_id', 'Siswa belum terdaftar, belum bisa dicatat pelanggarannya.');
                 }
             },
         ];

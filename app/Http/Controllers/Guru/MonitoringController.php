@@ -57,6 +57,7 @@ class MonitoringController extends Controller
             'pengguna',
             'kelas',
             'pelanggaranSiswa' => fn ($q) => $q->disetujui()->latest('tanggal_pelanggaran')->with(['dicatatOleh', 'jenisPelanggaran']),
+            'pengajuanPoin' => fn ($q) => $q->disetujui()->latest()->with('diajukanOleh'),
             'absensi' => fn ($q) => $q->latest('tanggal')->take(30),
         ]);
 

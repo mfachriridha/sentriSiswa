@@ -115,33 +115,6 @@ test('violation report filters by kategori', function () {
         ->assertDontSee('Kategori Ringan Laporan');
 });
 
-// TS.LAP.006 / TC.LAP.006.001 — filter berdasarkan status (positive)
-test('violation report filters by status', function () {
-    $kesiswaan = laporanPelanggaranActor();
-    $student = laporanPelanggaranStudent('10', '10. Laporan 7', '95009');
-    $type = JenisPelanggaran::factory()->create(['nama' => 'Status Approved Laporan', 'kategori' => 'ringan', 'pengurangan_poin' => 10]);
-    PelanggaranSiswa::factory()->create([
-        'profil_siswa_id' => $student->nisn,
-        'jenis_pelanggaran_id' => $type->id,
-        'nama_pelanggaran' => 'Status Approved Laporan',
-        'status' => 'approved',
-        'tanggal_pelanggaran' => '2026-03-08',
-    ]);
-    $typeRejected = JenisPelanggaran::factory()->create(['nama' => 'Status Rejected Laporan', 'kategori' => 'ringan', 'pengurangan_poin' => 10]);
-    PelanggaranSiswa::factory()->create([
-        'profil_siswa_id' => $student->nisn,
-        'jenis_pelanggaran_id' => $typeRejected->id,
-        'nama_pelanggaran' => 'Status Rejected Laporan',
-        'status' => 'rejected',
-        'tanggal_pelanggaran' => '2026-03-08',
-    ]);
-
-    $this->actingAs($kesiswaan)->get(route('kesiswaan.laporan.index', ['status' => 'approved']))
-        ->assertSuccessful()
-        ->assertSee('Status Approved Laporan')
-        ->assertDontSee('Status Rejected Laporan');
-});
-
 // TS.LAP.007 / TC.LAP.007.001 — kelas_id yang tidak ada ditolak (negative)
 test('violation report rejects a non-existent kelas_id', function () {
     $kesiswaan = laporanPelanggaranActor();

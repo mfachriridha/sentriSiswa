@@ -23,7 +23,6 @@ class ViolationReportFilterRequest extends FormRequest
             'kelas_id' => ['nullable', 'integer', Rule::exists('kelas', 'id')],
             'tingkat' => ['nullable', Rule::in(['10', '11', '12'])],
             'kategori' => ['nullable', Rule::in(['ringan', 'sedang', 'berat', 'sangat_berat'])],
-            'status' => ['nullable', Rule::in(['pending', 'approved', 'rejected'])],
         ];
     }
 }

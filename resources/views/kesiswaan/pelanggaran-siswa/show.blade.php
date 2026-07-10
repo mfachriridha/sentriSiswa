@@ -12,7 +12,7 @@
     ];
 @endphp
 
-<div class="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+<div class="mb-5">
     <a href="{{ route('kesiswaan.pelanggaran-siswa.index') }}"
        class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition-colors">
         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -20,12 +20,6 @@
         </svg>
         Kembali
     </a>
-    <div class="flex flex-wrap gap-2">
-        <a href="{{ route('kesiswaan.pelanggaran-siswa.edit', $pelanggaranSiswa) }}"
-           class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors">
-            Edit
-        </a>
-    </div>
 </div>
 
 <div class="rounded-xl border border-gray-200 bg-white p-6">
@@ -37,9 +31,6 @@
             </span>
             <span class="inline-flex items-center rounded-full bg-red-50 px-3 py-1 text-sm font-medium text-red-700">
                 {{ $pelanggaranSiswa->pengurangan_poin }} poin
-            </span>
-            <span class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">
-                {{ $statusLabels[$pelanggaranSiswa->status] ?? $pelanggaranSiswa->status }}
             </span>
             <span class="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-700">
                 Sisa Poin: {{ $pelanggaranSiswa->profilSiswa?->poin ?? '-' }}
