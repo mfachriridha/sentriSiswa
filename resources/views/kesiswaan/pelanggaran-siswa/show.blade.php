@@ -41,6 +41,9 @@
             <span class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700">
                 {{ $statusLabels[$pelanggaranSiswa->status] ?? $pelanggaranSiswa->status }}
             </span>
+            <span class="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-700">
+                Sisa Poin: {{ $pelanggaranSiswa->profilSiswa?->poin ?? '-' }}
+            </span>
         </div>
     </div>
 

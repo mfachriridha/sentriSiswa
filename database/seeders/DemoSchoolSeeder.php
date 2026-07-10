@@ -278,19 +278,19 @@ class DemoSchoolSeeder extends Seeder
         $recorders = Pengguna::whereIn('peran', ['wali_kelas', 'bk', 'kesiswaan'])->pluck('id');
         $students = array_values($students);
 
-        // Sengaja beragam: nyentuh ke-4 kategori pelanggaran, ke-3 status,
-        // dan beberapa siswa dibiarin bersih buat kontras. Dua entri
-        // pending/rejected cuma buat demo tampilan status filter/badge -
-        // di alur sekarang kesiswaan langsung approved, tapi data lama
-        // dengan status itu tetap valid untuk ditampilkan (lihat CLAUDE.md).
+        // Sengaja beragam: nyentuh ke-4 kategori pelanggaran, beberapa siswa
+        // dibiarin bersih buat kontras. Semua langsung approved - sesuai alur
+        // aplikasi sekarang (kesiswaan mencatat pelanggaran langsung approved,
+        // gak ada lagi antrean pending/reject buat PelanggaranSiswa - beda
+        // dari PengajuanPoin yang masih punya alur approve/reject aktif).
         $plan = [
             ['student' => 0, 'nama' => 'Penampilan tidak rapi', 'status' => 'approved'],
             ['student' => 2, 'nama' => 'Anggota tubuh bertato', 'status' => 'approved'],
             ['student' => 2, 'nama' => 'Salah Kostum', 'status' => 'approved'],
-            ['student' => 3, 'nama' => 'Ber make up', 'status' => 'pending'],
+            ['student' => 3, 'nama' => 'Ber make up', 'status' => 'approved'],
             ['student' => 5, 'nama' => 'Mesum di sekolah', 'status' => 'approved'],
             ['student' => 6, 'nama' => 'Terlibat Narkoba', 'status' => 'approved'],
-            ['student' => 7, 'nama' => 'Melakukan penghinaan', 'status' => 'rejected'],
+            ['student' => 7, 'nama' => 'Melakukan penghinaan', 'status' => 'approved'],
         ];
 
         foreach ($plan as $i => $item) {

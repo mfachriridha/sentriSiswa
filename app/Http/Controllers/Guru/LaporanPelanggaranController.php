@@ -123,7 +123,7 @@ class LaporanPelanggaranController extends Controller
         return collect($violations)
             ->where('status', 'approved')
             ->groupBy('profil_siswa_id')
-            ->map(fn ($group) => max(0, 100 - $group->sum('pengurangan_poin')))
+            ->map(fn ($group) => $group->first()->profilSiswa?->poin ?? 100)
             ->all();
     }
 
@@ -137,14 +137,13 @@ class LaporanPelanggaranController extends Controller
             ->groupBy('profil_siswa_id')
             ->map(function ($group) {
                 $first = $group->first();
-                $totalDeducted = $group->sum('pengurangan_poin');
 
                 return [
                     'nama' => $first->profilSiswa?->pengguna?->nama ?? '-',
                     'nis' => $first->profilSiswa?->nis ?? '-',
                     'kelas' => $first->profilSiswa?->kelas?->nama ?? '-',
-                    'total_terpotong' => $totalDeducted,
-                    'sisa_poin' => max(0, 100 - $totalDeducted),
+                    'total_terpotong' => $group->sum('pengurangan_poin'),
+                    'sisa_poin' => $first->profilSiswa?->poin ?? 100,
                 ];
             })
             ->sortBy('sisa_poin')

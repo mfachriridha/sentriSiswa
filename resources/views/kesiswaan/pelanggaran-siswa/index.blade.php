@@ -109,6 +109,7 @@
                     <th class="px-4 py-3"><x-sort-link label="Pelanggaran" column="violation_name" :sort="$sort" :direction="$direction" /></th>
                     <th class="px-4 py-3"><x-sort-link label="Kategori" column="violation_category" :sort="$sort" :direction="$direction" /></th>
                     <th class="px-4 py-3"><x-sort-link label="Poin" column="point_deduction" :sort="$sort" :direction="$direction" /></th>
+                    <th class="px-4 py-3 text-gray-600 font-semibold">Sisa Poin</th>
                     <th class="px-4 py-3 text-gray-600 font-semibold">Status</th>
                     <th class="px-4 py-3 text-gray-600 font-semibold">Aksi</th>
                 </tr>
@@ -129,6 +130,7 @@
                             </span>
                         </td>
                         <td class="px-4 py-3 text-gray-700">{{ $studentViolation->pengurangan_poin }} poin</td>
+                        <td class="px-4 py-3 font-medium text-gray-900">{{ $studentViolation->profilSiswa?->poin ?? '-' }}</td>
                         <td class="px-4 py-3 text-gray-700">{{ $statusLabels[$studentViolation->status] ?? $studentViolation->status }}</td>
                         <td class="px-4 py-3">
                             <div class="flex items-center gap-2">
@@ -160,7 +162,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8" class="px-6 py-16 text-center text-sm text-gray-500">
+                        <td colspan="9" class="px-6 py-16 text-center text-sm text-gray-500">
                             {{ $hasActiveFilters ? 'Tidak ada pelanggaran siswa yang sesuai dengan filter.' : 'Belum ada catatan pelanggaran siswa.' }}
                         </td>
                     </tr>

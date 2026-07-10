@@ -21,6 +21,7 @@
                     <th class="px-4 py-3 text-gray-600 font-semibold">Tanggal</th>
                     <th class="px-4 py-3 text-gray-600 font-semibold">Siswa</th>
                     <th class="px-4 py-3 text-gray-600 font-semibold">Kelas</th>
+                    <th class="px-4 py-3 text-gray-600 font-semibold">Sisa Poin</th>
                     <th class="px-4 py-3 text-gray-600 font-semibold">Alasan</th>
                     <th class="px-4 py-3 text-gray-600 font-semibold">Diajukan Oleh</th>
                     <th class="px-4 py-3 text-gray-600 font-semibold">Aksi</th>
@@ -35,6 +36,7 @@
                             <p class="mt-1 text-xs text-gray-500">NIS: {{ $pengajuan->profilSiswa?->nis ?? '-' }}</p>
                         </td>
                         <td class="px-4 py-3 text-gray-700">{{ $pengajuan->profilSiswa?->kelas?->nama ?? '-' }}</td>
+                        <td class="px-4 py-3 font-medium text-gray-900">{{ $pengajuan->profilSiswa?->poin ?? '-' }}</td>
                         <td class="px-4 py-3 text-gray-700">{{ $pengajuan->alasan }}</td>
                         <td class="px-4 py-3 text-gray-500">{{ $pengajuan->diajukanOleh?->nama ?? '-' }}</td>
                         <td class="px-4 py-3">
@@ -54,7 +56,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="px-6 py-16 text-center text-sm text-gray-500">
+                        <td colspan="7" class="px-6 py-16 text-center text-sm text-gray-500">
                             Tidak ada pengajuan poin yang menunggu persetujuan.
                         </td>
                     </tr>

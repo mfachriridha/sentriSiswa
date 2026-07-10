@@ -31,7 +31,7 @@ test('attendance history accepts month 2026-01, the lower boundary', function ()
 
     $this->actingAs($student)->get(route('siswa.absensi.riwayat', ['month' => '2026-01']))
         ->assertSuccessful()
-        ->assertSee('January 2026');
+        ->assertSee('Januari 2026');
 });
 
 // TS.RAS.009 / TC.RAS.009.001 — bulan 2026-00 (di bawah batas, invalid, fallback ke bulan berjalan)
@@ -41,7 +41,7 @@ test('attendance history rejects month 2026-00, 1 below the lower boundary', fun
 
     $this->actingAs($student)->get(route('siswa.absensi.riwayat', ['month' => '2026-00']))
         ->assertSuccessful()
-        ->assertSee('June 2026');
+        ->assertSee('Juni 2026');
 });
 
 // TS.RAS.010 / TC.RAS.010.001 — bulan 2026-12 (batas atas, diperbolehkan)
@@ -51,7 +51,7 @@ test('attendance history accepts month 2026-12, the upper boundary', function ()
 
     $this->actingAs($student)->get(route('siswa.absensi.riwayat', ['month' => '2026-12']))
         ->assertSuccessful()
-        ->assertSee('December 2026');
+        ->assertSee('Desember 2026');
 });
 
 // TS.RAS.011 / TC.RAS.011.001 — bulan 2026-13 (di atas batas, invalid, fallback ke bulan berjalan)
@@ -61,5 +61,5 @@ test('attendance history rejects month 2026-13, 1 above the upper boundary', fun
 
     $this->actingAs($student)->get(route('siswa.absensi.riwayat', ['month' => '2026-13']))
         ->assertSuccessful()
-        ->assertSee('June 2026');
+        ->assertSee('Juni 2026');
 });

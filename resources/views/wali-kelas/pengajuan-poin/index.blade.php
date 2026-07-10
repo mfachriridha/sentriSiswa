@@ -29,6 +29,7 @@
                     <th class="px-4 py-3">Siswa</th>
                     <th class="px-4 py-3">Alasan</th>
                     <th class="px-4 py-3">Jumlah Poin</th>
+                    <th class="px-4 py-3">Sisa Poin</th>
                     <th class="px-4 py-3">Status</th>
                 </tr>
             </thead>
@@ -39,10 +40,11 @@
                         <td class="px-4 py-3">{{ $pengajuan->profilSiswa?->pengguna?->nama ?? '-' }}<div class="text-xs text-gray-500">{{ $pengajuan->profilSiswa?->kelas?->nama ?? '-' }}</div></td>
                         <td class="px-4 py-3">{{ $pengajuan->alasan }}</td>
                         <td class="px-4 py-3 font-semibold text-green-600">{{ $pengajuan->jumlah_poin !== null ? '+'.$pengajuan->jumlah_poin : '-' }}</td>
+                        <td class="px-4 py-3 font-medium text-gray-900">{{ $pengajuan->profilSiswa?->poin ?? '-' }}</td>
                         <td class="px-4 py-3">{{ $statusLabels[$pengajuan->status] ?? $pengajuan->status }}</td>
                     </tr>
                 @empty
-                    <tr><td colspan="5" class="px-6 py-16 text-center text-sm text-gray-500">Belum ada pengajuan.</td></tr>
+                    <tr><td colspan="6" class="px-6 py-16 text-center text-sm text-gray-500">Belum ada pengajuan.</td></tr>
                 @endforelse
             </tbody>
         </table>

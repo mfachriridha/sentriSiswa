@@ -31,7 +31,7 @@ test('attendance history shows the current month when no month parameter is give
 
     $this->actingAs($student)->get(route('siswa.absensi.riwayat'))
         ->assertSuccessful()
-        ->assertSee('June 2026');
+        ->assertSee('Juni 2026');
 });
 
 // TS.RAS.002 / TC.RAS.002.001 — parameter bulan valid nampilin catatan bulan tersebut (positive)
@@ -56,7 +56,7 @@ test('attendance history falls back to the current month when the month paramete
 
     $this->actingAs($student)->get(route('siswa.absensi.riwayat', ['month' => 'not-a-month']))
         ->assertSuccessful()
-        ->assertSee('June 2026');
+        ->assertSee('Juni 2026');
 });
 
 // TS.RAS.004 / TC.RAS.004.001 — belum ada catatan absensi nampilin pesan kosong (positive)
