@@ -136,7 +136,7 @@
                         @if ($teacher->isRegistered())
                             <span class="inline-flex items-center gap-1 rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-700">Terdaftar</span>
                         @else
-                            <span class="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-500">Belum</span>
+                            <span class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">Belum Terdaftar</span>
                         @endif
                     </td>
                     <td class="px-4 py-3">

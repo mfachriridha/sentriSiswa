@@ -20,7 +20,9 @@ class DashboardController extends Controller
         $summary = [];
 
         if ($user->isWaliKelas() && $user->kelasWali) {
-            $profileIds = $user->kelasWali->siswa()->pluck('nisn');
+            $profileIds = $user->kelasWali->siswa()
+                ->whereHas('pengguna', fn ($query) => $query->where('status', 'registered'))
+                ->pluck('nisn');
             $todayAttendances = Absensi::whereIn('profil_siswa_id', $profileIds)
                 ->whereDate('tanggal', today())
                 ->get();
@@ -44,7 +46,9 @@ class DashboardController extends Controller
 
         if ($user->isBk()) {
             $grade = $user->profilGuru?->tingkat;
-            $studentIds = ProfilSiswa::whereHas('kelas', fn ($query) => $query->where('tingkat', $grade))->pluck('nisn');
+            $studentIds = ProfilSiswa::whereHas('kelas', fn ($query) => $query->where('tingkat', $grade))
+                ->whereHas('pengguna', fn ($query) => $query->where('status', 'registered'))
+                ->pluck('nisn');
             $warningCount = $absenceWarning->alphaCountsForStudentIds($studentIds)
                 ->filter(fn (int $count): bool => $absenceWarning->hasWarning($count))
                 ->count();
@@ -52,21 +56,24 @@ class DashboardController extends Controller
             $summary['bk'] = [
                 'grade' => $grade,
                 'students' => $studentIds->count(),
+                'classes' => Kelas::where('tingkat', $grade)->count(),
+                'pelanggaran' => PelanggaranSiswa::disetujui()
+                    ->whereHas('profilSiswa.kelas', fn ($query) => $query->where('tingkat', $grade))
+                    ->count(),
                 'warnings' => $warningCount,
             ];
         }
 
         if ($user->isKesiswaan()) {
-            $violations = PelanggaranSiswa::all();
-            $studentIds = ProfilSiswa::query()->pluck('nisn');
+            $studentIds = ProfilSiswa::whereHas('pengguna', fn ($query) => $query->where('status', 'registered'))->pluck('nisn');
             $warningCount = $absenceWarning->alphaCountsForStudentIds($studentIds)
                 ->filter(fn (int $count): bool => $absenceWarning->hasWarning($count))
                 ->count();
 
             $summary['kesiswaan'] = [
                 'classes' => Kelas::count(),
-                'students' => ProfilSiswa::count(),
-                'approved' => $violations->where('status', 'approved')->count(),
+                'students' => $studentIds->count(),
+                'approved' => PelanggaranSiswa::disetujui()->count(),
                 'pengajuan_poin_pending' => PengajuanPoin::where('status', 'pending')->count(),
                 'warnings' => $warningCount,
             ];

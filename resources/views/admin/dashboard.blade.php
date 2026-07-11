@@ -15,8 +15,8 @@
             </svg>
         </div>
         <div>
-            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Siswa</p>
-            <p class="text-2xl font-extrabold text-slate-800 mt-0.5">{{ \App\Models\ProfilSiswa::count() }}</p>
+            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Siswa Terdaftar</p>
+            <p class="text-2xl font-extrabold text-slate-800 mt-0.5">{{ $totals['students'] }}</p>
         </div>
     </div>
 
@@ -28,8 +28,8 @@
             </svg>
         </div>
         <div>
-            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Guru</p>
-            <p class="text-2xl font-extrabold text-slate-800 mt-0.5">{{ \App\Models\Pengguna::whereIn('peran', ['wali_kelas', 'bk', 'kesiswaan'])->count() }}</p>
+            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Guru Terdaftar</p>
+            <p class="text-2xl font-extrabold text-slate-800 mt-0.5">{{ $totals['teachers'] }}</p>
         </div>
     </div>
 
@@ -42,31 +42,41 @@
         </div>
         <div>
             <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Kelas</p>
-            <p class="text-2xl font-extrabold text-slate-800 mt-0.5">{{ \App\Models\Kelas::count() }}</p>
+            <p class="text-2xl font-extrabold text-slate-800 mt-0.5">{{ $totals['classes'] }}</p>
         </div>
+    </div>
+</div>
+
+@php
+    $studentRegistered = collect($charts['registration'])->firstWhere('label', 'Terdaftar')['value'] ?? 0;
+    $studentTotal = collect($charts['registration'])->sum('value');
+    $teacherRegistered = collect($charts['teacherRegistration'])->firstWhere('label', 'Terdaftar')['value'] ?? 0;
+    $teacherTotal = collect($charts['teacherRegistration'])->sum('value');
+@endphp
+
+<div class="mb-6 rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+    <h2 class="mb-3 text-sm font-semibold text-gray-900">Siswa Terdaftar per Tingkat</h2>
+    <div class="grid grid-cols-3 gap-3">
+        @foreach ($charts['studentsByGrade'] as $item)
+            <div class="rounded-lg bg-gray-50 p-3 text-center">
+                <p class="text-xl font-bold text-gray-900">{{ $item['value'] }}</p>
+                <p class="mt-1 text-xs text-gray-500">{{ $item['label'] }}</p>
+            </div>
+        @endforeach
     </div>
 </div>
 
 <div class="mb-6 grid gap-4 lg:grid-cols-2">
     <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-        <h2 class="mb-3 text-sm font-semibold text-gray-900">Siswa per Tingkat</h2>
-        <div class="grid grid-cols-3 gap-3">
-            @foreach ($charts['studentsByGrade'] as $item)
-                <div class="rounded-lg bg-gray-50 p-3 text-center">
-                    <p class="text-xl font-bold text-gray-900">{{ $item['value'] }}</p>
-                    <p class="mt-1 text-xs text-gray-500">{{ $item['label'] }}</p>
-                </div>
-            @endforeach
-        </div>
+        <h2 class="mb-3 text-sm font-semibold text-gray-900">Status Registrasi Siswa</h2>
+        <p class="text-xl font-bold text-gray-900">{{ $studentRegistered }} <span class="text-sm font-normal text-gray-500">/ {{ $studentTotal }} terdaftar</span></p>
+        <p class="mt-1 text-xs text-amber-700">{{ $studentTotal - $studentRegistered }} belum daftar akun</p>
     </div>
 
     <div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-        <h2 class="mb-3 text-sm font-semibold text-gray-900">Status Registrasi Siswa</h2>
-        @php
-            $registered = collect($charts['registration'])->firstWhere('label', 'Terdaftar')['value'] ?? 0;
-            $total = collect($charts['registration'])->sum('value');
-        @endphp
-        <p class="text-xl font-bold text-gray-900">{{ $registered }} <span class="text-sm font-normal text-gray-500">/ {{ $total }} terdaftar</span></p>
+        <h2 class="mb-3 text-sm font-semibold text-gray-900">Status Registrasi Guru</h2>
+        <p class="text-xl font-bold text-gray-900">{{ $teacherRegistered }} <span class="text-sm font-normal text-gray-500">/ {{ $teacherTotal }} terdaftar</span></p>
+        <p class="mt-1 text-xs text-amber-700">{{ $teacherTotal - $teacherRegistered }} belum daftar akun</p>
     </div>
 </div>
 
