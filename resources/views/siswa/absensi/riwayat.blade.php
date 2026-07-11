@@ -22,15 +22,20 @@
 
         <form method="GET" action="{{ route('siswa.absensi.riwayat') }}" class="flex flex-wrap items-center gap-2">
             <label for="month" class="text-sm font-medium text-gray-600">Bulan</label>
-            <input id="month"
-                   type="month"
-                   name="month"
-                   value="{{ $selectedMonth }}"
-                   class="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20">
-            <button type="submit"
-                    class="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-dark">
-                Filter
-            </button>
+            <select id="month"
+                    name="month"
+                    onchange="this.form.submit()"
+                    class="rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20">
+                @foreach ($monthOptions as $value => $label)
+                    <option value="{{ $value }}" @selected($selectedMonth === $value)>{{ $label }}</option>
+                @endforeach
+            </select>
+            <noscript>
+                <button type="submit"
+                        class="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-dark">
+                    Filter
+                </button>
+            </noscript>
         </form>
     </div>
 

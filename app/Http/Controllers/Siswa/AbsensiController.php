@@ -298,6 +298,16 @@ class AbsensiController extends Controller
 
         $monthLabel = $month->translatedFormat('F Y');
 
-        return view('siswa.absensi.riwayat', compact('attendances', 'monthLabel', 'selectedMonth'));
+        // 12 bulan terakhir. Bulan yang lagi dipilih selalu ikut masuk walau di luar
+        // rentang itu (mis. dibuka lewat URL), biar pilihannya gak ke-reset diam-diam.
+        $monthOptions = collect(range(0, 11))
+            ->map(fn (int $back): Carbon => now()->startOfMonth()->subMonths($back))
+            ->push($month)
+            ->unique(fn (Carbon $date): string => $date->format('Y-m'))
+            ->sortByDesc(fn (Carbon $date): string => $date->format('Y-m'))
+            ->mapWithKeys(fn (Carbon $date): array => [$date->format('Y-m') => $date->translatedFormat('F Y')])
+            ->all();
+
+        return view('siswa.absensi.riwayat', compact('attendances', 'monthLabel', 'selectedMonth', 'monthOptions'));
     }
 }
