@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Pengguna;
 use App\Services\OtpService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -11,6 +12,9 @@ use Illuminate\View\View;
 
 class OtpController extends Controller
 {
+    /** Jeda minimum antar kirim ulang OTP. */
+    public const RESEND_COOLDOWN_SECONDS = 60;
+
     public function __construct(private readonly OtpService $otpService) {}
 
     public function show(): View|RedirectResponse
@@ -22,8 +26,9 @@ class OtpController extends Controller
         $pending = session('otp_pending', []);
         $emailToShow = $pending['new_email'] ?? Auth::user()->email ?? '';
         $maskedEmail = $emailToShow ? $this->maskEmail($emailToShow) : '***@***';
+        $resendAvailableIn = $this->resendAvailableIn(Auth::user());
 
-        return view('auth.verify-otp', compact('maskedEmail'));
+        return view('auth.verify-otp', compact('maskedEmail', 'resendAvailableIn'));
     }
 
     public function verify(Request $request): RedirectResponse
@@ -79,17 +84,42 @@ class OtpController extends Controller
                 ->withErrors(['otp' => 'Sesi OTP tidak valid. Silakan coba lagi.']);
         }
 
-        // Throttle: 1 resend per minute
-        $cacheKey = "otp_resend_{$user->id}";
-        if (cache()->has($cacheKey)) {
-            return back()->withErrors(['otp' => 'Harap tunggu sebentar sebelum mengirim ulang kode.']);
+        $remaining = $this->resendAvailableIn($user);
+
+        if ($remaining > 0) {
+            return back()->withErrors([
+                'otp' => "Tunggu {$remaining} detik lagi sebelum mengirim ulang kode.",
+            ]);
         }
 
-        cache()->put($cacheKey, true, 60);
+        // Simpan waktu kapan boleh kirim ulang lagi (bukan sekadar penanda), biar
+        // sisa detiknya bisa dihitung ulang walau halaman di-refresh.
+        cache()->put(
+            $this->resendCacheKey($user),
+            now()->addSeconds(self::RESEND_COOLDOWN_SECONDS)->timestamp,
+            self::RESEND_COOLDOWN_SECONDS,
+        );
 
         $this->otpService->generate($user, $type, $pending);
 
         return back()->with('success', 'Kode OTP baru telah dikirim.');
+    }
+
+    /** Sisa detik sebelum boleh kirim ulang; 0 kalau sudah boleh. */
+    private function resendAvailableIn(Pengguna $user): int
+    {
+        $availableAt = cache()->get($this->resendCacheKey($user));
+
+        if (! is_numeric($availableAt)) {
+            return 0;
+        }
+
+        return max(0, (int) $availableAt - now()->timestamp);
+    }
+
+    private function resendCacheKey(Pengguna $user): string
+    {
+        return "otp_resend_{$user->id}";
     }
 
     private function maskEmail(string $email): string

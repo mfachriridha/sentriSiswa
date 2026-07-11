@@ -56,20 +56,18 @@
                 </button>
             </form>
 
-            <div class="mt-6 text-center" x-data="otpTimer()" x-init="start()">
-                <p class="text-xs text-slate-400 font-bold">
-                    <span x-show="timeLeft > 0">
-                        Kirim ulang dalam <span class="font-bold text-primary" x-text="formatTime(timeLeft)"></span>
-                    </span>
-                    <span x-show="timeLeft === 0" x-cloak>
-                        <form method="POST" action="{{ route('otp.kirim-ulang') }}" class="inline">
-                            @csrf
-                            <button type="submit" class="font-bold text-primary hover:text-primary-dark hover:underline transition-colors cursor-pointer">
-                                Kirim Ulang Kode
-                            </button>
-                        </form>
-                    </span>
-                </p>
+            <div class="mt-6 text-center" x-data="otpResendTimer({{ $resendAvailableIn }})" x-init="start()">
+                <form method="POST" action="{{ route('otp.kirim-ulang') }}">
+                    @csrf
+                    <button type="submit" :disabled="timeLeft > 0"
+                            class="text-xs font-bold text-primary transition-colors hover:text-primary-dark hover:underline
+                                   disabled:cursor-not-allowed disabled:text-slate-400 disabled:no-underline">
+                        <span x-show="timeLeft > 0">
+                            Kirim ulang kode dalam <span x-text="timeLeft"></span> detik
+                        </span>
+                        <span x-show="timeLeft === 0">Kirim Ulang Kode</span>
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -121,21 +119,19 @@
         }
     });
 
-    function otpTimer() {
+    // Sisa detik datang dari server, jadi tetap akurat walau halaman di-refresh.
+    function otpResendTimer(initialSeconds) {
         return {
-            timeLeft: 600,
+            timeLeft: initialSeconds,
             interval: null,
             start() {
+                if (this.timeLeft <= 0) return;
+
                 this.interval = setInterval(() => {
                     if (this.timeLeft > 0) this.timeLeft--;
                     else clearInterval(this.interval);
                 }, 1000);
             },
-            formatTime(s) {
-                const m = Math.floor(s / 60);
-                const sec = s % 60;
-                return `${m}:${String(sec).padStart(2, '0')}`;
-            }
         };
     }
 </script>

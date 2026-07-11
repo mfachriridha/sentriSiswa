@@ -161,3 +161,50 @@ test('verifying profile OTP applies changes', function () {
     $student->refresh();
     expect($student->email)->toBe('verified-new-email@example.com');
 });
+
+test('otp resend is throttled and reports the remaining wait in seconds', function () {
+    Mail::fake();
+
+    $teacher = Pengguna::factory()->create(['peran' => 'wali_kelas', 'status' => 'registered', 'email' => 'guru.otp@example.com']);
+    ProfilGuru::factory()->create(['pengguna_id' => $teacher->id, 'tipe_guru' => 'wali_kelas']);
+
+    session(['otp_type' => 'email_change', 'otp_pending' => ['new_email' => 'baru@example.com']]);
+
+    // Kirim ulang pertama boleh.
+    $this->actingAs($teacher)->post(route('otp.kirim-ulang'))
+        ->assertSessionHas('success', 'Kode OTP baru telah dikirim.');
+
+    expect(TokenOtp::where('pengguna_id', $teacher->id)->count())->toBe(1);
+
+    // Kirim ulang kedua langsung setelahnya ditolak, dan pesannya nyebut sisa detik.
+    $this->actingAs($teacher)->post(route('otp.kirim-ulang'))
+        ->assertSessionHasErrors('otp');
+
+    expect(session('errors')->first('otp'))->toContain('detik');
+
+    // Tidak ada token baru yang dibuat oleh percobaan yang ditolak.
+    expect(TokenOtp::where('pengguna_id', $teacher->id)->count())->toBe(1);
+});
+
+test('otp page shows the remaining resend cooldown from the server', function () {
+    Mail::fake();
+
+    $teacher = Pengguna::factory()->create(['peran' => 'wali_kelas', 'status' => 'registered', 'email' => 'guru.otp2@example.com']);
+    ProfilGuru::factory()->create(['pengguna_id' => $teacher->id, 'tipe_guru' => 'wali_kelas']);
+
+    session(['otp_type' => 'email_change', 'otp_pending' => ['new_email' => 'baru2@example.com']]);
+
+    // Belum pernah kirim ulang: tombol langsung aktif.
+    $this->actingAs($teacher)->get(route('otp.show'))
+        ->assertSuccessful()
+        ->assertViewHas('resendAvailableIn', 0);
+
+    $this->actingAs($teacher)->post(route('otp.kirim-ulang'));
+
+    // Setelah kirim ulang: sisa cooldown ikut dikirim ke view, jadi countdown-nya
+    // tetap benar walau halaman di-refresh.
+    $response = $this->actingAs($teacher)->get(route('otp.show'))->assertSuccessful();
+
+    expect($response->viewData('resendAvailableIn'))->toBeGreaterThan(0);
+    expect($response->viewData('resendAvailableIn'))->toBeLessThanOrEqual(60);
+});
