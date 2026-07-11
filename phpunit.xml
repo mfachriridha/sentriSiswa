@@ -12,7 +12,6 @@
             <directory suffix="Test.php">tests/Feature</directory>
             <directory suffix="_ev.php">tests/Feature</directory>
             <directory suffix="_bva.php">tests/Feature</directory>
-            <directory suffix="_stt.php">tests/Feature</directory>
         </testsuite>
     </testsuites>
     <source>

@@ -1,152 +1,160 @@
 <?php
 
-use App\Models\Pengguna;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-function siswaBvaAdmin(): Pengguna
+/*
+|--------------------------------------------------------------------------
+| Fitur Data Siswa (Admin) — Boundary Value Analysis
+|--------------------------------------------------------------------------
+|
+| Menguji nilai tepat di batas yang diperbolehkan dan tepat di luarnya:
+|   - Panjang nama    : 3 sampai 100 karakter.
+|   - Panjang NISN    : tepat 10 angka.
+|   - Panjang NIS     : maksimal 15 angka.
+|   - Panjang nomor HP: 10 sampai 15 karakter.
+|
+*/
+
+/** Data siswa yang sah, agar setiap pengujian hanya mengubah satu kolom saja. */
+function dataSiswaSah(array $ubahan = []): array
 {
-    return Pengguna::factory()->admin()->create(['status' => 'registered']);
+    return array_merge([
+        'nama' => 'Ahmad Fauzi',
+        'nisn' => '1234567890',
+        'nis' => '10001',
+    ], $ubahan);
 }
 
-// ── Boundary: nama length, min:3 / max:100 ────────────────────────────────
+// ── Batas panjang nama: 3 sampai 100 karakter ──────────────────────────────
 
-// TS.SIS.011 / TC.SIS.011.001 — nama with 2 characters (just below the minimum of 3, invalid)
-test('admin cannot create a student with a 2 character name', function () {
-    $this->actingAs(siswaBvaAdmin())->post(route('admin.siswa.store'), [
-        'nama' => 'Ab',
-        'nisn' => '1111111101',
-        'nis' => '90001',
-    ])->assertSessionHasErrors('nama');
+// TS.SIS.013 / TC.SIS.013.001 — Negative
+test('nama dua karakter ditolak karena kurang dari batas minimum', function () {
+    adminDataSiswa();
+
+    $this->from('/admin/siswa/create')
+        ->followingRedirects()
+        ->post('/admin/siswa', dataSiswaSah(['nama' => 'Ab']))
+        ->assertSee('Nama minimal 3 karakter.');
 });
 
-// TS.SIS.012 / TC.SIS.012.001 — nama with exactly 3 characters (at the minimum, valid)
-test('admin can create a student with a 3 character name', function () {
-    $this->actingAs(siswaBvaAdmin())->post(route('admin.siswa.store'), [
-        'nama' => 'Abi',
-        'nisn' => '1111111102',
-        'nis' => '90002',
-    ])->assertRedirect(route('admin.siswa.index'));
+// TS.SIS.013 / TC.SIS.013.002 — Positive
+test('nama tiga karakter diterima karena tepat di batas minimum', function () {
+    adminDataSiswa();
+
+    $this->followingRedirects()
+        ->post('/admin/siswa', dataSiswaSah(['nama' => 'Abu']))
+        ->assertSee('Siswa berhasil ditambahkan.');
 });
 
-// TS.SIS.013 / TC.SIS.013.001 — nama with exactly 100 characters (at the maximum, valid)
-test('admin can create a student with a 100 character name', function () {
-    $nama100 = str_repeat('a', 100);
+// TS.SIS.014 / TC.SIS.014.001 — Positive
+test('nama seratus karakter diterima karena tepat di batas maksimum', function () {
+    adminDataSiswa();
 
-    $this->actingAs(siswaBvaAdmin())->post(route('admin.siswa.store'), [
-        'nama' => $nama100,
-        'nisn' => '1111111103',
-        'nis' => '90003',
-    ])->assertRedirect(route('admin.siswa.index'));
+    $this->followingRedirects()
+        ->post('/admin/siswa', dataSiswaSah(['nama' => str_repeat('a', 100)]))
+        ->assertSee('Siswa berhasil ditambahkan.');
 });
 
-// TS.SIS.014 / TC.SIS.014.001 — nama with 101 characters (just above the maximum, invalid)
-test('admin cannot create a student with a 101 character name', function () {
-    $nama101 = str_repeat('a', 101);
+// TS.SIS.014 / TC.SIS.014.002 — Negative
+test('nama seratus satu karakter ditolak karena melebihi batas maksimum', function () {
+    adminDataSiswa();
 
-    $this->actingAs(siswaBvaAdmin())->post(route('admin.siswa.store'), [
-        'nama' => $nama101,
-        'nisn' => '1111111104',
-        'nis' => '90004',
-    ])->assertSessionHasErrors('nama');
+    $this->from('/admin/siswa/create')
+        ->followingRedirects()
+        ->post('/admin/siswa', dataSiswaSah(['nama' => str_repeat('a', 101)]))
+        ->assertSee('Nama maksimal 100 karakter.');
 });
 
-// ── Boundary: nisn exact length, digits:10 ────────────────────────────────
+// ── Panjang NISN: tepat 10 angka ───────────────────────────────────────────
 
-// TS.SIS.015 / TC.SIS.015.001 — nisn with 9 digits (below the required 10, invalid)
-test('admin cannot create a student with a 9 digit nisn', function () {
-    $this->actingAs(siswaBvaAdmin())->post(route('admin.siswa.store'), [
-        'nama' => 'Siswa Nisn Sembilan',
-        'nisn' => '123456789',
-        'nis' => '90005',
-    ])->assertSessionHasErrors('nisn');
+// TS.SIS.015 / TC.SIS.015.001 — Negative
+test('nisn sembilan angka ditolak karena kurang dari panjang yang ditentukan', function () {
+    adminDataSiswa();
+
+    $this->from('/admin/siswa/create')
+        ->followingRedirects()
+        ->post('/admin/siswa', dataSiswaSah(['nisn' => '123456789']))
+        ->assertSee('NISN harus terdiri dari 10 angka.');
 });
 
-// TS.SIS.016 / TC.SIS.016.001 — nisn with exactly 10 digits (valid)
-test('admin can create a student with a 10 digit nisn', function () {
-    $this->actingAs(siswaBvaAdmin())->post(route('admin.siswa.store'), [
-        'nama' => 'Siswa Nisn Sepuluh',
-        'nisn' => '1234567895',
-        'nis' => '90006',
-    ])->assertRedirect(route('admin.siswa.index'));
+// TS.SIS.015 / TC.SIS.015.002 — Positive
+test('nisn sepuluh angka diterima karena sesuai panjang yang ditentukan', function () {
+    adminDataSiswa();
+
+    $this->followingRedirects()
+        ->post('/admin/siswa', dataSiswaSah(['nisn' => '1234567890']))
+        ->assertSee('Siswa berhasil ditambahkan.');
 });
 
-// TS.SIS.017 / TC.SIS.017.001 — nisn with 11 digits (above the required 10, invalid)
-test('admin cannot create a student with an 11 digit nisn', function () {
-    $this->actingAs(siswaBvaAdmin())->post(route('admin.siswa.store'), [
-        'nama' => 'Siswa Nisn Sebelas',
-        'nisn' => '12345678951',
-        'nis' => '90007',
-    ])->assertSessionHasErrors('nisn');
+// TS.SIS.016 / TC.SIS.016.001 — Negative
+test('nisn sebelas angka ditolak karena melebihi panjang yang ditentukan', function () {
+    adminDataSiswa();
+
+    $this->from('/admin/siswa/create')
+        ->followingRedirects()
+        ->post('/admin/siswa', dataSiswaSah(['nisn' => '12345678901']))
+        ->assertSee('NISN harus terdiri dari 10 angka.');
 });
 
-// ── Boundary: nis length, max:15 ──────────────────────────────────────────
+// ── Batas panjang NIS: maksimal 15 angka ───────────────────────────────────
 
-// TS.SIS.018 / TC.SIS.018.001 — nis with exactly 15 characters (at the maximum, valid)
-test('admin can create a student with a 15 character nis', function () {
-    $nis15 = str_repeat('9', 15);
+// TS.SIS.017 / TC.SIS.017.001 — Positive
+test('nis lima belas angka diterima karena tepat di batas maksimum', function () {
+    adminDataSiswa();
 
-    $this->actingAs(siswaBvaAdmin())->post(route('admin.siswa.store'), [
-        'nama' => 'Siswa Nis Limabelas',
-        'nisn' => '1111111108',
-        'nis' => $nis15,
-    ])->assertRedirect(route('admin.siswa.index'));
+    $this->followingRedirects()
+        ->post('/admin/siswa', dataSiswaSah(['nis' => str_repeat('1', 15)]))
+        ->assertSee('Siswa berhasil ditambahkan.');
 });
 
-// TS.SIS.019 / TC.SIS.019.001 — nis with 16 characters (just above the maximum, invalid)
-test('admin cannot create a student with a 16 character nis', function () {
-    $nis16 = str_repeat('9', 16);
+// TS.SIS.017 / TC.SIS.017.002 — Negative
+test('nis enam belas angka ditolak karena melebihi batas maksimum', function () {
+    adminDataSiswa();
 
-    $this->actingAs(siswaBvaAdmin())->post(route('admin.siswa.store'), [
-        'nama' => 'Siswa Nis Enambelas',
-        'nisn' => '1111111109',
-        'nis' => $nis16,
-    ])->assertSessionHasErrors('nis');
+    $this->from('/admin/siswa/create')
+        ->followingRedirects()
+        ->post('/admin/siswa', dataSiswaSah(['nis' => str_repeat('1', 16)]))
+        ->assertSee('NIS maksimal 15 karakter.');
 });
 
-// ── Boundary: telepon length, min:10 / max:15 ─────────────────────────────
+// ── Batas panjang nomor HP: 10 sampai 15 karakter ──────────────────────────
 
-// TS.SIS.020 / TC.SIS.020.001 — telepon with 9 characters (just below the minimum of 10, invalid)
-test('admin cannot create a student with a 9 character telepon', function () {
-    $this->actingAs(siswaBvaAdmin())->post(route('admin.siswa.store'), [
-        'nama' => 'Siswa Telepon Sembilan',
-        'nisn' => '1111111110',
-        'nis' => '90010',
-        'telepon' => '081234567',
-    ])->assertSessionHasErrors('telepon');
+// TS.SIS.018 / TC.SIS.018.001 — Negative
+test('nomor hp siswa sembilan digit ditolak karena kurang dari batas minimum', function () {
+    adminDataSiswa();
+
+    $this->from('/admin/siswa/create')
+        ->followingRedirects()
+        ->post('/admin/siswa', dataSiswaSah(['telepon' => '081234567']))
+        ->assertSee('Nomor HP minimal 10 karakter.');
 });
 
-// TS.SIS.021 / TC.SIS.021.001 — telepon with exactly 10 characters (at the minimum, valid)
-test('admin can create a student with a 10 character telepon', function () {
-    $this->actingAs(siswaBvaAdmin())->post(route('admin.siswa.store'), [
-        'nama' => 'Siswa Telepon Sepuluh',
-        'nisn' => '1111111111',
-        'nis' => '90011',
-        'telepon' => '0812345678',
-    ])->assertRedirect(route('admin.siswa.index'));
+// TS.SIS.018 / TC.SIS.018.002 — Positive
+test('nomor hp siswa sepuluh digit diterima karena tepat di batas minimum', function () {
+    adminDataSiswa();
+
+    $this->followingRedirects()
+        ->post('/admin/siswa', dataSiswaSah(['telepon' => '0812345678']))
+        ->assertSee('Siswa berhasil ditambahkan.');
 });
 
-// TS.SIS.022 / TC.SIS.022.001 — telepon with exactly 15 characters (at the maximum, valid)
-test('admin can create a student with a 15 character telepon', function () {
-    $telepon15 = str_repeat('0', 15);
+// TS.SIS.019 / TC.SIS.019.001 — Positive
+test('nomor hp siswa lima belas digit diterima karena tepat di batas maksimum', function () {
+    adminDataSiswa();
 
-    $this->actingAs(siswaBvaAdmin())->post(route('admin.siswa.store'), [
-        'nama' => 'Siswa Telepon Limabelas',
-        'nisn' => '1111111112',
-        'nis' => '90012',
-        'telepon' => $telepon15,
-    ])->assertRedirect(route('admin.siswa.index'));
+    $this->followingRedirects()
+        ->post('/admin/siswa', dataSiswaSah(['telepon' => '081234567890123']))
+        ->assertSee('Siswa berhasil ditambahkan.');
 });
 
-// TS.SIS.023 / TC.SIS.023.001 — telepon with 16 characters (just above the maximum, invalid)
-test('admin cannot create a student with a 16 character telepon', function () {
-    $telepon16 = str_repeat('0', 16);
+// TS.SIS.019 / TC.SIS.019.002 — Negative
+test('nomor hp siswa enam belas digit ditolak karena melebihi batas maksimum', function () {
+    adminDataSiswa();
 
-    $this->actingAs(siswaBvaAdmin())->post(route('admin.siswa.store'), [
-        'nama' => 'Siswa Telepon Enambelas',
-        'nisn' => '1111111113',
-        'nis' => '90013',
-        'telepon' => $telepon16,
-    ])->assertSessionHasErrors('telepon');
+    $this->from('/admin/siswa/create')
+        ->followingRedirects()
+        ->post('/admin/siswa', dataSiswaSah(['telepon' => '0812345678901234']))
+        ->assertSee('Nomor HP maksimal 15 karakter.');
 });

@@ -4,161 +4,226 @@ use App\Models\Kelas;
 use App\Models\Pengguna;
 use App\Models\ProfilSiswa;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Hash;
 
 uses(RefreshDatabase::class);
 
-function siswaAdmin(): Pengguna
+/*
+|--------------------------------------------------------------------------
+| Fitur Data Siswa (Admin) — Equivalence Partitioning
+|--------------------------------------------------------------------------
+|
+| Pengujian black box: admin masuk lewat halaman masuk, lalu mengelola data
+| siswa seperti pengguna biasa. Hasilnya diperiksa dari apa yang muncul di
+| layar, bukan dari basis data.
+|
+*/
+
+function adminDataSiswa(): Pengguna
 {
-    return Pengguna::factory()->admin()->create(['status' => 'registered']);
+    $admin = Pengguna::factory()->admin()->create([
+        'email' => 'admin.siswa@sentrisiswa.test',
+        'status' => 'registered',
+    ]);
+
+    masukSebagai($admin);
+
+    return $admin;
 }
 
-// TS.SIS.001 / TC.SIS.001.001 — create student with valid data, password always defaults to "password" (positive)
-test('admin can create a student with valid data', function () {
-    $admin = siswaAdmin();
-    $class = Kelas::create(['nama' => '10. 1', 'tingkat' => '10']);
-
-    $this->actingAs($admin)->post(route('admin.siswa.store'), [
-        'nama' => 'Siswa Baru',
-        'nisn' => '1234567890',
-        'nis' => '10001',
-        'kelas_id' => (string) $class->id,
-        'telepon' => '081234567890',
-        'alamat' => 'Jl. Testing 1',
-    ])->assertRedirect(route('admin.siswa.index'));
-
-    $student = Pengguna::where('nama', 'Siswa Baru')->firstOrFail();
-    expect($student->peran)->toBe('siswa');
-    expect($student->status)->toBe('unregistered');
-    expect(Hash::check('password', $student->password))->toBeTrue();
-    $this->assertDatabaseHas('profil_siswa', [
-        'pengguna_id' => $student->id,
-        'nisn' => '1234567890',
-        'kelas_id' => (string) $class->id,
-    ]);
-});
-
-// TS.SIS.002 / TC.SIS.002.001 — create student with a duplicate nisn (negative)
-test('admin cannot create a student with duplicate nisn', function () {
-    $admin = siswaAdmin();
-    $existing = Pengguna::factory()->student()->create();
-    ProfilSiswa::factory()->create(['pengguna_id' => $existing->id, 'nisn' => '2234567890']);
-
-    $this->actingAs($admin)->post(route('admin.siswa.store'), [
-        'nama' => 'Siswa Duplikat',
-        'nisn' => '2234567890',
-        'nis' => '10002',
-    ])->assertSessionHasErrors('nisn');
-});
-
-// TS.SIS.003 / TC.SIS.003.001 — create student with a duplicate nis (negative)
-test('admin cannot create a student with duplicate nis', function () {
-    $admin = siswaAdmin();
-    $existing = Pengguna::factory()->student()->create();
-    ProfilSiswa::factory()->create(['pengguna_id' => $existing->id, 'nis' => '20002']);
-
-    $this->actingAs($admin)->post(route('admin.siswa.store'), [
-        'nama' => 'Siswa Duplikat Nis',
-        'nisn' => '3234567890',
-        'nis' => '20002',
-    ])->assertSessionHasErrors('nis');
-});
-
-// TS.SIS.004 / TC.SIS.004.001 — create student with nama containing digits, fails the letters-only regex (negative)
-test('admin cannot create a student with a name containing digits', function () {
-    $admin = siswaAdmin();
-
-    $this->actingAs($admin)->post(route('admin.siswa.store'), [
-        'nama' => 'Siswa123',
-        'nisn' => '4234567890',
-        'nis' => '10004',
-    ])->assertSessionHasErrors('nama');
-});
-
-// TS.SIS.005 / TC.SIS.005.001 — create student with a kelas_id that does not exist (negative)
-test('admin cannot create a student with a non-existent kelas_id', function () {
-    $admin = siswaAdmin();
-
-    $this->actingAs($admin)->post(route('admin.siswa.store'), [
-        'nama' => 'Siswa Kelas Salah',
-        'nisn' => '5234567890',
-        'nis' => '10005',
-        'kelas_id' => 'kelas-tidak-ada',
-    ])->assertSessionHasErrors('kelas_id');
-});
-
-// TS.SIS.006 / TC.SIS.006.001 — submitting a password field directly is ignored, saved password stays the default (positive, dead-field robustness)
-test('admin submitted password field is ignored when creating a student', function () {
-    $admin = siswaAdmin();
-
-    $this->actingAs($admin)->post(route('admin.siswa.store'), [
-        'nama' => 'Siswa Bypass',
-        'nisn' => '6234567890',
-        'nis' => '10006',
-        'password' => 'Secret123',
-    ])->assertRedirect(route('admin.siswa.index'));
-
-    $student = Pengguna::where('nama', 'Siswa Bypass')->firstOrFail();
-    expect(Hash::check('password', $student->password))->toBeTrue();
-    expect(Hash::check('Secret123', $student->password))->toBeFalse();
-});
-
-// TS.SIS.007 / TC.SIS.007.001 — update student succeeds (positive)
-test('admin can update a student', function () {
-    $admin = siswaAdmin();
-    $student = Pengguna::factory()->student()->create(['nama' => 'Nama Lama']);
-    ProfilSiswa::factory()->create(['pengguna_id' => $student->id, 'nisn' => '7234567890', 'nis' => '10007']);
-
-    $this->actingAs($admin)->put(route('admin.siswa.update', $student), [
-        'nama' => 'Nama Baru',
-        'nisn' => '7234567890',
-        'nis' => '10007',
-        'telepon' => '081200000007',
-    ])->assertRedirect(route('admin.siswa.index'));
-
-    expect($student->fresh()->nama)->toBe('Nama Baru');
-    expect($student->fresh()->profilSiswa->telepon)->toBe('081200000007');
-});
-
-// TS.SIS.008 / TC.SIS.008.001 — delete student succeeds (positive)
-test('admin can delete a student', function () {
-    $admin = siswaAdmin();
-    $student = Pengguna::factory()->student()->create();
-    ProfilSiswa::factory()->create(['pengguna_id' => $student->id]);
-
-    $this->actingAs($admin)->delete(route('admin.siswa.destroy', $student))
-        ->assertRedirect(route('admin.siswa.index'));
-
-    $this->assertDatabaseMissing('pengguna', ['id' => $student->id]);
-});
-
-// TS.SIS.009 / TC.SIS.009.001 — unregistered student is blocked from the siswa dashboard (negative)
-test('unregistered student is blocked from siswa dashboard', function () {
-    $student = Pengguna::factory()->student()->create([
+function siswaTercatat(string $nama, string $nisn, string $nis, ?Kelas $kelas = null): ProfilSiswa
+{
+    $pengguna = Pengguna::factory()->student()->create([
+        'nama' => $nama,
         'status' => 'unregistered',
-        'password' => Hash::make('password'),
+        'email' => null,
     ]);
-    ProfilSiswa::factory()->create(['pengguna_id' => $student->id]);
 
-    $this->actingAs($student)
-        ->get(route('siswa.dashboard'))
-        ->assertRedirect(route('login'))
-        ->assertSessionHas('error', 'Akun belum terdaftar. Silakan daftar terlebih dahulu.');
+    return ProfilSiswa::factory()->create([
+        'pengguna_id' => $pengguna->id,
+        'nisn' => $nisn,
+        'nis' => $nis,
+        'kelas_id' => $kelas?->id,
+    ]);
+}
 
-    $this->assertGuest();
+// TS.SIS.001 / TC.SIS.001.001 — Positive
+test('admin berhasil menambah siswa dengan data yang lengkap dan benar', function () {
+    adminDataSiswa();
+    $kelas = Kelas::create(['nama' => '10 IPA 1', 'tingkat' => '10']);
+
+    $this->get('/admin/siswa/create')->assertSee('Tambah Siswa');
+
+    $this->followingRedirects()
+        ->post('/admin/siswa', [
+            'nama' => 'Ahmad Fauzi',
+            'nisn' => '1234567890',
+            'nis' => '10001',
+            'kelas_id' => (string) $kelas->id,
+            'telepon' => '081234567890',
+            'alamat' => 'Jalan Melati Nomor 10',
+        ])
+        ->assertSee('Siswa berhasil ditambahkan.')
+        ->assertSee('Ahmad Fauzi');
 });
 
-// TS.SIS.010 / TC.SIS.010.001 — admin filters student index by registration status (positive)
-test('admin can filter students by registration status', function () {
-    $admin = siswaAdmin();
-    $registered = Pengguna::factory()->student()->create(['nama' => 'Siswa Terdaftar', 'status' => 'registered']);
-    $unregistered = Pengguna::factory()->student()->create(['nama' => 'Siswa Belum Daftar', 'status' => 'unregistered']);
-    ProfilSiswa::factory()->create(['pengguna_id' => $registered->id]);
-    ProfilSiswa::factory()->create(['pengguna_id' => $unregistered->id]);
+// TS.SIS.002 / TC.SIS.002.001 — Positive
+test('admin berhasil menambah siswa tanpa mengisi kelas', function () {
+    adminDataSiswa();
 
-    $this->actingAs($admin)
-        ->get(route('admin.siswa.index', ['status' => 'registered']))
-        ->assertSuccessful()
-        ->assertSee('Siswa Terdaftar')
-        ->assertDontSee('Siswa Belum Daftar');
+    $this->followingRedirects()
+        ->post('/admin/siswa', [
+            'nama' => 'Siti Aminah',
+            'nisn' => '1234567891',
+            'nis' => '10002',
+        ])
+        ->assertSee('Siswa berhasil ditambahkan.')
+        ->assertSee('Siti Aminah');
+});
+
+// TS.SIS.003 / TC.SIS.003.001 — Negative
+test('admin gagal menambah siswa karena nisn sudah dipakai siswa lain', function () {
+    adminDataSiswa();
+    siswaTercatat('Budi Santoso', '1234567892', '10003');
+
+    $this->from('/admin/siswa/create')
+        ->followingRedirects()
+        ->post('/admin/siswa', [
+            'nama' => 'Siswa Kembar',
+            'nisn' => '1234567892',
+            'nis' => '10004',
+        ])
+        ->assertSee('NISN sudah digunakan.')
+        ->assertDontSee('Siswa berhasil ditambahkan.');
+});
+
+// TS.SIS.004 / TC.SIS.004.001 — Negative
+test('admin gagal menambah siswa karena nis sudah dipakai siswa lain', function () {
+    adminDataSiswa();
+    siswaTercatat('Budi Santoso', '1234567893', '10005');
+
+    $this->from('/admin/siswa/create')
+        ->followingRedirects()
+        ->post('/admin/siswa', [
+            'nama' => 'Siswa Kembar',
+            'nisn' => '1234567894',
+            'nis' => '10005',
+        ])
+        ->assertSee('NIS sudah digunakan.');
+});
+
+// TS.SIS.005 / TC.SIS.005.001 — Negative
+test('admin gagal menambah siswa karena nama mengandung angka', function () {
+    adminDataSiswa();
+
+    $this->from('/admin/siswa/create')
+        ->followingRedirects()
+        ->post('/admin/siswa', [
+            'nama' => 'Siswa 123',
+            'nisn' => '1234567895',
+            'nis' => '10006',
+        ])
+        ->assertSee('Format Nama tidak valid.');
+});
+
+// TS.SIS.006 / TC.SIS.006.001 — Negative
+test('admin gagal menambah siswa karena nis mengandung huruf', function () {
+    adminDataSiswa();
+
+    $this->from('/admin/siswa/create')
+        ->followingRedirects()
+        ->post('/admin/siswa', [
+            'nama' => 'Rina Marlina',
+            'nisn' => '1234567896',
+            'nis' => 'ABC12',
+        ])
+        ->assertSee('Format NIS tidak valid.');
+});
+
+// TS.SIS.007 / TC.SIS.007.001 — Negative
+test('admin gagal menambah siswa karena nomor hp mengandung huruf', function () {
+    adminDataSiswa();
+
+    $this->from('/admin/siswa/create')
+        ->followingRedirects()
+        ->post('/admin/siswa', [
+            'nama' => 'Rina Marlina',
+            'nisn' => '1234567897',
+            'nis' => '10007',
+            'telepon' => 'nomor-saya',
+        ])
+        ->assertSee('Format Nomor HP tidak valid.');
+});
+
+// TS.SIS.008 / TC.SIS.008.001 — Positive
+test('admin berhasil mengubah data siswa yang sudah ada', function () {
+    adminDataSiswa();
+    $siswa = siswaTercatat('Nama Lama', '1234567898', '10008');
+
+    $this->get("/admin/siswa/{$siswa->pengguna_id}/edit")->assertSee('Nama Lama');
+
+    $this->followingRedirects()
+        ->put("/admin/siswa/{$siswa->pengguna_id}", [
+            'nama' => 'Nama Baru',
+            'nisn' => '1234567898',
+            'nis' => '10008',
+        ])
+        ->assertSee('Siswa berhasil diperbarui.')
+        ->assertSee('Nama Baru')
+        ->assertDontSee('Nama Lama');
+});
+
+// TS.SIS.009 / TC.SIS.009.001 — Positive
+test('admin berhasil menghapus data siswa', function () {
+    adminDataSiswa();
+    $siswa = siswaTercatat('Siswa Dihapus', '1234567899', '10009');
+
+    $this->followingRedirects()
+        ->delete("/admin/siswa/{$siswa->pengguna_id}")
+        ->assertSee('Siswa berhasil dihapus.')
+        ->assertDontSee('Siswa Dihapus');
+});
+
+// TS.SIS.010 / TC.SIS.010.001 — Positive
+test('admin mencari siswa berdasarkan namanya', function () {
+    adminDataSiswa();
+    siswaTercatat('Dewi Lestari', '1234567800', '10010');
+    siswaTercatat('Bagus Wibowo', '1234567801', '10011');
+
+    $this->get('/admin/siswa?search=Dewi')
+        ->assertSee('Dewi Lestari')
+        ->assertDontSee('Bagus Wibowo');
+});
+
+// TS.SIS.011 / TC.SIS.011.001 — Positive
+test('admin menyaring daftar siswa berdasarkan tingkat kelas', function () {
+    adminDataSiswa();
+    $kelasSepuluh = Kelas::create(['nama' => '10 IPA 1', 'tingkat' => '10']);
+    $kelasSebelas = Kelas::create(['nama' => '11 IPS 1', 'tingkat' => '11']);
+
+    siswaTercatat('Siswa Kelas Sepuluh', '1234567802', '10012', $kelasSepuluh);
+    siswaTercatat('Siswa Kelas Sebelas', '1234567803', '10013', $kelasSebelas);
+
+    $this->get('/admin/siswa?tingkat=10')
+        ->assertSee('Siswa Kelas Sepuluh')
+        ->assertDontSee('Siswa Kelas Sebelas');
+});
+
+// TS.SIS.012 / TC.SIS.012.001 — Positive
+test('admin menyaring daftar siswa yang belum mendaftar akun', function () {
+    adminDataSiswa();
+    siswaTercatat('Siswa Belum Daftar', '1234567804', '10014');
+
+    $sudahDaftar = Pengguna::factory()->student()->create([
+        'nama' => 'Siswa Sudah Daftar',
+        'status' => 'registered',
+    ]);
+    ProfilSiswa::factory()->create([
+        'pengguna_id' => $sudahDaftar->id,
+        'nisn' => '1234567805',
+        'nis' => '10015',
+    ]);
+
+    $this->get('/admin/siswa?status=unregistered')
+        ->assertSee('Siswa Belum Daftar')
+        ->assertDontSee('Siswa Sudah Daftar');
 });

@@ -35,16 +35,25 @@ expect()->extend('toBeOne', function () {
 
 /*
 |--------------------------------------------------------------------------
-| Functions
+| Pembantu Pengujian Black Box
 |--------------------------------------------------------------------------
 |
-| While Pest is very powerful out-of-the-box, you may have some testing code specific to your
-| project that you don't want to repeat in every file. Here you can also expose helpers as
-| global functions to help you to reduce the number of lines of code in your test files.
+| Pengujian di proyek ini bersifat black box: setiap pengujian menempuh alur
+| yang sama seperti pengguna dan hanya memeriksa apa yang muncul di layar.
+| Karena itu, masuk ke aplikasi pun harus lewat halaman masuk, bukan lewat
+| jalan pintas dari kode.
 |
 */
 
-function something()
+/**
+ * Masuk ke aplikasi lewat halaman masuk, persis seperti pengguna biasa.
+ *
+ * Semua akun yang dibuat lewat pabrik data memakai kata sandi "password".
+ */
+function masukSebagai(App\Models\Pengguna $pengguna, string $kataSandi = 'password'): void
 {
-    // ..
+    test()->post('/login', [
+        'email' => $pengguna->email,
+        'password' => $kataSandi,
+    ]);
 }
