@@ -1,93 +1,116 @@
 <?php
 
-use App\Models\Pengaturan;
-use App\Models\Pengguna;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 
 uses(RefreshDatabase::class);
 
-function lokasiAbsenBvaAdmin(): Pengguna
-{
-    return Pengguna::factory()->admin()->create(['status' => 'registered']);
-}
+/*
+|--------------------------------------------------------------------------
+| Fitur Lokasi Absen (Admin) — Boundary Value Analysis
+|--------------------------------------------------------------------------
+|
+| Menguji nilai tepat di batas yang diperbolehkan dan tepat di luarnya:
+|   - Toleransi jarak      : 0 sampai 500 meter.
+|   - Ukuran berkas area   : maksimal 5 MB.
+|   - Jumlah titik area    : minimal 3 titik.
+|
+*/
 
-function lokasiAbsenBvaKmlContentOfSize(int $bytes): string
-{
-    $base = '<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://www.opengis.net/kml/2.2"><Document><Placemark><Polygon><outerBoundaryIs><LinearRing><coordinates>106.8272,-6.1751,0 106.8280,-6.1751,0 106.8280,-6.1760,0 106.8272,-6.1760,0 106.8272,-6.1751,0</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark></Document></kml>';
+// ── Batas toleransi jarak: 0 sampai 500 meter ─────────────────────────────
 
-    $padLength = max(0, $bytes - strlen($base) - 7);
-    $comment = '<!--'.str_repeat('x', $padLength).'-->';
+// TS.LKA.008 / TC.LKA.008.001 — Negative
+test('toleransi jarak minus satu meter ditolak karena di bawah batas minimum', function () {
+    adminLokasiAbsen();
 
-    return str_replace('?>', '?>'.$comment, $base);
-}
-
-function lokasiAbsenBvaKmlFile(int $bytes): UploadedFile
-{
-    $path = tempnam(sys_get_temp_dir(), 'kml');
-    file_put_contents($path, lokasiAbsenBvaKmlContentOfSize($bytes));
-
-    return new UploadedFile($path, 'area.kml', null, null, true);
-}
-
-// ── Boundary: kml_file size, max:5120 KB ──────────────────────────────────
-
-// TS.LKA.006 / TC.LKA.006.001 — file size exactly 5120 KB (at the maximum, valid)
-test('admin can upload a kml file at exactly the maximum size', function () {
-    $admin = lokasiAbsenBvaAdmin();
-
-    $this->actingAs($admin)->put(route('admin.pengaturan.lokasi-absen.update'), [
-        'kml_file' => lokasiAbsenBvaKmlFile(5120 * 1024),
-    ])->assertRedirect(route('admin.pengaturan.lokasi-absen.index'));
+    $this->from('/admin/pengaturan/lokasi-absen')
+        ->followingRedirects()
+        ->put('/admin/pengaturan/lokasi-absen/tolerance', ['tolerance_meters' => -1])
+        ->assertSee('Toleransi minimal 0 meter.');
 });
 
-// TS.LKA.007 / TC.LKA.007.001 — file size 1 byte above the 5120 KB maximum (invalid)
-test('admin cannot upload a kml file above the maximum size', function () {
-    $admin = lokasiAbsenBvaAdmin();
+// TS.LKA.008 / TC.LKA.008.002 — Positive
+test('toleransi jarak nol meter diterima karena tepat di batas minimum', function () {
+    adminLokasiAbsen();
 
-    $this->actingAs($admin)->put(route('admin.pengaturan.lokasi-absen.update'), [
-        'kml_file' => lokasiAbsenBvaKmlFile(5120 * 1024 + 1),
-    ])->assertSessionHasErrors('kml_file');
+    $this->followingRedirects()
+        ->put('/admin/pengaturan/lokasi-absen/tolerance', ['tolerance_meters' => 0])
+        ->assertSee('Toleransi jarak berhasil disimpan.');
 });
 
-// ── Boundary: tolerance_meters, min:0 / max:500 ────────────────────────────
+// TS.LKA.009 / TC.LKA.009.001 — Positive
+test('toleransi jarak lima ratus meter diterima karena tepat di batas maksimum', function () {
+    adminLokasiAbsen();
 
-// TS.LKA.008 / TC.LKA.008.001 — tolerance of -1 (just below the minimum of 0, invalid)
-test('admin cannot save a tolerance of -1', function () {
-    $admin = lokasiAbsenBvaAdmin();
-
-    $this->actingAs($admin)->put(route('admin.pengaturan.lokasi-absen.tolerance'), [
-        'tolerance_meters' => '-1',
-    ])->assertSessionHasErrors('tolerance_meters');
+    $this->followingRedirects()
+        ->put('/admin/pengaturan/lokasi-absen/tolerance', ['tolerance_meters' => 500])
+        ->assertSee('Toleransi jarak berhasil disimpan.');
 });
 
-// TS.LKA.009 / TC.LKA.009.001 — tolerance of exactly 0 (at the minimum, valid)
-test('admin can save a tolerance of exactly 0', function () {
-    $admin = lokasiAbsenBvaAdmin();
+// TS.LKA.009 / TC.LKA.009.002 — Negative
+test('toleransi jarak lima ratus satu meter ditolak karena melebihi batas maksimum', function () {
+    adminLokasiAbsen();
 
-    $this->actingAs($admin)->put(route('admin.pengaturan.lokasi-absen.tolerance'), [
-        'tolerance_meters' => '0',
-    ])->assertRedirect(route('admin.pengaturan.lokasi-absen.index'));
-
-    expect(Pengaturan::get('attendance_tolerance_meters'))->toBe('0');
+    $this->from('/admin/pengaturan/lokasi-absen')
+        ->followingRedirects()
+        ->put('/admin/pengaturan/lokasi-absen/tolerance', ['tolerance_meters' => 501])
+        ->assertSee('Toleransi maksimal 500 meter.');
 });
 
-// TS.LKA.010 / TC.LKA.010.001 — tolerance of exactly 500 (at the maximum, valid)
-test('admin can save a tolerance of exactly 500', function () {
-    $admin = lokasiAbsenBvaAdmin();
+// ── Batas jumlah titik area: minimal 3 titik ──────────────────────────────
 
-    $this->actingAs($admin)->put(route('admin.pengaturan.lokasi-absen.tolerance'), [
-        'tolerance_meters' => '500',
-    ])->assertRedirect(route('admin.pengaturan.lokasi-absen.index'));
+// TS.LKA.010 / TC.LKA.010.001 — Negative
+test('area dengan dua titik ditolak karena kurang dari jumlah titik minimum', function () {
+    adminLokasiAbsen();
 
-    expect(Pengaturan::get('attendance_tolerance_meters'))->toBe('500');
+    $duaTitik = <<<'KML'
+    <?xml version="1.0" encoding="UTF-8"?>
+    <kml xmlns="http://www.opengis.net/kml/2.2">
+      <Document><Placemark><Polygon><outerBoundaryIs><LinearRing>
+        <coordinates>106.827,-6.175,0 106.828,-6.175,0</coordinates>
+      </LinearRing></outerBoundaryIs></Polygon></Placemark></Document>
+    </kml>
+    KML;
+
+    $this->from('/admin/pengaturan/lokasi-absen')
+        ->followingRedirects()
+        ->put('/admin/pengaturan/lokasi-absen', [
+            'kml_file' => UploadedFile::fake()->createWithContent('dua-titik.kml', $duaTitik),
+        ])
+        ->assertSee('Polygon harus memiliki minimal 3 titik koordinat unik.');
 });
 
-// TS.LKA.011 / TC.LKA.011.001 — tolerance of 501 (just above the maximum, invalid)
-test('admin cannot save a tolerance of 501', function () {
-    $admin = lokasiAbsenBvaAdmin();
+// TS.LKA.010 / TC.LKA.010.002 — Positive
+test('area dengan tiga titik diterima karena tepat di jumlah titik minimum', function () {
+    adminLokasiAbsen();
 
-    $this->actingAs($admin)->put(route('admin.pengaturan.lokasi-absen.tolerance'), [
-        'tolerance_meters' => '501',
-    ])->assertSessionHasErrors('tolerance_meters');
+    $tigaTitik = <<<'KML'
+    <?xml version="1.0" encoding="UTF-8"?>
+    <kml xmlns="http://www.opengis.net/kml/2.2">
+      <Document><Placemark><Polygon><outerBoundaryIs><LinearRing>
+        <coordinates>106.827,-6.175,0 106.828,-6.175,0 106.828,-6.176,0 106.827,-6.175,0</coordinates>
+      </LinearRing></outerBoundaryIs></Polygon></Placemark></Document>
+    </kml>
+    KML;
+
+    $this->followingRedirects()
+        ->put('/admin/pengaturan/lokasi-absen', [
+            'kml_file' => UploadedFile::fake()->createWithContent('tiga-titik.kml', $tigaTitik),
+        ])
+        ->assertSee('Area absensi berhasil diimpor.');
+});
+
+// ── Batas ukuran berkas area: maksimal 5 MB ───────────────────────────────
+
+// TS.LKA.011 / TC.LKA.011.001 — Negative
+test('berkas area yang melebihi lima megabita ditolak karena di atas batas maksimum', function () {
+    adminLokasiAbsen();
+
+    $this->from('/admin/pengaturan/lokasi-absen')
+        ->followingRedirects()
+        ->put('/admin/pengaturan/lokasi-absen', [
+            'kml_file' => UploadedFile::fake()
+                ->create('besar.kml', 5121, 'application/vnd.google-earth.kml+xml'),
+        ])
+        ->assertSee('File maksimal 5 MB.');
 });

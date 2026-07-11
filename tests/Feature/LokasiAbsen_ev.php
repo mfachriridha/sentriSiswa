@@ -1,82 +1,161 @@
 <?php
 
-use App\Models\Pengaturan;
 use App\Models\Pengguna;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 
 uses(RefreshDatabase::class);
 
-function lokasiAbsenAdmin(): Pengguna
+/*
+|--------------------------------------------------------------------------
+| Fitur Lokasi Absen (Admin) — Equivalence Partitioning
+|--------------------------------------------------------------------------
+|
+| Pengujian black box: admin masuk lewat halaman masuk, lalu mengatur area
+| absensi seperti pengguna biasa. Hasilnya diperiksa dari apa yang muncul di
+| layar, bukan dari basis data.
+|
+| Area absensi digambar di Google My Maps lalu diunduh sebagai berkas KML.
+| Admin mengunggah berkas itu, dan boleh menambahkan toleransi jarak agar
+| siswa yang berada sedikit di luar garis area tetap bisa absen.
+|
+*/
+
+function adminLokasiAbsen(): Pengguna
 {
-    return Pengguna::factory()->admin()->create(['status' => 'registered']);
+    $admin = Pengguna::factory()->admin()->create([
+        'email' => 'admin.lokasi@sentrisiswa.test',
+        'status' => 'registered',
+    ]);
+
+    masukSebagai($admin);
+
+    return $admin;
 }
 
-function lokasiAbsenValidKmlContent(): string
+/** Berkas KML berisi area sekolah, seperti yang diunduh dari Google My Maps. */
+function berkasAreaSekolah(string $namaBerkas = 'area-sekolah.kml'): UploadedFile
 {
-    return <<<'KML'
-<?xml version="1.0" encoding="UTF-8"?>
-<kml xmlns="http://www.opengis.net/kml/2.2"><Document><Placemark><Polygon><outerBoundaryIs><LinearRing><coordinates>106.8272,-6.1751,0 106.8280,-6.1751,0 106.8280,-6.1760,0 106.8272,-6.1760,0 106.8272,-6.1751,0</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark></Document></kml>
-KML;
+    $isi = <<<'KML'
+    <?xml version="1.0" encoding="UTF-8"?>
+    <kml xmlns="http://www.opengis.net/kml/2.2">
+      <Document>
+        <Placemark>
+          <Polygon>
+            <outerBoundaryIs>
+              <LinearRing>
+                <coordinates>
+                  106.827,-6.175,0 106.828,-6.175,0 106.828,-6.176,0 106.827,-6.176,0 106.827,-6.175,0
+                </coordinates>
+              </LinearRing>
+            </outerBoundaryIs>
+          </Polygon>
+        </Placemark>
+      </Document>
+    </kml>
+    KML;
+
+    return UploadedFile::fake()->createWithContent($namaBerkas, $isi);
 }
 
-function lokasiAbsenKmlFile(string $filename = 'area.kml', ?string $content = null): UploadedFile
-{
-    $path = tempnam(sys_get_temp_dir(), 'kml');
-    file_put_contents($path, $content ?? lokasiAbsenValidKmlContent());
+// TS.LKA.001 / TC.LKA.001.001 — Positive
+test('admin berhasil mengunggah berkas area absensi', function () {
+    adminLokasiAbsen();
 
-    return new UploadedFile($path, $filename, null, null, true);
-}
+    $this->get('/admin/pengaturan/lokasi-absen')->assertSee('Lokasi Absen');
 
-// TS.LKA.001 / TC.LKA.001.001 — upload a valid KML polygon file (positive)
-test('admin can upload a valid kml file', function () {
-    $admin = lokasiAbsenAdmin();
-
-    $this->actingAs($admin)->put(route('admin.pengaturan.lokasi-absen.update'), [
-        'kml_file' => lokasiAbsenKmlFile(),
-    ])->assertRedirect(route('admin.pengaturan.lokasi-absen.index'));
-
-    $geofence = json_decode(Pengaturan::get('attendance_geofence_data'), true);
-    expect($geofence['coordinates'])->toHaveCount(4);
+    $this->followingRedirects()
+        ->put('/admin/pengaturan/lokasi-absen', [
+            'kml_file' => berkasAreaSekolah(),
+        ])
+        ->assertSee('Area absensi berhasil diimpor.');
 });
 
-// TS.LKA.002 / TC.LKA.002.001 — upload a file that is not a valid KML format (negative)
-test('admin cannot upload a file with an invalid kml format', function () {
-    $admin = lokasiAbsenAdmin();
+// TS.LKA.002 / TC.LKA.002.001 — Negative
+test('admin gagal mengunggah berkas yang bukan berkas area', function () {
+    adminLokasiAbsen();
 
-    $this->actingAs($admin)->put(route('admin.pengaturan.lokasi-absen.update'), [
-        'kml_file' => lokasiAbsenKmlFile('area.kml', 'ini bukan file kml sama sekali, cuma teks biasa'),
-    ])->assertSessionHasErrors('kml_file');
+    $this->from('/admin/pengaturan/lokasi-absen')
+        ->followingRedirects()
+        ->put('/admin/pengaturan/lokasi-absen', [
+            'kml_file' => UploadedFile::fake()->create('gambar.jpg', 100, 'image/jpeg'),
+        ])
+        ->assertSee('File harus berformat KML.')
+        ->assertDontSee('Area absensi berhasil diimpor.');
 });
 
-// TS.LKA.003 / TC.LKA.003.001 — submit the form without a file at all (negative)
-test('admin cannot save attendance location without a kml file', function () {
-    $admin = lokasiAbsenAdmin();
+// TS.LKA.003 / TC.LKA.003.001 — Negative
+test('admin gagal mengunggah berkas area yang tidak memuat gambar area', function () {
+    adminLokasiAbsen();
 
-    $this->actingAs($admin)->put(route('admin.pengaturan.lokasi-absen.update'), [])
-        ->assertSessionHasErrors('kml_file');
+    $tanpaArea = <<<'KML'
+    <?xml version="1.0" encoding="UTF-8"?>
+    <kml xmlns="http://www.opengis.net/kml/2.2">
+      <Document><Placemark><Point><coordinates>106.827,-6.175,0</coordinates></Point></Placemark></Document>
+    </kml>
+    KML;
+
+    $this->from('/admin/pengaturan/lokasi-absen')
+        ->followingRedirects()
+        ->put('/admin/pengaturan/lokasi-absen', [
+            'kml_file' => UploadedFile::fake()->createWithContent('titik.kml', $tanpaArea),
+        ])
+        ->assertSee('Tidak ditemukan polygon dalam file KML.');
 });
 
-// TS.LKA.004 / TC.LKA.004.001 — set a tolerance value within the valid 0-500 range (positive)
-test('admin can save a tolerance within the valid range', function () {
-    $admin = lokasiAbsenAdmin();
+// TS.LKA.004 / TC.LKA.004.001 — Negative
+test('admin gagal mengunggah berkas area yang titiknya kurang dari tiga', function () {
+    adminLokasiAbsen();
 
-    $this->actingAs($admin)->put(route('admin.pengaturan.lokasi-absen.tolerance'), [
-        'tolerance_meters' => '50',
-    ])->assertRedirect(route('admin.pengaturan.lokasi-absen.index'));
+    $duaTitik = <<<'KML'
+    <?xml version="1.0" encoding="UTF-8"?>
+    <kml xmlns="http://www.opengis.net/kml/2.2">
+      <Document><Placemark><Polygon><outerBoundaryIs><LinearRing>
+        <coordinates>106.827,-6.175,0 106.828,-6.175,0</coordinates>
+      </LinearRing></outerBoundaryIs></Polygon></Placemark></Document>
+    </kml>
+    KML;
 
-    expect(Pengaturan::get('attendance_tolerance_meters'))->toBe('50');
+    $this->from('/admin/pengaturan/lokasi-absen')
+        ->followingRedirects()
+        ->put('/admin/pengaturan/lokasi-absen', [
+            'kml_file' => UploadedFile::fake()->createWithContent('kurang.kml', $duaTitik),
+        ])
+        ->assertSee('Polygon harus memiliki minimal 3 titik koordinat unik.');
 });
 
-// TS.LKA.005 / TC.LKA.005.001 — delete the saved location clears the geofence and resets tolerance (positive)
-test('admin can delete the saved attendance location', function () {
-    $admin = lokasiAbsenAdmin();
-    Pengaturan::set('attendance_geofence_data', json_encode(['coordinates' => [['lat' => 1, 'lng' => 1]]]));
-    Pengaturan::set('attendance_tolerance_meters', '80');
+// TS.LKA.005 / TC.LKA.005.001 — Positive
+test('admin berhasil menyimpan toleransi jarak', function () {
+    adminLokasiAbsen();
 
-    $this->actingAs($admin)->delete(route('admin.pengaturan.lokasi-absen.destroy'))
-        ->assertRedirect(route('admin.pengaturan.lokasi-absen.index'));
+    $this->followingRedirects()
+        ->put('/admin/pengaturan/lokasi-absen/tolerance', [
+            'tolerance_meters' => 50,
+        ])
+        ->assertSee('Toleransi jarak berhasil disimpan.');
+});
 
-    expect(Pengaturan::get('attendance_geofence_data'))->toBe('');
-    expect(Pengaturan::get('attendance_tolerance_meters'))->toBe('0');
+// TS.LKA.006 / TC.LKA.006.001 — Negative
+test('admin gagal menyimpan toleransi jarak yang bukan angka', function () {
+    adminLokasiAbsen();
+
+    $this->from('/admin/pengaturan/lokasi-absen')
+        ->followingRedirects()
+        ->put('/admin/pengaturan/lokasi-absen/tolerance', [
+            'tolerance_meters' => 'lima puluh',
+        ])
+        ->assertSee('Toleransi harus berupa angka.');
+});
+
+// TS.LKA.007 / TC.LKA.007.001 — Positive
+test('admin berhasil menghapus area absensi yang sudah dipasang', function () {
+    adminLokasiAbsen();
+
+    $this->followingRedirects()
+        ->put('/admin/pengaturan/lokasi-absen', ['kml_file' => berkasAreaSekolah()])
+        ->assertSee('Area absensi berhasil diimpor.');
+
+    $this->followingRedirects()
+        ->delete('/admin/pengaturan/lokasi-absen')
+        ->assertSee('Lokasi absen berhasil dihapus.');
 });

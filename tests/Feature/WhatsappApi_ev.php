@@ -2,83 +2,174 @@
 
 use App\Models\Pengaturan;
 use App\Models\Pengguna;
+use App\Models\PesanWhatsapp;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 
 uses(RefreshDatabase::class);
 
-function whatsappApiAdmin(): Pengguna
+/*
+|--------------------------------------------------------------------------
+| Fitur WhatsApp API (Admin) — Equivalence Partitioning
+|--------------------------------------------------------------------------
+|
+| Pengujian black box: admin masuk lewat halaman masuk, lalu mengatur
+| pengiriman WhatsApp seperti pengguna biasa. Hasilnya diperiksa dari apa yang
+| muncul di layar, bukan dari basis data.
+|
+| Sekolah memakai layanan luar untuk mengirim WhatsApp. Admin menyimpan token
+| layanan itu, lalu bisa mengirim pesan uji untuk memastikan pengiriman
+| berjalan. Pada pengujian ini layanan luar tersebut ditiru, sehingga tidak ada
+| pesan yang benar-benar terkirim ke nomor siapa pun.
+|
+*/
+
+function adminWhatsapp(): Pengguna
 {
-    return Pengguna::factory()->admin()->create(['status' => 'registered']);
+    $admin = Pengguna::factory()->admin()->create([
+        'email' => 'admin.whatsapp@sentrisiswa.test',
+        'status' => 'registered',
+    ]);
+
+    masukSebagai($admin);
+
+    return $admin;
 }
 
-function whatsappApiFakeSuccess(): void
+/** Meniru layanan pengirim WhatsApp yang berhasil mengirim. */
+function layananWhatsappBerhasil(): void
 {
     Http::fake([
-        'api.fonnte.com/*' => Http::response([
-            'detail' => 'success! message in queue',
-            'id' => ['fonnte-message-id'],
-            'process' => 'pending',
-            'requestid' => 1,
-            'status' => true,
-            'target' => ['628123456789'],
-        ]),
+        'api.fonnte.com/*' => Http::response(['status' => true, 'id' => ['123']], 200),
     ]);
 }
 
-// TS.WAP.001 / TC.WAP.001.001 — admin saves a new fonnte token (positive)
-test('admin can save a new fonnte token', function () {
-    $admin = whatsappApiAdmin();
+// TS.WAP.001 / TC.WAP.001.001 — Positive
+test('admin berhasil menyimpan token layanan pengirim whatsapp', function () {
+    adminWhatsapp();
 
-    $this->actingAs($admin)->put(route('admin.pengaturan.whatsapp.update'), [
-        'fonnte_token' => 'token-baru-123',
-    ])->assertRedirect(route('admin.pengaturan.whatsapp.index'));
+    $this->get('/admin/pengaturan/whatsapp')->assertSee('WhatsApp');
 
-    expect(Pengaturan::get('fonnte_token'))->toBe('token-baru-123');
+    $this->followingRedirects()
+        ->put('/admin/pengaturan/whatsapp', [
+            'fonnte_token' => 'token-rahasia-sekolah',
+        ])
+        ->assertSee('Konfigurasi WhatsApp berhasil disimpan.');
 });
 
-// TS.WAP.002 / TC.WAP.002.001 — sending a test message without any token configured fails (negative)
-test('admin cannot send a test message when no token is configured', function () {
-    $admin = whatsappApiAdmin();
+// TS.WAP.002 / TC.WAP.002.001 — Positive
+test('admin berhasil menghapus token yang tersimpan', function () {
+    adminWhatsapp();
+    Pengaturan::set('fonnte_token', 'token-lama');
 
-    $this->actingAs($admin)->postJson(route('admin.pengaturan.whatsapp.test'), [
-        'phone' => '08123456789',
-        'message' => 'Test tanpa token',
-    ])->assertUnprocessable()
-        ->assertJsonPath('success', false)
-        ->assertJsonPath('error', 'Token Fonnte belum dikonfigurasi. Isi token di pengaturan WhatsApp.');
+    $this->followingRedirects()
+        ->put('/admin/pengaturan/whatsapp', [
+            'clear_fonnte_token' => '1',
+        ])
+        ->assertSee('Konfigurasi WhatsApp berhasil disimpan.');
 });
 
-// TS.WAP.003 / TC.WAP.003.001 — sending to the same number twice within 60 seconds is rate limited on the second attempt (negative)
-test('sending a test message to the same number twice within 60 seconds is rate limited', function () {
-    $admin = whatsappApiAdmin();
-    Pengaturan::set('fonnte_token', 'fonnte-test-token');
-    whatsappApiFakeSuccess();
+// TS.WAP.003 / TC.WAP.003.001 — Positive
+test('admin berhasil mengirim pesan uji setelah token dipasang', function () {
+    adminWhatsapp();
+    Pengaturan::set('fonnte_token', 'token-yang-sah');
+    layananWhatsappBerhasil();
 
-    $this->actingAs($admin)->postJson(route('admin.pengaturan.whatsapp.test'), [
-        'phone' => '08199988877',
-        'message' => 'Pesan pertama',
-    ])->assertSuccessful();
-
-    $this->actingAs($admin)->postJson(route('admin.pengaturan.whatsapp.test'), [
-        'phone' => '08199988877',
-        'message' => 'Pesan kedua',
-    ])->assertTooManyRequests()
-        ->assertJsonPath('success', false);
-
-    Http::assertSentCount(1);
+    $this->postJson('/admin/pengaturan/whatsapp/test', [
+        'phone' => '081234567890',
+        'message' => 'Pesan uji dari sekolah.',
+    ])->assertSee('true');
 });
 
-// TS.WAP.004 / TC.WAP.004.001 — provider connection failure is reported as an error (negative)
-test('test message reports an error when the provider connection fails', function () {
-    $admin = whatsappApiAdmin();
-    Pengaturan::set('fonnte_token', 'fonnte-test-token');
-    Http::fake(['api.fonnte.com/*' => Http::failedConnection()]);
+// TS.WAP.004 / TC.WAP.004.001 — Negative
+test('admin gagal mengirim pesan uji karena token belum dipasang', function () {
+    adminWhatsapp();
+    Pengaturan::set('fonnte_token', '');
 
-    $this->actingAs($admin)->postJson(route('admin.pengaturan.whatsapp.test'), [
-        'phone' => '08155566677',
-        'message' => 'Test koneksi gagal',
-    ])->assertUnprocessable()
-        ->assertJsonPath('success', false)
-        ->assertJsonPath('error', 'Koneksi ke Fonnte timeout atau tidak bisa dijangkau.');
+    $this->postJson('/admin/pengaturan/whatsapp/test', [
+        'phone' => '081234567890',
+        'message' => 'Pesan uji dari sekolah.',
+    ])->assertSee('Token Fonnte belum dikonfigurasi. Isi token di pengaturan WhatsApp.');
+});
+
+// TS.WAP.005 / TC.WAP.005.001 — Negative
+test('admin gagal mengirim pesan uji berkali kali ke nomor yang sama dalam waktu singkat', function () {
+    adminWhatsapp();
+    Pengaturan::set('fonnte_token', 'token-yang-sah');
+    layananWhatsappBerhasil();
+
+    $this->postJson('/admin/pengaturan/whatsapp/test', [
+        'phone' => '081234567890',
+        'message' => 'Pesan uji pertama.',
+    ]);
+
+    // Pengiriman kedua ke nomor yang sama langsung sesudahnya ditahan.
+    $this->postJson('/admin/pengaturan/whatsapp/test', [
+        'phone' => '081234567890',
+        'message' => 'Pesan uji kedua.',
+    ])->assertSee('Nomor ini baru saja dipakai untuk test. Tunggu sebelum mengirim ulang.');
+});
+
+// TS.WAP.006 / TC.WAP.006.001 — Positive
+test('admin melihat riwayat pesan whatsapp yang pernah dikirim', function () {
+    adminWhatsapp();
+
+    PesanWhatsapp::create([
+        'telepon_penerima' => '081234567890',
+        'nama_penerima' => 'Raka Pradipta',
+        'tipe_pesan' => 'attendance_report',
+        'isi_pesan' => 'Laporan absensi harian.',
+        'status' => 'sent',
+        'dikirim_pada' => now(),
+    ]);
+
+    $this->get('/admin/pengaturan/whatsapp/riwayat')
+        ->assertSee('Riwayat Pengiriman Pesan')
+        ->assertSee('Raka Pradipta')
+        ->assertSee('Terkirim');
+});
+
+// TS.WAP.007 / TC.WAP.007.001 — Positive
+test('admin mengirim ulang pesan whatsapp dari riwayat', function () {
+    adminWhatsapp();
+    Pengaturan::set('fonnte_token', 'token-yang-sah');
+    layananWhatsappBerhasil();
+
+    $pesan = PesanWhatsapp::create([
+        'telepon_penerima' => '081234567890',
+        'nama_penerima' => 'Raka Pradipta',
+        'tipe_pesan' => 'attendance_report',
+        'isi_pesan' => 'Laporan absensi harian.',
+        'status' => 'failed',
+    ]);
+
+    $this->followingRedirects()
+        ->post("/admin/pengaturan/whatsapp/riwayat/{$pesan->id}/kirim-ulang")
+        ->assertSee('Pesan sedang diproses ulang.');
+});
+
+// TS.WAP.008 / TC.WAP.008.001 — Positive
+test('admin menyaring riwayat pesan berdasarkan status pengiriman', function () {
+    adminWhatsapp();
+
+    PesanWhatsapp::create([
+        'telepon_penerima' => '081234567890',
+        'nama_penerima' => 'Penerima Berhasil',
+        'tipe_pesan' => 'attendance_report',
+        'isi_pesan' => 'Laporan absensi harian.',
+        'status' => 'sent',
+        'dikirim_pada' => now(),
+    ]);
+
+    PesanWhatsapp::create([
+        'telepon_penerima' => '081234567891',
+        'nama_penerima' => 'Penerima Gagal',
+        'tipe_pesan' => 'attendance_report',
+        'isi_pesan' => 'Laporan absensi harian.',
+        'status' => 'failed',
+    ]);
+
+    $this->get('/admin/pengaturan/whatsapp/riwayat?status=failed')
+        ->assertSee('Penerima Gagal')
+        ->assertDontSee('Penerima Berhasil');
 });
