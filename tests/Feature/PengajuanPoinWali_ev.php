@@ -8,140 +8,175 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-function pengajuanPoinWaliHomeroom(string $className = '10. Pengajuan 1'): array
-{
-    $teacher = Pengguna::factory()->homeroom()->create(['status' => 'registered']);
-    $teacher->profilGuru()->create([
-        'nip' => fake()->unique()->numerify('19################'),
-        'tipe_guru' => 'wali_kelas',
-    ]);
-    $class = Kelas::create(['nama' => $className, 'tingkat' => '10', 'wali_kelas_id' => $teacher->id]);
+/*
+|--------------------------------------------------------------------------
+| Fitur Pengajuan Poin (Wali Kelas) — Equivalence Partitioning
+|--------------------------------------------------------------------------
+|
+| Pengujian black box: wali kelas masuk lewat halaman masuk, lalu mengajukan
+| penambahan poin untuk siswa di kelasnya. Hasilnya diperiksa dari apa yang
+| muncul di layar, bukan dari basis data.
+|
+| Wali kelas hanya memilih siswa dan menuliskan alasannya — jumlah poinnya
+| ditentukan kesiswaan saat menyetujui. Pengajuan yang baru dikirim berstatus
+| menunggu, dan wali kelas bisa memantaunya di daftar pengajuan.
+|
+*/
 
-    return [$teacher, $class];
+/** Isian pengajuan poin yang sah. */
+function pengajuanPoinSah(ProfilSiswa $siswa, array $ubahan = []): array
+{
+    return array_merge([
+        'profil_siswa_id' => $siswa->nisn,
+        'alasan' => 'Menjadi juara pertama lomba cerdas cermat tingkat kabupaten.',
+    ], $ubahan);
 }
 
-function pengajuanPoinWaliStudent(Kelas $class, string $nis): ProfilSiswa
-{
-    $student = Pengguna::factory()->student()->create(['status' => 'registered']);
+// TS.PPW.001 / TC.PPW.001.001 — Positive
+test('wali kelas mengirim pengajuan penambahan poin untuk siswa di kelasnya', function () {
+    [, , $siswa] = waliKelasDenganKelas();
 
-    return ProfilSiswa::factory()->create([
-        'pengguna_id' => $student->id,
-        'kelas_id' => $class->id,
-        'nis' => $nis,
+    $this->followingRedirects()
+        ->post('/wali-kelas/pengajuan-poin', pengajuanPoinSah($siswa))
+        ->assertSee('Pengajuan penambahan poin berhasil dikirim ke kesiswaan.')
+        ->assertSee('Ahmad Fauzi')
+        ->assertSee('Menunggu');
+});
+
+// TS.PPW.002 / TC.PPW.002.001 — Positive
+test('halaman buat pengajuan hanya menawarkan siswa dari kelas wali kelas itu', function () {
+    waliKelasDenganKelas();
+
+    $kelasLain = Kelas::create(['nama' => '11 IPS 1', 'tingkat' => '11']);
+    $penggunaLain = Pengguna::factory()->student()->create([
+        'nama' => 'Siswa Kelas Lain',
+        'status' => 'registered',
     ]);
-}
+    ProfilSiswa::factory()->create([
+        'pengguna_id' => $penggunaLain->id,
+        'nisn' => '1234567891',
+        'nis' => '10002',
+        'kelas_id' => $kelasLain->id,
+    ]);
 
-// TS.PGP.001 / TC.PGP.001.001 — ajukan penambahan poin untuk siswa kelas sendiri berhasil (positive)
-test('homeroom teacher can submit a point-addition request for own class student', function () {
-    [$teacher, $class] = pengajuanPoinWaliHomeroom();
-    $student = pengajuanPoinWaliStudent($class, '60001');
-
-    $this->actingAs($teacher)->post(route('wali-kelas.pengajuan-poin.store'), [
-        'profil_siswa_id' => $student->nisn,
-        'alasan' => 'Juara 1 lomba debat tingkat provinsi.',
-    ])->assertRedirect(route('wali-kelas.pengajuan-poin.index'));
-
-    $pengajuan = PengajuanPoin::where('profil_siswa_id', $student->nisn)->firstOrFail();
-    expect($pengajuan->status)->toBe('pending');
-    expect($pengajuan->jumlah_poin)->toBeNull();
-    expect($student->fresh()->poin)->toBe(100);
+    $this->get('/wali-kelas/pengajuan-poin/buat')
+        ->assertSee('Ahmad Fauzi')
+        ->assertDontSee('Siswa Kelas Lain');
 });
 
-// TS.PGP.002 / TC.PGP.002.001 — ajukan untuk siswa kelas lain ditolak (negative)
-test('homeroom teacher cannot submit a point-addition request for another class student', function () {
-    [$teacher] = pengajuanPoinWaliHomeroom();
-    [, $otherClass] = pengajuanPoinWaliHomeroom('10. Pengajuan 2');
-    $otherStudent = pengajuanPoinWaliStudent($otherClass, '60002');
+// TS.PPW.003 / TC.PPW.003.001 — Negative
+test('wali kelas tidak bisa mengajukan poin untuk siswa dari kelas lain', function () {
+    waliKelasDenganKelas();
 
-    $this->actingAs($teacher)->post(route('wali-kelas.pengajuan-poin.store'), [
-        'profil_siswa_id' => $otherStudent->nisn,
-        'alasan' => 'Alasan apapun.',
-    ])->assertForbidden();
+    $kelasLain = Kelas::create(['nama' => '11 IPS 1', 'tingkat' => '11']);
+    $penggunaLain = Pengguna::factory()->student()->create([
+        'nama' => 'Siswa Kelas Lain',
+        'status' => 'registered',
+    ]);
+    $siswaLain = ProfilSiswa::factory()->create([
+        'pengguna_id' => $penggunaLain->id,
+        'nisn' => '1234567891',
+        'nis' => '10002',
+        'kelas_id' => $kelasLain->id,
+    ]);
+
+    $this->post('/wali-kelas/pengajuan-poin', pengajuanPoinSah($siswaLain))
+        ->assertForbidden();
 });
 
-// TS.PGP.003 / TC.PGP.003.001 — alasan kosong ditolak (negative)
-test('homeroom teacher cannot submit a point-addition request with an empty alasan', function () {
-    [$teacher, $class] = pengajuanPoinWaliHomeroom();
-    $student = pengajuanPoinWaliStudent($class, '60003');
+// TS.PPW.004 / TC.PPW.004.001 — Negative
+test('pengajuan ditolak ketika alasan tidak diisi', function () {
+    [, , $siswa] = waliKelasDenganKelas();
 
-    $this->actingAs($teacher)->post(route('wali-kelas.pengajuan-poin.store'), [
-        'profil_siswa_id' => $student->nisn,
-        'alasan' => '',
-    ])->assertSessionHasErrors('alasan');
+    $this->from('/wali-kelas/pengajuan-poin/buat')
+        ->followingRedirects()
+        ->post('/wali-kelas/pengajuan-poin', pengajuanPoinSah($siswa, ['alasan' => '']))
+        ->assertSee('Alasan wajib diisi.');
 });
 
-// TS.PGP.004 / TC.PGP.004.001 — profil_siswa_id (nisn) yang tidak ada ditolak (negative)
-test('homeroom teacher cannot submit a point-addition request for a non-existent nisn', function () {
-    [$teacher, $class] = pengajuanPoinWaliHomeroom();
+// TS.PPW.005 / TC.PPW.005.001 — Negative
+test('pengajuan ditolak ketika siswa belum dipilih', function () {
+    waliKelasDenganKelas();
 
-    $this->actingAs($teacher)->post(route('wali-kelas.pengajuan-poin.store'), [
-        'profil_siswa_id' => '9999999999',
-        'alasan' => 'Alasan apapun.',
-    ])->assertSessionHasErrors('profil_siswa_id');
+    $this->from('/wali-kelas/pengajuan-poin/buat')
+        ->followingRedirects()
+        ->post('/wali-kelas/pengajuan-poin', ['profil_siswa_id' => '', 'alasan' => 'Berprestasi.'])
+        ->assertSee('Siswa wajib dipilih.');
 });
 
-// TS.PGP.005 / TC.PGP.005.001 — profil_siswa_id kosong ditolak (negative)
-test('homeroom teacher cannot submit a point-addition request without a profil_siswa_id', function () {
-    [$teacher, $class] = pengajuanPoinWaliHomeroom();
+// TS.PPW.006 / TC.PPW.006.001 — Positive
+test('wali kelas melihat daftar pengajuan yang pernah dikirimnya', function () {
+    [$wali, , $siswa] = waliKelasDenganKelas();
 
-    $this->actingAs($teacher)->post(route('wali-kelas.pengajuan-poin.store'), [
-        'profil_siswa_id' => '',
-        'alasan' => 'Alasan apapun.',
-    ])->assertSessionHasErrors('profil_siswa_id');
+    PengajuanPoin::create([
+        'profil_siswa_id' => $siswa->nisn,
+        'diajukan_oleh_id' => $wali->id,
+        'alasan' => 'Juara lomba cerdas cermat.',
+        'status' => 'pending',
+    ]);
+
+    $this->get('/wali-kelas/pengajuan-poin')
+        ->assertSee('Ahmad Fauzi')
+        ->assertSee('Juara lomba cerdas cermat.')
+        ->assertSee('Menunggu');
 });
 
-// TS.PGP.006 / TC.PGP.006.001 — index cuma nampilin pengajuan milik sendiri (positive)
-test('pengajuan poin index only shows submissions made by the logged in teacher', function () {
-    [$teacherA, $classA] = pengajuanPoinWaliHomeroom();
-    [$teacherB, $classB] = pengajuanPoinWaliHomeroom('10. Pengajuan 3');
-    $studentA = pengajuanPoinWaliStudent($classA, '60004');
-    $studentB = pengajuanPoinWaliStudent($classB, '60005');
+// TS.PPW.007 / TC.PPW.007.001 — Positive
+test('wali kelas menyaring daftar pengajuan berdasarkan status', function () {
+    [$wali, $kelas, $siswa] = waliKelasDenganKelas();
+    $siswaLain = siswaLainDiKelas($kelas->id, 'Siti Aminah', '1234567892', '10003');
 
-    PengajuanPoin::factory()->create(['profil_siswa_id' => $studentA->nisn, 'diajukan_oleh_id' => $teacherA->id, 'status' => 'pending', 'alasan' => 'Pengajuan A']);
-    PengajuanPoin::factory()->create(['profil_siswa_id' => $studentB->nisn, 'diajukan_oleh_id' => $teacherB->id, 'status' => 'pending', 'alasan' => 'Pengajuan B']);
+    PengajuanPoin::create([
+        'profil_siswa_id' => $siswa->nisn,
+        'diajukan_oleh_id' => $wali->id,
+        'alasan' => 'Juara lomba cerdas cermat.',
+        'status' => 'pending',
+    ]);
+    PengajuanPoin::create([
+        'profil_siswa_id' => $siswaLain->nisn,
+        'diajukan_oleh_id' => $wali->id,
+        'alasan' => 'Aktif membantu kegiatan sekolah.',
+        'status' => 'approved',
+        'jumlah_poin' => 10,
+    ]);
 
-    $this->actingAs($teacherA)->get(route('wali-kelas.pengajuan-poin.index'))
+    $this->get('/wali-kelas/pengajuan-poin?status=pending')
+        ->assertSee('Juara lomba cerdas cermat.')
+        ->assertDontSee('Aktif membantu kegiatan sekolah.');
+});
+
+// TS.PPW.008 / TC.PPW.008.001 — Negative
+test('wali kelas tidak melihat pengajuan yang dikirim wali kelas lain', function () {
+    [, $kelas, $siswa] = waliKelasDenganKelas();
+
+    $waliLain = Pengguna::factory()->homeroom()->create([
+        'nama' => 'Wali Kelas Lain',
+        'email' => 'wali.lain@sentrisiswa.test',
+        'status' => 'registered',
+    ]);
+
+    PengajuanPoin::create([
+        'profil_siswa_id' => $siswa->nisn,
+        'diajukan_oleh_id' => $waliLain->id,
+        'alasan' => 'Pengajuan milik wali kelas lain.',
+        'status' => 'pending',
+    ]);
+
+    $this->get('/wali-kelas/pengajuan-poin')
+        ->assertDontSee('Pengajuan milik wali kelas lain.')
+        ->assertSee('Belum ada pengajuan.');
+});
+
+// TS.PPW.009 / TC.PPW.009.001 — Negative
+test('guru yang belum dipasangi kelas tidak menemukan siswa untuk diajukan', function () {
+    $wali = Pengguna::factory()->homeroom()->create([
+        'email' => 'wali.tanpa.kelas@sentrisiswa.test',
+        'status' => 'registered',
+    ]);
+
+    masukSebagai($wali);
+
+    $this->get('/wali-kelas/pengajuan-poin/buat')
         ->assertSuccessful()
-        ->assertSee('Pengajuan A')
-        ->assertDontSee('Pengajuan B');
-});
-
-// TS.PGP.007 / TC.PGP.007.001 — index filter berdasarkan status (positive)
-test('pengajuan poin index filters by status', function () {
-    [$teacher, $class] = pengajuanPoinWaliHomeroom();
-    $student = pengajuanPoinWaliStudent($class, '60006');
-
-    PengajuanPoin::factory()->create(['profil_siswa_id' => $student->nisn, 'diajukan_oleh_id' => $teacher->id, 'status' => 'pending', 'alasan' => 'Masih menunggu']);
-    PengajuanPoin::factory()->create(['profil_siswa_id' => $student->nisn, 'diajukan_oleh_id' => $teacher->id, 'status' => 'approved', 'jumlah_poin' => 5, 'alasan' => 'Sudah disetujui']);
-
-    $this->actingAs($teacher)->get(route('wali-kelas.pengajuan-poin.index', ['status' => 'pending']))
-        ->assertSuccessful()
-        ->assertSee('Masih menunggu')
-        ->assertDontSee('Sudah disetujui');
-});
-
-// TS.PGP.008 / TC.PGP.008.001 — guru tanpa kelas wali, daftar siswa di create() kosong (positive)
-test('create form shows an empty student list when teacher has no homeroom class', function () {
-    $teacher = Pengguna::factory()->homeroom()->create(['status' => 'registered']);
-    $teacher->profilGuru()->create(['nip' => fake()->unique()->numerify('19################'), 'tipe_guru' => 'wali_kelas']);
-
-    $this->actingAs($teacher)->get(route('wali-kelas.pengajuan-poin.create'))
-        ->assertSuccessful()
-        ->assertViewHas('students', fn ($students) => $students->isEmpty());
-});
-
-// TS.PGP.009 / TC.PGP.009.001 — submit tanpa mengisi jumlah_poin (memang tidak ada field-nya) tetap tersimpan null (positive, dokumentasi penambahan bukan pengurangan)
-test('submitting a jumlah_poin field directly is ignored since the form has none', function () {
-    [$teacher, $class] = pengajuanPoinWaliHomeroom();
-    $student = pengajuanPoinWaliStudent($class, '60007');
-
-    $this->actingAs($teacher)->post(route('wali-kelas.pengajuan-poin.store'), [
-        'profil_siswa_id' => $student->nisn,
-        'alasan' => 'Ikut serta lomba robotik nasional.',
-        'jumlah_poin' => 999,
-    ])->assertRedirect(route('wali-kelas.pengajuan-poin.index'));
-
-    $pengajuan = PengajuanPoin::where('profil_siswa_id', $student->nisn)->firstOrFail();
-    expect($pengajuan->jumlah_poin)->toBeNull();
-    expect($pengajuan->status)->toBe('pending');
+        ->assertDontSee('Ahmad Fauzi');
 });

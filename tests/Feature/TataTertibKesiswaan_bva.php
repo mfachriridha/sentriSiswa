@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\Pengguna;
-use App\Models\TataTertib;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;

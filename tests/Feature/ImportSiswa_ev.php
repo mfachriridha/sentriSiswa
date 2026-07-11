@@ -5,7 +5,7 @@ use App\Models\Pengguna;
 use App\Models\ProfilSiswa;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Testing\TestResponse;
 use Maatwebsite\Excel\Facades\Excel;
 
 uses(RefreshDatabase::class);
@@ -61,7 +61,7 @@ function berkasImporSiswa(array $barisSiswa): UploadedFile
 /**
  * Menempuh tahap unggah dan tinjau, lalu menyetujui impor.
  */
-function jalankanImporSiswa(UploadedFile $berkas): Illuminate\Testing\TestResponse
+function jalankanImporSiswa(UploadedFile $berkas): TestResponse
 {
     test()->post('/admin/siswa/impor/unggah', ['file' => $berkas]);
 

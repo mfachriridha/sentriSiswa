@@ -1,6 +1,16 @@
 <?php
 
+use App\Exports\ArrayExport;
+use App\Models\Absensi;
+use App\Models\JenisPelanggaran;
+use App\Models\Kelas;
+use App\Models\PelanggaranSiswa;
+use App\Models\Pengguna;
+use App\Models\ProfilSiswa;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 use Tests\TestCase;
 
 /*
@@ -50,7 +60,7 @@ expect()->extend('toBeOne', function () {
  *
  * Semua akun yang dibuat lewat pabrik data memakai kata sandi "password".
  */
-function masukSebagai(App\Models\Pengguna $pengguna, string $kataSandi = 'password'): void
+function masukSebagai(Pengguna $pengguna, string $kataSandi = 'password'): void
 {
     test()->post('/login', [
         'email' => $pengguna->email,
@@ -64,24 +74,121 @@ function masukSebagai(App\Models\Pengguna $pengguna, string $kataSandi = 'passwo
  *
  * @param  list<list<string>>  $baris  Baris pertama adalah judul kolom.
  */
-function berkasExcel(string $namaBerkas, array $baris): Illuminate\Http\UploadedFile
+function berkasExcel(string $namaBerkas, array $baris): UploadedFile
 {
     $jalurSementara = tempnam(sys_get_temp_dir(), 'impor').'.xlsx';
 
-    Maatwebsite\Excel\Facades\Excel::store(
-        new App\Exports\ArrayExport(array_shift($baris), $baris),
+    Excel::store(
+        new ArrayExport(array_shift($baris), $baris),
         basename($jalurSementara),
         'local',
     );
 
-    $jalurTersimpan = Illuminate\Support\Facades\Storage::disk('local')
+    $jalurTersimpan = Storage::disk('local')
         ->path(basename($jalurSementara));
 
-    return new Illuminate\Http\UploadedFile(
+    return new UploadedFile(
         $jalurTersimpan,
         $namaBerkas,
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         null,
         true,
     );
+}
+
+/*
+|--------------------------------------------------------------------------
+| Kondisi Awal Kelas dan Isinya
+|--------------------------------------------------------------------------
+|
+| Beberapa fitur dipakai bersama oleh wali kelas, BK, dan kesiswaan, jadi
+| kondisi awalnya disiapkan di sini supaya sama persis di semua pengujian.
+|
+*/
+
+/**
+ * Wali kelas beserta kelas dan seorang siswa yang sudah terdaftar di dalamnya.
+ * Wali kelas langsung masuk ke aplikasi.
+ *
+ * @return array{0: Pengguna, 1: Kelas, 2: ProfilSiswa}
+ */
+function waliKelasDenganKelas(string $namaSiswa = 'Ahmad Fauzi', string $nisn = '1234567890'): array
+{
+    $wali = Pengguna::factory()->homeroom()->create([
+        'nama' => 'Raka Pradipta',
+        'email' => 'wali.kelas@sentrisiswa.test',
+        'status' => 'registered',
+    ]);
+
+    $kelas = Kelas::create([
+        'nama' => '10 IPA 1',
+        'tingkat' => '10',
+        'wali_kelas_id' => $wali->id,
+    ]);
+
+    $penggunaSiswa = Pengguna::factory()->student()->create([
+        'nama' => $namaSiswa,
+        'status' => 'registered',
+    ]);
+
+    $siswa = ProfilSiswa::factory()->create([
+        'pengguna_id' => $penggunaSiswa->id,
+        'nisn' => $nisn,
+        'nis' => '10001',
+        'kelas_id' => $kelas->id,
+    ]);
+
+    masukSebagai($wali);
+
+    return [$wali, $kelas, $siswa];
+}
+
+/** Menambah seorang siswa lain ke sebuah kelas. */
+function siswaLainDiKelas(int $kelasId, string $nama, string $nisn, string $nis): ProfilSiswa
+{
+    $pengguna = Pengguna::factory()->student()->create([
+        'nama' => $nama,
+        'status' => 'registered',
+    ]);
+
+    return ProfilSiswa::factory()->create([
+        'pengguna_id' => $pengguna->id,
+        'nisn' => $nisn,
+        'nis' => $nis,
+        'kelas_id' => $kelasId,
+    ]);
+}
+
+/** Mencatat kehadiran seorang siswa pada tanggal tertentu. */
+function catatKehadiran(string $nisn, string $tanggal, string $status): void
+{
+    Absensi::create([
+        'profil_siswa_id' => $nisn,
+        'tanggal' => $tanggal,
+        'status' => $status,
+    ]);
+}
+
+/** Mencatat sebuah pelanggaran yang sudah disetujui untuk seorang siswa. */
+function catatPelanggaran(
+    ProfilSiswa $siswa,
+    string $nama,
+    string $kategori,
+    string $tanggal,
+    int $pengurangan = 5,
+): PelanggaranSiswa {
+    $jenis = JenisPelanggaran::firstOrCreate(
+        ['nama' => $nama],
+        ['kategori' => $kategori, 'pengurangan_poin' => $pengurangan, 'aktif' => true],
+    );
+
+    return PelanggaranSiswa::create([
+        'profil_siswa_id' => $siswa->nisn,
+        'jenis_pelanggaran_id' => $jenis->id,
+        'tanggal_pelanggaran' => $tanggal,
+        'nama_pelanggaran' => $nama,
+        'kategori_pelanggaran' => $kategori,
+        'pengurangan_poin' => $pengurangan,
+        'status' => 'approved',
+    ]);
 }

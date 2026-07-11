@@ -53,6 +53,13 @@
         </div>
     </form>
 
+    @error('date_from')
+        <p class="mb-4 text-sm text-red-600">{{ $message }}</p>
+    @enderror
+    @error('date_to')
+        <p class="mb-4 text-sm text-red-600">{{ $message }}</p>
+    @enderror
+
     {{-- Table --}}
     @if($violations->isEmpty())
         <div class="py-12 text-center">

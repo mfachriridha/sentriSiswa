@@ -133,17 +133,17 @@ function createActorWorkflowTeacher(string $teacherType, ?string $grade = null):
     }
 
     $factoryState = match ($teacherType) {
-        'bk'        => 'counselor',
+        'bk' => 'counselor',
         'kesiswaan' => 'studentAffairs',
-        default     => 'homeroom',
+        default => 'homeroom',
     };
 
     $teacher = Pengguna::factory()->{$factoryState}()->create(['status' => 'registered']);
     $teacher->profilGuru()->create([
-        'nip'      => fake()->unique()->numerify('19############'),
-        'telepon'  => fake()->numerify('08##########'),
-        'tipe_guru'=> $teacherType,
-        'tingkat'  => $grade,
+        'nip' => fake()->unique()->numerify('19############'),
+        'telepon' => fake()->numerify('08##########'),
+        'tipe_guru' => $teacherType,
+        'tingkat' => $grade,
     ]);
 
     if ($teacherType === 'kesiswaan') {

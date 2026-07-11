@@ -1,57 +1,63 @@
 <?php
 
-use App\Models\Kelas;
-use App\Models\Pengguna;
-use App\Models\ProfilSiswa;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-function pengajuanPoinWaliBvaHomeroom(string $className = '10. Pengajuan BVA 1'): array
-{
-    $teacher = Pengguna::factory()->homeroom()->create(['status' => 'registered']);
-    $teacher->profilGuru()->create([
-        'nip' => fake()->unique()->numerify('19################'),
-        'tipe_guru' => 'wali_kelas',
-    ]);
-    $class = Kelas::create(['nama' => $className, 'tingkat' => '10', 'wali_kelas_id' => $teacher->id]);
+/*
+|--------------------------------------------------------------------------
+| Fitur Pengajuan Poin (Wali Kelas) — Boundary Value Analysis
+|--------------------------------------------------------------------------
+|
+| Batas yang diuji adalah panjang alasan pengajuan: minimal 1 karakter dan
+| maksimal 1000 karakter. Diuji tepat di bawah, tepat pada, dan tepat di atas
+| kedua batas itu.
+|
+*/
 
-    return [$teacher, $class];
-}
+// TS.PPW.010 / TC.PPW.010.001 — Negative — batas bawah, 0 karakter
+test('alasan kosong ditolak', function () {
+    [, , $siswa] = waliKelasDenganKelas();
 
-function pengajuanPoinWaliBvaStudent(Kelas $class, string $nis): ProfilSiswa
-{
-    $student = Pengguna::factory()->student()->create(['status' => 'registered']);
-
-    return ProfilSiswa::factory()->create([
-        'pengguna_id' => $student->id,
-        'kelas_id' => $class->id,
-        'nis' => $nis,
-    ]);
-}
-
-// ── Boundary: alasan length, max:1000 ─────────────────────────────────────
-
-// TS.PGP.010 / TC.PGP.010.001 — alasan 1001 karakter (tepat di atas batas maksimum, ditolak)
-test('homeroom teacher cannot submit a point-addition request with 1001 character alasan', function () {
-    [$teacher, $class] = pengajuanPoinWaliBvaHomeroom();
-    $student = pengajuanPoinWaliBvaStudent($class, '70001');
-    $alasan1001 = str_repeat('a', 1001);
-
-    $this->actingAs($teacher)->post(route('wali-kelas.pengajuan-poin.store'), [
-        'profil_siswa_id' => $student->nisn,
-        'alasan' => $alasan1001,
-    ])->assertSessionHasErrors('alasan');
+    $this->from('/wali-kelas/pengajuan-poin/buat')
+        ->followingRedirects()
+        ->post('/wali-kelas/pengajuan-poin', pengajuanPoinSah($siswa, ['alasan' => '']))
+        ->assertSee('Alasan wajib diisi.');
 });
 
-// TS.PGP.011 / TC.PGP.011.001 — alasan tepat 1000 karakter (tepat di batas maksimum, diperbolehkan)
-test('homeroom teacher can submit a point-addition request with exactly 1000 character alasan', function () {
-    [$teacher, $class] = pengajuanPoinWaliBvaHomeroom();
-    $student = pengajuanPoinWaliBvaStudent($class, '70002');
-    $alasan1000 = str_repeat('a', 1000);
+// TS.PPW.010 / TC.PPW.010.002 — Positive — tepat di batas bawah, 1 karakter
+test('alasan sepanjang satu karakter diterima', function () {
+    [, , $siswa] = waliKelasDenganKelas();
 
-    $this->actingAs($teacher)->post(route('wali-kelas.pengajuan-poin.store'), [
-        'profil_siswa_id' => $student->nisn,
-        'alasan' => $alasan1000,
-    ])->assertRedirect(route('wali-kelas.pengajuan-poin.index'));
+    $this->followingRedirects()
+        ->post('/wali-kelas/pengajuan-poin', pengajuanPoinSah($siswa, ['alasan' => 'A']))
+        ->assertSee('Pengajuan penambahan poin berhasil dikirim ke kesiswaan.');
+});
+
+// TS.PPW.011 / TC.PPW.011.001 — Positive — tepat di bawah batas atas, 999 karakter
+test('alasan sepanjang 999 karakter diterima', function () {
+    [, , $siswa] = waliKelasDenganKelas();
+
+    $this->followingRedirects()
+        ->post('/wali-kelas/pengajuan-poin', pengajuanPoinSah($siswa, ['alasan' => str_repeat('a', 999)]))
+        ->assertSee('Pengajuan penambahan poin berhasil dikirim ke kesiswaan.');
+});
+
+// TS.PPW.011 / TC.PPW.011.002 — Positive — tepat di batas atas, 1000 karakter
+test('alasan sepanjang 1000 karakter diterima', function () {
+    [, , $siswa] = waliKelasDenganKelas();
+
+    $this->followingRedirects()
+        ->post('/wali-kelas/pengajuan-poin', pengajuanPoinSah($siswa, ['alasan' => str_repeat('a', 1000)]))
+        ->assertSee('Pengajuan penambahan poin berhasil dikirim ke kesiswaan.');
+});
+
+// TS.PPW.011 / TC.PPW.011.003 — Negative — sekarakter di atas batas atas, 1001 karakter
+test('alasan sepanjang 1001 karakter ditolak', function () {
+    [, , $siswa] = waliKelasDenganKelas();
+
+    $this->from('/wali-kelas/pengajuan-poin/buat')
+        ->followingRedirects()
+        ->post('/wali-kelas/pengajuan-poin', pengajuanPoinSah($siswa, ['alasan' => str_repeat('a', 1001)]))
+        ->assertSee('Alasan maksimal 1000 karakter.');
 });

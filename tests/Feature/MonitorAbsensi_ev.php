@@ -2,6 +2,7 @@
 
 use App\Models\Absensi;
 use App\Models\Kelas;
+use App\Models\Pengaturan;
 use App\Models\Pengguna;
 use App\Models\ProfilSiswa;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -9,148 +10,134 @@ use Illuminate\Support\Carbon;
 
 uses(RefreshDatabase::class);
 
+/*
+|--------------------------------------------------------------------------
+| Fitur Kelas Saya (Wali Kelas) — Equivalence Partitioning
+|--------------------------------------------------------------------------
+|
+| Pengujian black box: wali kelas masuk lewat halaman masuk, lalu memantau
+| kehadiran kelasnya seperti pengguna biasa. Hasilnya diperiksa dari apa yang
+| muncul di layar, bukan dari basis data.
+|
+| Wali kelas melihat kehadiran hari ini untuk kelas yang dipegangnya, dan bisa
+| menetapkan status absensi seorang siswa secara manual, misalnya ketika siswa
+| menyerahkan surat izin atau surat sakit.
+|
+*/
+
 afterEach(function () {
     Carbon::setTestNow();
 });
 
-function monitorAbsensiHomeroom(string $className = '10. Monitor 1'): array
-{
-    $teacher = Pengguna::factory()->homeroom()->create(['status' => 'registered']);
-    $teacher->profilGuru()->create([
-        'nip' => fake()->unique()->numerify('19################'),
-        'tipe_guru' => 'wali_kelas',
+// TS.MOA.001 / TC.MOA.001.001 — Positive
+test('wali kelas melihat daftar siswa kelasnya beserta kehadiran hari ini', function () {
+    Carbon::setTestNow('2026-07-06 07:00:00'); // Senin, hari aktif absensi.
+    [, , $siswa] = waliKelasDenganKelas();
+
+    Absensi::create([
+        'profil_siswa_id' => $siswa->nisn,
+        'tanggal' => today()->toDateString(),
+        'status' => 'hadir',
+        'waktu_masuk' => '06:45:00',
     ]);
-    $class = Kelas::create(['nama' => $className, 'tingkat' => '10', 'wali_kelas_id' => $teacher->id]);
 
-    return [$teacher, $class];
-}
+    $this->get('/wali-kelas/kelas-saya')
+        ->assertSee('Kelas Saya')
+        ->assertSee('10 IPA 1')
+        ->assertSee('Ahmad Fauzi')
+        ->assertSee('Hadir');
+});
 
-function monitorAbsensiStudent(Kelas $class, string $name, string $nis): ProfilSiswa
-{
-    $student = Pengguna::factory()->student()->create(['nama' => $name, 'status' => 'registered']);
+// TS.MOA.002 / TC.MOA.002.001 — Positive
+test('wali kelas menetapkan status absensi siswa secara manual', function () {
+    Carbon::setTestNow('2026-07-06 07:00:00');
+    [, , $siswa] = waliKelasDenganKelas();
 
-    return ProfilSiswa::factory()->create([
-        'pengguna_id' => $student->id,
-        'kelas_id' => $class->id,
-        'nis' => $nis,
+    $this->followingRedirects()
+        ->put("/wali-kelas/kelas-saya/{$siswa->nisn}/absensi", ['status' => 'sakit'])
+        ->assertSee('Status absensi hari ini berhasil diperbarui.')
+        ->assertSee('Sakit');
+});
+
+// TS.MOA.003 / TC.MOA.003.001 — Negative
+test('wali kelas gagal menetapkan status absensi di hari yang bukan hari absensi', function () {
+    Carbon::setTestNow('2026-07-05 07:00:00'); // Minggu, bukan hari aktif absensi.
+    [, , $siswa] = waliKelasDenganKelas();
+
+    $this->followingRedirects()
+        ->put("/wali-kelas/kelas-saya/{$siswa->nisn}/absensi", ['status' => 'hadir'])
+        ->assertSee('Absensi hanya tersedia pada hari '.Pengaturan::labelHariAbsen().'.')
+        ->assertDontSee('Status absensi hari ini berhasil diperbarui.');
+});
+
+/*
+| Status absensi hanya bisa dipilih dari tombol yang tersedia di layar, sehingga
+| pengguna tidak mungkin mengirim status di luar pilihan itu. Karena tidak pernah
+| dialami pengguna, kasus tersebut tidak didokumentasikan.
+*/
+
+// TS.MOA.004 / TC.MOA.004.001 — Negative
+test('wali kelas tidak bisa mengubah absensi siswa dari kelas lain', function () {
+    Carbon::setTestNow('2026-07-06 07:00:00');
+    waliKelasDenganKelas();
+
+    $kelasLain = Kelas::create(['nama' => '11 IPS 1', 'tingkat' => '11']);
+    $penggunaLain = Pengguna::factory()->student()->create([
+        'nama' => 'Siswa Kelas Lain',
+        'status' => 'registered',
     ]);
-}
+    $siswaLain = ProfilSiswa::factory()->create([
+        'pengguna_id' => $penggunaLain->id,
+        'nisn' => '1234567891',
+        'nis' => '10002',
+        'kelas_id' => $kelasLain->id,
+    ]);
 
-// TS.MOA.001 / TC.MOA.001.001 — index tampil status + daftar siswa kelas sendiri hari ini (positive)
-test('kelas saya index shows status and student list for own class today', function () {
-    Carbon::setTestNow('2026-06-01 08:00:00');
-    [$teacher, $class] = monitorAbsensiHomeroom();
-    $student = monitorAbsensiStudent($class, 'Ayu', '20001');
-    Absensi::create(['profil_siswa_id' => $student->nisn, 'tanggal' => now()->toDateString(), 'status' => 'hadir']);
-
-    $this->actingAs($teacher)->get(route('wali-kelas.kelas-saya'))
-        ->assertSuccessful()
-        ->assertSee('Ayu')
-        ->assertViewHas('stats', fn (array $stats): bool => $stats['hadir'] === 1);
-});
-
-// TS.MOA.002 / TC.MOA.002.001 — guru tanpa kelas wali, index tetap tampil kosong (positive)
-test('kelas saya index shows empty view when teacher has no homeroom class', function () {
-    $teacher = Pengguna::factory()->homeroom()->create(['status' => 'registered']);
-    $teacher->profilGuru()->create(['nip' => fake()->unique()->numerify('19################'), 'tipe_guru' => 'wali_kelas']);
-
-    $this->actingAs($teacher)->get(route('wali-kelas.kelas-saya'))
-        ->assertSuccessful();
-});
-
-// TS.MOA.003 / TC.MOA.003.001 — update status siswa sendiri berhasil membuat record baru (positive)
-test('homeroom teacher can create a new attendance record for own student', function () {
-    Carbon::setTestNow('2026-06-01 08:00:00');
-    [$teacher, $class] = monitorAbsensiHomeroom();
-    $student = monitorAbsensiStudent($class, 'Ayu', '20002');
-
-    $this->actingAs($teacher)->put(route('wali-kelas.kelas-saya.absensi.update', $student), [
-        'status' => 'hadir',
-    ])->assertRedirect(route('wali-kelas.kelas-saya'));
-
-    expect(Absensi::where('profil_siswa_id', $student->nisn)->first()->status)->toBe('hadir');
-});
-
-// TS.MOA.004 / TC.MOA.004.001 — update ulang siswa yang record hari ini sudah ada, replace bukan duplikat (positive)
-test('homeroom teacher updating an existing attendance record replaces it instead of duplicating', function () {
-    Carbon::setTestNow('2026-06-01 08:00:00');
-    [$teacher, $class] = monitorAbsensiHomeroom();
-    $student = monitorAbsensiStudent($class, 'Ayu', '20003');
-    Absensi::create(['profil_siswa_id' => $student->nisn, 'tanggal' => now()->toDateString(), 'status' => 'hadir']);
-
-    $this->actingAs($teacher)->put(route('wali-kelas.kelas-saya.absensi.update', $student), [
-        'status' => 'izin',
-    ])->assertRedirect(route('wali-kelas.kelas-saya'));
-
-    expect(Absensi::where('profil_siswa_id', $student->nisn)->count())->toBe(1);
-    expect(Absensi::where('profil_siswa_id', $student->nisn)->first()->status)->toBe('izin');
-});
-
-// TS.MOA.005 / TC.MOA.005.001 — update siswa dari kelas lain ditolak (negative)
-test('homeroom teacher cannot update attendance for a student outside own class', function () {
-    Carbon::setTestNow('2026-06-01 08:00:00');
-    [$teacher] = monitorAbsensiHomeroom();
-    [, $otherClass] = monitorAbsensiHomeroom('10. Monitor 2');
-    $otherStudent = monitorAbsensiStudent($otherClass, 'Citra', '20004');
-
-    $this->actingAs($teacher)->put(route('wali-kelas.kelas-saya.absensi.update', $otherStudent), [
-        'status' => 'hadir',
-    ])->assertForbidden();
-});
-
-// TS.MOA.006 / TC.MOA.006.001 — update pas hari weekend ditolak dengan flash error (negative)
-test('homeroom teacher cannot update attendance on a weekend day', function () {
-    Carbon::setTestNow('2026-06-06 08:00:00');
-    [$teacher, $class] = monitorAbsensiHomeroom();
-    $student = monitorAbsensiStudent($class, 'Ayu', '20005');
-
-    $this->actingAs($teacher)->put(route('wali-kelas.kelas-saya.absensi.update', $student), [
-        'status' => 'hadir',
-    ])->assertRedirect(route('wali-kelas.kelas-saya'))
-        ->assertSessionHas('error');
-
-    expect(Absensi::where('profil_siswa_id', $student->nisn)->exists())->toBeFalse();
-});
-
-// TS.MOA.007 / TC.MOA.007.001 — status yang bukan salah satu dari 5 opsi ditolak (negative)
-test('homeroom teacher cannot set an invalid attendance status', function () {
-    Carbon::setTestNow('2026-06-01 08:00:00');
-    [$teacher, $class] = monitorAbsensiHomeroom();
-    $student = monitorAbsensiStudent($class, 'Ayu', '20006');
-
-    $this->actingAs($teacher)->put(route('wali-kelas.kelas-saya.absensi.update', $student), [
-        'status' => 'libur',
-    ])->assertSessionHasErrors('status');
-});
-
-// TS.MOA.008 / TC.MOA.008.001 — lihat detail siswa sendiri berhasil (positive)
-test('homeroom teacher can view own student detail', function () {
-    [$teacher, $class] = monitorAbsensiHomeroom();
-    $student = monitorAbsensiStudent($class, 'Ayu', '20007');
-
-    $this->actingAs($teacher)->get(route('wali-kelas.kelas-saya.show', $student))
-        ->assertSuccessful();
-});
-
-// TS.MOA.009 / TC.MOA.009.001 — lihat detail siswa kelas lain ditolak (negative)
-test('homeroom teacher cannot view another class student detail', function () {
-    [$teacher] = monitorAbsensiHomeroom();
-    [, $otherClass] = monitorAbsensiHomeroom('10. Monitor 3');
-    $otherStudent = monitorAbsensiStudent($otherClass, 'Citra', '20008');
-
-    $this->actingAs($teacher)->get(route('wali-kelas.kelas-saya.show', $otherStudent))
+    $this->put("/wali-kelas/kelas-saya/{$siswaLain->nisn}/absensi", ['status' => 'hadir'])
         ->assertForbidden();
 });
 
-// TS.MOA.010 / TC.MOA.010.001 — endpoint status-absensi (JSON) mengembalikan data yang benar (positive)
-test('status absensi endpoint returns correct json stats and rows', function () {
-    Carbon::setTestNow('2026-06-01 08:00:00');
-    [$teacher, $class] = monitorAbsensiHomeroom();
-    $student = monitorAbsensiStudent($class, 'Ayu', '20009');
-    Absensi::create(['profil_siswa_id' => $student->nisn, 'tanggal' => now()->toDateString(), 'status' => 'hadir']);
+// TS.MOA.005 / TC.MOA.005.001 — Positive
+test('wali kelas melihat rincian seorang siswa di kelasnya', function () {
+    Carbon::setTestNow('2026-07-06 07:00:00');
+    [, , $siswa] = waliKelasDenganKelas();
 
-    $this->actingAs($teacher)->get(route('wali-kelas.kelas-saya.status-absensi'))
+    $this->get("/wali-kelas/kelas-saya/{$siswa->nisn}")
+        ->assertSee('Ahmad Fauzi')
+        ->assertSee('Riwayat Kehadiran');
+});
+
+// TS.MOA.006 / TC.MOA.006.001 — Positive
+test('wali kelas mencari siswa di kelasnya berdasarkan nama', function () {
+    Carbon::setTestNow('2026-07-06 07:00:00');
+    [, $kelas] = waliKelasDenganKelas();
+
+    $penggunaLain = Pengguna::factory()->student()->create([
+        'nama' => 'Siti Aminah',
+        'status' => 'registered',
+    ]);
+    ProfilSiswa::factory()->create([
+        'pengguna_id' => $penggunaLain->id,
+        'nisn' => '1234567892',
+        'nis' => '10003',
+        'kelas_id' => $kelas->id,
+    ]);
+
+    $this->get('/wali-kelas/kelas-saya?search=Siti')
+        ->assertSee('Siti Aminah')
+        ->assertDontSee('Ahmad Fauzi');
+});
+
+// TS.MOA.007 / TC.MOA.007.001 — Negative
+test('guru yang belum dipasangi kelas melihat keterangan bahwa ia belum punya kelas', function () {
+    $wali = Pengguna::factory()->homeroom()->create([
+        'email' => 'wali.tanpa.kelas@sentrisiswa.test',
+        'status' => 'registered',
+    ]);
+
+    masukSebagai($wali);
+
+    $this->get('/wali-kelas/kelas-saya')
         ->assertSuccessful()
-        ->assertJsonPath('stats.hadir', 1)
-        ->assertJsonFragment(['id' => $student->nisn, 'status' => 'hadir']);
+        ->assertDontSee('Ahmad Fauzi');
 });

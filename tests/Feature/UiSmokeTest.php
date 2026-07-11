@@ -95,9 +95,9 @@ test('student dashboard and attendance page render existing primary actions', fu
 function createDashboardTeacher(string $teacherType, ?string $grade = null): Pengguna
 {
     $factoryState = match ($teacherType) {
-        'bk'        => 'counselor',
+        'bk' => 'counselor',
         'kesiswaan' => 'studentAffairs',
-        default     => 'homeroom',
+        default => 'homeroom',
     };
 
     $teacher = Pengguna::factory()->{$factoryState}()->create([
@@ -105,9 +105,9 @@ function createDashboardTeacher(string $teacherType, ?string $grade = null): Pen
     ]);
 
     $teacher->profilGuru()->create([
-        'nip'      => fake()->unique()->numerify('19################'),
-        'tipe_guru'=> $teacherType,
-        'tingkat'  => $grade,
+        'nip' => fake()->unique()->numerify('19################'),
+        'tipe_guru' => $teacherType,
+        'tingkat' => $grade,
     ]);
 
     return $teacher;

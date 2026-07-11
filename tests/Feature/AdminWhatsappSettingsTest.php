@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\Pengguna;
 use App\Models\Pengaturan;
+use App\Models\Pengguna;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 
