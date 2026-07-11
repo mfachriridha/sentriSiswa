@@ -127,6 +127,10 @@ class ImporGuruController extends Controller
                 'teachers_existing' => $import->teachersExisting,
                 'classes_created' => $import->classesCreated,
                 'errors' => $import->errors,
+                // Alasan tiap baris yang dilewati sebenarnya sudah dikumpulkan,
+                // tetapi tidak pernah dikirim ke layar, sehingga admin hanya tahu
+                // ada baris yang dilewati tanpa tahu kenapa.
+                'error_details' => $import->errorDetails,
                 'duration' => $duration,
             ]);
     }

@@ -5,147 +5,186 @@ use App\Models\Pengguna;
 use App\Models\ProfilSiswa;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
 uses(RefreshDatabase::class);
 
-function importSiswaAdmin(): Pengguna
+/*
+|--------------------------------------------------------------------------
+| Fitur Impor Siswa (Admin) — Equivalence Partitioning
+|--------------------------------------------------------------------------
+|
+| Pengujian black box: admin masuk lewat halaman masuk, lalu mengimpor data
+| siswa seperti pengguna biasa. Hasilnya diperiksa dari apa yang muncul di
+| layar, bukan dari basis data.
+|
+| Impor berjalan tiga tahap: admin mengunggah berkas, meninjau isinya lebih
+| dulu, lalu menyetujui untuk disimpan. Baris yang datanya bermasalah dilewati,
+| dan alasannya ditampilkan setelah impor selesai.
+|
+*/
+
+function adminImporSiswa(): Pengguna
 {
-    return Pengguna::factory()->admin()->create(['status' => 'registered']);
-}
-
-function importSiswaXlsxFile(array $rows, string $filename = 'siswa.xlsx'): UploadedFile
-{
-    $spreadsheet = new Spreadsheet;
-    $sheet = $spreadsheet->getActiveSheet();
-    $sheet->fromArray(['Nama', 'NISN', 'NIS', 'Kelas'], null, 'A1');
-    $sheet->fromArray($rows, null, 'A2');
-
-    $path = sys_get_temp_dir().'/'.uniqid('import_siswa_').'.xlsx';
-    (new Xlsx($spreadsheet))->save($path);
-
-    return new UploadedFile($path, $filename, null, null, true);
-}
-
-function importSiswaUploadAndGetPath(Pengguna $admin, array $rows): string
-{
-    test()->actingAs($admin)->post(route('admin.siswa.impor.unggah'), [
-        'file' => importSiswaXlsxFile($rows),
-    ])->assertRedirect(route('admin.siswa.impor.pratinjau'));
-
-    return session('import_siswa_file_path');
-}
-
-// TS.IMS.001 / TC.IMS.001.001 — upload valid xlsx then import creates new students (positive)
-test('admin can upload a valid xlsx and import new students', function () {
-    $admin = importSiswaAdmin();
-    $path = importSiswaUploadAndGetPath($admin, [
-        ['Ahmad Fauzi', '0011122233', '11001', '10. 1'],
+    $admin = Pengguna::factory()->admin()->create([
+        'email' => 'admin.impor.siswa@sentrisiswa.test',
+        'status' => 'registered',
     ]);
 
-    $this->actingAs($admin)->get(route('admin.siswa.impor.pratinjau'))
-        ->assertSuccessful()
+    masukSebagai($admin);
+
+    return $admin;
+}
+
+/**
+ * Berkas impor siswa, sebagaimana yang disusun admin dari templat yang diunduh.
+ *
+ * @param  list<array{nama: string, nisn: string, nis: string, kelas?: string}>  $barisSiswa
+ */
+function berkasImporSiswa(array $barisSiswa): UploadedFile
+{
+    $baris = [['nama', 'nisn', 'nis', 'kelas']];
+
+    foreach ($barisSiswa as $siswa) {
+        $baris[] = [
+            $siswa['nama'],
+            $siswa['nisn'],
+            $siswa['nis'],
+            $siswa['kelas'] ?? '',
+        ];
+    }
+
+    return berkasExcel('impor-siswa.xlsx', $baris);
+}
+
+/**
+ * Menempuh tahap unggah dan tinjau, lalu menyetujui impor.
+ */
+function jalankanImporSiswa(UploadedFile $berkas): Illuminate\Testing\TestResponse
+{
+    test()->post('/admin/siswa/impor/unggah', ['file' => $berkas]);
+
+    $tinjauan = test()->get('/admin/siswa/impor/pratinjau');
+    $jalurBerkas = $tinjauan->viewData('filePath');
+
+    return test()->followingRedirects()
+        ->post('/admin/siswa/impor', ['file_path' => $jalurBerkas]);
+}
+
+// TS.IMS.001 / TC.IMS.001.001 — Positive
+test('admin berhasil mengimpor siswa dari berkas yang benar', function () {
+    adminImporSiswa();
+
+    $berkas = berkasImporSiswa([
+        ['nama' => 'Ahmad Fauzi', 'nisn' => '1234567890', 'nis' => '10001'],
+        ['nama' => 'Siti Aminah', 'nisn' => '1234567891', 'nis' => '10002'],
+    ]);
+
+    $this->get('/admin/siswa/impor')->assertSee('Impor');
+
+    $this->post('/admin/siswa/impor/unggah', ['file' => $berkas])
+        ->assertRedirect('/admin/siswa/impor/pratinjau');
+
+    $this->get('/admin/siswa/impor/pratinjau')
+        ->assertSee('Ahmad Fauzi')
+        ->assertSee('Siti Aminah');
+
+    jalankanImporSiswa(berkasImporSiswa([
+        ['nama' => 'Ahmad Fauzi', 'nisn' => '1234567890', 'nis' => '10001'],
+        ['nama' => 'Siti Aminah', 'nisn' => '1234567891', 'nis' => '10002'],
+    ]))
+        ->assertSee('Impor berhasil')
+        ->assertSee('2 siswa baru dibuat')
         ->assertSee('Ahmad Fauzi');
-
-    $this->actingAs($admin)->post(route('admin.siswa.impor.store'), [
-        'file_path' => $path,
-    ])->assertRedirect(route('admin.siswa.index'));
-
-    $student = Pengguna::where('nama', 'Ahmad Fauzi')->firstOrFail();
-    $this->assertDatabaseHas('profil_siswa', ['pengguna_id' => $student->id, 'nisn' => '0011122233']);
 });
 
-// TS.IMS.002 / TC.IMS.002.001 — upload a file that is not xlsx/xls (negative)
-test('admin cannot upload a non-spreadsheet file for student import', function () {
-    $admin = importSiswaAdmin();
+// TS.IMS.002 / TC.IMS.002.001 — Positive
+test('admin berhasil mengimpor siswa sekaligus menempatkannya ke kelas', function () {
+    adminImporSiswa();
+    Kelas::create(['nama' => '10 IPA 1', 'tingkat' => '10']);
 
-    $this->actingAs($admin)->post(route('admin.siswa.impor.unggah'), [
-        'file' => UploadedFile::fake()->create('siswa.pdf', 10, 'application/pdf'),
-    ])->assertSessionHasErrors('file');
+    jalankanImporSiswa(berkasImporSiswa([
+        ['nama' => 'Ahmad Fauzi', 'nisn' => '1234567892', 'nis' => '10003', 'kelas' => '10 IPA 1'],
+    ]))->assertSee('Impor berhasil');
+
+    $this->get('/admin/siswa?tingkat=10')->assertSee('Ahmad Fauzi');
 });
 
-// TS.IMS.003 / TC.IMS.003.001 — submit upload without any file (negative)
-test('admin cannot submit student import without a file', function () {
-    $admin = importSiswaAdmin();
+// TS.IMS.003 / TC.IMS.003.001 — Negative
+test('admin gagal mengunggah berkas impor yang bukan berkas excel', function () {
+    adminImporSiswa();
 
-    $this->actingAs($admin)->post(route('admin.siswa.impor.unggah'), [])
-        ->assertSessionHasErrors('file');
+    $this->from('/admin/siswa/impor')
+        ->followingRedirects()
+        ->post('/admin/siswa/impor/unggah', [
+            'file' => UploadedFile::fake()->create('catatan.txt', 10, 'text/plain'),
+        ])
+        ->assertSee('File harus bertipe: xlsx, xls.');
 });
 
-// TS.IMS.004 / TC.IMS.004.001 — a row with an empty name is skipped and reported (negative)
-test('student import skips a row with an empty name', function () {
-    $admin = importSiswaAdmin();
-    $path = importSiswaUploadAndGetPath($admin, [
-        ['', '0022233344', '11002', '10. 1'],
+// TS.IMS.004 / TC.IMS.004.001 — Positive
+test('baris tanpa nama dilewati dan alasannya ditampilkan', function () {
+    adminImporSiswa();
+
+    jalankanImporSiswa(berkasImporSiswa([
+        ['nama' => '', 'nisn' => '1234567893', 'nis' => '10004'],
+        ['nama' => 'Siti Aminah', 'nisn' => '1234567894', 'nis' => '10005'],
+    ]))
+        ->assertSee('1 siswa baru dibuat')
+        ->assertSee('Detail baris yang dilewati')
+        ->assertSee('Nama kosong');
+});
+
+// TS.IMS.005 / TC.IMS.005.001 — Positive
+test('baris tanpa nisn dilewati dan alasannya ditampilkan', function () {
+    adminImporSiswa();
+
+    jalankanImporSiswa(berkasImporSiswa([
+        ['nama' => 'Ahmad Fauzi', 'nisn' => '', 'nis' => '10006'],
+    ]))
+        ->assertSee('Detail baris yang dilewati')
+        ->assertSee('NISN kosong');
+});
+
+// TS.IMS.006 / TC.IMS.006.001 — Positive
+test('baris yang nisnya mengandung huruf dilewati dan alasannya ditampilkan', function () {
+    adminImporSiswa();
+
+    jalankanImporSiswa(berkasImporSiswa([
+        ['nama' => 'Ahmad Fauzi', 'nisn' => '1234567895', 'nis' => 'ABC12'],
+    ]))
+        ->assertSee('Detail baris yang dilewati')
+        ->assertSee('NIS harus berupa angka');
+});
+
+// TS.IMS.007 / TC.IMS.007.001 — Positive
+test('siswa yang nisnya sudah ada tidak dibuat ulang', function () {
+    adminImporSiswa();
+
+    $pengguna = Pengguna::factory()->student()->create([
+        'nama' => 'Siswa Lama',
+        'status' => 'registered',
+    ]);
+    ProfilSiswa::factory()->create([
+        'pengguna_id' => $pengguna->id,
+        'nisn' => '1234567896',
+        'nis' => '10007',
     ]);
 
-    $this->actingAs($admin)->post(route('admin.siswa.impor.store'), ['file_path' => $path])
-        ->assertRedirect(route('admin.siswa.index'));
-
-    expect(Pengguna::where('peran', 'siswa')->count())->toBe(0);
+    jalankanImporSiswa(berkasImporSiswa([
+        ['nama' => 'Siswa Lama', 'nisn' => '1234567896', 'nis' => '10007'],
+    ]))
+        ->assertSee('Impor berhasil')
+        ->assertSee('0 siswa baru dibuat');
 });
 
-// TS.IMS.005 / TC.IMS.005.001 — a row with an empty nisn is skipped and reported (negative)
-test('student import skips a row with an empty nisn', function () {
-    $admin = importSiswaAdmin();
-    $path = importSiswaUploadAndGetPath($admin, [
-        ['Siswa Tanpa Nisn', '', '11003', '10. 1'],
-    ]);
+// TS.IMS.008 / TC.IMS.008.001 — Positive
+test('admin mengunduh templat berkas impor siswa', function () {
+    Excel::fake();
+    adminImporSiswa();
 
-    $this->actingAs($admin)->post(route('admin.siswa.impor.store'), ['file_path' => $path])
-        ->assertRedirect(route('admin.siswa.index'));
+    $this->get('/admin/siswa/impor/template')->assertSuccessful();
 
-    expect(Pengguna::where('peran', 'siswa')->count())->toBe(0);
-});
-
-// TS.IMS.006 / TC.IMS.006.001 — a row with an empty nis is skipped and reported (negative)
-test('student import skips a row with an empty nis', function () {
-    $admin = importSiswaAdmin();
-    $path = importSiswaUploadAndGetPath($admin, [
-        ['Siswa Tanpa Nis', '0033344455', '', '10. 1'],
-    ]);
-
-    $this->actingAs($admin)->post(route('admin.siswa.impor.store'), ['file_path' => $path])
-        ->assertRedirect(route('admin.siswa.index'));
-
-    expect(Pengguna::where('peran', 'siswa')->count())->toBe(0);
-});
-
-// TS.IMS.007 / TC.IMS.007.001 — a row whose nisn already exists updates the existing profile instead of duplicating (positive)
-test('student import treats an existing nisn as an update, not a duplicate', function () {
-    $admin = importSiswaAdmin();
-    $existing = Pengguna::factory()->student()->create(['nama' => 'Siswa Lama']);
-    ProfilSiswa::factory()->create(['pengguna_id' => $existing->id, 'nisn' => '0044455566', 'nis' => '20000']);
-
-    $path = importSiswaUploadAndGetPath($admin, [
-        ['Siswa Lama', '0044455566', '20999', '10. 1'],
-    ]);
-
-    $this->actingAs($admin)->post(route('admin.siswa.impor.store'), ['file_path' => $path])
-        ->assertRedirect(route('admin.siswa.index'));
-
-    expect(Pengguna::where('peran', 'siswa')->count())->toBe(1);
-    expect($existing->fresh()->profilSiswa->nis)->toBe('20999');
-});
-
-// TS.IMS.008 / TC.IMS.008.001 — a row referencing a class that does not exist yet creates it automatically (positive)
-test('student import automatically creates a class that does not exist yet', function () {
-    $admin = importSiswaAdmin();
-    $path = importSiswaUploadAndGetPath($admin, [
-        ['Siswa Kelas Baru', '0055566677', '11008', '10. Baru'],
-    ]);
-
-    $this->actingAs($admin)->post(route('admin.siswa.impor.store'), ['file_path' => $path])
-        ->assertRedirect(route('admin.siswa.index'));
-
-    $this->assertDatabaseHas('kelas', ['nama' => '10. Baru', 'tingkat' => '10']);
-});
-
-// TS.IMS.009 / TC.IMS.009.001 — accessing the preview page without uploading a file first redirects back (negative)
-test('student import preview redirects back when no file was uploaded first', function () {
-    $admin = importSiswaAdmin();
-
-    $this->actingAs($admin)->get(route('admin.siswa.impor.pratinjau'))
-        ->assertRedirect(route('admin.siswa.impor'));
+    Excel::assertDownloaded('template-impor-siswa.xlsx');
 });

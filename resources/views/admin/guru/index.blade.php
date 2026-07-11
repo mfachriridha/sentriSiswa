@@ -77,6 +77,36 @@
                 <li>{{ session('import_result.errors') }} baris dilewati</li>
             @endif
         </ul>
+
+        {{-- Tanpa rincian ini, admin hanya diberi tahu ada baris yang dilewati
+             tetapi tidak pernah tahu barisnya yang mana dan kenapa, sehingga
+             tidak bisa memperbaiki berkasnya. Halaman impor siswa sudah
+             menampilkannya; halaman ini yang terlewat. --}}
+        @if (! empty(session('import_result.error_details')))
+            <div class="mt-3">
+                <p class="font-medium text-red-800">Detail baris yang dilewati/diabaikan:</p>
+                <div class="mt-2 max-h-48 overflow-y-auto rounded border border-red-200 bg-red-50 p-3">
+                    <table class="w-full text-left text-sm">
+                        <thead>
+                            <tr class="text-red-700">
+                                <th class="py-1 pr-4">Baris</th>
+                                <th class="py-1 pr-4">Nama</th>
+                                <th class="py-1">Alasan</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-red-600">
+                            @foreach (session('import_result.error_details') as $detail)
+                                <tr>
+                                    <td class="py-1 pr-4">{{ $detail['row'] }}</td>
+                                    <td class="py-1 pr-4">{{ $detail['nama'] }}</td>
+                                    <td class="py-1">{{ $detail['reason'] }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        @endif
     </div>
 @endif
 

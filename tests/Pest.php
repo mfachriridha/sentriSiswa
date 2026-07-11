@@ -57,3 +57,31 @@ function masukSebagai(App\Models\Pengguna $pengguna, string $kataSandi = 'passwo
         'password' => $kataSandi,
     ]);
 }
+
+/**
+ * Membuat berkas Excel sungguhan untuk diunggah, seperti berkas yang disusun
+ * admin dari templat yang diunduh.
+ *
+ * @param  list<list<string>>  $baris  Baris pertama adalah judul kolom.
+ */
+function berkasExcel(string $namaBerkas, array $baris): Illuminate\Http\UploadedFile
+{
+    $jalurSementara = tempnam(sys_get_temp_dir(), 'impor').'.xlsx';
+
+    Maatwebsite\Excel\Facades\Excel::store(
+        new App\Exports\ArrayExport(array_shift($baris), $baris),
+        basename($jalurSementara),
+        'local',
+    );
+
+    $jalurTersimpan = Illuminate\Support\Facades\Storage::disk('local')
+        ->path(basename($jalurSementara));
+
+    return new Illuminate\Http\UploadedFile(
+        $jalurTersimpan,
+        $namaBerkas,
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        null,
+        true,
+    );
+}
