@@ -30,6 +30,7 @@ class StoreSchoolRuleRequest extends FormRequest
     {
         return [
             'judul.required' => 'Judul tata tertib wajib diisi.',
+            'judul.max' => 'Judul tata tertib maksimal 200 karakter.',
             'file_pdf.required' => 'File PDF tata tertib wajib diunggah.',
             'file_pdf.mimes' => 'File tata tertib harus berupa PDF.',
             'file_pdf.max' => 'Ukuran PDF maksimal 10 MB.',

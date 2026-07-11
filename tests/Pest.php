@@ -197,6 +197,12 @@ function kesiswaanMasuk(): Pengguna
     return $kesiswaan;
 }
 
+/** Berkas tata tertib berbentuk PDF, dengan ukuran dalam kilobita. */
+function berkasTataTertib(int $ukuranKb = 500): UploadedFile
+{
+    return UploadedFile::fake()->create('tata-tertib-sekolah.pdf', $ukuranKb, 'application/pdf');
+}
+
 /** Sebuah jenis pelanggaran yang siap dipilih saat mencatat pelanggaran. */
 function jenisPelanggaranTersedia(array $ubahan = []): JenisPelanggaran
 {
