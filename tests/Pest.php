@@ -6,6 +6,7 @@ use App\Models\JenisPelanggaran;
 use App\Models\Kelas;
 use App\Models\PelanggaranSiswa;
 use App\Models\Pengguna;
+use App\Models\ProfilGuru;
 use App\Models\ProfilSiswa;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -195,6 +196,28 @@ function kesiswaanMasuk(): Pengguna
     masukSebagai($kesiswaan);
 
     return $kesiswaan;
+}
+
+/**
+ * Guru BK yang sudah masuk ke aplikasi. Tiap guru BK hanya memegang satu tingkat,
+ * dan hanya boleh memantau siswa di tingkat itu.
+ */
+function bkMasuk(string $tingkat = '10'): Pengguna
+{
+    $bk = Pengguna::factory()->counselor()->create([
+        'nama' => 'Ibu Sari',
+        'email' => 'bk@sentrisiswa.test',
+        'status' => 'registered',
+    ]);
+
+    ProfilGuru::factory()->counselor()->create([
+        'pengguna_id' => $bk->id,
+        'tingkat' => $tingkat,
+    ]);
+
+    masukSebagai($bk);
+
+    return $bk;
 }
 
 /** Berkas tata tertib berbentuk PDF, dengan ukuran dalam kilobita. */

@@ -1,98 +1,115 @@
 <?php
 
-use App\Models\JenisPelanggaran;
 use App\Models\Kelas;
-use App\Models\PelanggaranSiswa;
 use App\Models\PengajuanPoin;
-use App\Models\Pengguna;
-use App\Models\ProfilSiswa;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-function monitoringPoinBkCounselor(string $tingkat): Pengguna
-{
-    $counselor = Pengguna::factory()->counselor()->create(['status' => 'registered']);
-    $counselor->profilGuru()->create([
-        'nip' => fake()->unique()->numerify('19################'),
-        'tipe_guru' => 'bk',
-        'tingkat' => $tingkat,
-    ]);
+/*
+|--------------------------------------------------------------------------
+| Fitur Monitoring Poin (BK) — Equivalence Partitioning
+|--------------------------------------------------------------------------
+|
+| Pengujian black box: guru BK masuk lewat halaman masuk, lalu menelusuri poin
+| dan pelanggaran siswa di tingkatnya. Hasilnya diperiksa dari apa yang muncul di
+| layar, bukan dari basis data.
+|
+| Poin siswa mulai dari 100, berkurang oleh pelanggaran, dan bertambah oleh
+| pengajuan poin yang sudah disetujui kesiswaan. Guru BK hanya memantau: ia tidak
+| bisa mencatat pelanggaran baru, karena itu wewenang kesiswaan.
+|
+*/
 
-    return $counselor;
-}
+// TS.MPB.001 / TC.MPB.001.001 — Positive
+test('guru bk melihat sisa poin siswa di daftar monitoring', function () {
+    [, , $siswa] = kelasBerisiSiswa();
+    catatPelanggaran($siswa, 'Terlambat masuk kelas', 'ringan', '2026-07-06', 10);
 
-function monitoringPoinBkStudent(string $tingkat, string $className, string $nama, string $nisn): ProfilSiswa
-{
-    $class = Kelas::create(['nama' => $className, 'tingkat' => $tingkat]);
-    $studentUser = Pengguna::factory()->student()->create(['status' => 'registered', 'nama' => $nama]);
+    bkMasuk('10');
 
-    return ProfilSiswa::factory()->create([
-        'pengguna_id' => $studentUser->id,
-        'kelas_id' => $class->id,
-        'nisn' => $nisn,
-    ]);
-}
-
-// TS.MPB.001 / TC.MPB.001.001 — index nampilin sisa poin siswa tingkat sendiri yang belum pernah dapat pelanggaran (positive)
-test('bk monitoring index shows the default remaining points for a student with no violations', function () {
-    $counselor = monitoringPoinBkCounselor('10');
-    monitoringPoinBkStudent('10', '10. Monitoring Poin Bk 1', 'Fauzan Akbar', '71001');
-
-    $this->actingAs($counselor)->get(route('bk.monitoring.index'))
-        ->assertSuccessful()
-        ->assertSee('Fauzan Akbar')
-        ->assertSeeInOrder(['Fauzan Akbar', '100']);
+    $this->get('/bk/monitoring')
+        ->assertSee('Ahmad Fauzi')
+        ->assertSee('90');
 });
 
-// TS.MPB.002 / TC.MPB.002.001 — sisa poin dihitung dari total pelanggaran disetujui dikurangi ditambah pengajuan poin disetujui (positive)
-test('bk monitoring index computes remaining points from approved violations and point additions', function () {
-    $counselor = monitoringPoinBkCounselor('10');
-    $student = monitoringPoinBkStudent('10', '10. Monitoring Poin Bk 2', 'Gita Purnama', '71002');
-    $type = JenisPelanggaran::factory()->create(['kategori' => 'sedang', 'pengurangan_poin' => 30]);
-    PelanggaranSiswa::factory()->create([
-        'profil_siswa_id' => $student->nisn,
-        'jenis_pelanggaran_id' => $type->id,
-        'pengurangan_poin' => 30,
-        'status' => 'approved',
-    ]);
-    PengajuanPoin::factory()->create([
-        'profil_siswa_id' => $student->nisn,
-        'status' => 'approved',
-        'jumlah_poin' => 10,
-    ]);
+// TS.MPB.002 / TC.MPB.002.001 — Positive
+test('guru bk menelusuri riwayat pelanggaran seorang siswa', function () {
+    [, , $siswa] = kelasBerisiSiswa();
+    catatPelanggaran($siswa, 'Terlambat masuk kelas', 'ringan', '2026-07-06', 10);
+    catatPelanggaran($siswa, 'Berkelahi', 'berat', '2026-07-07', 60);
 
-    $this->actingAs($counselor)->get(route('bk.monitoring.index'))
-        ->assertSuccessful()
-        ->assertSeeInOrder(['Gita Purnama', '80']);
+    bkMasuk('10');
+
+    $this->get("/bk/monitoring/{$siswa->nisn}")
+        ->assertSee('Terlambat masuk kelas')
+        ->assertSee('Berkelahi')
+        ->assertSee('30');
 });
 
-// TS.MPB.003 / TC.MPB.003.001 — show detail nampilin agregat poin siswa tingkat sendiri (positive)
-test('bk monitoring show displays the aggregated point information for a student in own grade level', function () {
-    $counselor = monitoringPoinBkCounselor('10');
-    $student = monitoringPoinBkStudent('10', '10. Monitoring Poin Bk 3', 'Hasan Nur', '71003');
-    $type = JenisPelanggaran::factory()->create(['kategori' => 'ringan', 'pengurangan_poin' => 15, 'nama' => 'Terlambat Poin Bk']);
-    PelanggaranSiswa::factory()->create([
-        'profil_siswa_id' => $student->nisn,
-        'jenis_pelanggaran_id' => $type->id,
-        'nama_pelanggaran' => 'Terlambat Poin Bk',
-        'pengurangan_poin' => 15,
+// TS.MPB.003 / TC.MPB.003.001 — Positive
+test('poin siswa bertambah setelah pengajuan poin disetujui', function () {
+    [$wali, , $siswa] = kelasBerisiSiswa();
+    catatPelanggaran($siswa, 'Terlambat masuk kelas', 'ringan', '2026-07-06', 20);
+
+    PengajuanPoin::create([
+        'profil_siswa_id' => $siswa->nisn,
+        'diajukan_oleh_id' => $wali->id,
+        'alasan' => 'Juara lomba cerdas cermat.',
         'status' => 'approved',
+        'jumlah_poin' => 5,
     ]);
 
-    $this->actingAs($counselor)->get(route('bk.monitoring.show', $student))
-        ->assertSuccessful()
-        ->assertSee('Hasan Nur')
-        ->assertSee('Terlambat Poin Bk');
+    bkMasuk('10');
+
+    // Poin awal 100, dipotong 20 karena pelanggaran, ditambah 5 dari pengajuan.
+    $this->get("/bk/monitoring/{$siswa->nisn}")
+        ->assertSee('Juara lomba cerdas cermat.')
+        ->assertSee('85');
 });
 
-// TS.MPB.004 / TC.MPB.004.001 — show detail BK tidak sedia tautan catat pelanggaran baru, beda dengan kesiswaan (negative, dokumentasi batas kewenangan)
-test('bk monitoring show does not provide a link to record a new violation', function () {
-    $counselor = monitoringPoinBkCounselor('10');
-    $student = monitoringPoinBkStudent('10', '10. Monitoring Poin Bk 4', 'Indah Permata', '71004');
+// TS.MPB.004 / TC.MPB.004.001 — Negative
+test('pengajuan poin yang belum disetujui belum menambah poin siswa', function () {
+    [$wali, , $siswa] = kelasBerisiSiswa();
+    catatPelanggaran($siswa, 'Terlambat masuk kelas', 'ringan', '2026-07-06', 20);
 
-    $this->actingAs($counselor)->get(route('bk.monitoring.show', $student))
-        ->assertSuccessful()
-        ->assertViewHas('createViolationRoute', null)
+    PengajuanPoin::create([
+        'profil_siswa_id' => $siswa->nisn,
+        'diajukan_oleh_id' => $wali->id,
+        'alasan' => 'Juara lomba cerdas cermat.',
+        'status' => 'pending',
+    ]);
+
+    bkMasuk('10');
+
+    // Pengajuan masih menunggu keputusan, jadi poinnya tetap 100 dikurangi 20.
+    $this->get("/bk/monitoring/{$siswa->nisn}")
+        ->assertSee('80')
+        ->assertDontSee('Juara lomba cerdas cermat.');
+});
+
+// TS.MPB.005 / TC.MPB.005.001 — Negative
+test('guru bk tidak menemukan tombol untuk mencatat pelanggaran', function () {
+    [, , $siswa] = kelasBerisiSiswa();
+
+    bkMasuk('10');
+
+    // Mencatat pelanggaran adalah wewenang kesiswaan, bukan BK.
+    $this->get("/bk/monitoring/{$siswa->nisn}")
+        ->assertSee('Ahmad Fauzi')
         ->assertDontSee('Catat Pelanggaran');
+});
+
+// TS.MPB.006 / TC.MPB.006.001 — Negative
+test('guru bk tidak melihat poin siswa dari tingkat lain', function () {
+    kelasBerisiSiswa();
+
+    $kelasTingkatLain = Kelas::create(['nama' => '11 IPS 1', 'tingkat' => '11']);
+    $siswaTingkatLain = siswaLainDiKelas($kelasTingkatLain->id, 'Siswa Tingkat 11', '1234567891', '10002');
+    catatPelanggaran($siswaTingkatLain, 'Berkelahi', 'berat', '2026-07-07', 60);
+
+    bkMasuk('10');
+
+    $this->get('/bk/monitoring')
+        ->assertDontSee('Siswa Tingkat 11');
 });
