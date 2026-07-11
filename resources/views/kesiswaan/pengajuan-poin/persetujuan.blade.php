@@ -17,6 +17,13 @@
 <x-alert type="success" :message="session('success')" />
 <x-alert type="error" :message="session('error')" />
 
+@error('jumlah_poin')
+    <x-alert type="error" :message="$message" />
+@enderror
+@error('alasan_penolakan')
+    <x-alert type="error" :message="$message" />
+@enderror
+
 <div class="overflow-hidden rounded-xl border border-gray-200 bg-white">
     <div class="overflow-x-auto">
         <table class="min-w-full text-left text-sm">
