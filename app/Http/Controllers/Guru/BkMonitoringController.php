@@ -19,6 +19,7 @@ class BkMonitoringController extends Controller
         $filterClass = $request->get('kelas_id', '');
 
         $query = ProfilSiswa::with(['pengguna', 'kelas'])
+            ->whereHas('pengguna', fn ($query) => $query->where('status', 'registered'))
             ->withSum(['pelanggaranSiswa' => fn ($query) => $query->disetujui()], 'pengurangan_poin')
             ->withSum(['pengajuanPoin' => fn ($query) => $query->disetujui()], 'jumlah_poin')
             ->with(['absensi' => fn ($query) => $query->whereDate('tanggal', today())])
@@ -59,6 +60,7 @@ class BkMonitoringController extends Controller
             'pengguna',
             'kelas',
             'pelanggaranSiswa' => fn ($query) => $query->disetujui()->latest('tanggal_pelanggaran')->with(['dicatatOleh', 'jenisPelanggaran']),
+            'pengajuanPoin' => fn ($query) => $query->disetujui()->latest()->with('diajukanOleh'),
             'absensi' => fn ($query) => $query->latest('tanggal')->take(30),
         ]);
 

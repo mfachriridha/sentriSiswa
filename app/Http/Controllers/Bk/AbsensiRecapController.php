@@ -12,6 +12,7 @@ use App\Models\ProfilSiswa;
 use App\Services\AbsenceWarningService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -41,7 +42,7 @@ class AbsensiRecapController extends Controller
         $filterStudents = $this->gradeStudents($classIds);
         $students = $this->gradeStudents($classIds, $validated['profil_siswa_id'] ?? null);
         $stats = $this->calculateStats($students, $this->attendancesByStudent($students, $startDate, $endDate));
-        $students = $this->filterStudentsByStatus($students, $stats, $statusFilter);
+        $students = $this->paginateStudents($this->filterStudentsByStatus($students, $stats, $statusFilter), $request);
 
         return view('bk.laporan.index', compact(
             'classes', 'students', 'filterStudents', 'stats',
@@ -166,6 +167,7 @@ class AbsensiRecapController extends Controller
             ->whereIn('kelas_id', $classIds)
             ->when($studentId, fn ($query) => $query->where('profil_siswa.nisn', $studentId))
             ->join('pengguna', 'profil_siswa.pengguna_id', '=', 'pengguna.id')
+            ->where('pengguna.status', 'registered')
             ->with(['pengguna', 'kelas'])
             ->orderBy('profil_siswa.kelas_id')
             ->orderBy('pengguna.nama')
@@ -228,4 +230,24 @@ class AbsensiRecapController extends Controller
             ->values();
     }
 
+    /**
+     * Stats dihitung di level Collection (bukan query), jadi paginasinya manual.
+     * Ekspor sengaja gak lewat sini - file ekspor harus berisi semua baris.
+     *
+     * @param  Collection<int, ProfilSiswa>  $students
+     * @return LengthAwarePaginator<int, ProfilSiswa>
+     */
+    private function paginateStudents(Collection $students, AttendanceRecapFilterRequest $request): LengthAwarePaginator
+    {
+        $perPage = 25;
+        $page = LengthAwarePaginator::resolveCurrentPage();
+
+        return new LengthAwarePaginator(
+            $students->forPage($page, $perPage)->values(),
+            $students->count(),
+            $perPage,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()],
+        );
+    }
 }

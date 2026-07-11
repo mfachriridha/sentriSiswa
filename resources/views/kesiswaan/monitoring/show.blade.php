@@ -94,9 +94,9 @@
             <div class="border-b border-gray-200 p-5">
                 <h3 class="text-lg font-semibold text-gray-900">Riwayat Pelanggaran</h3>
             </div>
-            <div class="overflow-x-auto">
+            <div class="max-h-96 overflow-y-auto overflow-x-auto">
                 <table class="w-full text-left text-sm text-gray-600">
-                    <thead class="bg-gray-50 text-xs uppercase text-gray-500">
+                    <thead class="sticky top-0 z-10 bg-gray-50 text-xs uppercase text-gray-500">
                         <tr>
                             <th class="px-4 py-3 font-semibold">Tanggal</th>
                             <th class="px-4 py-3 font-semibold">Pelanggaran</th>
@@ -128,10 +128,11 @@
         <div class="rounded-xl border border-gray-200 bg-white">
             <div class="border-b border-gray-200 p-5">
                 <h3 class="text-lg font-semibold text-gray-900">Riwayat Kehadiran</h3>
+                <p class="mt-1 text-xs text-gray-500">30 catatan terakhir.</p>
             </div>
-            <div class="overflow-x-auto">
+            <div class="max-h-96 overflow-y-auto overflow-x-auto">
                 <table class="w-full text-left text-sm text-gray-600">
-                    <thead class="bg-gray-50 text-xs uppercase text-gray-500">
+                    <thead class="sticky top-0 z-10 bg-gray-50 text-xs uppercase text-gray-500">
                         <tr>
                             <th class="px-4 py-3 font-semibold">Tanggal</th>
                             <th class="px-4 py-3 font-semibold">Status</th>
@@ -164,9 +165,9 @@
             <div class="border-b border-gray-200 p-5">
                 <h3 class="text-lg font-semibold text-gray-900">Riwayat Pengajuan Poin (Disetujui)</h3>
             </div>
-            <div class="overflow-x-auto">
+            <div class="max-h-96 overflow-y-auto overflow-x-auto">
                 <table class="w-full text-left text-sm text-gray-600">
-                    <thead class="bg-gray-50 text-xs uppercase text-gray-500">
+                    <thead class="sticky top-0 z-10 bg-gray-50 text-xs uppercase text-gray-500">
                         <tr>
                             <th class="px-4 py-3 font-semibold">Tanggal</th>
                             <th class="px-4 py-3 font-semibold">Alasan</th>

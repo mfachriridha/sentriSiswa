@@ -35,6 +35,7 @@ class ClassRosterController extends Controller
 
         $students = $class->siswa()
             ->join('pengguna', 'profil_siswa.pengguna_id', '=', 'pengguna.id')
+            ->where('pengguna.status', 'registered')
             ->with('pengguna')
             ->when($request->string('search')->toString(), function ($query, string $search) {
                 $query->where(function ($query) use ($search) {
@@ -138,6 +139,7 @@ class ClassRosterController extends Controller
             'pengguna',
             'kelas',
             'pelanggaranSiswa' => fn ($query) => $query->disetujui()->latest('tanggal_pelanggaran')->with(['dicatatOleh', 'jenisPelanggaran']),
+            'pengajuanPoin' => fn ($query) => $query->disetujui()->latest()->with('diajukanOleh'),
             'absensi' => fn ($query) => $query->latest('tanggal')->take(30),
         ]);
 

@@ -3,13 +3,25 @@
 @section('title', 'Rekap Absensi')
 
 @section('content')
-<div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-900">Rekap Absensi</h1>
-    <p class="mt-1 text-sm text-gray-500">Laporan absensi siswa kelas {{ $class->nama }}</p>
+<div class="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-900">Rekap Absensi</h1>
+        <p class="mt-1 text-sm text-gray-500">Laporan absensi siswa kelas {{ $class->nama }}</p>
+    </div>
+    <div class="flex flex-wrap gap-2">
+        <a href="{{ route('wali-kelas.absensi.ekspor-excel', request()->query()) }}"
+           class="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
+            Export Excel
+        </a>
+        <a href="{{ route('wali-kelas.absensi.ekspor-pdf', request()->query()) }}"
+           class="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
+            Export PDF
+        </a>
+    </div>
 </div>
 
 <div class="rounded-xl border border-gray-200 bg-white p-6">
-    <div class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+    <div class="mb-6">
         <form method="GET" action="{{ route('wali-kelas.absensi.index') }}" class="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
             <div>
                 <label for="start_date" class="block text-sm font-medium text-gray-700">Tanggal Mulai</label>
@@ -43,17 +55,6 @@
                 Terapkan
             </button>
         </form>
-
-        <div class="flex flex-wrap gap-2">
-            <a href="{{ route('wali-kelas.absensi.ekspor-excel', request()->query()) }}"
-               class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
-                Export Excel
-            </a>
-            <a href="{{ route('wali-kelas.absensi.ekspor-pdf', request()->query()) }}"
-               class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
-                Export PDF
-            </a>
-        </div>
     </div>
 
     @error('mulai')
@@ -84,7 +85,7 @@
                         $stat = $stats[$student->nisn];
                     @endphp
                     <tr class="hover:bg-gray-50">
-                        <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-900">{{ $index + 1 }}</td>
+                        <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-900">{{ $students->firstItem() + $index }}</td>
                         <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-500">{{ $student->nis ?? '-' }}</td>
                         <td class="whitespace-nowrap px-4 py-3 text-sm font-medium text-gray-900">{{ $student->pengguna->nama }}</td>
                         <td class="whitespace-nowrap px-4 py-3 text-center text-sm font-medium text-green-600">{{ $stat['hadir'] }}</td>
@@ -105,6 +106,12 @@
             </tbody>
         </table>
     </div>
+
+    @if ($students->hasPages())
+        <div class="mt-5 border-t border-gray-200 pt-5">
+            <x-pagination :paginator="$students" />
+        </div>
+    @endif
 
     <div class="mt-5 flex flex-wrap gap-4 text-xs text-gray-500">
         <span>H: Hadir</span>

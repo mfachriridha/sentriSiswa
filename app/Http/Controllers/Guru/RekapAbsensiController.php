@@ -11,6 +11,7 @@ use App\Models\ProfilSiswa;
 use App\Services\AbsenceWarningService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -34,7 +35,7 @@ class RekapAbsensiController extends Controller
         $students = $this->classStudents($class->id, $validated['profil_siswa_id'] ?? null);
         $stats = $this->calculateStats($students, $this->attendancesByStudent($students, $startDate, $endDate));
         $statusFilter = $validated['status'] ?? '';
-        $students = $this->filterStudentsByStatus($students, $stats, $statusFilter);
+        $students = $this->paginateStudents($this->filterStudentsByStatus($students, $stats, $statusFilter), $request);
         $selectedStudent = $validated['profil_siswa_id'] ?? '';
         $selectedMonth = $validated['month'] ?? '';
 
@@ -133,6 +134,7 @@ class RekapAbsensiController extends Controller
             ->where('kelas_id', $classId)
             ->when($studentId, fn ($query) => $query->where('profil_siswa.nisn', $studentId))
             ->join('pengguna', 'profil_siswa.pengguna_id', '=', 'pengguna.id')
+            ->where('pengguna.status', 'registered')
             ->with('pengguna')
             ->orderBy('pengguna.nama')
             ->select('profil_siswa.*')
@@ -194,4 +196,24 @@ class RekapAbsensiController extends Controller
             ->values();
     }
 
+    /**
+     * Stats dihitung di level Collection (bukan query), jadi paginasinya manual.
+     * Ekspor sengaja gak lewat sini - file ekspor harus berisi semua baris.
+     *
+     * @param  Collection<int, ProfilSiswa>  $students
+     * @return LengthAwarePaginator<int, ProfilSiswa>
+     */
+    private function paginateStudents(Collection $students, AttendanceRecapFilterRequest $request): LengthAwarePaginator
+    {
+        $perPage = 25;
+        $page = LengthAwarePaginator::resolveCurrentPage();
+
+        return new LengthAwarePaginator(
+            $students->forPage($page, $perPage)->values(),
+            $students->count(),
+            $perPage,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()],
+        );
+    }
 }
