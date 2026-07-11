@@ -33,6 +33,7 @@ class ProfilController extends Controller
         $admin = $request->user();
         $data = $request->validated();
 
+        $admin->nama = $data['nama'];
         $admin->nomor_wa = $data['whatsapp_number'] ?? null;
 
         if ($request->hasFile('photo')) {

@@ -14,6 +14,10 @@
     <p class="mt-1 text-sm text-gray-500">Konfigurasi jam absensi dan toleransi keterlambatan.</p>
 </div>
 
+{{-- Tanpa ini, admin menyimpan konfigurasi lalu tidak melihat konfirmasi apa
+     pun, padahal sistem sudah mengirim pesannya. --}}
+<x-alert type="success" :message="session('success')" />
+
 <div class="mb-6 rounded-xl border border-green-200 bg-green-50 p-4">
     <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>

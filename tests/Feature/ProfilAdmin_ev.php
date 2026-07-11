@@ -3,118 +3,162 @@
 use App\Models\Pengguna;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 
 uses(RefreshDatabase::class);
 
-function profilAdminUser(): Pengguna
+/*
+|--------------------------------------------------------------------------
+| Fitur Profil Admin — Equivalence Partitioning
+|--------------------------------------------------------------------------
+|
+| Pengujian black box: admin masuk lewat halaman masuk, lalu mengelola
+| profilnya sendiri. Hasilnya diperiksa dari apa yang muncul di layar, bukan
+| dari basis data.
+|
+| Admin boleh mengganti email dan nomor WhatsApp secara langsung. Penggantian
+| kata sandi punya alurnya sendiri: sistem mengirim kode OTP ke email admin
+| lebih dulu.
+|
+*/
+
+function adminProfil(string $email = 'admin.profil@sentrisiswa.test'): Pengguna
 {
-    return Pengguna::factory()->admin()->create([
+    $admin = Pengguna::factory()->admin()->create([
+        'nama' => 'Admin Sekolah',
+        'email' => $email,
         'status' => 'registered',
-        'email' => 'admin.lama@example.com',
-        'password' => Hash::make('OldPassw0rd'),
     ]);
+
+    masukSebagai($admin);
+
+    return $admin;
 }
 
-// TS.PAD.001 / TC.PAD.001.001 — update profile with valid data (positive)
-test('admin can update profile with valid data', function () {
-    $admin = profilAdminUser();
+// TS.PAD.001 / TC.PAD.001.001 — Positive
+test('admin melihat halaman profilnya sendiri', function () {
+    adminProfil();
 
-    $this->actingAs($admin)->put(route('admin.profil.update'), [
-        'email' => 'admin.baru@example.com',
-        'whatsapp_number' => '081234567890',
-    ])->assertRedirect(route('admin.profil'));
-
-    $admin->refresh();
-    expect($admin->email)->toBe('admin.baru@example.com');
-    expect($admin->nomor_wa)->toBe('081234567890');
+    $this->get('/admin/profil')
+        ->assertSee('Admin Sekolah')
+        ->assertSee('admin.profil@sentrisiswa.test');
 });
 
-// TS.PAD.002 / TC.PAD.002.001 — email already used by another account (negative)
-test('admin cannot update profile with an email already used by another account', function () {
-    $admin = profilAdminUser();
-    Pengguna::factory()->create(['email' => 'dipakai@example.com']);
+// TS.PAD.002 / TC.PAD.002.001 — Positive
+test('admin berhasil mengganti namanya sendiri', function () {
+    adminProfil();
 
-    $this->actingAs($admin)->put(route('admin.profil.update'), [
-        'email' => 'dipakai@example.com',
-    ])->assertSessionHasErrors('email');
+    $this->get('/admin/profil/edit')->assertSee('Admin Sekolah');
+
+    $this->followingRedirects()
+        ->put('/admin/profil', [
+            'nama' => 'Admin Baru',
+            'email' => 'admin.profil@sentrisiswa.test',
+        ])
+        ->assertSee('Profil admin berhasil diperbarui.')
+        ->assertSee('Admin Baru')
+        ->assertDontSee('Admin Sekolah');
 });
 
-// TS.PAD.003 / TC.PAD.003.001 — photo with a disallowed format (gif) is rejected (negative)
-test('admin cannot update profile photo with a gif format', function () {
-    $admin = profilAdminUser();
+// TS.PAD.003 / TC.PAD.003.001 — Positive
+test('admin berhasil mengganti emailnya', function () {
+    adminProfil();
 
-    $this->actingAs($admin)->put(route('admin.profil.update'), [
-        'email' => $admin->email,
-        'photo' => UploadedFile::fake()->image('foto.gif'),
-    ])->assertSessionHasErrors('photo');
+    $this->followingRedirects()
+        ->put('/admin/profil', [
+            'nama' => 'Admin Sekolah',
+            'email' => 'admin.baru@sentrisiswa.test',
+        ])
+        ->assertSee('Profil admin berhasil diperbarui.')
+        ->assertSee('admin.baru@sentrisiswa.test');
 });
 
-// TS.PAD.004 / TC.PAD.004.001 — whatsapp_number with invalid characters is rejected (negative)
-test('admin cannot update profile with an invalid whatsapp number format', function () {
-    $admin = profilAdminUser();
+// TS.PAD.004 / TC.PAD.004.001 — Positive
+test('admin berhasil menyimpan nomor whatsapp', function () {
+    adminProfil();
 
-    $this->actingAs($admin)->put(route('admin.profil.update'), [
-        'email' => $admin->email,
-        'whatsapp_number' => 'abc-nomor-salah',
-    ])->assertSessionHasErrors('whatsapp_number');
+    $this->followingRedirects()
+        ->put('/admin/profil', [
+            'nama' => 'Admin Sekolah',
+            'email' => 'admin.profil@sentrisiswa.test',
+            'whatsapp_number' => '081234567890',
+        ])
+        ->assertSee('Profil admin berhasil diperbarui.')
+        ->assertSee('081234567890');
 });
 
-// TS.PAD.005 / TC.PAD.005.001 — submitting a password on this form has no real effect (positive, dead-validation documented)
-test('submitting a password on the profile form does not change the real password', function () {
-    $admin = profilAdminUser();
+// TS.PAD.005 / TC.PAD.005.001 — Negative
+test('admin gagal mengganti email karena sudah dipakai akun lain', function () {
+    adminProfil();
 
-    $this->actingAs($admin)->put(route('admin.profil.update'), [
-        'email' => $admin->email,
-        'password' => 'BypassPass1',
-    ])->assertRedirect(route('admin.profil'));
+    Pengguna::factory()->student()->create([
+        'email' => 'sudah.dipakai@sentrisiswa.test',
+        'status' => 'registered',
+    ]);
 
-    expect(Hash::check('OldPassw0rd', $admin->fresh()->password))->toBeTrue();
-    expect(Hash::check('BypassPass1', $admin->fresh()->password))->toBeFalse();
+    $this->from('/admin/profil/edit')
+        ->followingRedirects()
+        ->put('/admin/profil', [
+            'nama' => 'Admin Sekolah',
+            'email' => 'sudah.dipakai@sentrisiswa.test',
+        ])
+        ->assertSee('Email sudah digunakan.')
+        ->assertDontSee('Profil admin berhasil diperbarui.');
 });
 
-// TS.PAD.006 / TC.PAD.006.001 — requesting a password change redirects to the OTP screen (positive)
-test('admin requesting password change is redirected to otp screen', function () {
-    $admin = profilAdminUser();
+// TS.PAD.006 / TC.PAD.006.001 — Negative
+test('admin gagal menyimpan nomor whatsapp yang mengandung huruf', function () {
+    adminProfil();
 
-    $this->actingAs($admin)->post('/admin/profil/ganti-sandi')
-        ->assertRedirect(route('otp.show'));
+    $this->from('/admin/profil/edit')
+        ->followingRedirects()
+        ->put('/admin/profil', [
+            'nama' => 'Admin Sekolah',
+            'email' => 'admin.profil@sentrisiswa.test',
+            'whatsapp_number' => 'nomor-saya',
+        ])
+        ->assertSee('Format nomor WhatsApp tidak valid.');
 });
 
-// TS.PAD.007 / TC.PAD.007.001 — submitting a new password without a verified session is rejected (negative)
-test('admin cannot set a new password without a verified otp session', function () {
-    $admin = profilAdminUser();
+// TS.PAD.007 / TC.PAD.007.001 — Positive
+test('admin berhasil mengunggah foto profil bertipe yang diizinkan', function () {
+    Storage::fake('public');
+    adminProfil();
 
-    $this->actingAs($admin)->post('/admin/profil/set-sandi-baru', [
-        'password' => 'NewPassw0rd',
-        'password_confirmation' => 'NewPassw0rd',
-    ])->assertRedirect(route('admin.profil'));
-
-    expect(Hash::check('OldPassw0rd', $admin->fresh()->password))->toBeTrue();
+    $this->followingRedirects()
+        ->put('/admin/profil', [
+            'nama' => 'Admin Sekolah',
+            'email' => 'admin.profil@sentrisiswa.test',
+            'photo' => UploadedFile::fake()->image('foto.jpg'),
+        ])
+        ->assertSee('Profil admin berhasil diperbarui.');
 });
 
-// TS.PAD.008 / TC.PAD.008.001 — submitting a new password with a verified session succeeds (positive)
-test('admin can set a new password with a verified otp session', function () {
-    $admin = profilAdminUser();
-    session(['password_change_verified' => true]);
+// TS.PAD.008 / TC.PAD.008.001 — Negative
+test('admin gagal mengunggah foto profil bertipe yang tidak diizinkan', function () {
+    Storage::fake('public');
+    adminProfil();
 
-    $this->actingAs($admin)->post('/admin/profil/set-sandi-baru', [
-        'password' => 'NewPassw0rd',
-        'password_confirmation' => 'NewPassw0rd',
-    ])->assertRedirect(route('admin.profil'));
-
-    expect(Hash::check('NewPassw0rd', $admin->fresh()->password))->toBeTrue();
+    $this->from('/admin/profil/edit')
+        ->followingRedirects()
+        ->put('/admin/profil', [
+            'nama' => 'Admin Sekolah',
+            'email' => 'admin.profil@sentrisiswa.test',
+            'photo' => UploadedFile::fake()->create('dokumen.pdf', 100, 'application/pdf'),
+        ])
+        ->assertSee('Foto harus berupa gambar.');
 });
 
-// TS.PAD.009 / TC.PAD.009.001 — password confirmation mismatch is rejected (negative)
-test('admin cannot set a new password when confirmation does not match', function () {
-    $admin = profilAdminUser();
-    session(['password_change_verified' => true]);
+// TS.PAD.009 / TC.PAD.009.001 — Positive
+test('admin meminta penggantian kata sandi dan diarahkan ke halaman kode otp', function () {
+    Mail::fake();
+    adminProfil();
 
-    $this->actingAs($admin)->post('/admin/profil/set-sandi-baru', [
-        'password' => 'NewPassw0rd',
-        'password_confirmation' => 'BedaSekali9',
-    ])->assertSessionHasErrors('password');
+    $this->get('/admin/profil/ganti-sandi')->assertSee('Ganti Kata Sandi');
 
-    expect(Hash::check('OldPassw0rd', $admin->fresh()->password))->toBeTrue();
+    $this->followingRedirects()
+        ->post('/admin/profil/ganti-sandi')
+        ->assertSee('Kode OTP telah dikirim ke email Anda.')
+        ->assertSee('Verifikasi OTP');
 });

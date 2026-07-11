@@ -22,6 +22,7 @@ test('admin can update whatsapp number and email directly without OTP', function
     // Update WhatsApp only
     $this->actingAs($admin)
         ->put(route('admin.profil.update'), [
+            'nama' => $admin->nama,
             'email' => 'admin@example.com',
             'whatsapp_number' => '081234567890',
         ])
@@ -34,6 +35,7 @@ test('admin can update whatsapp number and email directly without OTP', function
     // Admin email change is direct (no OTP) so admin can fix seeder emails
     $this->actingAs($admin)
         ->put(route('admin.profil.update'), [
+            'nama' => $admin->nama,
             'email' => 'new-admin-email@example.com',
             'whatsapp_number' => '081234567890',
         ])

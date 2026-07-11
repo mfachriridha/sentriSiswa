@@ -60,6 +60,15 @@
         <!-- Form Fields Grid -->
         <div class="grid gap-6 md:grid-cols-2">
             <div>
+                <label for="nama" class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Nama <span class="text-red-500">*</span></label>
+                <input id="nama" type="text" name="nama" value="{{ old('nama', $admin->nama) }}" required
+                       class="mt-2 block w-full rounded-xl border border-slate-300 bg-slate-50/50 px-4 py-3 text-sm text-slate-800 placeholder:text-slate-400 shadow-inner focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/20 transition-all duration-300">
+                @error('nama')
+                    <p class="mt-1.5 text-xs text-red-500 font-semibold">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
                 <label for="email" class="block text-xs font-bold text-slate-500 uppercase tracking-wider">Email <span class="text-red-500">*</span></label>
                 <input id="email" type="email" name="email" value="{{ old('email', $admin->email) }}" required
                        class="mt-2 block w-full rounded-xl border border-slate-300 bg-slate-50/50 px-4 py-3 text-sm text-slate-800 placeholder:text-slate-400 shadow-inner focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/20 transition-all duration-300">
