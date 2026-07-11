@@ -23,6 +23,7 @@ test('admin can save a late tolerance equal to the attendance duration', functio
         'attendance_end_hour' => '07',
         'attendance_end_minute' => '00',
         'attendance_late_tolerance_minutes' => '60',
+        'attendance_active_days' => [1, 2, 3, 4, 5],
     ])->assertRedirect(route('admin.pengaturan.waktu-absen.index'));
 
     expect(Pengaturan::get('attendance_late_tolerance_minutes'))->toBe('60');
@@ -38,5 +39,6 @@ test('admin cannot save a late tolerance greater than the attendance duration', 
         'attendance_end_hour' => '07',
         'attendance_end_minute' => '00',
         'attendance_late_tolerance_minutes' => '90',
+        'attendance_active_days' => [1, 2, 3, 4, 5],
     ])->assertSessionHasErrors('attendance_late_tolerance_minutes');
 });

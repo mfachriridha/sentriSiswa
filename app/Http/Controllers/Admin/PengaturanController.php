@@ -32,6 +32,9 @@ class PengaturanController extends Controller
             'endTime' => $endTime,
             'lateToleranceMinutes' => (int) $lateToleranceMinutes,
             'updatedAt' => $updatedAt,
+            'activeDays' => Pengaturan::hariAbsen(),
+            'dayNames' => Pengaturan::namaHari(),
+            'activeDaysLabel' => Pengaturan::labelHariAbsen(),
         ]);
     }
 
@@ -47,8 +50,16 @@ class PengaturanController extends Controller
             'attendance_end_hour' => ['required', Rule::in($hours)],
             'attendance_end_minute' => ['required', Rule::in($minutes)],
             'attendance_late_tolerance_minutes' => ['required', Rule::in($lateToleranceOptions)],
+            'attendance_active_days' => ['required', 'array', 'min:1'],
+            'attendance_active_days.*' => ['integer', 'between:1,7'],
         ], [
-            '*.required' => 'Jam dan menit wajib diisi.',
+            'attendance_start_hour.required' => 'Jam dan menit wajib diisi.',
+            'attendance_start_minute.required' => 'Jam dan menit wajib diisi.',
+            'attendance_end_hour.required' => 'Jam dan menit wajib diisi.',
+            'attendance_end_minute.required' => 'Jam dan menit wajib diisi.',
+            'attendance_late_tolerance_minutes.required' => 'Toleransi terlambat wajib diisi.',
+            'attendance_active_days.required' => 'Pilih minimal satu hari aktif absensi.',
+            'attendance_active_days.min' => 'Pilih minimal satu hari aktif absensi.',
             '*.in' => 'Pilihan jam atau menit tidak valid.',
         ]);
 
@@ -69,10 +80,17 @@ class PengaturanController extends Controller
             ])->withInput();
         }
 
+        $activeDays = collect($validated['attendance_active_days'])
+            ->map(fn ($day): int => (int) $day)
+            ->unique()
+            ->sort()
+            ->values();
+
         Pengaturan::set('attendance_start_time', $startTime);
         Pengaturan::set('attendance_end_time', $endTime);
         Pengaturan::set('attendance_late_tolerance_minutes', (string) $lateToleranceMinutes);
         Pengaturan::set('attendance_late_time', $this->formatMinutesAsTime($this->minutesFromTime($endTime) - $lateToleranceMinutes));
+        Pengaturan::set('attendance_active_days', $activeDays->implode(','));
         Pengaturan::set('attendance_time_updated_at', now()->toDateTimeString());
 
         return redirect()->route('admin.pengaturan.waktu-absen.index')->with('success', 'Konfigurasi waktu absen berhasil disimpan.');

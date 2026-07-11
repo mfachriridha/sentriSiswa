@@ -107,7 +107,7 @@ test('student cannot check in on weekend', function () {
             'selfie' => UploadedFile::fake()->image('selfie.jpg')->size(100),
         ])
         ->assertRedirect(route('siswa.absensi'))
-        ->assertSessionHas('error', 'Absensi hanya tersedia pada hari Senin sampai Jumat.');
+        ->assertSessionHas('error', 'Absensi hanya tersedia pada hari Senin, Selasa, Rabu, Kamis dan Jumat.');
 
     expect(Absensi::count())->toBe(0);
 });

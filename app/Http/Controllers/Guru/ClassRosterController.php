@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Guru;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Guru\UpdateDailyAttendanceRequest;
 use App\Models\Absensi;
+use App\Models\Pengaturan;
 use App\Models\ProfilSiswa;
 use App\Services\AbsenceWarningService;
 use Illuminate\Http\JsonResponse;
@@ -24,7 +25,7 @@ class ClassRosterController extends Controller
         }
 
         $today = now()->toDateString();
-        $isWeekday = now()->isWeekday();
+        $isWeekday = Pengaturan::hariAbsenAktif();
         $studentIds = $class->siswa()->pluck('profil_siswa.nisn');
         $attendances = Absensi::query()
             ->whereIn('profil_siswa_id', $studentIds)
@@ -103,8 +104,8 @@ class ClassRosterController extends Controller
             abort(403);
         }
 
-        if (now()->isWeekend()) {
-            return redirect()->route('wali-kelas.kelas-saya')->with('error', 'Absensi hanya tersedia pada hari Senin sampai Jumat.');
+        if (! Pengaturan::hariAbsenAktif()) {
+            return redirect()->route('wali-kelas.kelas-saya')->with('error', 'Absensi hanya tersedia pada hari '.Pengaturan::labelHariAbsen().'.');
         }
 
         $attendance = Absensi::query()

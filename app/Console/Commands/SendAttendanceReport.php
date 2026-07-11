@@ -20,7 +20,7 @@ class SendAttendanceReport extends Command
 
     public function handle(FonnteService $whatsapp): int
     {
-        if (now()->isWeekend()) {
+        if (! Pengaturan::hariAbsenAktif()) {
             $this->info('Hari ini bukan hari aktif absensi. Laporan tidak dikirim.');
 
             return self::SUCCESS;

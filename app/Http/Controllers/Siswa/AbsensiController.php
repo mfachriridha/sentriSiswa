@@ -28,7 +28,7 @@ class AbsensiController extends Controller
         $now = now();
         $currentTime = $now->format('H:i');
         $currentTimeLabel = $now->format('H:i');
-        $isWeekday = $now->isWeekday();
+        $isWeekday = Pengaturan::hariAbsenAktif($now);
         $canCheckIn = $isWeekday && $currentTime >= $startTime && $currentTime <= $endTime;
 
         $geofenceData = Pengaturan::get('attendance_geofence_data');
@@ -103,8 +103,8 @@ class AbsensiController extends Controller
             return redirect()->route('siswa.absensi')->with('error', 'Profil siswa tidak ditemukan.');
         }
 
-        if (now()->isWeekend()) {
-            return redirect()->route('siswa.absensi')->with('error', 'Absensi hanya tersedia pada hari Senin sampai Jumat.');
+        if (! Pengaturan::hariAbsenAktif()) {
+            return redirect()->route('siswa.absensi')->with('error', 'Absensi hanya tersedia pada hari '.Pengaturan::labelHariAbsen().'.');
         }
 
         $today = now()->toDateString();

@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Absensi;
+use App\Models\Pengaturan;
 use App\Models\ProfilSiswa;
 use Illuminate\Console\Command;
 
@@ -14,7 +15,7 @@ class CreateDailyAttendanceRecords extends Command
 
     public function handle(): int
     {
-        if (now()->isWeekend()) {
+        if (! Pengaturan::hariAbsenAktif()) {
             $this->info('Hari ini bukan hari aktif absensi. Tidak ada record yang dibuat.');
 
             return self::SUCCESS;

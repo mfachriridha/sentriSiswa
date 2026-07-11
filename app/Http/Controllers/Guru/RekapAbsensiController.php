@@ -6,6 +6,7 @@ use App\Exports\RekapAbsensiExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Guru\AttendanceRecapFilterRequest;
 use App\Models\Absensi;
+use App\Models\Pengaturan;
 use App\Models\ProfilSiswa;
 use App\Services\AbsenceWarningService;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -149,7 +150,7 @@ class RekapAbsensiController extends Controller
             ->whereDate('tanggal', '<=', $endDate)
             ->whereIn('profil_siswa_id', $students->pluck('nisn'))
             ->get()
-            ->filter(fn (Absensi $absensi): bool => $absensi->tanggal->isWeekday())
+            ->filter(fn (Absensi $absensi): bool => Pengaturan::hariAbsenAktif($absensi->tanggal))
             ->groupBy('profil_siswa_id');
     }
 

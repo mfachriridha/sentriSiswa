@@ -19,6 +19,7 @@ function waktuAbsenPayload(array $overrides = []): array
         'attendance_end_hour' => '07',
         'attendance_end_minute' => '00',
         'attendance_late_tolerance_minutes' => '30',
+        'attendance_active_days' => [1, 2, 3, 4, 5],
     ], $overrides);
 }
 
@@ -81,4 +82,28 @@ test('admin cannot save attendance time with an out of range hour', function () 
     $this->actingAs($admin)->put(route('admin.pengaturan.waktu-absen.update'), waktuAbsenPayload([
         'attendance_start_hour' => '24',
     ]))->assertSessionHasErrors('attendance_start_hour');
+});
+
+// TS.WKA.010 / TC.WKA.010.001 — admin menyimpan hari aktif absensi kustom (positive)
+test('admin can save custom active attendance days', function () {
+    $admin = waktuAbsenAdmin();
+
+    $this->actingAs($admin)->put(route('admin.pengaturan.waktu-absen.update'), waktuAbsenPayload([
+        'attendance_active_days' => [1, 3, 5, 6],
+    ]))->assertRedirect(route('admin.pengaturan.waktu-absen.index'));
+
+    expect(Pengaturan::get('attendance_active_days'))->toBe('1,3,5,6');
+    expect(Pengaturan::hariAbsen())->toBe([1, 3, 5, 6]);
+    expect(Pengaturan::labelHariAbsen())->toBe('Senin, Rabu, Jumat dan Sabtu');
+});
+
+// TS.WKA.011 / TC.WKA.011.001 — tanpa memilih hari aktif ditolak (negative)
+test('admin cannot save attendance config without selecting any active day', function () {
+    $admin = waktuAbsenAdmin();
+
+    $payload = waktuAbsenPayload();
+    unset($payload['attendance_active_days']);
+
+    $this->actingAs($admin)->put(route('admin.pengaturan.waktu-absen.update'), $payload)
+        ->assertSessionHasErrors('attendance_active_days');
 });

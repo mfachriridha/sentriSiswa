@@ -21,6 +21,7 @@
             <p class="mt-1 text-sm text-green-700">
                 Jam mulai {{ $startTime }}, selesai {{ $endTime }}, toleransi terlambat {{ $lateToleranceMinutes }} menit.
             </p>
+            <p class="mt-1 text-sm text-green-700">Hari aktif: {{ $activeDaysLabel }}.</p>
         </div>
         <div class="text-sm text-green-700">
             @if($updatedAt)
@@ -167,6 +168,32 @@
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>
+        </div>
+
+        <div class="mt-6 border-t border-gray-100 pt-6">
+            <label class="block text-sm font-medium text-gray-700">
+                Hari Aktif Absensi <span class="text-red-500">*</span>
+            </label>
+            <p class="mt-1 text-sm text-gray-500">Absensi cuma bisa dilakukan di hari yang dicentang.</p>
+
+            @php
+                $selectedDays = array_map('intval', old('attendance_active_days', $activeDays));
+            @endphp
+
+            <div class="mt-3 flex flex-wrap gap-2">
+                @foreach ($dayNames as $value => $label)
+                    <label class="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-700 transition-colors hover:bg-gray-50">
+                        <input type="checkbox" name="attendance_active_days[]" value="{{ $value }}"
+                               {{ in_array($value, $selectedDays, true) ? 'checked' : '' }}
+                               class="rounded border-gray-300 text-primary focus:ring-primary/30">
+                        {{ $label }}
+                    </label>
+                @endforeach
+            </div>
+
+            @error('attendance_active_days')
+                <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
+            @enderror
         </div>
     </div>
 

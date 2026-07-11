@@ -14,7 +14,7 @@ class UpdateUnmarkedAttendance extends Command
 
     public function handle(): int
     {
-        if (now()->isWeekend()) {
+        if (! Pengaturan::hariAbsenAktif()) {
             $this->info('Hari ini bukan hari aktif absensi. Tidak ada status yang diperbarui.');
 
             return self::SUCCESS;
