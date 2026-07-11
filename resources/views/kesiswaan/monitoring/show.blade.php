@@ -163,7 +163,7 @@
 
         <div class="rounded-xl border border-gray-200 bg-white lg:col-span-2">
             <div class="border-b border-gray-200 p-5">
-                <h3 class="text-lg font-semibold text-gray-900">Riwayat Pengajuan Poin (Disetujui)</h3>
+                <h3 class="text-lg font-semibold text-gray-900">Riwayat Pengajuan Poin</h3>
             </div>
             <div class="max-h-96 overflow-y-auto overflow-x-auto">
                 <table class="w-full text-left text-sm text-gray-600">
@@ -181,11 +181,11 @@
                                 <td class="whitespace-nowrap px-4 py-3">{{ $pengajuan->dibuat_pada->translatedFormat('d F Y') }}</td>
                                 <td class="px-4 py-3">{{ $pengajuan->alasan }}</td>
                                 <td class="px-4 py-3">{{ $pengajuan->diajukanOleh?->nama ?? '-' }}</td>
-                                <td class="px-4 py-3 text-center font-bold text-green-600">+{{ $pengajuan->jumlah_poin }}</td>
+                                <td class="px-4 py-3 text-center font-bold text-green-600">{{ $pengajuan->jumlah_poin !== null ? '+'.$pengajuan->jumlah_poin : '-' }}</td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="px-6 py-8 text-center text-gray-500">Belum ada pengajuan poin yang disetujui.</td>
+                                <td colspan="4" class="px-6 py-8 text-center text-gray-500">Belum ada pengajuan poin.</td>
                             </tr>
                         @endforelse
                     </tbody>
