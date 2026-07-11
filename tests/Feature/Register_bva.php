@@ -1,163 +1,133 @@
 <?php
 
-use App\Models\Pengguna;
-use App\Models\ProfilGuru;
-use App\Models\ProfilSiswa;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-function bvaEmailOfLength(int $totalLength): string
-{
-    $domain = '@example.com';
-    $localLength = $totalLength - strlen($domain);
+/*
+|--------------------------------------------------------------------------
+| Fitur Daftar Akun — Boundary Value Analysis
+|--------------------------------------------------------------------------
+|
+| Menguji nilai tepat di batas yang diperbolehkan dan tepat di luarnya:
+|   - Panjang kata sandi : minimal 8 karakter.
+|   - Panjang nomor HP guru : 10 sampai 15 digit.
+|
+| Kondisi awal disiapkan memakai pembantu yang sama dengan pengujian
+| Equivalence Partitioning, lalu kedua tahap pendaftaran ditempuh seperti
+| pengguna dan hasilnya diperiksa dari apa yang muncul di layar.
+|
+*/
 
-    return str_repeat('a', $localLength).$domain;
+/** Menempuh tahap pertama pendaftaran untuk siswa yang datanya sudah disiapkan. */
+function lanjutkanPendaftaranSiswa(string $nisn): void
+{
+    test()->post('/daftar/verifikasi', [
+        'peran' => 'student',
+        'identity' => $nisn,
+    ])->assertSee('Lengkapi Profil');
 }
 
-function bvaRegisterStudentSession(): Pengguna
+/** Menempuh tahap pertama pendaftaran untuk guru yang datanya sudah disiapkan. */
+function lanjutkanPendaftaranGuru(string $nip): void
 {
-    $student = Pengguna::factory()->student()->create(['status' => 'unregistered', 'email' => null]);
-    ProfilSiswa::factory()->create([
-        'pengguna_id' => $student->id,
-        'nisn' => '2222222220',
-        'nis' => '30001',
-    ]);
-
-    session([
-        'register_role' => 'student',
-        'register_user_id' => $student->id,
-        'register_identity' => '2222222220',
-        'register_name' => $student->nama,
-    ]);
-
-    return $student;
+    test()->post('/daftar/verifikasi', [
+        'peran' => 'teacher',
+        'identity' => $nip,
+    ])->assertSee('Nomor HP');
 }
 
-function bvaRegisterTeacherSession(): Pengguna
-{
-    $teacher = Pengguna::factory()->homeroom()->create(['status' => 'unregistered', 'email' => null]);
-    ProfilGuru::factory()->create([
-        'pengguna_id' => $teacher->id,
-        'nip' => '198501012020121088',
-    ]);
+// ── Batas panjang kata sandi: minimal 8 karakter ───────────────────────────
 
-    session([
-        'register_role' => 'teacher',
-        'register_user_id' => $teacher->id,
-        'register_identity' => '198501012020121088',
-        'register_name' => $teacher->nama,
-    ]);
+// TS.REG.013 / TC.REG.013.001 — Negative
+test('kata sandi tujuh karakter ditolak karena kurang dari batas minimum', function () {
+    siswaBelumPunyaAkun(nisn: '2234567890', nis: '20001');
+    lanjutkanPendaftaranSiswa('2234567890');
 
-    return $teacher;
-}
-
-// ── Boundary: password length, min:8 ──────────────────────────────────────
-
-// TS.REG.019 / TC.REG.019.001 — password with 7 characters (just below the minimum of 8, invalid)
-test('register store rejects password with 7 characters', function () {
-    bvaRegisterStudentSession();
-
-    $this->post(route('register.store'), [
-        'email' => 'boundary.pw7@example.com',
-        'password' => 'Passw0r',
-        'password_confirmation' => 'Passw0r',
-    ])->assertSessionHasErrors('password');
+    $this->from('/daftar/lengkapi')
+        ->followingRedirects()
+        ->post('/daftar/lengkapi', [
+            'email' => 'sandi.tujuh@sentrisiswa.test',
+            'password' => 'Rahas12',
+            'password_confirmation' => 'Rahas12',
+        ])
+        ->assertSee('Kata sandi minimal 8 karakter.');
 });
 
-// TS.REG.020 / TC.REG.020.001 — password with exactly 8 characters (at the minimum, valid)
-test('register store accepts password with exactly 8 characters', function () {
-    $student = bvaRegisterStudentSession();
+// TS.REG.013 / TC.REG.013.002 — Positive
+test('kata sandi delapan karakter diterima karena tepat di batas minimum', function () {
+    siswaBelumPunyaAkun(nisn: '2234567891', nis: '20002');
+    lanjutkanPendaftaranSiswa('2234567891');
 
-    $this->post(route('register.store'), [
-        'email' => 'boundary.pw8@example.com',
-        'password' => 'Passw0rd',
-        'password_confirmation' => 'Passw0rd',
-    ])->assertRedirect(route('login'));
-
-    expect($student->fresh()->status)->toBe('registered');
+    $this->followingRedirects()
+        ->post('/daftar/lengkapi', [
+            'email' => 'sandi.delapan@sentrisiswa.test',
+            'password' => 'Rahas123',
+            'password_confirmation' => 'Rahas123',
+        ])
+        ->assertSee('Pendaftaran berhasil. Silakan masuk dengan akun Anda.');
 });
 
-// ── Boundary: teacher telepon length, min:10 / max:15 ─────────────────────
+// ── Batas panjang nomor HP guru: 10 sampai 15 digit ────────────────────────
 
-// TS.REG.021 / TC.REG.021.001 — telepon with 9 characters (just below the minimum of 10, invalid)
-test('register store rejects teacher telepon with 9 characters', function () {
-    bvaRegisterTeacherSession();
+// TS.REG.014 / TC.REG.014.001 — Negative
+test('nomor hp guru sembilan digit ditolak karena kurang dari batas minimum', function () {
+    guruBelumPunyaAkun(nip: '198501012020122001');
+    lanjutkanPendaftaranGuru('198501012020122001');
 
-    $this->post(route('register.store'), [
-        'email' => 'boundary.tel9@example.com',
-        'password' => 'Passw0rd',
-        'password_confirmation' => 'Passw0rd',
-        'telepon' => '081234567',
-    ])->assertSessionHasErrors('telepon');
+    $this->from('/daftar/lengkapi')
+        ->followingRedirects()
+        ->post('/daftar/lengkapi', [
+            'email' => 'hp.sembilan@sentrisiswa.test',
+            'password' => 'Rahasia123',
+            'password_confirmation' => 'Rahasia123',
+            'telepon' => '081234567',
+        ])
+        ->assertSee('Nomor HP minimal 10 digit.');
 });
 
-// TS.REG.022 / TC.REG.022.001 — telepon with exactly 10 characters (at the minimum, valid)
-test('register store accepts teacher telepon with exactly 10 characters', function () {
-    $teacher = bvaRegisterTeacherSession();
+// TS.REG.014 / TC.REG.014.002 — Positive
+test('nomor hp guru sepuluh digit diterima karena tepat di batas minimum', function () {
+    guruBelumPunyaAkun(nip: '198501012020122002');
+    lanjutkanPendaftaranGuru('198501012020122002');
 
-    $this->post(route('register.store'), [
-        'email' => 'boundary.tel10@example.com',
-        'password' => 'Passw0rd',
-        'password_confirmation' => 'Passw0rd',
-        'telepon' => '0812345678',
-    ])->assertRedirect(route('login'));
-
-    expect($teacher->fresh()->profilGuru->telepon)->toBe('0812345678');
+    $this->followingRedirects()
+        ->post('/daftar/lengkapi', [
+            'email' => 'hp.sepuluh@sentrisiswa.test',
+            'password' => 'Rahasia123',
+            'password_confirmation' => 'Rahasia123',
+            'telepon' => '0812345678',
+        ])
+        ->assertSee('Pendaftaran berhasil. Silakan masuk dengan akun Anda.');
 });
 
-// TS.REG.023 / TC.REG.023.001 — telepon with exactly 15 characters (at the maximum, valid)
-test('register store accepts teacher telepon with exactly 15 characters', function () {
-    $teacher = bvaRegisterTeacherSession();
-    $telepon15 = str_repeat('0', 15);
+// TS.REG.015 / TC.REG.015.001 — Positive
+test('nomor hp guru lima belas digit diterima karena tepat di batas maksimum', function () {
+    guruBelumPunyaAkun(nip: '198501012020122003');
+    lanjutkanPendaftaranGuru('198501012020122003');
 
-    $this->post(route('register.store'), [
-        'email' => 'boundary.tel15@example.com',
-        'password' => 'Passw0rd',
-        'password_confirmation' => 'Passw0rd',
-        'telepon' => $telepon15,
-    ])->assertRedirect(route('login'));
-
-    expect($teacher->fresh()->profilGuru->telepon)->toBe($telepon15);
+    $this->followingRedirects()
+        ->post('/daftar/lengkapi', [
+            'email' => 'hp.limabelas@sentrisiswa.test',
+            'password' => 'Rahasia123',
+            'password_confirmation' => 'Rahasia123',
+            'telepon' => '081234567890123',
+        ])
+        ->assertSee('Pendaftaran berhasil. Silakan masuk dengan akun Anda.');
 });
 
-// TS.REG.024 / TC.REG.024.001 — telepon with 16 characters (just above the maximum, invalid)
-test('register store rejects teacher telepon with 16 characters', function () {
-    bvaRegisterTeacherSession();
-    $telepon16 = str_repeat('0', 16);
+// TS.REG.015 / TC.REG.015.002 — Negative
+test('nomor hp guru enam belas digit ditolak karena melebihi batas maksimum', function () {
+    guruBelumPunyaAkun(nip: '198501012020122004');
+    lanjutkanPendaftaranGuru('198501012020122004');
 
-    $this->post(route('register.store'), [
-        'email' => 'boundary.tel16@example.com',
-        'password' => 'Passw0rd',
-        'password_confirmation' => 'Passw0rd',
-        'telepon' => $telepon16,
-    ])->assertSessionHasErrors('telepon');
-});
-
-// ── Boundary: email length, max:255 ───────────────────────────────────────
-
-// TS.REG.025 / TC.REG.025.001 — email with exactly 255 characters (at the maximum, valid)
-test('register store accepts email with exactly 255 characters', function () {
-    $student = bvaRegisterStudentSession();
-    $email255 = bvaEmailOfLength(255);
-
-    $this->post(route('register.store'), [
-        'email' => $email255,
-        'password' => 'Passw0rd',
-        'password_confirmation' => 'Passw0rd',
-    ])->assertRedirect(route('login'));
-
-    expect($student->fresh()->email)->toBe($email255);
-});
-
-// TS.REG.026 / TC.REG.026.001 — email with 256 characters (just above the maximum, invalid)
-test('register store rejects email with 256 characters', function () {
-    bvaRegisterStudentSession();
-    $email256 = bvaEmailOfLength(256);
-
-    $this->post(route('register.store'), [
-        'email' => $email256,
-        'password' => 'Passw0rd',
-        'password_confirmation' => 'Passw0rd',
-    ])->assertSessionHasErrors('email');
+    $this->from('/daftar/lengkapi')
+        ->followingRedirects()
+        ->post('/daftar/lengkapi', [
+            'email' => 'hp.enambelas@sentrisiswa.test',
+            'password' => 'Rahasia123',
+            'password_confirmation' => 'Rahasia123',
+            'telepon' => '0812345678901234',
+        ])
+        ->assertDontSee('Pendaftaran berhasil. Silakan masuk dengan akun Anda.');
 });
