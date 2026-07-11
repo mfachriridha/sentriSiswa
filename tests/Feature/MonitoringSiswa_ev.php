@@ -1,87 +1,161 @@
 <?php
 
 use App\Models\Kelas;
+use App\Models\PengajuanPoin;
 use App\Models\Pengguna;
 use App\Models\ProfilSiswa;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 
 uses(RefreshDatabase::class);
 
-function monitoringSiswaKesiswaan(): Pengguna
-{
-    $studentAffairs = Pengguna::factory()->studentAffairs()->create(['status' => 'registered']);
-    $studentAffairs->profilGuru()->create([
-        'nip' => fake()->unique()->numerify('19################'),
-        'tipe_guru' => 'kesiswaan',
-    ]);
+/*
+|--------------------------------------------------------------------------
+| Fitur Monitoring Siswa (Kesiswaan) — Equivalence Partitioning
+|--------------------------------------------------------------------------
+|
+| Pengujian black box: kesiswaan masuk lewat halaman masuk, lalu memantau seluruh
+| siswa sekolah. Hasilnya diperiksa dari apa yang muncul di layar, bukan dari
+| basis data.
+|
+| Monitoring menampilkan kehadiran hari ini, persentase kehadiran, dan sisa poin
+| tiap siswa. Siswa yang alpha-nya sudah mencapai ambang batas ditandai supaya
+| bisa ditindaklanjuti. Hanya siswa yang sudah mendaftarkan akunnya yang tampil.
+|
+*/
 
-    return $studentAffairs;
-}
-
-function monitoringSiswaStudent(string $tingkat, string $className, string $nama, string $nisn): ProfilSiswa
-{
-    $class = Kelas::create(['nama' => $className, 'tingkat' => $tingkat]);
-    $studentUser = Pengguna::factory()->student()->create(['status' => 'registered', 'nama' => $nama]);
-
-    return ProfilSiswa::factory()->create([
-        'pengguna_id' => $studentUser->id,
-        'kelas_id' => $class->id,
-        'nisn' => $nisn,
-    ]);
-}
-
-// TS.MOS.001 / TC.MOS.001.001 — index nampilin siswa dari seluruh sekolah tanpa batas kelas/tingkat (positive)
-test('monitoring index shows students from every grade level school-wide', function () {
-    $kesiswaan = monitoringSiswaKesiswaan();
-    monitoringSiswaStudent('10', '10. Monitoring 1', 'Siswa Sepuluh', '80001');
-    monitoringSiswaStudent('12', '12. Monitoring 1', 'Siswa Dua Belas', '80002');
-
-    $this->actingAs($kesiswaan)->get(route('kesiswaan.monitoring.index'))
-        ->assertSuccessful()
-        ->assertSee('Siswa Sepuluh')
-        ->assertSee('Siswa Dua Belas');
+afterEach(function () {
+    Carbon::setTestNow();
 });
 
-// TS.MOS.002 / TC.MOS.002.001 — filter search berdasarkan nama (positive)
-test('monitoring index filters by student name search', function () {
-    $kesiswaan = monitoringSiswaKesiswaan();
-    monitoringSiswaStudent('10', '10. Monitoring 2', 'Ahmad Fauzi', '80003');
-    monitoringSiswaStudent('10', '10. Monitoring 3', 'Budi Santoso', '80004');
+// TS.MOS.001 / TC.MOS.001.001 — Positive
+test('kesiswaan memantau seluruh siswa beserta kehadiran hari ini', function () {
+    Carbon::setTestNow('2026-07-06 08:00:00'); // Senin, hari absensi.
+    [, , $siswa] = kelasBerisiSiswa();
+    catatKehadiran($siswa->nisn, '2026-07-06', 'hadir');
 
-    $this->actingAs($kesiswaan)->get(route('kesiswaan.monitoring.index', ['search' => 'Ahmad']))
-        ->assertSuccessful()
+    kesiswaanMasuk();
+
+    $this->get('/kesiswaan/monitoring')
+        ->assertSee('Monitoring Siswa')
         ->assertSee('Ahmad Fauzi')
-        ->assertDontSee('Budi Santoso');
+        ->assertSee('10 IPA 1')
+        ->assertSee('Hadir');
 });
 
-// TS.MOS.003 / TC.MOS.003.001 — filter berdasarkan kelas_id (positive)
-test('monitoring index filters by kelas_id', function () {
-    $kesiswaan = monitoringSiswaKesiswaan();
-    $studentA = monitoringSiswaStudent('11', '11. Monitoring 4', 'Citra Dewi', '80005');
-    monitoringSiswaStudent('11', '11. Monitoring 5', 'Doni Prakoso', '80006');
+// TS.MOS.002 / TC.MOS.002.001 — Positive
+test('monitoring menampilkan sisa poin siswa setelah dipotong pelanggaran', function () {
+    [, , $siswa] = kelasBerisiSiswa();
+    catatPelanggaran($siswa, 'Terlambat masuk kelas', 'ringan', '2026-07-06', 10);
 
-    $this->actingAs($kesiswaan)->get(route('kesiswaan.monitoring.index', ['kelas_id' => $studentA->kelas_id]))
-        ->assertSuccessful()
-        ->assertSee('Citra Dewi')
-        ->assertDontSee('Doni Prakoso');
+    kesiswaanMasuk();
+
+    $this->get("/kesiswaan/monitoring/{$siswa->nisn}")
+        ->assertSee('Ahmad Fauzi')
+        ->assertSee('Terlambat masuk kelas')
+        ->assertSee('90');
 });
 
-// TS.MOS.004 / TC.MOS.004.001 — show detail nampilin agregat poin dan absensi (positive)
-test('monitoring show displays student detail with aggregated points and attendance', function () {
-    $kesiswaan = monitoringSiswaKesiswaan();
-    $student = monitoringSiswaStudent('10', '10. Monitoring 6', 'Eka Wulandari', '80007');
+// TS.MOS.003 / TC.MOS.003.001 — Positive
+test('poin siswa bertambah setelah pengajuan poin disetujui', function () {
+    [$wali, , $siswa] = kelasBerisiSiswa();
+    catatPelanggaran($siswa, 'Terlambat masuk kelas', 'ringan', '2026-07-06', 20);
 
-    $this->actingAs($kesiswaan)->get(route('kesiswaan.monitoring.show', $student))
-        ->assertSuccessful()
-        ->assertSee('Eka Wulandari');
+    PengajuanPoin::create([
+        'profil_siswa_id' => $siswa->nisn,
+        'diajukan_oleh_id' => $wali->id,
+        'alasan' => 'Juara lomba cerdas cermat.',
+        'status' => 'approved',
+        'jumlah_poin' => 5,
+    ]);
+
+    kesiswaanMasuk();
+
+    // Poin awal 100, dipotong 20 karena pelanggaran, ditambah 5 dari pengajuan.
+    $this->get("/kesiswaan/monitoring/{$siswa->nisn}")
+        ->assertSee('Juara lomba cerdas cermat.')
+        ->assertSee('85');
 });
 
-// TS.MOS.005 / TC.MOS.005.001 — show detail sedia link untuk catat pelanggaran baru (positive)
-test('monitoring show provides a link to record a new violation for the student', function () {
-    $kesiswaan = monitoringSiswaKesiswaan();
-    $student = monitoringSiswaStudent('10', '10. Monitoring 7', 'Fajar Nugroho', '80008');
+// TS.MOS.004 / TC.MOS.004.001 — Negative
+test('siswa yang belum mendaftarkan akun tidak ikut dipantau', function () {
+    [, $kelas] = kelasBerisiSiswa();
 
-    $this->actingAs($kesiswaan)->get(route('kesiswaan.monitoring.show', $student))
-        ->assertSuccessful()
-        ->assertViewHas('createViolationRoute', route('kesiswaan.pelanggaran-siswa.create', ['profil_siswa_id' => $student->nisn]));
+    $penggunaBelumDaftar = Pengguna::factory()->student()->create([
+        'nama' => 'Siswa Belum Daftar',
+        'status' => 'unregistered',
+    ]);
+    ProfilSiswa::factory()->create([
+        'pengguna_id' => $penggunaBelumDaftar->id,
+        'nisn' => '1234567895',
+        'nis' => '10009',
+        'kelas_id' => $kelas->id,
+    ]);
+
+    kesiswaanMasuk();
+
+    $this->get('/kesiswaan/monitoring')
+        ->assertSee('Ahmad Fauzi')
+        ->assertDontSee('Siswa Belum Daftar');
+});
+
+// TS.MOS.005 / TC.MOS.005.001 — Positive
+test('kesiswaan mencari siswa berdasarkan nama', function () {
+    [, $kelas] = kelasBerisiSiswa();
+    siswaLainDiKelas($kelas->id, 'Siti Aminah', '1234567892', '10003');
+
+    kesiswaanMasuk();
+
+    $this->get('/kesiswaan/monitoring?search=Siti')
+        ->assertSee('Siti Aminah')
+        ->assertDontSee('Ahmad Fauzi');
+});
+
+// TS.MOS.006 / TC.MOS.006.001 — Positive
+test('kesiswaan mencari siswa berdasarkan NIS', function () {
+    [, $kelas] = kelasBerisiSiswa();
+    siswaLainDiKelas($kelas->id, 'Siti Aminah', '1234567892', '10003');
+
+    kesiswaanMasuk();
+
+    $this->get('/kesiswaan/monitoring?search=10003')
+        ->assertSee('Siti Aminah')
+        ->assertDontSee('Ahmad Fauzi');
+});
+
+// TS.MOS.007 / TC.MOS.007.001 — Positive
+test('kesiswaan menyaring siswa berdasarkan kelas', function () {
+    [, $kelas] = kelasBerisiSiswa();
+
+    $kelasLain = Kelas::create(['nama' => '11 IPS 1', 'tingkat' => '11']);
+    siswaLainDiKelas($kelasLain->id, 'Siswa Kelas Lain', '1234567891', '10002');
+
+    kesiswaanMasuk();
+
+    $this->get("/kesiswaan/monitoring?kelas_id={$kelas->id}")
+        ->assertSee('Ahmad Fauzi')
+        ->assertDontSee('Siswa Kelas Lain');
+});
+
+// TS.MOS.008 / TC.MOS.008.001 — Positive
+test('kesiswaan melihat riwayat kehadiran seorang siswa', function () {
+    Carbon::setTestNow('2026-07-10 08:00:00');
+    [, , $siswa] = kelasBerisiSiswa();
+    catatKehadiran($siswa->nisn, '2026-07-06', 'alpha');
+
+    kesiswaanMasuk();
+
+    $this->get("/kesiswaan/monitoring/{$siswa->nisn}")
+        ->assertSee('Ahmad Fauzi')
+        ->assertSee('Riwayat Kehadiran')
+        ->assertSee('Alpha');
+});
+
+// TS.MOS.009 / TC.MOS.009.001 — Positive
+test('daftar monitoring yang tidak menemukan siswa menampilkan keterangannya', function () {
+    kelasBerisiSiswa();
+    kesiswaanMasuk();
+
+    $this->get('/kesiswaan/monitoring?search=Nama Yang Tidak Ada')
+        ->assertSee('Tidak ada data siswa ditemukan.');
 });

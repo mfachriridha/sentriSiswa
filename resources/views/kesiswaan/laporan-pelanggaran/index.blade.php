@@ -7,12 +7,12 @@
 
 <div class="mb-4 rounded-xl border border-gray-200 bg-white p-4">
     <form method="GET" action="{{ route($routeName.'.index') }}" class="grid gap-3 md:grid-cols-3 xl:grid-cols-6">
-        <input id="start_date" type="date" name="mulai" value="{{ $filters['start_date'] ?? '' }}" class="rounded-lg border border-gray-300 px-3 py-2 text-sm">
-        <input id="end_date" type="date" name="selesai" value="{{ $filters['end_date'] ?? '' }}" class="rounded-lg border border-gray-300 px-3 py-2 text-sm">
+        <input id="start_date" type="date" name="mulai" value="{{ $filters['mulai'] ?? '' }}" class="rounded-lg border border-gray-300 px-3 py-2 text-sm">
+        <input id="end_date" type="date" name="selesai" value="{{ $filters['selesai'] ?? '' }}" class="rounded-lg border border-gray-300 px-3 py-2 text-sm">
         <select name="kelas_id" class="rounded-lg border border-gray-300 px-3 py-2 text-sm">
             <option value="">Semua Kelas</option>
             @foreach ($classes as $class)
-                <option value="{{ $class->id }}" {{ ($filters['class_id'] ?? '') == $class->id ? 'selected' : '' }}>{{ $class->nama }}</option>
+                <option value="{{ $class->id }}" {{ ($filters['kelas_id'] ?? '') == $class->id ? 'selected' : '' }}>{{ $class->nama }}</option>
             @endforeach
         </select>
         <select name="kategori" class="rounded-lg border border-gray-300 px-3 py-2 text-sm">
@@ -27,6 +27,13 @@
         <a href="{{ route($routeName.'.ekspor-excel', request()->query()) }}" class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Export Excel</a>
         <a href="{{ route($routeName.'.ekspor-pdf', request()->query()) }}" class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Export PDF</a>
     </div>
+
+    @error('mulai')
+        <p class="mt-3 text-sm text-red-600">{{ $message }}</p>
+    @enderror
+    @error('selesai')
+        <p class="mt-3 text-sm text-red-600">{{ $message }}</p>
+    @enderror
 </div>
 
 <div class="overflow-hidden rounded-xl border border-gray-200 bg-white">
