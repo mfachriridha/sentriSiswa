@@ -1,38 +1,95 @@
 <?php
 
-use App\Models\Pengguna;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-function kelasBvaAdmin(): Pengguna
-{
-    return Pengguna::factory()->admin()->create(['status' => 'registered']);
-}
+/*
+|--------------------------------------------------------------------------
+| Fitur Data Kelas (Admin) — Boundary Value Analysis
+|--------------------------------------------------------------------------
+|
+| Menguji nilai tepat di batas yang diperbolehkan dan tepat di luarnya:
+|   - Panjang nama kelas : maksimal 20 karakter.
+|   - Pilihan tingkat    : hanya 10, 11, dan 12.
+|
+*/
 
-// ── Boundary: identifier (nama field before composition) length, max:20 ───
+// ── Batas panjang nama kelas: maksimal 20 karakter ─────────────────────────
 
-// TS.KEL.008 / TC.KEL.008.001 — identifier with exactly 20 characters (at the maximum, valid)
-test('admin can create a class with a 20 character identifier', function () {
-    $identifier20 = str_repeat('A', 20);
+// TS.KEL.012 / TC.KEL.012.001 — Positive
+test('nama kelas dua puluh karakter diterima karena tepat di batas maksimum', function () {
+    adminDataKelas();
 
-    $this->actingAs(kelasBvaAdmin())->post(route('admin.kelas.store'), [
-        'nama' => $identifier20,
-        'tingkat' => '10',
-    ])->assertRedirect(route('admin.kelas.index'));
-
-    $this->assertDatabaseHas('kelas', [
-        'nama' => '10 '.$identifier20,
-        'tingkat' => '10',
-    ]);
+    $this->followingRedirects()
+        ->post('/admin/kelas', [
+            'tingkat' => '10',
+            'nama' => str_repeat('A', 20),
+        ])
+        ->assertSee('Kelas berhasil ditambahkan.');
 });
 
-// TS.KEL.009 / TC.KEL.009.001 — identifier with 21 characters (just above the maximum, invalid)
-test('admin cannot create a class with a 21 character identifier', function () {
-    $identifier21 = str_repeat('A', 21);
+// TS.KEL.012 / TC.KEL.012.002 — Negative
+test('nama kelas dua puluh satu karakter ditolak karena melebihi batas maksimum', function () {
+    adminDataKelas();
 
-    $this->actingAs(kelasBvaAdmin())->post(route('admin.kelas.store'), [
-        'nama' => $identifier21,
-        'tingkat' => '10',
-    ])->assertSessionHasErrors('nama');
+    $this->from('/admin/kelas/create')
+        ->followingRedirects()
+        ->post('/admin/kelas', [
+            'tingkat' => '10',
+            'nama' => str_repeat('A', 21),
+        ])
+        ->assertSee('Nama maksimal 20 karakter.');
+});
+
+// ── Batas pilihan tingkat: hanya 10, 11, dan 12 ────────────────────────────
+
+// TS.KEL.013 / TC.KEL.013.001 — Negative
+test('tingkat sembilan ditolak karena berada di bawah pilihan yang tersedia', function () {
+    adminDataKelas();
+
+    $this->from('/admin/kelas/create')
+        ->followingRedirects()
+        ->post('/admin/kelas', [
+            'tingkat' => '9',
+            'nama' => 'IPA 1',
+        ])
+        ->assertSee('Tingkat yang dipilih tidak valid.');
+});
+
+// TS.KEL.013 / TC.KEL.013.002 — Positive
+test('tingkat sepuluh diterima karena berada di batas bawah pilihan', function () {
+    adminDataKelas();
+
+    $this->followingRedirects()
+        ->post('/admin/kelas', [
+            'tingkat' => '10',
+            'nama' => 'IPA 1',
+        ])
+        ->assertSee('Kelas berhasil ditambahkan.');
+});
+
+// TS.KEL.014 / TC.KEL.014.001 — Positive
+test('tingkat dua belas diterima karena berada di batas atas pilihan', function () {
+    adminDataKelas();
+
+    $this->followingRedirects()
+        ->post('/admin/kelas', [
+            'tingkat' => '12',
+            'nama' => 'IPA 1',
+        ])
+        ->assertSee('Kelas berhasil ditambahkan.');
+});
+
+// TS.KEL.014 / TC.KEL.014.002 — Negative
+test('tingkat tiga belas ditolak karena berada di atas pilihan yang tersedia', function () {
+    adminDataKelas();
+
+    $this->from('/admin/kelas/create')
+        ->followingRedirects()
+        ->post('/admin/kelas', [
+            'tingkat' => '13',
+            'nama' => 'IPA 1',
+        ])
+        ->assertSee('Tingkat yang dipilih tidak valid.');
 });

@@ -1,123 +1,128 @@
 <?php
 
-use App\Models\Pengguna;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-function guruBvaAdmin(): Pengguna
+/*
+|--------------------------------------------------------------------------
+| Fitur Data Guru (Admin) — Boundary Value Analysis
+|--------------------------------------------------------------------------
+|
+| Menguji nilai tepat di batas yang diperbolehkan dan tepat di luarnya:
+|   - Panjang nama    : 3 sampai 100 karakter.
+|   - Panjang NIP     : maksimal 30 karakter.
+|   - Panjang nomor HP: 10 sampai 15 karakter.
+|
+*/
+
+/** Data guru yang sah, agar setiap pengujian hanya mengubah satu kolom saja. */
+function dataGuruSah(array $ubahan = []): array
 {
-    return Pengguna::factory()->admin()->create(['status' => 'registered']);
+    return array_merge([
+        'nama' => 'Raka Pradipta',
+        'nip' => '198501012020121001',
+        'peran' => 'wali_kelas',
+    ], $ubahan);
 }
 
-// ── Boundary: nama length, min:3 / max:100 ────────────────────────────────
+// ── Batas panjang nama: 3 sampai 100 karakter ──────────────────────────────
 
-// TS.GUR.011 / TC.GUR.011.001 — nama with 2 characters (just below the minimum of 3, invalid)
-test('admin cannot create a teacher with a 2 character name', function () {
-    $this->actingAs(guruBvaAdmin())->post(route('admin.guru.store'), [
-        'nama' => 'Ab',
-        'nip' => '198601012020121101',
-        'peran' => 'wali_kelas',
-    ])->assertSessionHasErrors('nama');
+// TS.GUR.013 / TC.GUR.013.001 — Negative
+test('nama guru dua karakter ditolak karena kurang dari batas minimum', function () {
+    adminDataGuru();
+
+    $this->from('/admin/guru/create')
+        ->followingRedirects()
+        ->post('/admin/guru', dataGuruSah(['nama' => 'Ab']))
+        ->assertSee('Nama minimal 3 karakter.');
 });
 
-// TS.GUR.012 / TC.GUR.012.001 — nama with exactly 3 characters (at the minimum, valid)
-test('admin can create a teacher with a 3 character name', function () {
-    $this->actingAs(guruBvaAdmin())->post(route('admin.guru.store'), [
-        'nama' => 'Abi',
-        'nip' => '198601012020121102',
-        'peran' => 'wali_kelas',
-    ])->assertRedirect(route('admin.guru.index'));
+// TS.GUR.013 / TC.GUR.013.002 — Positive
+test('nama guru tiga karakter diterima karena tepat di batas minimum', function () {
+    adminDataGuru();
+
+    $this->followingRedirects()
+        ->post('/admin/guru', dataGuruSah(['nama' => 'Abu']))
+        ->assertSee('Guru berhasil ditambahkan.');
 });
 
-// TS.GUR.013 / TC.GUR.013.001 — nama with exactly 100 characters (at the maximum, valid)
-test('admin can create a teacher with a 100 character name', function () {
-    $nama100 = str_repeat('a', 100);
+// TS.GUR.014 / TC.GUR.014.001 — Positive
+test('nama guru seratus karakter diterima karena tepat di batas maksimum', function () {
+    adminDataGuru();
 
-    $this->actingAs(guruBvaAdmin())->post(route('admin.guru.store'), [
-        'nama' => $nama100,
-        'nip' => '198601012020121103',
-        'peran' => 'wali_kelas',
-    ])->assertRedirect(route('admin.guru.index'));
+    $this->followingRedirects()
+        ->post('/admin/guru', dataGuruSah(['nama' => str_repeat('a', 100)]))
+        ->assertSee('Guru berhasil ditambahkan.');
 });
 
-// TS.GUR.014 / TC.GUR.014.001 — nama with 101 characters (just above the maximum, invalid)
-test('admin cannot create a teacher with a 101 character name', function () {
-    $nama101 = str_repeat('a', 101);
+// TS.GUR.014 / TC.GUR.014.002 — Negative
+test('nama guru seratus satu karakter ditolak karena melebihi batas maksimum', function () {
+    adminDataGuru();
 
-    $this->actingAs(guruBvaAdmin())->post(route('admin.guru.store'), [
-        'nama' => $nama101,
-        'nip' => '198601012020121104',
-        'peran' => 'wali_kelas',
-    ])->assertSessionHasErrors('nama');
+    $this->from('/admin/guru/create')
+        ->followingRedirects()
+        ->post('/admin/guru', dataGuruSah(['nama' => str_repeat('a', 101)]))
+        ->assertSee('Nama maksimal 100 karakter.');
 });
 
-// ── Boundary: nip length, max:30 ──────────────────────────────────────────
+// ── Batas panjang NIP: maksimal 30 karakter ────────────────────────────────
 
-// TS.GUR.015 / TC.GUR.015.001 — nip with exactly 30 characters (at the maximum, valid)
-test('admin can create a teacher with a 30 character nip', function () {
-    $nip30 = str_repeat('9', 30);
+// TS.GUR.015 / TC.GUR.015.001 — Positive
+test('nip tiga puluh karakter diterima karena tepat di batas maksimum', function () {
+    adminDataGuru();
 
-    $this->actingAs(guruBvaAdmin())->post(route('admin.guru.store'), [
-        'nama' => 'Guru Nip Tigapuluh',
-        'nip' => $nip30,
-        'peran' => 'wali_kelas',
-    ])->assertRedirect(route('admin.guru.index'));
+    $this->followingRedirects()
+        ->post('/admin/guru', dataGuruSah(['nip' => str_repeat('1', 30)]))
+        ->assertSee('Guru berhasil ditambahkan.');
 });
 
-// TS.GUR.016 / TC.GUR.016.001 — nip with 31 characters (just above the maximum, invalid)
-test('admin cannot create a teacher with a 31 character nip', function () {
-    $nip31 = str_repeat('9', 31);
+// TS.GUR.015 / TC.GUR.015.002 — Negative
+test('nip tiga puluh satu karakter ditolak karena melebihi batas maksimum', function () {
+    adminDataGuru();
 
-    $this->actingAs(guruBvaAdmin())->post(route('admin.guru.store'), [
-        'nama' => 'Guru Nip Tigapuluhsatu',
-        'nip' => $nip31,
-        'peran' => 'wali_kelas',
-    ])->assertSessionHasErrors('nip');
+    $this->from('/admin/guru/create')
+        ->followingRedirects()
+        ->post('/admin/guru', dataGuruSah(['nip' => str_repeat('1', 31)]))
+        ->assertSee('NIP maksimal 30 karakter.');
 });
 
-// ── Boundary: telepon length, min:10 / max:15 ─────────────────────────────
+// ── Batas panjang nomor HP: 10 sampai 15 karakter ──────────────────────────
 
-// TS.GUR.017 / TC.GUR.017.001 — telepon with 9 characters (just below the minimum of 10, invalid)
-test('admin cannot create a teacher with a 9 character telepon', function () {
-    $this->actingAs(guruBvaAdmin())->post(route('admin.guru.store'), [
-        'nama' => 'Guru Telepon Sembilan',
-        'nip' => '198601012020121110',
-        'peran' => 'wali_kelas',
-        'telepon' => '081234567',
-    ])->assertSessionHasErrors('telepon');
+// TS.GUR.016 / TC.GUR.016.001 — Negative
+test('nomor hp guru sembilan digit ditolak karena kurang dari batas minimum', function () {
+    adminDataGuru();
+
+    $this->from('/admin/guru/create')
+        ->followingRedirects()
+        ->post('/admin/guru', dataGuruSah(['telepon' => '081234567']))
+        ->assertSee('Nomor HP minimal 10 karakter.');
 });
 
-// TS.GUR.018 / TC.GUR.018.001 — telepon with exactly 10 characters (at the minimum, valid)
-test('admin can create a teacher with a 10 character telepon', function () {
-    $this->actingAs(guruBvaAdmin())->post(route('admin.guru.store'), [
-        'nama' => 'Guru Telepon Sepuluh',
-        'nip' => '198601012020121111',
-        'peran' => 'wali_kelas',
-        'telepon' => '0812345678',
-    ])->assertRedirect(route('admin.guru.index'));
+// TS.GUR.016 / TC.GUR.016.002 — Positive
+test('nomor hp guru sepuluh digit diterima karena tepat di batas minimum', function () {
+    adminDataGuru();
+
+    $this->followingRedirects()
+        ->post('/admin/guru', dataGuruSah(['telepon' => '0812345678']))
+        ->assertSee('Guru berhasil ditambahkan.');
 });
 
-// TS.GUR.019 / TC.GUR.019.001 — telepon with exactly 15 characters (at the maximum, valid)
-test('admin can create a teacher with a 15 character telepon', function () {
-    $telepon15 = str_repeat('0', 15);
+// TS.GUR.017 / TC.GUR.017.001 — Positive
+test('nomor hp guru lima belas digit diterima karena tepat di batas maksimum', function () {
+    adminDataGuru();
 
-    $this->actingAs(guruBvaAdmin())->post(route('admin.guru.store'), [
-        'nama' => 'Guru Telepon Limabelas',
-        'nip' => '198601012020121112',
-        'peran' => 'wali_kelas',
-        'telepon' => $telepon15,
-    ])->assertRedirect(route('admin.guru.index'));
+    $this->followingRedirects()
+        ->post('/admin/guru', dataGuruSah(['telepon' => '081234567890123']))
+        ->assertSee('Guru berhasil ditambahkan.');
 });
 
-// TS.GUR.020 / TC.GUR.020.001 — telepon with 16 characters (just above the maximum, invalid)
-test('admin cannot create a teacher with a 16 character telepon', function () {
-    $telepon16 = str_repeat('0', 16);
+// TS.GUR.017 / TC.GUR.017.002 — Negative
+test('nomor hp guru enam belas digit ditolak karena melebihi batas maksimum', function () {
+    adminDataGuru();
 
-    $this->actingAs(guruBvaAdmin())->post(route('admin.guru.store'), [
-        'nama' => 'Guru Telepon Enambelas',
-        'nip' => '198601012020121113',
-        'peran' => 'wali_kelas',
-        'telepon' => $telepon16,
-    ])->assertSessionHasErrors('telepon');
+    $this->from('/admin/guru/create')
+        ->followingRedirects()
+        ->post('/admin/guru', dataGuruSah(['telepon' => '0812345678901234']))
+        ->assertSee('Nomor HP maksimal 15 karakter.');
 });

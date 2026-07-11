@@ -86,7 +86,11 @@
                         <p class="px-4 py-3 text-sm text-gray-500">Tidak ada siswa yang bisa ditambahkan.</p>
                     @endforelse
                 </div>
-                @error('siswa_nisn')
+                {{-- Pilihan siswa berupa daftar, jadi kesalahannya bernomor
+                     (siswa_nisn.0, siswa_nisn.1, ...). Tanpa tanda bintang,
+                     pesannya tidak pernah muncul dan formulir hanya termuat
+                     ulang tanpa penjelasan apa pun. --}}
+                @error('siswa_nisn.*')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                 @enderror
             </div>

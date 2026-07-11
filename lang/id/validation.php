@@ -147,6 +147,10 @@ return [
         'profil_siswa_id' => 'Siswa',
         'selfie' => 'Selfie',
         'siswa_nisn' => 'Siswa',
+        // Kolom pilihan siswa berupa daftar, sehingga kuncinya bernomor
+        // (siswa_nisn.0, siswa_nisn.1, ...). Tanpa baris ini, nomor itu ikut
+        // terbaca pengguna sebagai "siswa_nisn.0 yang dipilih tidak valid."
+        'siswa_nisn.*' => 'Siswa',
         'status' => 'Status',
         'tanggal_pelanggaran' => 'Tanggal Pelanggaran',
         'telepon' => 'Nomor HP',

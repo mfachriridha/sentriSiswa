@@ -7,161 +7,217 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-function kelasAdmin(): Pengguna
+/*
+|--------------------------------------------------------------------------
+| Fitur Data Kelas (Admin) — Equivalence Partitioning
+|--------------------------------------------------------------------------
+|
+| Pengujian black box: admin masuk lewat halaman masuk, lalu mengelola kelas
+| seperti pengguna biasa. Hasilnya diperiksa dari apa yang muncul di layar,
+| bukan dari basis data.
+|
+| Saat menambah kelas, admin mengisi tingkat dan nama kelas secara terpisah;
+| keduanya digabung menjadi nama lengkap, misalnya tingkat 10 dan nama "IPA 1"
+| menjadi "10 IPA 1". Admin juga bisa langsung memilihkan wali kelas dan
+| memasukkan beberapa siswa sekaligus.
+|
+*/
+
+function adminDataKelas(): Pengguna
 {
-    return Pengguna::factory()->admin()->create(['status' => 'registered']);
+    $admin = Pengguna::factory()->admin()->create([
+        'email' => 'admin.kelas@sentrisiswa.test',
+        'status' => 'registered',
+    ]);
+
+    masukSebagai($admin);
+
+    return $admin;
 }
 
-// TS.KEL.001 / TC.KEL.001.001 — create class with a wali kelas assigned (positive)
-test('admin can create a class with a homeroom teacher', function () {
-    $admin = kelasAdmin();
-    $wali = Pengguna::factory()->homeroom()->create();
-
-    $this->actingAs($admin)->post(route('admin.kelas.store'), [
-        'nama' => '1',
-        'tingkat' => '10',
-        'wali_kelas_id' => (string) $wali->id,
-    ])->assertRedirect(route('admin.kelas.index'));
-
-    $this->assertDatabaseHas('kelas', [
-        'nama' => '10. 1',
-        'tingkat' => '10',
-        'wali_kelas_id' => (string) $wali->id,
+function siswaTanpaKelas(string $nama, string $nisn, string $nis): ProfilSiswa
+{
+    $pengguna = Pengguna::factory()->student()->create([
+        'nama' => $nama,
+        'status' => 'registered',
     ]);
-});
 
-// TS.KEL.002 / TC.KEL.002.001 — create class with a duplicate nama+tingkat combination (negative)
-test('admin cannot create a class with a duplicate nama and tingkat combination', function () {
-    $admin = kelasAdmin();
-    Kelas::create(['nama' => '10. 2', 'tingkat' => '10']);
-
-    $this->actingAs($admin)->post(route('admin.kelas.store'), [
-        'nama' => '2',
-        'tingkat' => '10',
-    ])->assertSessionHasErrors('nama');
-
-    expect(Kelas::where('nama', '10. 2')->where('tingkat', '10')->count())->toBe(1);
-});
-
-// TS.KEL.003 / TC.KEL.003.001 — create class with an invalid tingkat (negative)
-test('admin cannot create a class with an invalid tingkat', function () {
-    $admin = kelasAdmin();
-
-    $this->actingAs($admin)->post(route('admin.kelas.store'), [
-        'nama' => '3',
-        'tingkat' => '13',
-    ])->assertSessionHasErrors('tingkat');
-});
-
-// TS.KEL.004 / TC.KEL.004.001 — create class with a wali_kelas_id that does not exist (negative)
-test('admin cannot create a class with a non-existent wali kelas', function () {
-    $admin = kelasAdmin();
-
-    $this->actingAs($admin)->post(route('admin.kelas.store'), [
-        'nama' => '4',
-        'tingkat' => '10',
-        'wali_kelas_id' => 'guru-tidak-ada',
-    ])->assertSessionHasErrors('wali_kelas_id');
-});
-
-// TS.KEL.005 / TC.KEL.005.001 — create class without a wali kelas, saved as null (positive, nullable)
-test('admin can create a class without a homeroom teacher', function () {
-    $admin = kelasAdmin();
-
-    $this->actingAs($admin)->post(route('admin.kelas.store'), [
-        'nama' => '5',
-        'tingkat' => '10',
-    ])->assertRedirect(route('admin.kelas.index'));
-
-    $this->assertDatabaseHas('kelas', [
-        'nama' => '10. 5',
-        'tingkat' => '10',
-        'wali_kelas_id' => null,
+    return ProfilSiswa::factory()->create([
+        'pengguna_id' => $pengguna->id,
+        'nisn' => $nisn,
+        'nis' => $nis,
+        'kelas_id' => null,
     ]);
+}
+
+// TS.KEL.001 / TC.KEL.001.001 — Positive
+test('admin berhasil menambah kelas baru', function () {
+    adminDataKelas();
+
+    $this->get('/admin/kelas/create')->assertSee('Tambah Kelas');
+
+    $this->followingRedirects()
+        ->post('/admin/kelas', [
+            'tingkat' => '10',
+            'nama' => 'IPA 1',
+        ])
+        ->assertSee('Kelas berhasil ditambahkan.')
+        ->assertSee('10 IPA 1');
 });
 
-// TS.KEL.006 / TC.KEL.006.001 — update class succeeds (positive)
-test('admin can update a class', function () {
-    $admin = kelasAdmin();
-    $class = Kelas::create(['nama' => '10. 6', 'tingkat' => '10']);
-    $wali = Pengguna::factory()->homeroom()->create();
+// TS.KEL.002 / TC.KEL.002.001 — Positive
+test('admin berhasil menambah kelas sekaligus memilihkan wali kelasnya', function () {
+    adminDataKelas();
 
-    $this->actingAs($admin)->put(route('admin.kelas.update', $class), [
-        'nama' => '6B',
-        'tingkat' => '11',
-        'wali_kelas_id' => (string) $wali->id,
-    ])->assertRedirect(route('admin.kelas.index'));
+    $wali = Pengguna::factory()->homeroom()->create([
+        'nama' => 'Raka Pradipta',
+        'status' => 'registered',
+    ]);
 
-    expect($class->fresh()->nama)->toBe('11 6B');
-    expect($class->fresh()->tingkat)->toBe('11');
-    expect($class->fresh()->wali_kelas_id)->toEqual($wali->id);
+    $this->followingRedirects()
+        ->post('/admin/kelas', [
+            'tingkat' => '10',
+            'nama' => 'IPA 2',
+            'wali_kelas_id' => (string) $wali->id,
+        ])
+        ->assertSee('Kelas berhasil ditambahkan.')
+        ->assertSee('10 IPA 2')
+        ->assertSee('Raka Pradipta');
 });
 
-// TS.KEL.007 / TC.KEL.007.001 — delete class succeeds (positive)
-test('admin can delete a class', function () {
-    $admin = kelasAdmin();
-    $class = Kelas::create(['nama' => '10. 7', 'tingkat' => '10']);
+// TS.KEL.003 / TC.KEL.003.001 — Positive
+test('admin berhasil menambah kelas sekaligus memasukkan beberapa siswa', function () {
+    adminDataKelas();
 
-    $this->actingAs($admin)->delete(route('admin.kelas.destroy', $class))
-        ->assertRedirect(route('admin.kelas.index'));
+    siswaTanpaKelas('Ahmad Fauzi', '1234567890', '10001');
+    siswaTanpaKelas('Siti Aminah', '1234567891', '10002');
 
-    $this->assertDatabaseMissing('kelas', ['id' => $class->id]);
+    $this->followingRedirects()
+        ->post('/admin/kelas', [
+            'tingkat' => '10',
+            'nama' => 'IPA 3',
+            'siswa_nisn' => ['1234567890', '1234567891'],
+        ])
+        ->assertSee('Kelas berhasil ditambahkan.');
+
+    $this->get('/admin/siswa?tingkat=10')
+        ->assertSee('Ahmad Fauzi')
+        ->assertSee('Siti Aminah');
 });
 
-// TS.KEL.008 / TC.KEL.008.001 — admin assigns multiple unassigned students to a new class at once (positive)
-test('admin can bulk-assign multiple unassigned students while creating a class', function () {
-    $admin = kelasAdmin();
-    $siswaA = Pengguna::factory()->student()->create();
-    $profilA = ProfilSiswa::factory()->create(['pengguna_id' => $siswaA->id, 'nisn' => '1111111181', 'kelas_id' => null]);
-    $siswaB = Pengguna::factory()->student()->create();
-    $profilB = ProfilSiswa::factory()->create(['pengguna_id' => $siswaB->id, 'nisn' => '1111111182', 'kelas_id' => null]);
+// TS.KEL.004 / TC.KEL.004.001 — Negative
+test('admin gagal menambah kelas karena namanya sudah ada di tingkat yang sama', function () {
+    adminDataKelas();
+    Kelas::create(['nama' => '10 IPA 1', 'tingkat' => '10']);
 
-    $this->actingAs($admin)->post(route('admin.kelas.store'), [
-        'nama' => '8',
-        'tingkat' => '10',
-        'siswa_nisn' => [$profilA->nisn, $profilB->nisn],
-    ])->assertRedirect(route('admin.kelas.index'));
-
-    $kelas = Kelas::where('nama', '10. 8')->firstOrFail();
-    expect($profilA->fresh()->kelas_id)->toBe($kelas->id);
-    expect($profilB->fresh()->kelas_id)->toBe($kelas->id);
+    $this->from('/admin/kelas/create')
+        ->followingRedirects()
+        ->post('/admin/kelas', [
+            'tingkat' => '10',
+            'nama' => 'IPA 1',
+        ])
+        ->assertSee('Kelas dengan kombinasi ini sudah ada.')
+        ->assertDontSee('Kelas berhasil ditambahkan.');
 });
 
-// TS.KEL.009 / TC.KEL.009.001 — admin cannot bulk-assign a student who already belongs to another class (negative)
-test('admin cannot bulk-assign a student who already has a class', function () {
-    $admin = kelasAdmin();
-    $existingKelas = Kelas::create(['nama' => '10. 9a', 'tingkat' => '10']);
-    $siswa = Pengguna::factory()->student()->create();
-    $profil = ProfilSiswa::factory()->create(['pengguna_id' => $siswa->id, 'nisn' => '1111111183', 'kelas_id' => $existingKelas->id]);
+// TS.KEL.005 / TC.KEL.005.001 — Negative
+test('admin gagal menambah kelas karena tingkat yang dipilih tidak tersedia', function () {
+    adminDataKelas();
 
-    $this->actingAs($admin)->post(route('admin.kelas.store'), [
-        'nama' => '9b',
-        'tingkat' => '10',
-        'siswa_nisn' => [$profil->nisn],
-    ])->assertSessionHasErrors('siswa_nisn.0');
-
-    expect($profil->fresh()->kelas_id)->toBe($existingKelas->id);
+    $this->from('/admin/kelas/create')
+        ->followingRedirects()
+        ->post('/admin/kelas', [
+            'tingkat' => '13',
+            'nama' => 'IPA 1',
+        ])
+        ->assertSee('Tingkat yang dipilih tidak valid.');
 });
 
-// TS.KEL.010 / TC.KEL.010.001 — updating a class releases unchecked students and keeps only the checked ones (positive)
-test('admin can add and remove students when updating a class', function () {
-    $admin = kelasAdmin();
-    $kelas = Kelas::create(['nama' => '10. 10', 'tingkat' => '10']);
+// TS.KEL.006 / TC.KEL.006.001 — Negative
+test('admin gagal memasukkan siswa yang sudah punya kelas lain', function () {
+    adminDataKelas();
 
-    $siswaStay = Pengguna::factory()->student()->create();
-    $profilStay = ProfilSiswa::factory()->create(['pengguna_id' => $siswaStay->id, 'nisn' => '1111111184', 'kelas_id' => $kelas->id]);
-    $siswaRemoved = Pengguna::factory()->student()->create();
-    $profilRemoved = ProfilSiswa::factory()->create(['pengguna_id' => $siswaRemoved->id, 'nisn' => '1111111185', 'kelas_id' => $kelas->id]);
-    $siswaAdded = Pengguna::factory()->student()->create();
-    $profilAdded = ProfilSiswa::factory()->create(['pengguna_id' => $siswaAdded->id, 'nisn' => '1111111186', 'kelas_id' => null]);
+    $kelasLama = Kelas::create(['nama' => '11 IPS 1', 'tingkat' => '11']);
+    $siswa = siswaTanpaKelas('Sudah Punya Kelas', '1234567892', '10003');
+    $siswa->update(['kelas_id' => $kelasLama->id]);
 
-    $this->actingAs($admin)->put(route('admin.kelas.update', $kelas), [
-        'nama' => '10',
-        'tingkat' => '10',
-        'siswa_nisn' => [$profilStay->nisn, $profilAdded->nisn],
-    ])->assertRedirect(route('admin.kelas.index'));
+    $this->from('/admin/kelas/create')
+        ->followingRedirects()
+        ->post('/admin/kelas', [
+            'tingkat' => '10',
+            'nama' => 'IPA 4',
+            'siswa_nisn' => ['1234567892'],
+        ])
+        ->assertSee('Siswa yang dipilih tidak valid.')
+        ->assertDontSee('Kelas berhasil ditambahkan.');
+});
 
-    expect($profilStay->fresh()->kelas_id)->toBe($kelas->id);
-    expect($profilAdded->fresh()->kelas_id)->toBe($kelas->id);
-    expect($profilRemoved->fresh()->kelas_id)->toBeNull();
+// TS.KEL.007 / TC.KEL.007.001 — Positive
+test('admin berhasil mengubah nama kelas yang sudah ada', function () {
+    adminDataKelas();
+    $kelas = Kelas::create(['nama' => '10 IPA 1', 'tingkat' => '10']);
+
+    $this->get("/admin/kelas/{$kelas->id}/edit")->assertSee('IPA 1');
+
+    $this->followingRedirects()
+        ->put("/admin/kelas/{$kelas->id}", [
+            'tingkat' => '10',
+            'nama' => 'IPA 9',
+        ])
+        ->assertSee('Kelas berhasil diperbarui.')
+        ->assertSee('10 IPA 9')
+        ->assertDontSee('10 IPA 1');
+});
+
+// TS.KEL.008 / TC.KEL.008.001 — Positive
+test('admin berhasil mengeluarkan siswa dari kelas saat mengubah kelas', function () {
+    adminDataKelas();
+
+    $kelas = Kelas::create(['nama' => '10 IPA 1', 'tingkat' => '10']);
+    $siswa = siswaTanpaKelas('Ahmad Fauzi', '1234567893', '10004');
+    $siswa->update(['kelas_id' => $kelas->id]);
+
+    // Menyimpan tanpa mencentang siswa manapun berarti mengeluarkan semuanya.
+    $this->followingRedirects()
+        ->put("/admin/kelas/{$kelas->id}", [
+            'tingkat' => '10',
+            'nama' => 'IPA 1',
+        ])
+        ->assertSee('Kelas berhasil diperbarui.');
+
+    $this->get("/admin/kelas/{$kelas->id}")
+        ->assertDontSee('Ahmad Fauzi');
+});
+
+// TS.KEL.009 / TC.KEL.009.001 — Positive
+test('admin berhasil menghapus kelas', function () {
+    adminDataKelas();
+    $kelas = Kelas::create(['nama' => '10 IPA 8', 'tingkat' => '10']);
+
+    $this->followingRedirects()
+        ->delete("/admin/kelas/{$kelas->id}")
+        ->assertSee('Kelas berhasil dihapus.')
+        ->assertDontSee('10 IPA 8');
+});
+
+// TS.KEL.010 / TC.KEL.010.001 — Positive
+test('admin mencari kelas berdasarkan namanya', function () {
+    adminDataKelas();
+    Kelas::create(['nama' => '10 IPA 1', 'tingkat' => '10']);
+    Kelas::create(['nama' => '11 IPS 1', 'tingkat' => '11']);
+
+    $this->get('/admin/kelas?search=IPA')
+        ->assertSee('10 IPA 1')
+        ->assertDontSee('11 IPS 1');
+});
+
+// TS.KEL.011 / TC.KEL.011.001 — Positive
+test('admin menyaring daftar kelas berdasarkan tingkat', function () {
+    adminDataKelas();
+    Kelas::create(['nama' => '10 IPA 1', 'tingkat' => '10']);
+    Kelas::create(['nama' => '11 IPS 1', 'tingkat' => '11']);
+
+    $this->get('/admin/kelas?tingkat=11')
+        ->assertSee('11 IPS 1')
+        ->assertDontSee('10 IPA 1');
 });

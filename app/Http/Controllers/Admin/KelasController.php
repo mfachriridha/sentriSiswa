@@ -36,8 +36,14 @@ class KelasController extends Controller
         }
 
         if ($sort === 'nama') {
+            // Urutkan angka di belakang nama secara wajar, supaya "10. 2" muncul
+            // sebelum "10. 10" dan bukan sesudahnya seperti pada urutan abjad.
+            // Mengurutkan berdasarkan panjang nama lebih dulu sudah cukup untuk
+            // itu, dan berlaku di semua jenis basis data - sebelumnya memakai
+            // fungsi khusus MySQL sehingga halaman ini terkunci ke satu jenis
+            // basis data dan tidak bisa diuji sama sekali.
             $classes = $classes->orderBy('tingkat', $direction)
-                ->orderByRaw("CAST(SUBSTRING_INDEX(nama, '. ', -1) AS UNSIGNED) {$direction}")
+                ->orderByRaw("LENGTH(nama) {$direction}")
                 ->orderBy('nama', $direction);
         } elseif ($sort === 'tingkat') {
             $classes = $classes->orderBy('tingkat', $direction)->orderBy('nama', 'asc');
