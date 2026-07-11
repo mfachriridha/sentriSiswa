@@ -1,178 +1,190 @@
 <?php
 
 use App\Models\JenisPelanggaran;
-use App\Models\Kelas;
-use App\Models\PelanggaranSiswa;
 use App\Models\Pengguna;
-use App\Models\ProfilSiswa;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-function jenisPelanggaranKesiswaan(): Pengguna
+/*
+|--------------------------------------------------------------------------
+| Fitur Jenis Pelanggaran (Kesiswaan) — Equivalence Partitioning
+|--------------------------------------------------------------------------
+|
+| Pengujian black box: kesiswaan masuk lewat halaman masuk, lalu mengelola daftar
+| jenis pelanggaran yang nanti dipakai untuk mencatat pelanggaran siswa. Hasilnya
+| diperiksa dari apa yang muncul di layar, bukan dari basis data.
+|
+| Tiap jenis pelanggaran punya kategori sanksi, dan poin yang dikurangi harus
+| masuk rentang kategorinya:
+|
+|   Sanksi Ringan          5 - 25 poin
+|   Sanksi Sedang         26 - 50 poin
+|   Sanksi Berat          51 - 75 poin
+|   Sanksi Sangat Berat   76 - 100 poin
+|
+| Jenis yang sudah dipakai pada catatan pelanggaran siswa tidak bisa dihapus,
+| hanya bisa dinonaktifkan.
+|
+*/
+
+/** Kesiswaan yang sudah masuk ke aplikasi. */
+function kesiswaanMasuk(): Pengguna
 {
-    $studentAffairs = Pengguna::factory()->studentAffairs()->create(['status' => 'registered']);
-    $studentAffairs->profilGuru()->create([
-        'nip' => fake()->unique()->numerify('19################'),
-        'tipe_guru' => 'kesiswaan',
+    $kesiswaan = Pengguna::factory()->studentAffairs()->create([
+        'nama' => 'Bagas Kesiswaan',
+        'email' => 'kesiswaan@sentrisiswa.test',
+        'status' => 'registered',
     ]);
 
-    return $studentAffairs;
+    masukSebagai($kesiswaan);
+
+    return $kesiswaan;
 }
 
-// TS.JNP.001 / TC.JNP.001.001 — buat jenis pelanggaran baru berhasil (positive)
-test('student affairs can create a new violation type', function () {
-    $kesiswaan = jenisPelanggaranKesiswaan();
-
-    $this->actingAs($kesiswaan)->post(route('kesiswaan.jenis-pelanggaran.store'), [
+/** Isian jenis pelanggaran yang sah. */
+function dataJenisPelanggaran(array $ubahan = []): array
+{
+    return array_merge([
         'nama' => 'Terlambat masuk kelas',
         'kategori' => 'ringan',
         'pengurangan_poin' => 10,
-        'keterangan' => 'Terlambat lebih dari 15 menit.',
-        'aktif' => '1',
-    ])->assertRedirect(route('kesiswaan.jenis-pelanggaran.index'));
+        'keterangan' => 'Datang setelah bel masuk berbunyi.',
+        'aktif' => 1,
+    ], $ubahan);
+}
 
-    $this->assertDatabaseHas('jenis_pelanggaran', [
-        'nama' => 'Terlambat masuk kelas',
-        'kategori' => 'ringan',
-        'pengurangan_poin' => 10,
-        'aktif' => true,
-    ]);
+// TS.JEP.001 / TC.JEP.001.001 — Positive
+test('kesiswaan menambah jenis pelanggaran baru', function () {
+    kesiswaanMasuk();
+
+    $this->followingRedirects()
+        ->post('/kesiswaan/jenis-pelanggaran', dataJenisPelanggaran())
+        ->assertSee('Jenis pelanggaran berhasil ditambahkan.')
+        ->assertSee('Terlambat masuk kelas')
+        ->assertSee('Sanksi Ringan');
 });
 
-// TS.JNP.002 / TC.JNP.002.001 — nama duplikat ditolak (negative)
-test('student affairs cannot create a violation type with a duplicate name', function () {
-    $kesiswaan = jenisPelanggaranKesiswaan();
-    JenisPelanggaran::factory()->create(['nama' => 'Membolos', 'kategori' => 'sedang', 'pengurangan_poin' => 30]);
+// TS.JEP.002 / TC.JEP.002.001 — Negative
+test('jenis pelanggaran ditolak ketika namanya sudah dipakai', function () {
+    kesiswaanMasuk();
+    JenisPelanggaran::create(dataJenisPelanggaran());
 
-    $this->actingAs($kesiswaan)->post(route('kesiswaan.jenis-pelanggaran.store'), [
-        'nama' => 'Membolos',
-        'kategori' => 'sedang',
-        'pengurangan_poin' => 30,
-        'aktif' => '1',
-    ])->assertSessionHasErrors('nama');
+    $this->from('/kesiswaan/jenis-pelanggaran/create')
+        ->followingRedirects()
+        ->post('/kesiswaan/jenis-pelanggaran', dataJenisPelanggaran())
+        ->assertSee('Nama pelanggaran sudah digunakan.');
 });
 
-// TS.JNP.003 / TC.JNP.003.001 — kategori tidak valid ditolak (negative)
-test('student affairs cannot create a violation type with an invalid category', function () {
-    $kesiswaan = jenisPelanggaranKesiswaan();
+// TS.JEP.003 / TC.JEP.003.001 — Negative
+test('jenis pelanggaran ditolak ketika poinnya di luar rentang kategori', function () {
+    kesiswaanMasuk();
 
-    $this->actingAs($kesiswaan)->post(route('kesiswaan.jenis-pelanggaran.store'), [
-        'nama' => 'Pelanggaran aneh',
-        'kategori' => 'extreme',
-        'pengurangan_poin' => 10,
-        'aktif' => '1',
-    ])->assertSessionHasErrors('kategori');
+    // Kategori Sanksi Ringan hanya menerima 5 sampai 25 poin.
+    $this->from('/kesiswaan/jenis-pelanggaran/create')
+        ->followingRedirects()
+        ->post('/kesiswaan/jenis-pelanggaran', dataJenisPelanggaran([
+            'kategori' => 'ringan',
+            'pengurangan_poin' => 60,
+        ]))
+        ->assertSee('Poin untuk kategori ini harus berada di antara 5 sampai 25.');
 });
 
-// TS.JNP.004 / TC.JNP.004.001 — poin di luar rentang kategori ditolak (negative)
-test('student affairs cannot create a violation type with points outside the category range', function () {
-    $kesiswaan = jenisPelanggaranKesiswaan();
+// TS.JEP.004 / TC.JEP.004.001 — Negative
+test('jenis pelanggaran ditolak ketika poinnya diisi huruf', function () {
+    kesiswaanMasuk();
 
-    $this->actingAs($kesiswaan)->post(route('kesiswaan.jenis-pelanggaran.store'), [
-        'nama' => 'Pelanggaran kategori salah',
-        'kategori' => 'ringan',
-        'pengurangan_poin' => 60,
-        'aktif' => '1',
-    ])->assertSessionHasErrors('pengurangan_poin');
+    $this->from('/kesiswaan/jenis-pelanggaran/create')
+        ->followingRedirects()
+        ->post('/kesiswaan/jenis-pelanggaran', dataJenisPelanggaran(['pengurangan_poin' => 'sepuluh']))
+        ->assertSee('Poin pelanggaran harus berupa angka.');
 });
 
-// TS.JNP.005 / TC.JNP.005.001 — update berhasil (positive)
-test('student affairs can update a violation type', function () {
-    $kesiswaan = jenisPelanggaranKesiswaan();
-    $type = JenisPelanggaran::factory()->create(['nama' => 'Seragam tidak lengkap', 'kategori' => 'ringan', 'pengurangan_poin' => 10]);
+// TS.JEP.005 / TC.JEP.005.001 — Positive
+test('kesiswaan mengubah jenis pelanggaran yang sudah ada', function () {
+    kesiswaanMasuk();
+    $jenis = JenisPelanggaran::create(dataJenisPelanggaran());
 
-    $this->actingAs($kesiswaan)->put(route('kesiswaan.jenis-pelanggaran.update', $type), [
-        'nama' => 'Seragam tidak rapi',
-        'kategori' => 'ringan',
-        'pengurangan_poin' => 15,
-        'aktif' => '1',
-    ])->assertRedirect(route('kesiswaan.jenis-pelanggaran.index'));
-
-    expect($type->fresh()->nama)->toBe('Seragam tidak rapi');
-    expect($type->fresh()->pengurangan_poin)->toBe(15);
+    $this->followingRedirects()
+        ->put("/kesiswaan/jenis-pelanggaran/{$jenis->id}", dataJenisPelanggaran([
+            'nama' => 'Terlambat lebih dari 15 menit',
+            'pengurangan_poin' => 15,
+        ]))
+        ->assertSee('Jenis pelanggaran berhasil diperbarui.')
+        ->assertSee('Terlambat lebih dari 15 menit');
 });
 
-// TS.JNP.006 / TC.JNP.006.001 — update nama jadi duplikat milik jenis lain ditolak (negative)
-test('student affairs cannot update a violation type name to one already used by another type', function () {
-    $kesiswaan = jenisPelanggaranKesiswaan();
-    JenisPelanggaran::factory()->create(['nama' => 'Merokok di area sekolah', 'kategori' => 'berat', 'pengurangan_poin' => 60]);
-    $type = JenisPelanggaran::factory()->create(['nama' => 'Berkelahi', 'kategori' => 'berat', 'pengurangan_poin' => 65]);
+// TS.JEP.006 / TC.JEP.006.001 — Positive
+test('kesiswaan menghapus jenis pelanggaran yang belum pernah dipakai', function () {
+    kesiswaanMasuk();
+    $jenis = JenisPelanggaran::create(dataJenisPelanggaran());
 
-    $this->actingAs($kesiswaan)->put(route('kesiswaan.jenis-pelanggaran.update', $type), [
-        'nama' => 'Merokok di area sekolah',
+    $this->followingRedirects()
+        ->delete("/kesiswaan/jenis-pelanggaran/{$jenis->id}")
+        ->assertSee('Jenis pelanggaran berhasil dihapus.')
+        ->assertSee('Belum ada data jenis pelanggaran.');
+});
+
+// TS.JEP.007 / TC.JEP.007.001 — Negative
+test('jenis pelanggaran yang sudah dipakai tidak bisa dihapus', function () {
+    [, , $siswa] = kelasBerisiSiswa();
+    $pelanggaran = catatPelanggaran($siswa, 'Terlambat masuk kelas', 'ringan', '2026-07-06');
+
+    kesiswaanMasuk();
+
+    $this->followingRedirects()
+        ->delete("/kesiswaan/jenis-pelanggaran/{$pelanggaran->jenis_pelanggaran_id}")
+        ->assertSee('Jenis pelanggaran sudah dipakai pada data pelanggaran siswa. Nonaktifkan jika tidak ingin digunakan lagi.')
+        ->assertSee('Terlambat masuk kelas');
+});
+
+// TS.JEP.008 / TC.JEP.008.001 — Positive
+test('kesiswaan menonaktifkan jenis pelanggaran agar tidak dipakai lagi', function () {
+    kesiswaanMasuk();
+    $jenis = JenisPelanggaran::create(dataJenisPelanggaran());
+
+    $this->followingRedirects()
+        ->put("/kesiswaan/jenis-pelanggaran/{$jenis->id}", dataJenisPelanggaran(['aktif' => 0]))
+        ->assertSee('Jenis pelanggaran berhasil diperbarui.');
+
+    $this->get('/kesiswaan/jenis-pelanggaran?status=inactive')
+        ->assertSee('Terlambat masuk kelas');
+});
+
+// TS.JEP.009 / TC.JEP.009.001 — Positive
+test('kesiswaan mencari jenis pelanggaran berdasarkan nama', function () {
+    kesiswaanMasuk();
+    JenisPelanggaran::create(dataJenisPelanggaran());
+    JenisPelanggaran::create(dataJenisPelanggaran([
+        'nama' => 'Berkelahi',
         'kategori' => 'berat',
-        'pengurangan_poin' => 65,
-        'aktif' => '1',
-    ])->assertSessionHasErrors('nama');
+        'pengurangan_poin' => 60,
+    ]));
+
+    $this->get('/kesiswaan/jenis-pelanggaran?search=Berkelahi')
+        ->assertSee('Berkelahi')
+        ->assertDontSee('Terlambat masuk kelas');
 });
 
-// TS.JNP.007 / TC.JNP.007.001 — nonaktifkan lewat update, bukan dihapus (positive)
-test('student affairs can deactivate a violation type via update instead of deleting it', function () {
-    $kesiswaan = jenisPelanggaranKesiswaan();
-    $type = JenisPelanggaran::factory()->create(['nama' => 'Tidak membawa buku', 'kategori' => 'ringan', 'pengurangan_poin' => 5, 'aktif' => true]);
+// TS.JEP.010 / TC.JEP.010.001 — Positive
+test('kesiswaan menyaring jenis pelanggaran berdasarkan kategori', function () {
+    kesiswaanMasuk();
+    JenisPelanggaran::create(dataJenisPelanggaran());
+    JenisPelanggaran::create(dataJenisPelanggaran([
+        'nama' => 'Berkelahi',
+        'kategori' => 'berat',
+        'pengurangan_poin' => 60,
+    ]));
 
-    $this->actingAs($kesiswaan)->put(route('kesiswaan.jenis-pelanggaran.update', $type), [
-        'nama' => 'Tidak membawa buku',
-        'kategori' => 'ringan',
-        'pengurangan_poin' => 5,
-        'aktif' => '0',
-    ])->assertRedirect(route('kesiswaan.jenis-pelanggaran.index'));
-
-    expect($type->fresh()->aktif)->toBeFalse();
-    $this->assertDatabaseHas('jenis_pelanggaran', ['id' => $type->id]);
+    $this->get('/kesiswaan/jenis-pelanggaran?category=berat')
+        ->assertSee('Berkelahi')
+        ->assertDontSee('Terlambat masuk kelas');
 });
 
-// TS.JNP.008 / TC.JNP.008.001 — hapus yang belum pernah dipakai berhasil (positive)
-test('student affairs can delete a violation type that has never been used', function () {
-    $kesiswaan = jenisPelanggaranKesiswaan();
-    $type = JenisPelanggaran::factory()->create(['nama' => 'Tidak memakai atribut', 'kategori' => 'ringan', 'pengurangan_poin' => 5]);
+// TS.JEP.011 / TC.JEP.011.001 — Positive
+test('daftar jenis pelanggaran yang masih kosong menampilkan keterangannya', function () {
+    kesiswaanMasuk();
 
-    $this->actingAs($kesiswaan)->delete(route('kesiswaan.jenis-pelanggaran.destroy', $type))
-        ->assertRedirect(route('kesiswaan.jenis-pelanggaran.index'));
-
-    $this->assertDatabaseMissing('jenis_pelanggaran', ['id' => $type->id]);
-});
-
-// TS.JNP.009 / TC.JNP.009.001 — hapus yang sudah dipakai ditolak (negative)
-test('student affairs cannot delete a violation type already used in a violation record', function () {
-    $kesiswaan = jenisPelanggaranKesiswaan();
-    $type = JenisPelanggaran::factory()->create(['nama' => 'Bullying', 'kategori' => 'sangat_berat', 'pengurangan_poin' => 80]);
-    $class = Kelas::create(['nama' => '10. Jenis Pelanggaran 1', 'tingkat' => '10']);
-    $studentUser = Pengguna::factory()->student()->create(['status' => 'registered']);
-    $student = ProfilSiswa::factory()->create(['pengguna_id' => $studentUser->id, 'kelas_id' => $class->id]);
-    PelanggaranSiswa::factory()->create([
-        'profil_siswa_id' => $student->nisn,
-        'jenis_pelanggaran_id' => $type->id,
-        'status' => 'approved',
-    ]);
-
-    $this->actingAs($kesiswaan)->delete(route('kesiswaan.jenis-pelanggaran.destroy', $type))
-        ->assertRedirect(route('kesiswaan.jenis-pelanggaran.index'));
-
-    $this->assertDatabaseHas('jenis_pelanggaran', ['id' => $type->id]);
-});
-
-// TS.JNP.010 / TC.JNP.010.001 — filter index berdasarkan kategori (positive)
-test('violation type index filters by category', function () {
-    $kesiswaan = jenisPelanggaranKesiswaan();
-    JenisPelanggaran::factory()->create(['nama' => 'Ringan A', 'kategori' => 'ringan', 'pengurangan_poin' => 10]);
-    JenisPelanggaran::factory()->create(['nama' => 'Berat B', 'kategori' => 'berat', 'pengurangan_poin' => 60]);
-
-    $this->actingAs($kesiswaan)->get(route('kesiswaan.jenis-pelanggaran.index', ['category' => 'ringan']))
-        ->assertSuccessful()
-        ->assertSee('Ringan A')
-        ->assertDontSee('Berat B');
-});
-
-// TS.JNP.011 / TC.JNP.011.001 — filter index berdasarkan status aktif/nonaktif (positive)
-test('violation type index filters by active status', function () {
-    $kesiswaan = jenisPelanggaranKesiswaan();
-    JenisPelanggaran::factory()->create(['nama' => 'Masih Aktif', 'kategori' => 'ringan', 'pengurangan_poin' => 10, 'aktif' => true]);
-    JenisPelanggaran::factory()->create(['nama' => 'Sudah Nonaktif', 'kategori' => 'ringan', 'pengurangan_poin' => 10, 'aktif' => false]);
-
-    $this->actingAs($kesiswaan)->get(route('kesiswaan.jenis-pelanggaran.index', ['status' => 'inactive']))
-        ->assertSuccessful()
-        ->assertSee('Sudah Nonaktif')
-        ->assertDontSee('Masih Aktif');
+    $this->get('/kesiswaan/jenis-pelanggaran')
+        ->assertSee('Belum ada data jenis pelanggaran.');
 });

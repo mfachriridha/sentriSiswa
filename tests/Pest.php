@@ -114,6 +114,22 @@ function berkasExcel(string $namaBerkas, array $baris): UploadedFile
  */
 function waliKelasDenganKelas(string $namaSiswa = 'Ahmad Fauzi', string $nisn = '1234567890'): array
 {
+    [$wali, $kelas, $siswa] = kelasBerisiSiswa($namaSiswa, $nisn);
+
+    masukSebagai($wali);
+
+    return [$wali, $kelas, $siswa];
+}
+
+/**
+ * Sebuah kelas beserta wali kelas dan seorang siswa di dalamnya, tanpa ada yang
+ * masuk ke aplikasi. Dipakai pengujian peran lain yang cuma butuh kelasnya sudah
+ * terisi, misalnya kesiswaan atau BK.
+ *
+ * @return array{0: Pengguna, 1: Kelas, 2: ProfilSiswa}
+ */
+function kelasBerisiSiswa(string $namaSiswa = 'Ahmad Fauzi', string $nisn = '1234567890'): array
+{
     $wali = Pengguna::factory()->homeroom()->create([
         'nama' => 'Raka Pradipta',
         'email' => 'wali.kelas@sentrisiswa.test',
@@ -137,8 +153,6 @@ function waliKelasDenganKelas(string $namaSiswa = 'Ahmad Fauzi', string $nisn = 
         'nis' => '10001',
         'kelas_id' => $kelas->id,
     ]);
-
-    masukSebagai($wali);
 
     return [$wali, $kelas, $siswa];
 }
