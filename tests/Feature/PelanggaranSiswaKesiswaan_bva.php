@@ -1,62 +1,100 @@
 <?php
 
-use App\Models\JenisPelanggaran;
-use App\Models\Kelas;
-use App\Models\Pengguna;
-use App\Models\ProfilSiswa;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 
 uses(RefreshDatabase::class);
 
-function pelanggaranKesiswaanBvaActor(): Pengguna
-{
-    $studentAffairs = Pengguna::factory()->studentAffairs()->create(['status' => 'registered']);
-    $studentAffairs->profilGuru()->create([
-        'nip' => fake()->unique()->numerify('19################'),
-        'tipe_guru' => 'kesiswaan',
-    ]);
+/*
+|--------------------------------------------------------------------------
+| Fitur Pelanggaran Siswa (Kesiswaan) — Boundary Value Analysis
+|--------------------------------------------------------------------------
+|
+| Dua batas yang diuji:
+|
+| 1. Tanggal kejadian paling akhir adalah hari ini. Kemarin dan hari ini
+|    diterima, besok ditolak.
+| 2. Sisa poin siswa dimulai dari 100 dan tidak boleh turun di bawah 0.
+|    Pengurangan yang pas menghabiskan poin membuat sisanya nol, dan
+|    pengurangan berikutnya tetap menyisakan nol, bukan angka minus.
+|
+| Hari ini pada pengujian ini adalah 10 Juli 2026.
+|
+*/
 
-    return $studentAffairs;
-}
-
-function pelanggaranKesiswaanBvaStudent(string $className, string $nisn): ProfilSiswa
-{
-    $class = Kelas::create(['nama' => $className, 'tingkat' => '10']);
-    $studentUser = Pengguna::factory()->student()->create(['status' => 'registered']);
-
-    return ProfilSiswa::factory()->create([
-        'pengguna_id' => $studentUser->id,
-        'kelas_id' => $class->id,
-        'nisn' => $nisn,
-    ]);
-}
-
-// ── Boundary: tanggal_pelanggaran, before_or_equal:today ───────────────────
-
-// TS.PSK.010 / TC.PSK.010.001 — tanggal hari ini (tepat di batas atas, diperbolehkan)
-test('violation record accepts a date exactly at today, the upper boundary', function () {
-    $kesiswaan = pelanggaranKesiswaanBvaActor();
-    $student = pelanggaranKesiswaanBvaStudent('10. Pelanggaran BVA 1', '91001');
-    $type = JenisPelanggaran::factory()->create(['aktif' => true]);
-
-    $this->actingAs($kesiswaan)->post(route('kesiswaan.pelanggaran-siswa.store'), [
-        'profil_siswa_id' => $student->nisn,
-        'jenis_pelanggaran_id' => $type->id,
-        'tanggal_pelanggaran' => now()->format('Y-m-d'),
-    ])->assertRedirect(route('kesiswaan.pelanggaran-siswa.index'));
-
-    $this->assertDatabaseHas('pelanggaran_siswa', ['profil_siswa_id' => $student->nisn]);
+afterEach(function () {
+    Carbon::setTestNow();
 });
 
-// TS.PSK.011 / TC.PSK.011.001 — tanggal besok (1 hari di atas batas, ditolak)
-test('violation record rejects a date 1 day above today, the upper boundary', function () {
-    $kesiswaan = pelanggaranKesiswaanBvaActor();
-    $student = pelanggaranKesiswaanBvaStudent('10. Pelanggaran BVA 2', '91002');
-    $type = JenisPelanggaran::factory()->create(['aktif' => true]);
+// TS.PLS.012 / TC.PLS.012.001 — Positive — tepat pada batas
+test('tanggal kejadian hari ini diterima', function () {
+    Carbon::setTestNow('2026-07-10 08:00:00');
+    [, , $siswa] = kelasBerisiSiswa();
+    kesiswaanMasuk();
+    $jenis = jenisPelanggaranTersedia();
 
-    $this->actingAs($kesiswaan)->post(route('kesiswaan.pelanggaran-siswa.store'), [
-        'profil_siswa_id' => $student->nisn,
-        'jenis_pelanggaran_id' => $type->id,
-        'tanggal_pelanggaran' => now()->addDay()->format('Y-m-d'),
-    ])->assertSessionHasErrors('tanggal_pelanggaran');
+    $this->followingRedirects()
+        ->post('/kesiswaan/pelanggaran-siswa', dataPelanggaranSiswa($siswa, $jenis, [
+            'tanggal_pelanggaran' => '2026-07-10',
+        ]))
+        ->assertSee('Pelanggaran siswa berhasil dicatat.');
+});
+
+// TS.PLS.012 / TC.PLS.012.002 — Positive — sehari di bawah batas
+test('tanggal kejadian kemarin diterima', function () {
+    Carbon::setTestNow('2026-07-10 08:00:00');
+    [, , $siswa] = kelasBerisiSiswa();
+    kesiswaanMasuk();
+    $jenis = jenisPelanggaranTersedia();
+
+    $this->followingRedirects()
+        ->post('/kesiswaan/pelanggaran-siswa', dataPelanggaranSiswa($siswa, $jenis, [
+            'tanggal_pelanggaran' => '2026-07-09',
+        ]))
+        ->assertSee('Pelanggaran siswa berhasil dicatat.');
+});
+
+// TS.PLS.012 / TC.PLS.012.003 — Negative — sehari di atas batas
+test('tanggal kejadian besok ditolak', function () {
+    Carbon::setTestNow('2026-07-10 08:00:00');
+    [, , $siswa] = kelasBerisiSiswa();
+    kesiswaanMasuk();
+    $jenis = jenisPelanggaranTersedia();
+
+    $this->from('/kesiswaan/pelanggaran-siswa/create')
+        ->followingRedirects()
+        ->post('/kesiswaan/pelanggaran-siswa', dataPelanggaranSiswa($siswa, $jenis, [
+            'tanggal_pelanggaran' => '2026-07-11',
+        ]))
+        ->assertSee('Tanggal pelanggaran tidak boleh melebihi hari ini.');
+});
+
+// TS.PLS.013 / TC.PLS.013.001 — Positive — tepat di batas bawah sisa poin
+test('sisa poin menjadi nol ketika pengurangannya pas menghabiskan poin', function () {
+    Carbon::setTestNow('2026-07-10 08:00:00');
+    [, , $siswa] = kelasBerisiSiswa();
+
+    // Poin awal 100, dipotong 100 sekaligus, sisanya pas nol.
+    $pelanggaran = catatPelanggaran($siswa, 'Membawa senjata tajam', 'sangat_berat', '2026-07-06', 100);
+
+    kesiswaanMasuk();
+
+    $this->get("/kesiswaan/pelanggaran-siswa/{$pelanggaran->id}")
+        ->assertSee('Sisa Poin: 0');
+});
+
+// TS.PLS.013 / TC.PLS.013.002 — Positive — di bawah batas bawah sisa poin
+test('sisa poin tetap nol dan tidak minus ketika pengurangannya melebihi poin yang tersisa', function () {
+    Carbon::setTestNow('2026-07-10 08:00:00');
+    [, , $siswa] = kelasBerisiSiswa();
+
+    // Poin awal 100, dipotong 100 lalu dipotong 10 lagi. Sisanya berhenti di nol.
+    catatPelanggaran($siswa, 'Membawa senjata tajam', 'sangat_berat', '2026-07-06', 100);
+    $pelanggaranKedua = catatPelanggaran($siswa, 'Terlambat masuk kelas', 'ringan', '2026-07-07', 10);
+
+    kesiswaanMasuk();
+
+    $this->get("/kesiswaan/pelanggaran-siswa/{$pelanggaranKedua->id}")
+        ->assertSee('Sisa Poin: 0')
+        ->assertDontSee('Sisa Poin: -10');
 });

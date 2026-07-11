@@ -183,6 +183,31 @@ function catatKehadiran(string $nisn, string $tanggal, string $status): void
     ]);
 }
 
+/** Kesiswaan yang sudah masuk ke aplikasi. */
+function kesiswaanMasuk(): Pengguna
+{
+    $kesiswaan = Pengguna::factory()->studentAffairs()->create([
+        'nama' => 'Bagas Kesiswaan',
+        'email' => 'kesiswaan@sentrisiswa.test',
+        'status' => 'registered',
+    ]);
+
+    masukSebagai($kesiswaan);
+
+    return $kesiswaan;
+}
+
+/** Sebuah jenis pelanggaran yang siap dipilih saat mencatat pelanggaran. */
+function jenisPelanggaranTersedia(array $ubahan = []): JenisPelanggaran
+{
+    return JenisPelanggaran::create(array_merge([
+        'nama' => 'Terlambat masuk kelas',
+        'kategori' => 'ringan',
+        'pengurangan_poin' => 10,
+        'aktif' => true,
+    ], $ubahan));
+}
+
 /** Mencatat sebuah pelanggaran yang sudah disetujui untuk seorang siswa. */
 function catatPelanggaran(
     ProfilSiswa $siswa,

@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\JenisPelanggaran;
-use App\Models\Pengguna;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -27,20 +26,6 @@ uses(RefreshDatabase::class);
 | hanya bisa dinonaktifkan.
 |
 */
-
-/** Kesiswaan yang sudah masuk ke aplikasi. */
-function kesiswaanMasuk(): Pengguna
-{
-    $kesiswaan = Pengguna::factory()->studentAffairs()->create([
-        'nama' => 'Bagas Kesiswaan',
-        'email' => 'kesiswaan@sentrisiswa.test',
-        'status' => 'registered',
-    ]);
-
-    masukSebagai($kesiswaan);
-
-    return $kesiswaan;
-}
 
 /** Isian jenis pelanggaran yang sah. */
 function dataJenisPelanggaran(array $ubahan = []): array
