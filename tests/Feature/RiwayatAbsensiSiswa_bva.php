@@ -1,65 +1,69 @@
 <?php
 
-use App\Models\Pengguna;
-use App\Models\ProfilSiswa;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 
 uses(RefreshDatabase::class);
 
+/*
+|--------------------------------------------------------------------------
+| Fitur Riwayat Absensi (Siswa) — Boundary Value Analysis
+|--------------------------------------------------------------------------
+|
+| Batas yang diuji adalah tepi bulan yang dipilih. Kehadiran pada tanggal pertama
+| dan tanggal terakhir bulan itu ikut tampil, sedangkan sehari sebelum atau
+| sesudahnya sudah masuk bulan lain dan tidak tampil.
+|
+| Bulan yang dipakai adalah Juli 2026, yang berjalan dari tanggal 1 sampai 31.
+|
+*/
+
 afterEach(function () {
     Carbon::setTestNow();
 });
 
-function riwayatAbsensiSiswaBvaStudent(): Pengguna
-{
-    $student = Pengguna::factory()->student()->create(['status' => 'registered']);
-    ProfilSiswa::factory()->create([
-        'pengguna_id' => $student->id,
-        'nis' => fake()->unique()->numerify('#####'),
-    ]);
+// TS.RAS.007 / TC.RAS.007.001 — Positive — batas bawah bulan
+test('kehadiran pada tanggal pertama bulan itu ikut tampil', function () {
+    Carbon::setTestNow('2026-08-10 08:00:00');
+    $siswa = siswaMasuk();
 
-    return $student;
-}
+    catatKehadiran($siswa->nisn, '2026-07-01', 'alpha');
 
-// ── Boundary: format bulan ^\d{4}-(0[1-9]|1[0-2])$ ──────────────────────────
-
-// TS.RAS.008 / TC.RAS.008.001 — bulan 2026-01 (batas bawah angka bulan, diperbolehkan)
-test('attendance history accepts month 2026-01, the lower boundary', function () {
-    Carbon::setTestNow('2026-06-15 08:00:00');
-    $student = riwayatAbsensiSiswaBvaStudent();
-
-    $this->actingAs($student)->get(route('siswa.absensi.riwayat', ['month' => '2026-01']))
-        ->assertSuccessful()
-        ->assertSee('Januari 2026');
+    $this->get('/siswa/absensi/riwayat?month=2026-07')
+        ->assertSee('Juli 2026')
+        ->assertSee('Alpha');
 });
 
-// TS.RAS.009 / TC.RAS.009.001 — bulan 2026-00 (di bawah batas, invalid, fallback ke bulan berjalan)
-test('attendance history rejects month 2026-00, 1 below the lower boundary', function () {
-    Carbon::setTestNow('2026-06-15 08:00:00');
-    $student = riwayatAbsensiSiswaBvaStudent();
+// TS.RAS.007 / TC.RAS.007.002 — Negative — sehari di bawah batas bawah
+test('kehadiran sehari sebelum bulan itu tidak tampil', function () {
+    Carbon::setTestNow('2026-08-10 08:00:00');
+    $siswa = siswaMasuk();
 
-    $this->actingAs($student)->get(route('siswa.absensi.riwayat', ['month' => '2026-00']))
-        ->assertSuccessful()
-        ->assertSee('Juni 2026');
+    catatKehadiran($siswa->nisn, '2026-06-30', 'alpha');
+
+    $this->get('/siswa/absensi/riwayat?month=2026-07')
+        ->assertSee('Belum ada catatan absensi pada bulan ini.');
 });
 
-// TS.RAS.010 / TC.RAS.010.001 — bulan 2026-12 (batas atas, diperbolehkan)
-test('attendance history accepts month 2026-12, the upper boundary', function () {
-    Carbon::setTestNow('2026-06-15 08:00:00');
-    $student = riwayatAbsensiSiswaBvaStudent();
+// TS.RAS.008 / TC.RAS.008.001 — Positive — batas atas bulan
+test('kehadiran pada tanggal terakhir bulan itu ikut tampil', function () {
+    Carbon::setTestNow('2026-08-10 08:00:00');
+    $siswa = siswaMasuk();
 
-    $this->actingAs($student)->get(route('siswa.absensi.riwayat', ['month' => '2026-12']))
-        ->assertSuccessful()
-        ->assertSee('Desember 2026');
+    catatKehadiran($siswa->nisn, '2026-07-31', 'alpha');
+
+    $this->get('/siswa/absensi/riwayat?month=2026-07')
+        ->assertSee('Juli 2026')
+        ->assertSee('Alpha');
 });
 
-// TS.RAS.011 / TC.RAS.011.001 — bulan 2026-13 (di atas batas, invalid, fallback ke bulan berjalan)
-test('attendance history rejects month 2026-13, 1 above the upper boundary', function () {
-    Carbon::setTestNow('2026-06-15 08:00:00');
-    $student = riwayatAbsensiSiswaBvaStudent();
+// TS.RAS.008 / TC.RAS.008.002 — Negative — sehari di atas batas atas
+test('kehadiran sehari setelah bulan itu tidak tampil', function () {
+    Carbon::setTestNow('2026-08-10 08:00:00');
+    $siswa = siswaMasuk();
 
-    $this->actingAs($student)->get(route('siswa.absensi.riwayat', ['month' => '2026-13']))
-        ->assertSuccessful()
-        ->assertSee('Juni 2026');
+    catatKehadiran($siswa->nisn, '2026-08-01', 'alpha');
+
+    $this->get('/siswa/absensi/riwayat?month=2026-07')
+        ->assertSee('Belum ada catatan absensi pada bulan ini.');
 });

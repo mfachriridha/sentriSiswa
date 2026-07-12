@@ -1,9 +1,6 @@
 <?php
 
-use App\Models\Absensi;
 use App\Models\Pengaturan;
-use App\Models\Pengguna;
-use App\Models\ProfilSiswa;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
@@ -11,189 +8,145 @@ use Illuminate\Support\Facades\Storage;
 
 uses(RefreshDatabase::class);
 
+/*
+|--------------------------------------------------------------------------
+| Fitur Absensi (Siswa) — Equivalence Partitioning
+|--------------------------------------------------------------------------
+|
+| Pengujian black box: siswa masuk lewat halaman masuk, lalu melakukan absensi
+| harian. Hasilnya diperiksa dari apa yang muncul di layar, bukan dari basis data.
+|
+| Absensi hanya bisa dilakukan pada hari absensi dan di dalam jam absen yang
+| ditentukan sekolah. Siswa mengambil selfie sebagai bukti kehadiran. Siswa yang
+| absen sebelum batas keterlambatan tercatat Hadir, sesudahnya tercatat Terlambat.
+| Satu siswa hanya bisa absen sekali sehari.
+|
+| Pada pengujian ini jam absen dibuka pukul 06:30 sampai 07:00, dengan batas
+| keterlambatan pukul 06:45.
+|
+*/
+
+beforeEach(function () {
+    Storage::fake('public');
+    Pengaturan::set('attendance_start_time', '06:30');
+    Pengaturan::set('attendance_end_time', '07:00');
+    Pengaturan::set('attendance_late_tolerance_minutes', 15); // Terlambat setelah 06:45.
+});
+
 afterEach(function () {
     Carbon::setTestNow();
 });
 
-function absensiSiswaStudent(): Pengguna
-{
-    $student = Pengguna::factory()->student()->create(['status' => 'registered']);
-    ProfilSiswa::factory()->create([
-        'pengguna_id' => $student->id,
-        'nis' => fake()->unique()->numerify('#####'),
-    ]);
+// TS.ABS.001 / TC.ABS.001.001 — Positive
+test('siswa absen tepat waktu dan tercatat hadir', function () {
+    Carbon::setTestNow('2026-07-06 06:35:00'); // Senin, di dalam jam absen, sebelum batas terlambat.
+    siswaMasuk();
 
-    return $student;
-}
-
-function absensiSiswaSquareGeofence(): void
-{
-    Pengaturan::set('attendance_geofence_data', json_encode([
-        'coordinates' => [
-            ['lat' => 0.0000, 'lng' => 0.0000],
-            ['lat' => 0.0000, 'lng' => 0.0020],
-            ['lat' => 0.0020, 'lng' => 0.0020],
-            ['lat' => 0.0020, 'lng' => 0.0000],
-        ],
-    ]));
-    Pengaturan::set('attendance_tolerance_meters', '10');
-}
-
-// TS.ABS.001 / TC.ABS.001.001 — check-in sebelum jendela waktu mulai ditolak (negative)
-test('student cannot check in before the attendance window starts', function () {
-    Carbon::setTestNow('2026-06-08 06:00:00');
-    Storage::fake('public');
-    $student = absensiSiswaStudent();
-
-    $this->actingAs($student)->post(route('siswa.absensi.store'), [
-        'selfie' => UploadedFile::fake()->image('selfie.jpg')->size(100),
-    ])->assertRedirect(route('siswa.absensi'))
-        ->assertSessionHas('error', 'Waktu absen sudah lewat atau belum dimulai.');
-
-    expect(Absensi::first()->status)->toBe('belum_absen');
+    $this->followingRedirects()
+        ->post('/siswa/absensi', ['selfie' => selfieAbsensi()])
+        ->assertSee('Absen berhasil: Hadir.');
 });
 
-// TS.ABS.002 / TC.ABS.002.001 — check-in setelah jendela waktu berakhir ditolak (negative)
-test('student cannot check in after the attendance window ends', function () {
-    Carbon::setTestNow('2026-06-08 08:00:00');
-    Storage::fake('public');
-    $student = absensiSiswaStudent();
+// TS.ABS.002 / TC.ABS.002.001 — Positive
+test('siswa absen setelah batas keterlambatan dan tercatat terlambat', function () {
+    Carbon::setTestNow('2026-07-06 06:50:00'); // Masih di dalam jam absen, tetapi lewat batas terlambat.
+    siswaMasuk();
 
-    $this->actingAs($student)->post(route('siswa.absensi.store'), [
-        'selfie' => UploadedFile::fake()->image('selfie.jpg')->size(100),
-    ])->assertRedirect(route('siswa.absensi'))
-        ->assertSessionHas('error', 'Waktu absen sudah lewat atau belum dimulai.');
-
-    expect(Absensi::first()->status)->toBe('belum_absen');
+    $this->followingRedirects()
+        ->post('/siswa/absensi', ['selfie' => selfieAbsensi()])
+        ->assertSee('Absen tercatat: Terlambat.');
 });
 
-// TS.ABS.003 / TC.ABS.003.001 — check-in yang telat dari batas toleransi hasilnya status terlambat (positive)
-test('student checking in past the late tolerance is marked terlambat', function () {
-    Pengaturan::set('attendance_start_time', '06:30');
-    Pengaturan::set('attendance_end_time', '07:30');
-    Pengaturan::set('attendance_late_time', '07:00');
-    Carbon::setTestNow('2026-06-08 07:15:00');
-    Storage::fake('public');
-    $student = absensiSiswaStudent();
+// TS.ABS.003 / TC.ABS.003.001 — Negative
+test('siswa gagal absen sebelum jam absen dibuka', function () {
+    Carbon::setTestNow('2026-07-06 06:00:00');
+    siswaMasuk();
 
-    $this->actingAs($student)->post(route('siswa.absensi.store'), [
-        'selfie' => UploadedFile::fake()->image('selfie.jpg')->size(100),
-    ])->assertRedirect(route('siswa.absensi'))
-        ->assertSessionHas('success', 'Absen tercatat: Terlambat.');
-
-    expect(Absensi::firstOrFail()->status)->toBe('terlambat');
+    $this->followingRedirects()
+        ->post('/siswa/absensi', ['selfie' => selfieAbsensi()])
+        ->assertSee('Waktu absen sudah lewat atau belum dimulai.');
 });
 
-// TS.ABS.004 / TC.ABS.004.001 — selfie tidak diisi ditolak (negative)
-test('student cannot check in without a selfie', function () {
-    Carbon::setTestNow('2026-06-08 06:45:00');
-    Storage::fake('public');
-    $student = absensiSiswaStudent();
+// TS.ABS.004 / TC.ABS.004.001 — Negative
+test('siswa gagal absen setelah jam absen berakhir', function () {
+    Carbon::setTestNow('2026-07-06 07:30:00');
+    siswaMasuk();
 
-    $this->actingAs($student)->post(route('siswa.absensi.store'), [])
-        ->assertSessionHasErrors('selfie');
-
-    expect(Absensi::first()->status)->toBe('belum_absen');
+    $this->followingRedirects()
+        ->post('/siswa/absensi', ['selfie' => selfieAbsensi()])
+        ->assertSee('Waktu absen sudah lewat atau belum dimulai.');
 });
 
-// TS.ABS.005 / TC.ABS.005.001 — selfie bukan format gambar yang diizinkan ditolak (negative)
-test('student cannot check in with a disallowed selfie file type', function () {
-    Carbon::setTestNow('2026-06-08 06:45:00');
-    Storage::fake('public');
-    $student = absensiSiswaStudent();
+// TS.ABS.005 / TC.ABS.005.001 — Negative
+test('siswa gagal absen di hari yang bukan hari absensi', function () {
+    Carbon::setTestNow('2026-07-05 06:35:00'); // Minggu.
+    siswaMasuk();
 
-    $this->actingAs($student)->post(route('siswa.absensi.store'), [
-        'selfie' => UploadedFile::fake()->create('selfie.pdf', 100, 'application/pdf'),
-    ])->assertSessionHasErrors('selfie');
-
-    expect(Absensi::first()->status)->toBe('belum_absen');
+    $this->followingRedirects()
+        ->post('/siswa/absensi', ['selfie' => selfieAbsensi()])
+        ->assertSee('Absensi hanya tersedia pada hari '.Pengaturan::labelHariAbsen().'.');
 });
 
-// TS.ABS.006 / TC.ABS.006.001 — profil siswa tidak ditemukan ditolak (negative, edge case)
-test('student without a linked profil siswa cannot check in', function () {
-    Carbon::setTestNow('2026-06-08 06:45:00');
-    Storage::fake('public');
-    $student = Pengguna::factory()->student()->create(['status' => 'registered']);
+// TS.ABS.006 / TC.ABS.006.001 — Negative
+test('siswa tidak bisa absen dua kali dalam sehari', function () {
+    Carbon::setTestNow('2026-07-06 06:35:00');
+    siswaMasuk();
 
-    $this->actingAs($student)->post(route('siswa.absensi.store'), [
-        'selfie' => UploadedFile::fake()->image('selfie.jpg')->size(100),
-    ])->assertRedirect(route('siswa.absensi'))
-        ->assertSessionHas('error', 'Profil siswa tidak ditemukan.');
+    $this->post('/siswa/absensi', ['selfie' => selfieAbsensi()]);
 
-    expect(Absensi::count())->toBe(0);
+    $this->followingRedirects()
+        ->post('/siswa/absensi', ['selfie' => selfieAbsensi()])
+        ->assertSee('Anda sudah absen hari ini.');
 });
 
-// TS.ABS.007 / TC.ABS.007.001 — cek lokasi GPS di dalam area geofence diperbolehkan (positive)
-test('checking location inside the geofence is allowed', function () {
-    Carbon::setTestNow('2026-06-08 06:45:00');
-    absensiSiswaSquareGeofence();
-    $student = absensiSiswaStudent();
+// TS.ABS.007 / TC.ABS.007.001 — Negative
+test('absensi ditolak ketika berkas selfienya bukan gambar', function () {
+    Carbon::setTestNow('2026-07-06 06:35:00');
+    siswaMasuk();
 
-    $this->actingAs($student)->postJson(route('siswa.absensi.cek-lokasi'), [
-        'latitude' => 0.0010,
-        'longitude' => 0.0010,
-        'accuracy' => 10,
-    ])->assertSuccessful()
-        ->assertJson(['allowed' => true, 'status' => 'inside']);
+    $this->from('/siswa/absensi')
+        ->followingRedirects()
+        ->post('/siswa/absensi', [
+            'selfie' => UploadedFile::fake()->create('catatan.pdf', 50, 'application/pdf'),
+        ])
+        ->assertSee('File harus berupa gambar.');
 });
 
-// TS.ABS.008 / TC.ABS.008.001 — cek lokasi GPS di luar area geofence dan di luar toleransi ditolak (negative)
-test('checking location outside the geofence and beyond tolerance is rejected', function () {
-    Carbon::setTestNow('2026-06-08 06:45:00');
-    absensiSiswaSquareGeofence();
-    $student = absensiSiswaStudent();
+// TS.ABS.008 / TC.ABS.008.001 — Positive
+test('halaman absensi menampilkan status hari ini setelah siswa absen', function () {
+    Carbon::setTestNow('2026-07-06 06:35:00');
+    siswaMasuk();
 
-    $this->actingAs($student)->postJson(route('siswa.absensi.cek-lokasi'), [
-        'latitude' => 10,
-        'longitude' => 10,
-        'accuracy' => 10,
-    ])->assertSuccessful()
-        ->assertJson(['allowed' => false, 'status' => 'outside']);
+    $this->post('/siswa/absensi', ['selfie' => selfieAbsensi()]);
+
+    $this->get('/siswa/absensi')
+        ->assertSee('Absensi Hari Ini')
+        ->assertSee('Absensi Anda hari ini sudah tercatat. Sampai jumpa besok!');
 });
 
-// TS.ABS.009 / TC.ABS.009.001 — check-in dengan geofence aktif tapi lokasi tidak dikirim ditolak (negative)
-test('student cannot check in without location data when the geofence is active', function () {
-    Carbon::setTestNow('2026-06-08 06:45:00');
-    Storage::fake('public');
-    absensiSiswaSquareGeofence();
-    $student = absensiSiswaStudent();
+// TS.ABS.009 / TC.ABS.009.001 — Positive
+test('halaman absensi memberi tahu siswa bahwa hari ini bukan hari absensi', function () {
+    Carbon::setTestNow('2026-07-05 06:35:00'); // Minggu.
+    siswaMasuk();
 
-    $this->actingAs($student)->post(route('siswa.absensi.store'), [
-        'selfie' => UploadedFile::fake()->image('selfie.jpg')->size(100),
-    ])->assertSessionHasErrors(['latitude', 'longitude', 'accuracy']);
-
-    expect(Absensi::first()->status)->toBe('belum_absen');
+    $this->get('/siswa/absensi')
+        ->assertSee('Absensi hanya tersedia pada hari Senin sampai Jumat.');
 });
 
-// TS.ABS.010 / TC.ABS.010.001 — check-in dengan lokasi di luar geofence ditolak (negative)
-test('student cannot check in when their location is outside the geofence', function () {
-    Carbon::setTestNow('2026-06-08 06:45:00');
-    Storage::fake('public');
-    absensiSiswaSquareGeofence();
-    $student = absensiSiswaStudent();
+// TS.ABS.010 / TC.ABS.010.001 — Positive
+test('halaman absensi memberi tahu siswa bahwa waktunya belum tiba', function () {
+    Carbon::setTestNow('2026-07-06 06:00:00');
+    siswaMasuk();
 
-    $this->actingAs($student)->post(route('siswa.absensi.store'), [
-        'selfie' => UploadedFile::fake()->image('selfie.jpg')->size(100),
-        'latitude' => 10,
-        'longitude' => 10,
-        'accuracy' => 10,
-    ])->assertRedirect(route('siswa.absensi'))
-        ->assertSessionHas('error', 'Lokasi Anda di luar area absensi dan tidak bisa absen.');
-
-    expect(Absensi::first()->status)->toBe('belum_absen');
+    $this->get('/siswa/absensi')
+        ->assertSee('Belum waktunya absen. Absen dimulai pukul 06:30.');
 });
 
-// TS.ABS.011 / TC.ABS.011.001 — endpoint status hari ini nampilin status yang sesuai (positive)
-test('today status endpoint reports the existing attendance status', function () {
-    Carbon::setTestNow('2026-06-08 06:45:00');
-    $student = absensiSiswaStudent();
-    Absensi::create([
-        'profil_siswa_id' => $student->profilSiswa->nisn,
-        'tanggal' => now()->toDateString(),
-        'status' => 'hadir',
-    ]);
+// TS.ABS.011 / TC.ABS.011.001 — Positive
+test('halaman absensi memberi tahu siswa bahwa waktunya sudah berakhir', function () {
+    Carbon::setTestNow('2026-07-06 07:30:00');
+    siswaMasuk();
 
-    $this->actingAs($student)->getJson(route('siswa.absensi.status'))
-        ->assertSuccessful()
-        ->assertJson(['sudah_absen' => true, 'status' => 'hadir']);
+    $this->get('/siswa/absensi')
+        ->assertSee('Waktu absen sudah berakhir pukul 07:00.');
 });

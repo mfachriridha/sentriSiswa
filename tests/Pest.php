@@ -198,6 +198,22 @@ function kesiswaanMasuk(): Pengguna
     return $kesiswaan;
 }
 
+/** Siswa yang sudah masuk ke aplikasi, beserta kelas tempatnya terdaftar. */
+function siswaMasuk(): ProfilSiswa
+{
+    [, , $siswa] = kelasBerisiSiswa();
+
+    masukSebagai($siswa->pengguna);
+
+    return $siswa;
+}
+
+/** Selfie absensi, dengan ukuran dalam kilobita. */
+function selfieAbsensi(int $ukuranKb = 100): UploadedFile
+{
+    return UploadedFile::fake()->create('selfie.jpg', $ukuranKb, 'image/jpeg');
+}
+
 /**
  * Guru BK yang sudah masuk ke aplikasi. Tiap guru BK hanya memegang satu tingkat,
  * dan hanya boleh memantau siswa di tingkat itu.
