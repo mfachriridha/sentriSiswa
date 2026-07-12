@@ -49,7 +49,6 @@ class AbsensiController extends Controller
 
         $stats = [
             'hadir' => $monthAttendances->where('status', 'hadir')->count(),
-            'terlambat' => $monthAttendances->where('status', 'terlambat')->count(),
             'izin' => $monthAttendances->where('status', 'izin')->count(),
             'sakit' => $monthAttendances->where('status', 'sakit')->count(),
             'alpha' => $monthAttendances->where('status', 'alpha')->count(),
@@ -123,7 +122,6 @@ class AbsensiController extends Controller
 
         $startTime = Pengaturan::get('attendance_start_time', '06:30');
         $endTime = Pengaturan::get('attendance_end_time', '07:00');
-        $lateToleranceMinutes = $this->lateToleranceMinutes($endTime);
         $currentTime = now()->format('H:i');
 
         if ($currentTime < $startTime || $currentTime > $endTime) {
@@ -176,12 +174,12 @@ class AbsensiController extends Controller
             $distanceMeters = $locationCheck['distance_meters'];
         }
 
-        $lateThresholdMinutes = $this->minutesFromTime($endTime) - $lateToleranceMinutes;
-        $status = ($this->minutesFromTime($currentTime) > $lateThresholdMinutes) ? 'terlambat' : 'hadir';
+        // Siapa pun yang berhasil absen di dalam jam absen tercatat hadir. Yang di
+        // luar jam absen sudah ditolak sebelum sampai sini.
         $selfiePath = $request->file('selfie')->store('attendance-selfies/'.$profile->nisn, 'public');
 
         $attendance->update([
-            'status' => $status,
+            'status' => 'hadir',
             'waktu_masuk' => $currentTime,
             'path_selfie' => $selfiePath,
             'latitude' => $latitude,
@@ -190,25 +188,7 @@ class AbsensiController extends Controller
             'jarak_meter' => $distanceMeters,
         ]);
 
-        return redirect()->route('siswa.absensi')->with('success', $status === 'terlambat' ? 'Absen tercatat: Terlambat.' : 'Absen berhasil: Hadir.');
-    }
-
-    private function minutesFromTime(string $time): int
-    {
-        [$hour, $minute] = array_map('intval', explode(':', $time));
-
-        return ($hour * 60) + $minute;
-    }
-
-    private function lateToleranceMinutes(string $endTime): int
-    {
-        $lateToleranceMinutes = Pengaturan::get('attendance_late_tolerance_minutes');
-
-        if (is_numeric($lateToleranceMinutes)) {
-            return (int) $lateToleranceMinutes;
-        }
-
-        return max(0, $this->minutesFromTime($endTime) - $this->minutesFromTime(Pengaturan::get('attendance_late_time', '07:00')));
+        return redirect()->route('siswa.absensi')->with('success', 'Absen berhasil: Hadir.');
     }
 
     /**

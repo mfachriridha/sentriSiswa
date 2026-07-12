@@ -18,7 +18,7 @@ uses(RefreshDatabase::class);
 | kehadiran seluruh siswa di tingkat yang dipegangnya. Hasilnya diperiksa dari apa
 | yang muncul di layar, bukan dari basis data.
 |
-| Rekap merangkum jumlah hadir, terlambat, izin, sakit, dan alpha tiap siswa pada
+| Rekap merangkum jumlah hadir, izin, sakit, dan alpha tiap siswa pada
 | rentang tanggal yang dipilih, beserta persentase kehadirannya. Rekap bisa
 | disaring per kelas, per siswa, per status, atau per bulan, lalu diunduh sebagai
 | berkas Excel maupun PDF.
@@ -35,7 +35,7 @@ test('guru bk melihat rekap kehadiran seluruh siswa di tingkatnya', function () 
     [, , $siswa] = kelasBerisiSiswa();
 
     catatKehadiran($siswa->nisn, '2026-07-06', 'hadir');
-    catatKehadiran($siswa->nisn, '2026-07-07', 'terlambat');
+    catatKehadiran($siswa->nisn, '2026-07-07', 'hadir');
 
     bkMasuk('10');
 

@@ -17,12 +17,11 @@ uses(RefreshDatabase::class);
 | harian. Hasilnya diperiksa dari apa yang muncul di layar, bukan dari basis data.
 |
 | Absensi hanya bisa dilakukan pada hari absensi dan di dalam jam absen yang
-| ditentukan sekolah. Siswa mengambil selfie sebagai bukti kehadiran. Siswa yang
-| absen sebelum batas keterlambatan tercatat Hadir, sesudahnya tercatat Terlambat.
-| Satu siswa hanya bisa absen sekali sehari.
+| ditentukan sekolah. Siswa mengambil selfie sebagai bukti kehadiran. Siapa pun
+| yang berhasil absen di dalam jam itu tercatat Hadir, tanpa peduli menit
+| keberapa. Satu siswa hanya bisa absen sekali sehari.
 |
-| Pada pengujian ini jam absen dibuka pukul 06:30 sampai 07:00, dengan batas
-| keterlambatan pukul 06:45.
+| Pada pengujian ini jam absen dibuka pukul 06:30 sampai 07:00.
 |
 */
 
@@ -30,7 +29,6 @@ beforeEach(function () {
     Storage::fake('public');
     Pengaturan::set('attendance_start_time', '06:30');
     Pengaturan::set('attendance_end_time', '07:00');
-    Pengaturan::set('attendance_late_tolerance_minutes', 15); // Terlambat setelah 06:45.
 });
 
 afterEach(function () {
@@ -39,7 +37,7 @@ afterEach(function () {
 
 // TS.ABS.001 / TC.ABS.001.001 — Positive
 test('siswa absen tepat waktu dan tercatat hadir', function () {
-    Carbon::setTestNow('2026-07-06 06:35:00'); // Senin, di dalam jam absen, sebelum batas terlambat.
+    Carbon::setTestNow('2026-07-06 06:35:00'); // Senin, di dalam jam absen.
     siswaMasuk();
 
     $this->followingRedirects()
@@ -47,17 +45,7 @@ test('siswa absen tepat waktu dan tercatat hadir', function () {
         ->assertSee('Absen berhasil: Hadir.');
 });
 
-// TS.ABS.002 / TC.ABS.002.001 — Positive
-test('siswa absen setelah batas keterlambatan dan tercatat terlambat', function () {
-    Carbon::setTestNow('2026-07-06 06:50:00'); // Masih di dalam jam absen, tetapi lewat batas terlambat.
-    siswaMasuk();
-
-    $this->followingRedirects()
-        ->post('/siswa/absensi', ['selfie' => selfieAbsensi()])
-        ->assertSee('Absen tercatat: Terlambat.');
-});
-
-// TS.ABS.003 / TC.ABS.003.001 — Negative
+// TS.ABS.002 / TC.ABS.002.001 — Negative
 test('siswa gagal absen sebelum jam absen dibuka', function () {
     Carbon::setTestNow('2026-07-06 06:00:00');
     siswaMasuk();
@@ -67,7 +55,7 @@ test('siswa gagal absen sebelum jam absen dibuka', function () {
         ->assertSee('Waktu absen sudah lewat atau belum dimulai.');
 });
 
-// TS.ABS.004 / TC.ABS.004.001 — Negative
+// TS.ABS.003 / TC.ABS.003.001 — Negative
 test('siswa gagal absen setelah jam absen berakhir', function () {
     Carbon::setTestNow('2026-07-06 07:30:00');
     siswaMasuk();
@@ -77,7 +65,7 @@ test('siswa gagal absen setelah jam absen berakhir', function () {
         ->assertSee('Waktu absen sudah lewat atau belum dimulai.');
 });
 
-// TS.ABS.005 / TC.ABS.005.001 — Negative
+// TS.ABS.004 / TC.ABS.004.001 — Negative
 test('siswa gagal absen di hari yang bukan hari absensi', function () {
     Carbon::setTestNow('2026-07-05 06:35:00'); // Minggu.
     siswaMasuk();
@@ -87,7 +75,7 @@ test('siswa gagal absen di hari yang bukan hari absensi', function () {
         ->assertSee('Absensi hanya tersedia pada hari '.Pengaturan::labelHariAbsen().'.');
 });
 
-// TS.ABS.006 / TC.ABS.006.001 — Negative
+// TS.ABS.005 / TC.ABS.005.001 — Negative
 test('siswa tidak bisa absen dua kali dalam sehari', function () {
     Carbon::setTestNow('2026-07-06 06:35:00');
     siswaMasuk();
@@ -99,7 +87,7 @@ test('siswa tidak bisa absen dua kali dalam sehari', function () {
         ->assertSee('Anda sudah absen hari ini.');
 });
 
-// TS.ABS.007 / TC.ABS.007.001 — Negative
+// TS.ABS.006 / TC.ABS.006.001 — Negative
 test('absensi ditolak ketika berkas selfienya bukan gambar', function () {
     Carbon::setTestNow('2026-07-06 06:35:00');
     siswaMasuk();
@@ -112,7 +100,7 @@ test('absensi ditolak ketika berkas selfienya bukan gambar', function () {
         ->assertSee('File harus berupa gambar.');
 });
 
-// TS.ABS.008 / TC.ABS.008.001 — Positive
+// TS.ABS.007 / TC.ABS.007.001 — Positive
 test('halaman absensi menampilkan status hari ini setelah siswa absen', function () {
     Carbon::setTestNow('2026-07-06 06:35:00');
     siswaMasuk();
@@ -124,7 +112,7 @@ test('halaman absensi menampilkan status hari ini setelah siswa absen', function
         ->assertSee('Absensi Anda hari ini sudah tercatat. Sampai jumpa besok!');
 });
 
-// TS.ABS.009 / TC.ABS.009.001 — Positive
+// TS.ABS.008 / TC.ABS.008.001 — Positive
 test('halaman absensi memberi tahu siswa bahwa hari ini bukan hari absensi', function () {
     Carbon::setTestNow('2026-07-05 06:35:00'); // Minggu.
     siswaMasuk();
@@ -133,7 +121,7 @@ test('halaman absensi memberi tahu siswa bahwa hari ini bukan hari absensi', fun
         ->assertSee('Absensi hanya tersedia pada hari Senin sampai Jumat.');
 });
 
-// TS.ABS.010 / TC.ABS.010.001 — Positive
+// TS.ABS.009 / TC.ABS.009.001 — Positive
 test('halaman absensi memberi tahu siswa bahwa waktunya belum tiba', function () {
     Carbon::setTestNow('2026-07-06 06:00:00');
     siswaMasuk();
@@ -142,7 +130,7 @@ test('halaman absensi memberi tahu siswa bahwa waktunya belum tiba', function ()
         ->assertSee('Belum waktunya absen. Absen dimulai pukul 06:30.');
 });
 
-// TS.ABS.011 / TC.ABS.011.001 — Positive
+// TS.ABS.010 / TC.ABS.010.001 — Positive
 test('halaman absensi memberi tahu siswa bahwa waktunya sudah berakhir', function () {
     Carbon::setTestNow('2026-07-06 07:30:00');
     siswaMasuk();

@@ -21,7 +21,6 @@ class DashboardController extends Controller
         $stats = [
             'points' => $points,
             'hadir' => $attendances->where('status', 'hadir')->count(),
-            'terlambat' => $attendances->where('status', 'terlambat')->count(),
             'izin_sakit' => $attendances->whereIn('status', ['izin', 'sakit'])->count(),
             'alpha' => $attendances->where('status', 'alpha')->count(),
         ];

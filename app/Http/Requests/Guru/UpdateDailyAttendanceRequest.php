@@ -24,7 +24,7 @@ class UpdateDailyAttendanceRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'status' => ['required', Rule::in(['hadir', 'terlambat', 'izin', 'sakit', 'alpha'])],
+            'status' => ['required', Rule::in(['hadir', 'izin', 'sakit', 'alpha'])],
         ];
     }
 }

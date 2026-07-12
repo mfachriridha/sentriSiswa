@@ -223,12 +223,12 @@ class DemoSchoolSeeder extends Seeder
             ->values();
 
         $patterns = [
-            // Rajin: nyaris selalu hadir, sesekali terlambat.
-            ['hadir', 'hadir', 'hadir', 'hadir', 'terlambat', 'hadir', 'hadir'],
-            // Sering terlambat.
-            ['terlambat', 'hadir', 'terlambat', 'hadir', 'terlambat', 'hadir', 'hadir'],
+            // Rajin: nyaris selalu hadir.
+            ['hadir', 'hadir', 'hadir', 'hadir', 'hadir', 'hadir', 'hadir'],
+            // Sesekali izin atau sakit.
+            ['hadir', 'izin', 'hadir', 'hadir', 'sakit', 'hadir', 'hadir'],
             // Rawan: campuran izin/sakit/alpha, alpha cukup sering biar kena ambang batas (>=3).
-            ['izin', 'sakit', 'alpha', 'hadir', 'alpha', 'izin', 'alpha', 'sakit', 'hadir', 'terlambat'],
+            ['izin', 'sakit', 'alpha', 'hadir', 'alpha', 'izin', 'alpha', 'sakit', 'hadir', 'hadir'],
         ];
 
         $today = today()->toDateString();
@@ -246,14 +246,14 @@ class DemoSchoolSeeder extends Seeder
                 if ($date->toDateString() === $today) {
                     $status = match ($idx % 3) {
                         0 => 'hadir',
-                        1 => 'terlambat',
+                        1 => 'hadir',
                         default => 'belum_absen',
                     };
                 }
 
                 $selfiePath = null;
 
-                if (in_array($status, ['hadir', 'terlambat'], true)) {
+                if ($status === 'hadir') {
                     $selfiePath = $this->generateSelfiePhoto($student->nisn, $date->toDateString());
                 }
 
@@ -261,11 +261,7 @@ class DemoSchoolSeeder extends Seeder
                     'profil_siswa_id' => $student->nisn,
                     'tanggal' => $date->toDateString(),
                     'status' => $status,
-                    'waktu_masuk' => match ($status) {
-                        'hadir' => '06:45:00',
-                        'terlambat' => '07:'.sprintf('%02d', 10 + ($idx % 15)).':00',
-                        default => null,
-                    },
+                    'waktu_masuk' => $status === 'hadir' ? '06:45:00' : null,
                     'path_selfie' => $selfiePath,
                 ]);
             }

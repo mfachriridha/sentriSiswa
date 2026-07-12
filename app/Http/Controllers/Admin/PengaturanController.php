@@ -20,17 +20,11 @@ class PengaturanController extends Controller
     {
         $startTime = Pengaturan::get('attendance_start_time', '06:30');
         $endTime = Pengaturan::get('attendance_end_time', '07:00');
-        $lateToleranceMinutes = Pengaturan::get('attendance_late_tolerance_minutes');
         $updatedAt = Pengaturan::get('attendance_time_updated_at');
-
-        if (! is_numeric($lateToleranceMinutes)) {
-            $lateToleranceMinutes = max(0, $this->minutesFromTime($endTime) - $this->minutesFromTime(Pengaturan::get('attendance_late_time', '07:00')));
-        }
 
         return view('admin.pengaturan.attendance-time', [
             'startTime' => $startTime,
             'endTime' => $endTime,
-            'lateToleranceMinutes' => (int) $lateToleranceMinutes,
             'updatedAt' => $updatedAt,
             'activeDays' => Pengaturan::hariAbsen(),
             'dayNames' => Pengaturan::namaHari(),
@@ -42,14 +36,12 @@ class PengaturanController extends Controller
     {
         $hours = array_map(fn (int $hour): string => sprintf('%02d', $hour), range(0, 23));
         $minutes = array_map(fn (int $minute): string => sprintf('%02d', $minute), range(0, 59));
-        $lateToleranceOptions = array_map('strval', [0, 5, 10, 15, 20, 30, 45, 60, 90, 120]);
 
         $validated = $request->validate([
             'attendance_start_hour' => ['required', Rule::in($hours)],
             'attendance_start_minute' => ['required', Rule::in($minutes)],
             'attendance_end_hour' => ['required', Rule::in($hours)],
             'attendance_end_minute' => ['required', Rule::in($minutes)],
-            'attendance_late_tolerance_minutes' => ['required', Rule::in($lateToleranceOptions)],
             'attendance_active_days' => ['required', 'array', 'min:1'],
             'attendance_active_days.*' => ['integer', 'between:1,7'],
         ], [
@@ -57,7 +49,6 @@ class PengaturanController extends Controller
             'attendance_start_minute.required' => 'Jam dan menit wajib diisi.',
             'attendance_end_hour.required' => 'Jam dan menit wajib diisi.',
             'attendance_end_minute.required' => 'Jam dan menit wajib diisi.',
-            'attendance_late_tolerance_minutes.required' => 'Toleransi terlambat wajib diisi.',
             'attendance_active_days.required' => 'Pilih minimal satu hari aktif absensi.',
             'attendance_active_days.min' => 'Pilih minimal satu hari aktif absensi.',
             '*.in' => 'Pilihan jam atau menit tidak valid.',
@@ -65,18 +56,10 @@ class PengaturanController extends Controller
 
         $startTime = $this->formatAttendanceTime($validated['attendance_start_hour'], $validated['attendance_start_minute']);
         $endTime = $this->formatAttendanceTime($validated['attendance_end_hour'], $validated['attendance_end_minute']);
-        $lateToleranceMinutes = (int) $validated['attendance_late_tolerance_minutes'];
-        $attendanceDurationMinutes = $this->minutesFromTime($endTime) - $this->minutesFromTime($startTime);
 
         if ($endTime <= $startTime) {
             return back()->withErrors([
                 'attendance_end_hour' => 'Jam selesai harus setelah jam mulai.',
-            ])->withInput();
-        }
-
-        if ($lateToleranceMinutes > $attendanceDurationMinutes) {
-            return back()->withErrors([
-                'attendance_late_tolerance_minutes' => 'Toleransi terlambat tidak boleh lebih besar dari durasi absen.',
             ])->withInput();
         }
 
@@ -88,8 +71,6 @@ class PengaturanController extends Controller
 
         Pengaturan::set('attendance_start_time', $startTime);
         Pengaturan::set('attendance_end_time', $endTime);
-        Pengaturan::set('attendance_late_tolerance_minutes', (string) $lateToleranceMinutes);
-        Pengaturan::set('attendance_late_time', $this->formatMinutesAsTime($this->minutesFromTime($endTime) - $lateToleranceMinutes));
         Pengaturan::set('attendance_active_days', $activeDays->implode(','));
         Pengaturan::set('attendance_time_updated_at', now()->toDateTimeString());
 
@@ -99,20 +80,6 @@ class PengaturanController extends Controller
     private function formatAttendanceTime(int|string $hour, int|string $minute): string
     {
         return sprintf('%02d:%02d', (int) $hour, (int) $minute);
-    }
-
-    private function minutesFromTime(string $time): int
-    {
-        [$hour, $minute] = array_map('intval', explode(':', $time));
-
-        return ($hour * 60) + $minute;
-    }
-
-    private function formatMinutesAsTime(int $minutes): string
-    {
-        $minutes %= 1440;
-
-        return sprintf('%02d:%02d', intdiv($minutes, 60), $minutes % 60);
     }
 
     public function attendanceLocation(): View

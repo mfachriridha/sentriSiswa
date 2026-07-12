@@ -134,27 +134,19 @@ class SekolahAktifSeeder extends Seeder
                 $status = $pola[$tanggalAbsen->dayOfYear % count($pola)];
 
                 // Hari ini sengaja dibuat beragam supaya papan pantau "hari ini"
-                // tidak kelihatan janggal: ada yang sudah hadir, ada yang
-                // terlambat, ada yang memang belum absen.
+                // tidak kelihatan janggal: ada yang sudah hadir, ada yang memang
+                // belum absen.
                 if ($tanggalAbsen->toDateString() === $hariIni) {
-                    $status = match ($urutan % 4) {
-                        0, 1 => 'hadir',
-                        2 => 'terlambat',
-                        default => 'belum_absen',
-                    };
+                    $status = $urutan % 4 === 3 ? 'belum_absen' : 'hadir';
                 }
 
-                $hadir = in_array($status, ['hadir', 'terlambat'], true);
+                $hadir = $status === 'hadir';
 
                 $antrean[] = [
                     'profil_siswa_id' => $profil->nisn,
                     'tanggal' => $tanggalAbsen->toDateString(),
                     'status' => $status,
-                    'waktu_masuk' => match ($status) {
-                        'hadir' => sprintf('06:%02d:00', 35 + ($urutan % 10)),
-                        'terlambat' => sprintf('07:%02d:00', 5 + ($urutan % 20)),
-                        default => null,
-                    },
+                    'waktu_masuk' => $hadir ? sprintf('06:%02d:00', 35 + ($urutan % 10)) : null,
                     'path_selfie' => $hadir ? $selfie : null,
                     'dibuat_pada' => now(),
                     'diperbarui_pada' => now(),
@@ -202,8 +194,8 @@ class SekolahAktifSeeder extends Seeder
     }
 
     /**
-     * Pola kehadiran seorang siswa. Sebagian besar siswa rajin, sebagian sering
-     * terlambat, dan sebagian kecil rawan — alpha-nya sengaja dibuat sampai
+     * Pola kehadiran seorang siswa. Sebagian besar siswa rajin, sebagian sesekali
+     * izin atau sakit, dan sebagian kecil rawan — alpha-nya sengaja dibuat sampai
      * menembus ambang peringatan (3 kali) supaya penandanya benar-benar muncul.
      *
      * @return list<string>
@@ -211,10 +203,10 @@ class SekolahAktifSeeder extends Seeder
     private function polaKehadiran(int $urutan): array
     {
         return match (true) {
-            $urutan % 10 < 6 => ['hadir', 'hadir', 'hadir', 'hadir', 'hadir', 'terlambat', 'hadir'],
-            $urutan % 10 < 8 => ['terlambat', 'hadir', 'hadir', 'terlambat', 'hadir', 'izin', 'hadir'],
+            $urutan % 10 < 6 => ['hadir', 'hadir', 'hadir', 'hadir', 'hadir', 'hadir', 'hadir'],
+            $urutan % 10 < 8 => ['hadir', 'hadir', 'hadir', 'izin', 'hadir', 'hadir', 'hadir'],
             $urutan % 10 === 8 => ['hadir', 'sakit', 'hadir', 'izin', 'hadir', 'hadir', 'sakit'],
-            default => ['alpha', 'hadir', 'alpha', 'izin', 'alpha', 'hadir', 'sakit', 'alpha', 'terlambat'],
+            default => ['alpha', 'hadir', 'alpha', 'izin', 'alpha', 'hadir', 'sakit', 'alpha', 'hadir'],
         };
     }
 

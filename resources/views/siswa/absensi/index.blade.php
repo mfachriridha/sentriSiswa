@@ -37,7 +37,6 @@
             @php
                 $statusConfig = [
                     'hadir'     => ['bg-green-50 text-green-700 border-green-200',   'Hadir',     'bg-green-100'],
-                    'terlambat' => ['bg-amber-50 text-amber-700 border-amber-200',   'Terlambat', 'bg-amber-100'],
                     'izin'      => ['bg-blue-50 text-blue-700 border-blue-200',      'Izin',      'bg-blue-100'],
                     'sakit'     => ['bg-purple-50 text-purple-700 border-purple-200','Sakit',     'bg-purple-100'],
                     'alpha'     => ['bg-red-50 text-red-700 border-red-200',         'Alpha',     'bg-red-100'],
@@ -327,9 +326,8 @@
         <h2 class="mb-4 text-base font-semibold text-gray-900">Ringkasan Bulan Ini</h2>
 
         @php
-            $totalDays = $stats['hadir'] + $stats['terlambat'] + $stats['izin'] + $stats['sakit'] + $stats['alpha'];
-            $totalHadir = $stats['hadir'] + $stats['terlambat'];
-            $pct = $totalDays > 0 ? round($totalHadir / $totalDays * 100) : 0;
+            $totalDays = $stats['hadir'] + $stats['izin'] + $stats['sakit'] + $stats['alpha'];
+            $pct = $totalDays > 0 ? round($stats['hadir'] / $totalDays * 100) : 0;
         @endphp
 
         <div class="mb-4 rounded-lg bg-gray-50 p-3 text-center">
@@ -341,10 +339,6 @@
             <div class="flex items-center justify-between rounded-lg border border-green-100 bg-green-50 px-3 py-2.5">
                 <span class="text-sm font-medium text-green-700">Hadir</span>
                 <span class="text-lg font-bold text-green-700">{{ $stats['hadir'] }}</span>
-            </div>
-            <div class="flex items-center justify-between rounded-lg border border-amber-100 bg-amber-50 px-3 py-2.5">
-                <span class="text-sm font-medium text-amber-700">Terlambat</span>
-                <span class="text-lg font-bold text-amber-700">{{ $stats['terlambat'] }}</span>
             </div>
             <div class="flex items-center justify-between rounded-lg border border-blue-100 bg-blue-50 px-3 py-2.5">
                 <span class="text-sm font-medium text-blue-700">Izin</span>

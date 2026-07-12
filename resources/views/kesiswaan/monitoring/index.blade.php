@@ -9,7 +9,6 @@
     $description = $description ?? 'Pantau kehadiran dan pelanggaran siswa secara keseluruhan.';
     $statusLabels = [
         'hadir' => ['Hadir', 'bg-green-50 text-green-700'],
-        'terlambat' => ['Terlambat', 'bg-amber-50 text-amber-700'],
         'sakit' => ['Sakit', 'bg-blue-50 text-blue-700'],
         'izin' => ['Izin', 'bg-indigo-50 text-indigo-700'],
         'alpha' => ['Alpha', 'bg-red-50 text-red-700'],

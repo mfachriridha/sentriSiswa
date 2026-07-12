@@ -24,7 +24,7 @@ class BkMonitoringController extends Controller
             ->withSum(['pengajuanPoin' => fn ($query) => $query->disetujui()], 'jumlah_poin')
             ->with(['absensi' => fn ($query) => $query->whereDate('tanggal', today())])
             ->withCount(['absensi as total_attendances'])
-            ->withCount(['absensi as present_attendances' => fn ($query) => $query->whereIn('status', ['hadir', 'terlambat'])])
+            ->withCount(['absensi as present_attendances' => fn ($query) => $query->where('status', 'hadir')])
             ->whereHas('kelas', fn ($query) => $query->where('tingkat', $grade));
 
         if ($search) {

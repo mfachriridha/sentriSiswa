@@ -62,7 +62,6 @@ class RekapAbsensiController extends Controller
                 $student->nis ?? '-',
                 $student->pengguna->nama,
                 $stat['hadir'],
-                $stat['terlambat'],
                 $stat['izin'],
                 $stat['sakit'],
                 $stat['alpha'],
@@ -163,7 +162,7 @@ class RekapAbsensiController extends Controller
     /**
      * @param  Collection<int, ProfilSiswa>  $students
      * @param  Collection<int, Collection<int, Absensi>>  $attendances
-     * @return array<int, array{hadir: int, terlambat: int, izin: int, sakit: int, alpha: int, percentage: float}>
+     * @return array<int, array{hadir: int, izin: int, sakit: int, alpha: int, percentage: float}>
      */
     private function calculateStats(Collection $students, Collection $attendances): array
     {
@@ -171,17 +170,16 @@ class RekapAbsensiController extends Controller
 
         foreach ($students as $student) {
             $studentAttendances = $attendances->get($student->nisn, collect());
-            $finalAttendances = $studentAttendances->whereIn('status', ['hadir', 'terlambat', 'izin', 'sakit', 'alpha']);
+            $finalAttendances = $studentAttendances->whereIn('status', ['hadir', 'izin', 'sakit', 'alpha']);
             $finalAttendanceCount = $finalAttendances->count();
 
             $stats[$student->nisn] = [
                 'hadir' => $finalAttendances->where('status', 'hadir')->count(),
-                'terlambat' => $finalAttendances->where('status', 'terlambat')->count(),
                 'izin' => $finalAttendances->where('status', 'izin')->count(),
                 'sakit' => $finalAttendances->where('status', 'sakit')->count(),
                 'alpha' => $finalAttendances->where('status', 'alpha')->count(),
                 'percentage' => $finalAttendanceCount > 0
-                    ? round(($finalAttendances->whereIn('status', ['hadir', 'terlambat'])->count() / $finalAttendanceCount) * 100, 1)
+                    ? round(($finalAttendances->where('status', 'hadir')->count() / $finalAttendanceCount) * 100, 1)
                     : 0,
             ];
         }

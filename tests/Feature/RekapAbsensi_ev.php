@@ -16,9 +16,9 @@ uses(RefreshDatabase::class);
 | kehadiran kelasnya. Hasilnya diperiksa dari apa yang muncul di layar, bukan
 | dari basis data.
 |
-| Rekap merangkum jumlah hadir, terlambat, izin, sakit, dan alpha tiap siswa pada
+| Rekap merangkum jumlah hadir, izin, sakit, dan alpha tiap siswa pada
 | rentang tanggal yang dipilih, beserta persentase kehadirannya. Persentase
-| dihitung dari hari yang sudah punya keputusan: (hadir + terlambat) dibagi
+| dihitung dari hari yang sudah punya keputusan: hadir dibagi
 | seluruh hari yang tercatat. Rekap bisa disaring per siswa, per status, atau per
 | bulan, dan bisa diunduh sebagai berkas Excel maupun PDF.
 |
@@ -35,7 +35,7 @@ test('wali kelas melihat rekap kehadiran kelasnya', function () {
 
     catatKehadiran($siswa->nisn, '2026-07-06', 'hadir');
     catatKehadiran($siswa->nisn, '2026-07-07', 'hadir');
-    catatKehadiran($siswa->nisn, '2026-07-08', 'terlambat');
+    catatKehadiran($siswa->nisn, '2026-07-08', 'hadir');
 
     $this->get('/wali-kelas/absensi?mulai=2026-07-06&selesai=2026-07-10')
         ->assertSee('Rekap Absensi')

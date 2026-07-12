@@ -54,7 +54,6 @@
                     @php
                         $statusConfig = [
                             'hadir' => ['bg-green-50 text-green-700', 'Hadir'],
-                            'terlambat' => ['bg-amber-50 text-amber-700', 'Terlambat'],
                             'izin' => ['bg-blue-50 text-blue-700', 'Izin'],
                             'sakit' => ['bg-purple-50 text-purple-700', 'Sakit'],
                             'alpha' => ['bg-red-50 text-red-700', 'Alpha'],

@@ -32,7 +32,6 @@
     @php
         $summaryCards = [
             ['status' => 'hadir', 'label' => 'Hadir', 'class' => 'border-green-200 bg-green-50 text-green-700'],
-            ['status' => 'terlambat', 'label' => 'Terlambat', 'class' => 'border-amber-200 bg-amber-50 text-amber-700'],
             ['status' => 'izin', 'label' => 'Izin', 'class' => 'border-blue-200 bg-blue-50 text-blue-700'],
             ['status' => 'sakit', 'label' => 'Sakit', 'class' => 'border-purple-200 bg-purple-50 text-purple-700'],
             ['status' => 'alpha', 'label' => 'Alpha', 'class' => 'border-red-200 bg-red-50 text-red-700'],
@@ -76,7 +75,6 @@
         @php
             $statusConfig = [
                 'hadir' => ['bg-green-100 text-green-800', 'Hadir'],
-                'terlambat' => ['bg-amber-100 text-amber-800', 'Terlambat'],
                 'izin' => ['bg-blue-100 text-blue-800', 'Izin'],
                 'sakit' => ['bg-purple-100 text-purple-800', 'Sakit'],
                 'alpha' => ['bg-red-100 text-red-800', 'Alpha'],
@@ -182,7 +180,6 @@
             <select id="status" name="status"
                     class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
                 <option value="hadir">Hadir</option>
-                <option value="terlambat">Terlambat</option>
                 <option value="izin">Izin</option>
                 <option value="sakit">Sakit</option>
                 <option value="alpha">Alpha</option>

@@ -55,7 +55,7 @@
                 <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
                 <select id="status" name="status" class="mt-1 w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
                     <option value="">Semua Status</option>
-                    @foreach (['hadir' => 'Hadir', 'terlambat' => 'Terlambat', 'izin' => 'Izin', 'sakit' => 'Sakit', 'alpha' => 'Alpha'] as $value => $label)
+                    @foreach (['hadir' => 'Hadir', 'izin' => 'Izin', 'sakit' => 'Sakit', 'alpha' => 'Alpha'] as $value => $label)
                         <option value="{{ $value }}" {{ $statusFilter === $value ? 'selected' : '' }}>{{ $label }}</option>
                     @endforeach
                 </select>
@@ -82,7 +82,6 @@
                     <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Nama</th>
                     <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Kelas</th>
                     <th class="px-4 py-2.5 text-center text-xs font-medium uppercase tracking-wider text-gray-500">H</th>
-                    <th class="px-4 py-2.5 text-center text-xs font-medium uppercase tracking-wider text-gray-500">T</th>
                     <th class="px-4 py-2.5 text-center text-xs font-medium uppercase tracking-wider text-gray-500">I</th>
                     <th class="px-4 py-2.5 text-center text-xs font-medium uppercase tracking-wider text-gray-500">S</th>
                     <th class="px-4 py-2.5 text-center text-xs font-medium uppercase tracking-wider text-gray-500">A</th>
@@ -98,7 +97,6 @@
                         <td class="whitespace-nowrap px-4 py-3 text-sm font-medium text-gray-900">{{ $student->pengguna->nama }}</td>
                         <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-500">{{ $student->kelas?->nama ?? '-' }}</td>
                         <td class="whitespace-nowrap px-4 py-3 text-center text-sm font-medium text-green-600">{{ $stat['hadir'] }}</td>
-                        <td class="whitespace-nowrap px-4 py-3 text-center text-sm font-medium text-amber-600">{{ $stat['terlambat'] }}</td>
                         <td class="whitespace-nowrap px-4 py-3 text-center text-sm font-medium text-blue-600">{{ $stat['izin'] }}</td>
                         <td class="whitespace-nowrap px-4 py-3 text-center text-sm font-medium text-purple-600">{{ $stat['sakit'] }}</td>
                         <td class="whitespace-nowrap px-4 py-3 text-center text-sm font-medium text-red-600">{{ $stat['alpha'] }}</td>
@@ -124,7 +122,6 @@
 
     <div class="mt-5 flex flex-wrap gap-4 text-xs text-gray-500">
         <span>H: Hadir</span>
-        <span>T: Terlambat</span>
         <span>I: Izin</span>
         <span>S: Sakit</span>
         <span>A: Alpha</span>

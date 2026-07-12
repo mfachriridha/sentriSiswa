@@ -36,7 +36,6 @@
                         @php
                             $statusMap = [
                                 'hadir'       => ['label' => 'Hadir', 'class' => 'badge-success'],
-                                'terlambat'   => ['label' => 'Terlambat', 'class' => 'badge-warning'],
                                 'izin'        => ['label' => 'Izin', 'class' => 'badge-info'],
                                 'sakit'       => ['label' => 'Sakit', 'class' => 'badge-info'],
                                 'alpha'       => ['label' => 'Tidak Hadir', 'class' => 'badge-error'],

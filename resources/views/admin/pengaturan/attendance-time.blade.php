@@ -6,12 +6,11 @@
 @php
     [$startHour, $startMinute] = explode(':', $startTime);
     [$endHour, $endMinute] = explode(':', $endTime);
-    $lateToleranceOptions = [0, 5, 10, 15, 20, 30, 45, 60, 90, 120];
 @endphp
 
 <div class="mb-6">
     <h1 class="text-2xl font-bold text-gray-900">Waktu Absen</h1>
-    <p class="mt-1 text-sm text-gray-500">Konfigurasi jam absensi dan toleransi keterlambatan.</p>
+    <p class="mt-1 text-sm text-gray-500">Konfigurasi jam mulai, jam selesai, dan hari aktif absensi.</p>
 </div>
 
 {{-- Tanpa ini, admin menyimpan konfigurasi lalu tidak melihat konfirmasi apa
@@ -23,7 +22,7 @@
         <div>
             <p class="text-sm font-semibold text-green-800">Konfigurasi tersimpan</p>
             <p class="mt-1 text-sm text-green-700">
-                Jam mulai {{ $startTime }}, selesai {{ $endTime }}, toleransi terlambat {{ $lateToleranceMinutes }} menit.
+                Jam mulai {{ $startTime }}, selesai {{ $endTime }}.
             </p>
             <p class="mt-1 text-sm text-green-700">Hari aktif: {{ $activeDaysLabel }}.</p>
         </div>
@@ -44,14 +43,6 @@
           startMinute: @js(old('attendance_start_minute', $startMinute)),
           endHour: @js(old('attendance_end_hour', $endHour)),
           endMinute: @js(old('attendance_end_minute', $endMinute)),
-          lateTolerance: @js((string) old('attendance_late_tolerance_minutes', $lateToleranceMinutes)),
-          get lateUntil() {
-              const totalMinutes = Math.max(0, (Number(this.endHour) * 60) + Number(this.endMinute) - Number(this.lateTolerance));
-              const hour = String(Math.floor(totalMinutes / 60)).padStart(2, '0');
-              const minute = String(totalMinutes % 60).padStart(2, '0');
-
-              return `${hour}:${minute}`;
-          }
       }"
       x-effect="
           if ((Number(endHour) * 60 + Number(endMinute)) < (Number(startHour) * 60 + Number(startMinute))) {
@@ -64,7 +55,7 @@
     @method('PUT')
 
     <div class="rounded-xl border border-gray-200 bg-white p-6">
-        <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
                 <label class="block text-sm font-medium text-gray-700">
                     Jam Mulai Absen <span class="text-red-500">*</span>
@@ -145,33 +136,6 @@
                 @enderror
             </div>
 
-            <div>
-                <label for="attendance_late_tolerance_minutes" class="block text-sm font-medium text-gray-700">
-                    Toleransi Terlambat <span class="text-red-500">*</span>
-                </label>
-                <div class="mt-1.5 flex flex-wrap items-center gap-2">
-                    <select id="attendance_late_tolerance_minutes"
-                            name="attendance_late_tolerance_minutes"
-                            x-model="lateTolerance"
-                            required
-                            class="block w-28 rounded-lg border border-gray-300 px-3 py-3 text-sm text-gray-900 shadow-sm transition-colors focus:border-primary focus:ring-2 focus:ring-primary/20">
-                        @foreach($lateToleranceOptions as $option)
-                            <option value="{{ $option }}" @selected((string) old('attendance_late_tolerance_minutes', $lateToleranceMinutes) === (string) $option)>{{ $option }}</option>
-                        @endforeach
-                    </select>
-                    <span class="text-sm text-gray-500">menit</span>
-                </div>
-                <template x-if="Number(lateTolerance) === 0">
-                    <p class="mt-1.5 text-sm text-gray-500">Tidak ada zona terlambat — absen sebelum jam selesai dianggap hadir.</p>
-                </template>
-                <template x-if="Number(lateTolerance) > 0">
-                    <p class="mt-1.5 text-sm text-gray-500">Hadir sebelum jam <span x-text="lateUntil"></span>, terlambat sesudahnya hingga jam selesai.</p>
-                </template>
-
-                @error('attendance_late_tolerance_minutes')
-                    <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
         </div>
 
         <div class="mt-6 border-t border-gray-100 pt-6">

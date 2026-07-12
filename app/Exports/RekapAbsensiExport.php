@@ -29,7 +29,6 @@ class RekapAbsensiExport implements FromArray, WithHeadings
             'NIS',
             'Nama',
             'Hadir',
-            'Terlambat',
             'Izin',
             'Sakit',
             'Alpha',
