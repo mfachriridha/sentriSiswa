@@ -1,6 +1,7 @@
 <?php
 
 use App\Exports\ArrayExport;
+use App\Mail\OtpMail;
 use App\Models\Absensi;
 use App\Models\JenisPelanggaran;
 use App\Models\Kelas;
@@ -10,6 +11,7 @@ use App\Models\ProfilGuru;
 use App\Models\ProfilSiswa;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use Tests\TestCase;
@@ -137,6 +139,13 @@ function kelasBerisiSiswa(string $namaSiswa = 'Ahmad Fauzi', string $nisn = '123
         'status' => 'registered',
     ]);
 
+    // Guru selalu punya NIP, karena NIP itulah yang dipakai admin saat mendaftarkannya.
+    ProfilGuru::factory()->homeroom()->create([
+        'pengguna_id' => $wali->id,
+        'nip' => '198701012010011001',
+        'telepon' => '081234567890',
+    ]);
+
     $kelas = Kelas::create([
         'nama' => '10 IPA 1',
         'tingkat' => '10',
@@ -196,6 +205,30 @@ function kesiswaanMasuk(): Pengguna
     masukSebagai($kesiswaan);
 
     return $kesiswaan;
+}
+
+/** Kode OTP yang diterima pengguna lewat email. */
+function kodeOtpTerkirim(): string
+{
+    $kode = '';
+
+    Mail::assertSent(OtpMail::class, function (OtpMail $surel) use (&$kode): bool {
+        $kode = $surel->otp;
+
+        return true;
+    });
+
+    return $kode;
+}
+
+/** Wali kelas yang sudah masuk dan sudah meminta kode OTP untuk mengganti kata sandi. */
+function mintaKodeGantiSandi(): string
+{
+    waliKelasDenganKelas();
+
+    test()->post('/wali-kelas/profil/ganti-sandi');
+
+    return kodeOtpTerkirim();
 }
 
 /** Siswa yang sudah masuk ke aplikasi, beserta kelas tempatnya terdaftar. */

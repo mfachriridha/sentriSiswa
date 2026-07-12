@@ -13,6 +13,12 @@
     };
 @endphp
 
+<x-alert type="success" :message="session('success')" />
+
+@error('photo')
+    <x-alert type="error" :message="$message" />
+@enderror
+
 <div class="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-center gap-4">
     <div>
         <h1 class="text-2xl font-bold text-gray-900">Profil Saya</h1>

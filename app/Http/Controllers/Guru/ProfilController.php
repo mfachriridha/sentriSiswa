@@ -8,6 +8,7 @@ use App\Services\OtpService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
@@ -129,7 +130,7 @@ class ProfilController extends Controller
         ]);
 
         $user = Auth::user();
-        $user->update(['password' => \Illuminate\Support\Facades\Hash::make($request->password)]);
+        $user->update(['password' => Hash::make($request->password)]);
         session()->forget('password_change_verified');
 
         return redirect()->route($user->profilRouteName())
@@ -151,6 +152,10 @@ class ProfilController extends Controller
     {
         request()->validate([
             'photo' => ['required', 'image', 'max:2048'],
+        ], [
+            'photo.required' => 'Foto wajib dipilih.',
+            'photo.image' => 'Foto harus berupa file gambar.',
+            'photo.max' => 'Ukuran foto maksimal 2MB.',
         ]);
 
         $teacher = Auth::user();
