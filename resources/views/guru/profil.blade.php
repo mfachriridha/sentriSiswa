@@ -77,5 +77,9 @@
             <p class="mt-1.5 text-sm text-gray-900">{{ $profile?->telepon ?? '-' }}</p>
         </div>
     </div>
+
+    <div class="mt-5">
+        <x-kartu-google :pengguna="$teacher" />
+    </div>
 </div>
 @endsection

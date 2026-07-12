@@ -10,14 +10,13 @@ use App\Models\ProfilGuru;
 use App\Models\ProfilSiswa;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
 
 class RegisterController extends Controller
 {
     public function create(): View
     {
-        return view('auth.register', ['adminWhatsAppUrl' => $this->adminWhatsAppUrl()]);
+        return view('auth.register');
     }
 
     public function verify(VerifyIdentityRequest $request): RedirectResponse|View
@@ -30,7 +29,6 @@ class RegisterController extends Controller
             if (! $profile) {
                 return back()
                     ->withErrors(['identity' => 'NIP tidak ditemukan.'])
-                    ->with('admin_whatsapp_url', $this->adminWhatsAppUrl())
                     ->onlyInput('identity', 'role');
             }
 
@@ -45,7 +43,6 @@ class RegisterController extends Controller
             if (! $profile) {
                 return back()
                     ->withErrors(['identity' => 'NISN/NIS tidak ditemukan.'])
-                    ->with('admin_whatsapp_url', $this->adminWhatsAppUrl())
                     ->onlyInput('identity', 'role');
             }
 
@@ -111,30 +108,5 @@ class RegisterController extends Controller
         return redirect()
             ->route('login')
             ->with('success', 'Pendaftaran berhasil. Silakan masuk dengan akun Anda.');
-    }
-
-    private function adminWhatsAppUrl(): ?string
-    {
-        if (! Schema::hasColumn('pengguna', 'nomor_wa')) {
-            return null;
-        }
-
-        $number = Pengguna::where('peran', 'admin')
-            ->whereNotNull('nomor_wa')
-            ->value('nomor_wa');
-
-        if (! $number) {
-            return null;
-        }
-
-        $normalized = preg_replace('/[^0-9+]/', '', $number);
-
-        if (str_starts_with($normalized, '+62')) {
-            $normalized = substr($normalized, 1);
-        } elseif (str_starts_with($normalized, '0')) {
-            $normalized = '62'.substr($normalized, 1);
-        }
-
-        return 'https://wa.me/'.ltrim($normalized, '+');
     }
 }

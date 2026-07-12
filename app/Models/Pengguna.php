@@ -2,18 +2,20 @@
 
 namespace App\Models;
 
+use Database\Factories\PenggunaFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Schema;
 
-#[Fillable(['nama', 'email', 'password', 'peran', 'status', 'foto', 'nomor_wa'])]
+#[Fillable(['nama', 'email', 'password', 'peran', 'status', 'foto', 'nomor_wa', 'id_google'])]
 #[Hidden(['password', 'remember_token'])]
 class Pengguna extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\PenggunaFactory> */
+    /** @use HasFactory<PenggunaFactory> */
     use HasFactory, Notifiable;
 
     protected $table = 'pengguna';
@@ -39,6 +41,47 @@ class Pengguna extends Authenticatable
     public function hasPassword(): bool
     {
         return $this->password !== null;
+    }
+
+    public function punyaGoogle(): bool
+    {
+        return $this->id_google !== null;
+    }
+
+    /**
+     * Tautan WhatsApp ke admin sekolah, untuk pengguna yang mentok: identitasnya
+     * belum didaftarkan, atau akunnya belum bisa dimasuki.
+     *
+     * Nomornya diisi admin lewat halaman Profil. Selama masih kosong, tidak ada
+     * tautan yang bisa ditawarkan.
+     */
+    public static function tautanWhatsappAdmin(): ?string
+    {
+        if (! Schema::hasColumn('pengguna', 'nomor_wa')) {
+            return null;
+        }
+
+        $nomor = static::where('peran', 'admin')
+            ->whereNotNull('nomor_wa')
+            ->value('nomor_wa');
+
+        if (! $nomor) {
+            return null;
+        }
+
+        $bersih = preg_replace('/[^0-9+]/', '', (string) $nomor);
+        $bersih = ltrim((string) $bersih, '+');
+
+        if ($bersih === '') {
+            return null;
+        }
+
+        // Nomor Indonesia biasa ditulis diawali 0; WhatsApp memintanya berkode negara.
+        if (str_starts_with($bersih, '0')) {
+            $bersih = '62'.substr($bersih, 1);
+        }
+
+        return 'https://wa.me/'.$bersih;
     }
 
     public function needsAdminSetup(): bool
