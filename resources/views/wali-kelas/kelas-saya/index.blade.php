@@ -101,20 +101,12 @@
                             $attendance = $attendances->get($student->nisn);
                             $status = $attendance?->status ?? 'belum_absen';
                             [$badgeClass, $statusLabel] = $statusConfig[$status];
-                            $alphaCount = $alphaWarnings->get($student->nisn, 0);
                         @endphp
                         <tr class="hover:bg-gray-50">
                             <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-900">{{ $index + 1 }}</td>
                             <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-500">{{ $student->nis ?? '-' }}</td>
                             <td class="whitespace-nowrap px-4 py-3 text-sm font-medium text-gray-900">
-                                <div class="flex flex-col gap-1">
-                                    <span>{{ $student->pengguna->nama }}</span>
-                                    @if($alphaCount >= $warningThreshold)
-                                        <span class="inline-flex w-fit items-center rounded-full bg-red-50 px-2 py-0.5 text-xs font-medium text-red-700">
-                                            Peringatan alpha {{ $alphaCount }}x
-                                        </span>
-                                    @endif
-                                </div>
+                                {{ $student->pengguna->nama }}
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 text-sm">
                                 <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {{ $badgeClass }}">

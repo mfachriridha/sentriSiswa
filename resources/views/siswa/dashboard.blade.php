@@ -5,13 +5,6 @@
 @section('content')
 <x-page-header title="Dashboard Siswa" :description="'Selamat datang, '.auth()->user()->nama.'!'" />
 
-@if($alphaWarningCount >= $warningThreshold)
-    <div class="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-        <span class="font-semibold">Peringatan absensi:</span>
-        kamu sudah alpha {{ $alphaWarningCount }} kali pada semester berjalan.
-    </div>
-@endif
-
 @php
     $pointsColor = $stats['points'] > 75 ? 'text-green-600' : ($stats['points'] > 50 ? 'text-amber-600' : 'text-red-600');
 @endphp

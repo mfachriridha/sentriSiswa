@@ -6,7 +6,7 @@
 <x-page-header title="Dashboard Guru" :description="'Selamat datang, '.auth()->user()->nama.'!'" />
 
 @if (! empty($summary['homeroom']))
-    <div class="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
+    <div class="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <div class="rounded-xl border border-gray-200 bg-white p-4">
             <p class="text-xs font-semibold uppercase text-gray-500">Kelas</p>
             <p class="mt-1 text-xl font-bold text-gray-900">{{ $summary['homeroom']['class_name'] }}</p>
@@ -27,15 +27,11 @@
             <p class="text-xs font-semibold uppercase text-gray-500">Belum Absen</p>
             <p class="mt-1 text-xl font-bold text-gray-700">{{ $summary['homeroom']['belum_absen'] }}</p>
         </div>
-        <div class="rounded-xl border border-red-200 bg-red-50 p-4">
-            <p class="text-xs font-semibold uppercase text-red-600">Peringatan Alpha</p>
-            <p class="mt-1 text-xl font-bold text-red-700">{{ $summary['homeroom']['warnings'] }}</p>
-        </div>
     </div>
 @endif
 
 @if (! empty($summary['bk']))
-    <div class="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+    <div class="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <div class="rounded-xl border border-gray-200 bg-white p-4">
             <p class="text-xs font-semibold uppercase text-gray-500">Tingkat BK</p>
             <p class="mt-1 text-xl font-bold text-gray-900">{{ $summary['bk']['grade'] ?? '-' }}</p>
@@ -52,15 +48,11 @@
             <p class="text-xs font-semibold uppercase text-gray-500">Pelanggaran</p>
             <p class="mt-1 text-xl font-bold text-gray-900">{{ $summary['bk']['pelanggaran'] }}</p>
         </div>
-        <div class="rounded-xl border border-red-200 bg-red-50 p-4">
-            <p class="text-xs font-semibold uppercase text-red-600">Peringatan Alpha</p>
-            <p class="mt-1 text-xl font-bold text-red-700">{{ $summary['bk']['warnings'] }}</p>
-        </div>
     </div>
 @endif
 
 @if (! empty($summary['kesiswaan']))
-    <div class="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+    <div class="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <div class="rounded-xl border border-gray-200 bg-white p-4">
             <p class="text-xs font-semibold uppercase text-gray-500">Kelas</p>
             <p class="mt-1 text-xl font-bold text-gray-900">{{ $summary['kesiswaan']['classes'] }}</p>
@@ -76,10 +68,6 @@
         <div class="rounded-xl border border-amber-200 bg-amber-50 p-4">
             <p class="text-xs font-semibold uppercase text-amber-600">Pengajuan Poin Pending</p>
             <p class="mt-1 text-xl font-bold text-amber-700">{{ $summary['kesiswaan']['pengajuan_poin_pending'] }}</p>
-        </div>
-        <div class="rounded-xl border border-red-200 bg-red-50 p-4">
-            <p class="text-xs font-semibold uppercase text-red-600">Peringatan Alpha</p>
-            <p class="mt-1 text-xl font-bold text-red-700">{{ $summary['kesiswaan']['warnings'] }}</p>
         </div>
     </div>
 @endif

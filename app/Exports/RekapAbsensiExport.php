@@ -33,7 +33,6 @@ class RekapAbsensiExport implements FromArray, WithHeadings
             'Sakit',
             'Alpha',
             'Persentase Kehadiran',
-            'Keterangan',
         ];
     }
 }

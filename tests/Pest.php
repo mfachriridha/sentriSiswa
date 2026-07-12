@@ -9,6 +9,7 @@ use App\Models\PelanggaranSiswa;
 use App\Models\Pengguna;
 use App\Models\ProfilGuru;
 use App\Models\ProfilSiswa;
+use App\Models\TokenAksesAbsensi;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
@@ -191,6 +192,29 @@ function catatKehadiran(string $nisn, string $tanggal, string $status): void
         'tanggal' => $tanggal,
         'status' => $status,
     ]);
+}
+
+/**
+ * Mencatat kehadiran lengkap dengan jam absen dan foto selfie-nya, seperti hasil
+ * siswa yang benar-benar absen sendiri lewat aplikasi.
+ */
+function catatKehadiranBerselfie(string $nisn, string $tanggal, string $jamMasuk = '06:45'): Absensi
+{
+    return Absensi::create([
+        'profil_siswa_id' => $nisn,
+        'tanggal' => $tanggal,
+        'status' => 'hadir',
+        'waktu_masuk' => $tanggal.' '.$jamMasuk.':00',
+        'path_selfie' => "attendance-selfies/{$nisn}/{$tanggal}.jpg",
+    ]);
+}
+
+/** Link cek absensi yang dikirim ke WhatsApp wali kelas untuk diteruskan ke orang tua. */
+function linkAbsensiOrangTua(int $kelasId, string $tanggal): string
+{
+    $token = TokenAksesAbsensi::buatAtauPerbarui($kelasId, $tanggal);
+
+    return "/absensi/publik/{$token->token}";
 }
 
 /** Kesiswaan yang sudah masuk ke aplikasi. */

@@ -31,11 +31,6 @@
     <div>
         <h1 class="text-2xl font-bold text-gray-900">Detail Siswa</h1>
         <p class="mt-2 text-sm text-gray-500">{{ $student->pengguna->nama }} · {{ $student->kelas->nama ?? '-' }}</p>
-        @if(($alphaWarningCount ?? 0) >= ($warningThreshold ?? 3))
-            <p class="mt-2 inline-flex items-center rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-700">
-                Peringatan alpha {{ $alphaWarningCount }} kali pada semester berjalan
-            </p>
-        @endif
     </div>
     @if(! empty($createViolationRoute))
         <a href="{{ $createViolationRoute }}" class="inline-flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-700 transition-colors">

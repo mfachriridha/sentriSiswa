@@ -14,8 +14,8 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                     </svg>
                 </div>
-                <h1 class="text-2xl font-bold text-slate-800">Cek Absensi Siswa</html>
-                <p class="text-slate-500 text-sm mt-1">Masukkan data siswa untuk melihat absensi hari ini</p>
+                <h1 class="text-2xl font-bold text-slate-800">Cek Absensi Anak</h1>
+                <p class="text-slate-500 text-sm mt-1">Masukkan NISN anak untuk melihat absensinya hari ini</p>
             </div>
 
             @if ($errors->any())
@@ -27,16 +27,10 @@
             <form action="{{ route('absensi.publik.cek', $token) }}" method="POST" class="space-y-5">
                 @csrf
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-2">NIS atau NISN Siswa</label>
-                    <input type="text" name="nis_nisn" value="{{ old('nis_nisn') }}" required
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">NISN Siswa</label>
+                    <input type="text" name="nisn" value="{{ old('nisn') }}" required inputmode="numeric"
                            class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
-                           placeholder="Masukkan NIS atau NISN">
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-2">Nama Lengkap Siswa</label>
-                    <input type="text" name="nama" value="{{ old('nama') }}" required
-                           class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
-                           placeholder="Nama lengkap sesuai data sekolah">
+                           placeholder="Masukkan NISN">
                 </div>
                 <button type="submit"
                         class="w-full py-3 px-6 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition active:scale-95 text-sm">

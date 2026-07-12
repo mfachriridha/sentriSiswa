@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Absensi;
 use App\Models\ProfilSiswa;
 use App\Models\TokenAksesAbsensi;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -21,7 +22,7 @@ class AbsensiPublikController extends Controller
         return view('publik.absensi.verifikasi', compact('token'));
     }
 
-    public function cek(Request $request, string $token)
+    public function cek(Request $request, string $token): View|RedirectResponse
     {
         $aksesToken = TokenAksesAbsensi::where('token', $token)->first();
 
@@ -30,26 +31,29 @@ class AbsensiPublikController extends Controller
         }
 
         $request->validate([
-            'nis_nisn' => ['required', 'string'],
-            'nama' => ['required', 'string'],
+            'nisn' => ['required', 'string'],
         ]);
 
-        $siswa = ProfilSiswa::where('kelas_id', $aksesToken->kelas_id)
-            ->where(function ($q) use ($request) {
-                $q->where('nis', $request->nis_nisn)
-                  ->orWhere('nisn', $request->nis_nisn);
-            })
-            ->whereHas('pengguna', fn ($q) => $q->whereRaw('LOWER(nama) = ?', [strtolower($request->nama)]))
+        $siswa = ProfilSiswa::with(['pengguna', 'kelas'])
+            ->where('kelas_id', $aksesToken->kelas_id)
+            ->where('nisn', $request->string('nisn')->trim()->value())
             ->first();
 
         if (! $siswa) {
-            return back()->withErrors(['nis_nisn' => 'Data siswa tidak ditemukan. Periksa NIS/NISN dan nama lengkap.'])->withInput();
+            return back()
+                ->withErrors(['nisn' => 'Data siswa tidak ditemukan. Periksa kembali NISN-nya.'])
+                ->withInput();
         }
 
-        $absensi = Absensi::where('profil_siswa_id', $siswa->id)
+        $absensi = Absensi::where('profil_siswa_id', $siswa->nisn)
             ->where('tanggal', $aksesToken->tanggal)
             ->first();
 
-        return view('publik.absensi.hasil', compact('siswa', 'absensi', 'aksesToken'));
+        return view('publik.absensi.hasil', [
+            'siswa' => $siswa,
+            'absensi' => $absensi,
+            'aksesToken' => $aksesToken,
+            'poin' => $siswa->poin,
+        ]);
     }
 }

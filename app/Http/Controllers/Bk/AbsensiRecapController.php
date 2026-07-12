@@ -9,7 +9,6 @@ use App\Models\Absensi;
 use App\Models\Kelas;
 use App\Models\Pengaturan;
 use App\Models\ProfilSiswa;
-use App\Services\AbsenceWarningService;
 use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -68,7 +67,6 @@ class AbsensiRecapController extends Controller
 
         $rows = $students->map(function (ProfilSiswa $student) use ($stats): array {
             $stat = $stats[$student->nisn];
-            $flagged = $stat['alpha'] >= AbsenceWarningService::Threshold;
 
             return [
                 $student->nis ?? '-',
@@ -79,12 +77,11 @@ class AbsensiRecapController extends Controller
                 $stat['sakit'],
                 $stat['alpha'],
                 $stat['percentage'].'%',
-                $flagged ? 'Perlu tindak lanjut' : '-',
             ];
         })->values()->all();
 
         return Excel::download(
-            new ArrayExport(['NIS', 'Nama', 'Kelas', 'Hadir', 'Izin', 'Sakit', 'Alpha', 'Kehadiran', 'Keterangan'], $rows),
+            new ArrayExport(['NIS', 'Nama', 'Kelas', 'Hadir', 'Izin', 'Sakit', 'Alpha', 'Kehadiran'], $rows),
             "rekap-absensi-tingkat-{$bkGrade}-{$startDate}-sampai-{$endDate}.xlsx",
         );
     }
@@ -119,7 +116,6 @@ class AbsensiRecapController extends Controller
             'stats' => $stats,
             'startDate' => $startDate,
             'endDate' => $endDate,
-            'warningThreshold' => AbsenceWarningService::Threshold,
         ]);
     }
 

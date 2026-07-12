@@ -5,14 +5,13 @@ namespace App\Http\Controllers\Guru;
 use App\Http\Controllers\Controller;
 use App\Models\Kelas;
 use App\Models\ProfilSiswa;
-use App\Services\AbsenceWarningService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class BkMonitoringController extends Controller
 {
-    public function index(Request $request, AbsenceWarningService $absenceWarning): View
+    public function index(Request $request): View
     {
         $grade = Auth::user()->profilGuru?->tingkat;
         $search = $request->get('search', '');
@@ -44,13 +43,11 @@ class BkMonitoringController extends Controller
         $routePrefix = 'bk.monitoring';
         $title = 'Monitoring BK';
         $description = 'Pantau absensi dan pelanggaran siswa tingkat '.$grade.'.';
-        $alphaWarnings = $absenceWarning->alphaCountsForStudentIds($students->getCollection()->pluck('nisn'));
-        $warningThreshold = AbsenceWarningService::Threshold;
 
-        return view('kesiswaan.monitoring.index', compact('students', 'classes', 'search', 'filterClass', 'routePrefix', 'title', 'description', 'alphaWarnings', 'warningThreshold'));
+        return view('kesiswaan.monitoring.index', compact('students', 'classes', 'search', 'filterClass', 'routePrefix', 'title', 'description'));
     }
 
-    public function show(ProfilSiswa $monitoring, AbsenceWarningService $absenceWarning): View
+    public function show(ProfilSiswa $monitoring): View
     {
         $grade = Auth::user()->profilGuru?->tingkat;
 
@@ -68,8 +65,6 @@ class BkMonitoringController extends Controller
             'student' => $monitoring,
             'backRoute' => route('bk.monitoring.index'),
             'createViolationRoute' => null,
-            'alphaWarningCount' => $absenceWarning->alphaCountForStudentId($monitoring->nisn),
-            'warningThreshold' => AbsenceWarningService::Threshold,
         ]);
     }
 }

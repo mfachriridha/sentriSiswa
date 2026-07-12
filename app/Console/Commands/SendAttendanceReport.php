@@ -135,7 +135,8 @@ class SendAttendanceReport extends Command
                 }
             }
 
-            $message .= "\n🔗 Input absensi siswa:\n{$linkAbsensi}\n";
+            // Isinya hasil absensi, bukan formulir input.
+            $message .= "\n🔗 Cek hasil absensi:\n{$linkAbsensi}\n";
 
             $pesanWa = PesanWhatsapp::create([
                 'kelas_id' => $kelas->id,

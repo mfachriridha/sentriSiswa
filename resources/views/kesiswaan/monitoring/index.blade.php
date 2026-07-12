@@ -72,18 +72,10 @@
             </thead>
             <tbody class="divide-y divide-gray-100">
                 @forelse ($students as $student)
-                    @php
-                        $alphaCount = $alphaWarnings->get($student->nisn, 0);
-                    @endphp
                     <tr class="hover:bg-gray-50 transition-colors">
                         <td class="px-4 py-3">
                             <div class="font-medium text-gray-900">{{ $student->pengguna->nama }}</div>
                             <div class="mt-1 text-sm text-gray-500">{{ $student->nisn }} / {{ $student->nis }}</div>
-                            @if($alphaCount >= $warningThreshold)
-                                <span class="mt-2 inline-flex items-center rounded-full bg-red-50 px-2.5 py-0.5 text-xs font-medium text-red-700">
-                                    Peringatan alpha {{ $alphaCount }}x
-                                </span>
-                            @endif
                         </td>
                         <td class="px-4 py-3 text-gray-700">{{ $student->kelas->nama ?? '-' }}</td>
                         <td class="px-4 py-3">

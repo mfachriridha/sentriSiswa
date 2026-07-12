@@ -7,7 +7,6 @@ use App\Http\Requests\Guru\UpdateDailyAttendanceRequest;
 use App\Models\Absensi;
 use App\Models\Pengaturan;
 use App\Models\ProfilSiswa;
-use App\Services\AbsenceWarningService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -16,7 +15,7 @@ use Illuminate\View\View;
 
 class ClassRosterController extends Controller
 {
-    public function index(Request $request, AbsenceWarningService $absenceWarning): View
+    public function index(Request $request): View
     {
         $class = Auth::user()->kelasWali;
 
@@ -60,10 +59,7 @@ class ClassRosterController extends Controller
             $stats[$status]++;
         }
 
-        $alphaWarnings = $absenceWarning->alphaCountsForStudentIds($students->pluck('nisn'));
-        $warningThreshold = AbsenceWarningService::Threshold;
-
-        return view('wali-kelas.kelas-saya.index', compact('class', 'students', 'attendances', 'stats', 'isWeekday', 'alphaWarnings', 'warningThreshold'));
+        return view('wali-kelas.kelas-saya.index', compact('class', 'students', 'attendances', 'stats', 'isWeekday'));
     }
 
     public function statusAbsensi(): JsonResponse
@@ -126,7 +122,7 @@ class ClassRosterController extends Controller
         return redirect()->route('wali-kelas.kelas-saya')->with('success', 'Status absensi hari ini berhasil diperbarui.');
     }
 
-    public function show(ProfilSiswa $profilSiswa, AbsenceWarningService $absenceWarning): View
+    public function show(ProfilSiswa $profilSiswa): View
     {
         $class = Auth::user()->kelasWali;
 
@@ -147,8 +143,6 @@ class ClassRosterController extends Controller
             'backRoute' => route('wali-kelas.kelas-saya'),
             'backLabel' => 'Kembali ke Kelas Saya',
             'createViolationRoute' => null,
-            'alphaWarningCount' => $absenceWarning->alphaCountForStudentId($profilSiswa->nisn),
-            'warningThreshold' => AbsenceWarningService::Threshold,
         ]);
     }
 }

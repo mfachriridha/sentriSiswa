@@ -16,8 +16,7 @@ uses(RefreshDatabase::class);
 |
 | Tiap guru BK hanya memegang satu tingkat, dan hanya boleh memantau siswa di
 | tingkat itu. Siswa dari tingkat lain tidak tampil dan rinciannya pun tidak bisa
-| dibuka. Siswa yang alpha-nya sudah mencapai ambang batas, yaitu tiga kali pada
-| semester berjalan, ditandai supaya bisa ditindaklanjuti.
+| dibuka.
 |
 */
 
@@ -114,34 +113,4 @@ test('pencarian yang tidak menemukan siswa menampilkan keterangannya', function 
 
     $this->get('/bk/monitoring?search=Nama Yang Tidak Ada')
         ->assertSee('Tidak ada data siswa ditemukan.');
-});
-
-// TS.MAB.008 / TC.MAB.008.001 — Negative — sekali di bawah ambang
-test('siswa dengan alpha dua kali belum ditandai perlu ditindaklanjuti', function () {
-    Carbon::setTestNow('2026-07-10 08:00:00');
-    [, , $siswa] = kelasBerisiSiswa();
-
-    catatKehadiran($siswa->nisn, '2026-07-06', 'alpha');
-    catatKehadiran($siswa->nisn, '2026-07-07', 'alpha');
-
-    bkMasuk('10');
-
-    $this->get('/bk/monitoring')
-        ->assertSee('Ahmad Fauzi')
-        ->assertDontSee('Peringatan alpha');
-});
-
-// TS.MAB.008 / TC.MAB.008.002 — Positive — tepat pada ambang
-test('siswa dengan alpha tiga kali ditandai perlu ditindaklanjuti', function () {
-    Carbon::setTestNow('2026-07-10 08:00:00');
-    [, , $siswa] = kelasBerisiSiswa();
-
-    catatKehadiran($siswa->nisn, '2026-07-06', 'alpha');
-    catatKehadiran($siswa->nisn, '2026-07-07', 'alpha');
-    catatKehadiran($siswa->nisn, '2026-07-08', 'alpha');
-
-    bkMasuk('10');
-
-    $this->get('/bk/monitoring')
-        ->assertSee('Peringatan alpha 3x');
 });

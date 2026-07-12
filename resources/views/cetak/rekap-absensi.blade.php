@@ -30,16 +30,14 @@
             <th class="border border-slate-300 px-2 py-1.5 text-center">Sakit</th>
             <th class="border border-slate-300 px-2 py-1.5 text-center">Alpha</th>
             <th class="border border-slate-300 px-2 py-1.5 text-center">Kehadiran</th>
-            <th class="border border-slate-300 px-2 py-1.5">Keterangan</th>
         </tr>
     </thead>
     <tbody>
         @forelse ($students as $index => $student)
             @php
                 $stat = $stats[$student->nisn];
-                $perluTindakLanjut = $stat['alpha'] >= $warningThreshold;
             @endphp
-            <tr class="{{ $perluTindakLanjut ? 'bg-red-50' : '' }}">
+            <tr>
                 <td class="border border-slate-300 px-2 py-1.5">{{ $index + 1 }}</td>
                 <td class="border border-slate-300 px-2 py-1.5">{{ $student->nis ?? '-' }}</td>
                 <td class="border border-slate-300 px-2 py-1.5">{{ $student->pengguna->nama }}</td>
@@ -51,13 +49,10 @@
                 <td class="border border-slate-300 px-2 py-1.5 text-center">{{ $stat['sakit'] }}</td>
                 <td class="border border-slate-300 px-2 py-1.5 text-center">{{ $stat['alpha'] }}</td>
                 <td class="border border-slate-300 px-2 py-1.5 text-center">{{ $stat['percentage'] }}%</td>
-                <td class="border border-slate-300 px-2 py-1.5 {{ $perluTindakLanjut ? 'font-bold text-red-700' : '' }}">
-                    {{ $perluTindakLanjut ? 'Perlu tindak lanjut' : '-' }}
-                </td>
             </tr>
         @empty
             <tr>
-                <td class="border border-slate-300 px-2 py-4 text-center text-slate-500" colspan="{{ $tampilkanKelas ? 10 : 9 }}">
+                <td class="border border-slate-300 px-2 py-4 text-center text-slate-500" colspan="{{ $tampilkanKelas ? 9 : 8 }}">
                     Tidak ada data.
                 </td>
             </tr>
