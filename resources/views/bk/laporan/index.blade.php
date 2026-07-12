@@ -13,9 +13,9 @@
            class="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
             Export Excel
         </a>
-        <a href="{{ route('bk.laporan.ekspor-pdf', request()->query()) }}"
+        <a href="{{ route('bk.laporan.cetak', request()->query()) }}" target="_blank" rel="noopener"
            class="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50">
-            Export PDF
+            Cetak / Simpan PDF
         </a>
     </div>
 </div>

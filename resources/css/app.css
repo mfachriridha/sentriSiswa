@@ -95,3 +95,42 @@
         }
     }
 }
+
+/*
+ * Halaman cetak.
+ *
+ * Laporan dan rekap tidak lagi dirender jadi PDF di server; halamannya dicetak
+ * langsung oleh peramban, dan pengguna memilih "Simpan sebagai PDF" di dialog
+ * cetak. Aturan di bawah ini yang membuat hasil cetaknya rapi.
+ */
+@media print {
+    @page {
+        size: A4;
+        margin: 12mm;
+    }
+
+    /* Bilah tombol dan apa pun yang hanya berguna di layar. */
+    .cetak-sembunyi {
+        display: none !important;
+    }
+
+    body {
+        background: #fff;
+    }
+
+    /* Kepala tabel diulang di tiap halaman, dan baris tidak dipotong di tengah. */
+    thead {
+        display: table-header-group;
+    }
+
+    tr,
+    img {
+        break-inside: avoid;
+    }
+
+    /* Warna latar tabel tetap tercetak, bukan dibuang peramban. */
+    * {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}

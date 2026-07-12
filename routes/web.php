@@ -134,7 +134,7 @@ Route::middleware(['auth', 'registered', 'wali-kelas'])->prefix('wali-kelas')->n
     Route::put('/kelas-saya/{profilSiswa}/absensi', [KelasSayaController::class, 'updateAttendance'])->name('kelas-saya.absensi.update');
     Route::get('/absensi', [WaliKelasAbsensiController::class, 'index'])->name('absensi.index');
     Route::get('/absensi/ekspor-excel', [WaliKelasAbsensiController::class, 'exportExcel'])->name('absensi.ekspor-excel');
-    Route::get('/absensi/ekspor-pdf', [WaliKelasAbsensiController::class, 'exportPdf'])->name('absensi.ekspor-pdf');
+    Route::get('/absensi/cetak', [WaliKelasAbsensiController::class, 'cetak'])->name('absensi.cetak');
     Route::get('/pelanggaran', [RiwayatPelanggaranController::class, 'index'])->name('pelanggaran');
     Route::get('/pengajuan-poin', [WaliKelasPengajuanPoinController::class, 'index'])->name('pengajuan-poin.index');
     Route::get('/pengajuan-poin/buat', [WaliKelasPengajuanPoinController::class, 'create'])->name('pengajuan-poin.create');
@@ -156,7 +156,7 @@ Route::middleware(['auth', 'registered', 'bk'])->prefix('bk')->name('bk.')->grou
     Route::get('/monitoring/{monitoring}', [BkMonitoringController::class, 'show'])->name('monitoring.show');
     Route::get('/laporan', [BkAbsensiRecapController::class, 'index'])->name('laporan.index');
     Route::get('/laporan/ekspor-excel', [BkAbsensiRecapController::class, 'exportExcel'])->name('laporan.ekspor-excel');
-    Route::get('/laporan/ekspor-pdf', [BkAbsensiRecapController::class, 'exportPdf'])->name('laporan.ekspor-pdf');
+    Route::get('/laporan/cetak', [BkAbsensiRecapController::class, 'cetak'])->name('laporan.cetak');
     Route::get('/profil', [BkProfilController::class, 'show'])->name('profil');
     Route::get('/profil/edit', [BkProfilController::class, 'edit'])->name('profil.edit');
     Route::put('/profil', [BkProfilController::class, 'update'])->name('profil.update');
@@ -184,7 +184,7 @@ Route::middleware(['auth', 'registered', 'kesiswaan'])->prefix('kesiswaan')->nam
     Route::put('/pengajuan-poin/{pengajuanPoin}/reject', [KesiswaanPengajuanPoinController::class, 'reject'])->name('pengajuan-poin.reject');
     Route::get('/laporan', [KesiswaanLaporanController::class, 'index'])->name('laporan.index');
     Route::get('/laporan/ekspor-excel', [KesiswaanLaporanController::class, 'exportExcel'])->name('laporan.ekspor-excel');
-    Route::get('/laporan/ekspor-pdf', [KesiswaanLaporanController::class, 'exportPdf'])->name('laporan.ekspor-pdf');
+    Route::get('/laporan/cetak', [KesiswaanLaporanController::class, 'cetak'])->name('laporan.cetak');
     Route::get('/tata-tertib', [TataTertibController::class, 'index'])->name('tata-tertib.index');
     Route::post('/tata-tertib', [TataTertibController::class, 'store'])->name('tata-tertib.store');
     Route::put('/tata-tertib/{tataTertib}/publish', [TataTertibController::class, 'publish'])->name('tata-tertib.publish');

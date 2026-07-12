@@ -10,7 +10,6 @@ use App\Models\Kelas;
 use App\Models\Pengaturan;
 use App\Models\ProfilSiswa;
 use App\Services\AbsenceWarningService;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -18,7 +17,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\Response;
 
 class AbsensiRecapController extends Controller
 {
@@ -92,7 +90,12 @@ class AbsensiRecapController extends Controller
         );
     }
 
-    public function exportPdf(AttendanceRecapFilterRequest $request): Response
+    /**
+     * Halaman cetak rekap tingkat. Kolom Kelas wajib ada di sini: satu tingkat
+     * berisi belasan kelas, jadi tanpa kolom itu tidak ada cara membedakan siapa
+     * dari kelas mana.
+     */
+    public function cetak(AttendanceRecapFilterRequest $request): View
     {
         $bkGrade = Auth::user()->loadMissing('profilGuru')->profilGuru?->tingkat;
 
@@ -109,16 +112,16 @@ class AbsensiRecapController extends Controller
         $stats = $this->calculateStats($students, $this->attendancesByStudent($students, $startDate, $endDate));
         $students = $this->filterStudentsByStatus($students, $stats, $validated['status'] ?? '');
 
-        $pdf = Pdf::loadView('exports.attendance-recap-pdf', [
-            'title' => "Rekap Absensi Tingkat {$bkGrade}",
-            'className' => "Tingkat {$bkGrade}",
+        return view('cetak.rekap-absensi', [
+            'judul' => "Rekap Absensi Tingkat {$bkGrade}",
+            'subjudul' => "Tingkat {$bkGrade}",
+            'tampilkanKelas' => true,
             'students' => $students,
             'stats' => $stats,
             'startDate' => $startDate,
             'endDate' => $endDate,
-        ])->setPaper('a4', 'portrait');
-
-        return $pdf->download("rekap-absensi-tingkat-{$bkGrade}-{$startDate}-sampai-{$endDate}.pdf");
+            'warningThreshold' => AbsenceWarningService::Threshold,
+        ]);
     }
 
     /**

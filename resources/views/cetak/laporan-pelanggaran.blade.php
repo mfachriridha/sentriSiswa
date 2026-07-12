@@ -1,0 +1,118 @@
+@extends('layouts.cetak')
+
+{{-- Judul halaman dipakai peramban sebagai nama berkas bawaan saat disimpan jadi PDF. --}}
+@section('title', $judul)
+@section('judul-cetak', $judul)
+
+@php
+    $th = 'border border-slate-300 px-2 py-1.5 text-left';
+    $td = 'border border-slate-300 px-2 py-1.5 align-top';
+@endphp
+
+@section('content')
+<header class="mb-6 border-b border-slate-200 pb-4">
+    <h1 class="text-xl font-bold text-slate-900">{{ $judul }}</h1>
+    <p class="mt-1 text-xs text-slate-400">
+        Dicetak {{ now()->locale('id')->translatedFormat('d F Y H:i') }}
+    </p>
+</header>
+
+@if (! empty($pointsSummary))
+    <section class="mb-8">
+        <h2 class="mb-2 text-sm font-bold text-slate-800">
+            Ringkasan Sisa Poin Seluruh Siswa
+            <span class="font-normal text-slate-500">(diurutkan dari poin tersisa terkecil)</span>
+        </h2>
+        <table class="w-full border-collapse text-xs">
+            <thead>
+                <tr class="bg-slate-100">
+                    <th class="{{ $th }}">NIS</th>
+                    <th class="{{ $th }}">Nama</th>
+                    <th class="{{ $th }}">Kelas</th>
+                    <th class="{{ $th }}">Sisa Poin</th>
+                    <th class="{{ $th }}">Keterangan</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($pointsSummary as $row)
+                    <tr class="{{ $row['sisa_poin'] <= 50 ? 'bg-red-50' : '' }}">
+                        <td class="{{ $td }}">{{ $row['nis'] }}</td>
+                        <td class="{{ $td }}">{{ $row['nama'] }}</td>
+                        <td class="{{ $td }}">{{ $row['kelas'] }}</td>
+                        <td class="{{ $td }}">{{ $row['sisa_poin'] }}</td>
+                        <td class="{{ $td }} {{ $row['sisa_poin'] <= 50 ? 'font-bold text-red-700' : '' }}">
+                            {{ $row['sisa_poin'] <= 50 ? 'Perhatian' : '-' }}
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </section>
+@endif
+
+<section class="mb-8">
+    <h2 class="mb-2 text-sm font-bold text-slate-800">Pelanggaran</h2>
+    <table class="w-full border-collapse text-xs">
+        <thead>
+            <tr class="bg-slate-100">
+                <th class="{{ $th }}">Tanggal</th>
+                <th class="{{ $th }}">Siswa</th>
+                <th class="{{ $th }}">Kelas</th>
+                <th class="{{ $th }}">Pelanggaran</th>
+                <th class="{{ $th }}">Kategori</th>
+                <th class="{{ $th }}">Poin</th>
+                <th class="{{ $th }}">Dicatat Oleh</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse ($violations as $violation)
+                <tr>
+                    <td class="{{ $td }}">{{ $violation->tanggal_pelanggaran->locale('id')->translatedFormat('d F Y') }}</td>
+                    <td class="{{ $td }}">{{ $violation->profilSiswa?->pengguna?->nama ?? '-' }}</td>
+                    <td class="{{ $td }}">{{ $violation->profilSiswa?->kelas?->nama ?? '-' }}</td>
+                    <td class="{{ $td }}">{{ $violation->nama_pelanggaran }}</td>
+                    <td class="{{ $td }}">{{ $categoryLabels[$violation->kategori_pelanggaran] ?? $violation->kategori_pelanggaran }}</td>
+                    <td class="{{ $td }} font-semibold text-red-700">-{{ $violation->pengurangan_poin }}</td>
+                    <td class="{{ $td }}">{{ $violation->dicatatOleh?->nama ?? '-' }}</td>
+                </tr>
+            @empty
+                <tr>
+                    <td class="{{ $td }} text-center text-slate-500" colspan="7">Tidak ada data laporan.</td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
+</section>
+
+<section>
+    <h2 class="mb-2 text-sm font-bold text-slate-800">Penambahan Poin (Disetujui)</h2>
+    <table class="w-full border-collapse text-xs">
+        <thead>
+            <tr class="bg-slate-100">
+                <th class="{{ $th }}">Tanggal Disetujui</th>
+                <th class="{{ $th }}">Siswa</th>
+                <th class="{{ $th }}">Kelas</th>
+                <th class="{{ $th }}">Alasan</th>
+                <th class="{{ $th }}">Poin</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse ($pengajuanPoin as $pengajuan)
+                <tr>
+                    <td class="{{ $td }}">{{ $pengajuan->disetujui_pada?->locale('id')->translatedFormat('d F Y') ?? '-' }}</td>
+                    <td class="{{ $td }}">{{ $pengajuan->profilSiswa?->pengguna?->nama ?? '-' }}</td>
+                    <td class="{{ $td }}">{{ $pengajuan->profilSiswa?->kelas?->nama ?? '-' }}</td>
+                    <td class="{{ $td }}">{{ $pengajuan->alasan }}</td>
+                    <td class="{{ $td }} font-semibold text-green-700">+{{ $pengajuan->jumlah_poin }}</td>
+                </tr>
+            @empty
+                <tr>
+                    <td class="{{ $td }} text-center text-slate-500" colspan="5">
+                        Tidak ada penambahan poin disetujui pada rentang ini.
+                    </td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
+</section>
+@endsection

@@ -11,13 +11,11 @@ use App\Models\PelanggaranSiswa;
 use App\Models\PengajuanPoin;
 use App\Models\Pengguna;
 use App\Models\ProfilSiswa;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\Response;
 
 class LaporanPelanggaranController extends Controller
 {
@@ -72,22 +70,23 @@ class LaporanPelanggaranController extends Controller
         ], $rows), 'laporan-pelanggaran.xlsx');
     }
 
-    public function exportPdf(ViolationReportFilterRequest $request): Response
+    /**
+     * Halaman cetak laporan. Peramban yang mencetaknya, dan penggunanya memilih
+     * "Simpan sebagai PDF" di dialog cetak.
+     */
+    public function cetak(ViolationReportFilterRequest $request): View
     {
         [$violations, $filters] = $this->reportData($request, paginated: false);
         $user = Auth::user()->loadMissing('profilGuru');
-        $title = $user->isBk() ? 'Laporan BK' : 'Laporan Kesiswaan';
 
-        $pdf = Pdf::loadView('exports.violation-report-pdf', [
-            'title' => $title,
+        return view('cetak.laporan-pelanggaran', [
+            'judul' => $user->isBk() ? 'Laporan BK' : 'Laporan Kesiswaan',
             'violations' => $violations,
             'filters' => $filters,
             'pengajuanPoin' => $this->approvedPengajuanPoinQuery($filters, $user)->get(),
             'pointsSummary' => $this->allStudentsPointsSummary($filters, $user),
             'categoryLabels' => JenisPelanggaran::categoryLabels(),
-        ])->setPaper('a4', 'landscape');
-
-        return $pdf->download('laporan-pelanggaran.pdf');
+        ]);
     }
 
     private function reportData(ViolationReportFilterRequest $request, bool $paginated = true): array
@@ -132,7 +131,7 @@ class LaporanPelanggaranController extends Controller
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Builder<PengajuanPoin>
+     * @return Builder<PengajuanPoin>
      */
     private function approvedPengajuanPoinQuery(array $filters, Pengguna $user): Builder
     {

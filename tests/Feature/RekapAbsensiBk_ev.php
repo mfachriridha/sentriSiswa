@@ -138,15 +138,21 @@ test('guru bk mengunduh rekap kehadiran dalam berkas excel', function () {
 });
 
 // TS.RAB.008 / TC.RAB.008.001 — Positive
-test('guru bk mengunduh rekap kehadiran dalam berkas pdf', function () {
+test('halaman cetak rekap bk menyebutkan kelas tiap siswa', function () {
     Carbon::setTestNow('2026-07-10 08:00:00');
     kelasBerisiSiswa();
 
     bkMasuk('10');
 
-    $this->get('/bk/laporan/ekspor-pdf?mulai=2026-07-01&selesai=2026-07-10')
+    // Satu tingkat berisi belasan kelas, jadi tanpa kolom Kelas tidak ada cara
+    // membedakan siapa dari kelas mana.
+    $this->get('/bk/laporan/cetak?mulai=2026-07-01&selesai=2026-07-10')
         ->assertSuccessful()
-        ->assertDownload('rekap-absensi-tingkat-10-2026-07-01-sampai-2026-07-10.pdf');
+        ->assertSee('Rekap Absensi Tingkat 10')
+        ->assertSee('Kelas')
+        ->assertSee('Ahmad Fauzi')
+        ->assertSee('10 IPA 1')
+        ->assertSee('Cetak / Simpan PDF');
 });
 
 // TS.RAB.009 / TC.RAB.009.001 — Negative

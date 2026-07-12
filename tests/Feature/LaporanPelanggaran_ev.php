@@ -145,15 +145,19 @@ test('kesiswaan mengunduh laporan dalam berkas excel', function () {
 });
 
 // TS.LAP.008 / TC.LAP.008.001 — Positive
-test('kesiswaan mengunduh laporan dalam berkas pdf', function () {
+test('kesiswaan membuka halaman cetak laporan', function () {
     [, , $siswa] = kelasBerisiSiswa();
     catatPelanggaran($siswa, 'Terlambat masuk kelas', 'ringan', '2026-07-06', 10);
 
     kesiswaanMasuk();
 
-    $this->get('/kesiswaan/laporan/ekspor-pdf')
+    $this->get('/kesiswaan/laporan/cetak')
         ->assertSuccessful()
-        ->assertDownload('laporan-pelanggaran.pdf');
+        ->assertSee('Laporan Kesiswaan')
+        ->assertSee('Ahmad Fauzi')
+        ->assertSee('10 IPA 1')
+        ->assertSee('Penambahan Poin (Disetujui)')
+        ->assertSee('Cetak / Simpan PDF');
 });
 
 // TS.LAP.009 / TC.LAP.009.001 — Positive

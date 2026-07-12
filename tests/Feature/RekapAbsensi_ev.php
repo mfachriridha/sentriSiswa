@@ -133,13 +133,17 @@ test('wali kelas mengunduh rekap kehadiran dalam berkas excel', function () {
 });
 
 // TS.REA.008 / TC.REA.008.001 — Positive
-test('wali kelas mengunduh rekap kehadiran dalam berkas pdf', function () {
+test('wali kelas membuka halaman cetak rekap kehadiran kelasnya', function () {
     Carbon::setTestNow('2026-07-10 08:00:00');
-    waliKelasDenganKelas();
+    [, , $siswa] = waliKelasDenganKelas();
+    catatKehadiran($siswa->nisn, '2026-07-06', 'hadir');
 
-    $this->get('/wali-kelas/absensi/ekspor-pdf?mulai=2026-07-01&selesai=2026-07-10')
+    $this->get('/wali-kelas/absensi/cetak?mulai=2026-07-01&selesai=2026-07-10')
         ->assertSuccessful()
-        ->assertDownload('rekap-absensi-10 IPA 1-2026-07-01-sampai-2026-07-10.pdf');
+        ->assertSee('Rekap Absensi')
+        ->assertSee('Kelas 10 IPA 1')
+        ->assertSee('Ahmad Fauzi')
+        ->assertSee('Cetak / Simpan PDF');
 });
 
 // TS.REA.009 / TC.REA.009.001 — Negative

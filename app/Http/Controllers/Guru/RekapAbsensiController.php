@@ -9,7 +9,6 @@ use App\Models\Absensi;
 use App\Models\Pengaturan;
 use App\Models\ProfilSiswa;
 use App\Services\AbsenceWarningService;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -17,7 +16,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\Response;
 
 class RekapAbsensiController extends Controller
 {
@@ -79,7 +77,11 @@ class RekapAbsensiController extends Controller
         );
     }
 
-    public function exportPdf(AttendanceRecapFilterRequest $request): Response
+    /**
+     * Halaman cetak rekap. Peramban yang mencetaknya, dan penggunanya memilih
+     * "Simpan sebagai PDF" di dialog cetak.
+     */
+    public function cetak(AttendanceRecapFilterRequest $request): View
     {
         $class = Auth::user()->kelasWali;
 
@@ -93,16 +95,18 @@ class RekapAbsensiController extends Controller
         $stats = $this->calculateStats($students, $this->attendancesByStudent($students, $startDate, $endDate));
         $students = $this->filterStudentsByStatus($students, $stats, $validated['status'] ?? '');
 
-        $pdf = Pdf::loadView('exports.attendance-recap-pdf', [
-            'title' => 'Rekap Absensi',
-            'className' => $class->nama,
+        return view('cetak.rekap-absensi', [
+            'judul' => 'Rekap Absensi',
+            'subjudul' => 'Kelas '.$class->nama,
+            // Wali kelas hanya memegang satu kelas, jadi kolom Kelas isinya akan
+            // sama semua - mubazir.
+            'tampilkanKelas' => false,
             'students' => $students,
             'stats' => $stats,
             'startDate' => $startDate,
             'endDate' => $endDate,
-        ])->setPaper('a4', 'portrait');
-
-        return $pdf->download("rekap-absensi-{$class->nama}-{$startDate}-sampai-{$endDate}.pdf");
+            'warningThreshold' => AbsenceWarningService::Threshold,
+        ]);
     }
 
     /**
