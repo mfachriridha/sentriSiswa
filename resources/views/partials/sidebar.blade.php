@@ -372,12 +372,6 @@
                 </li>
             @endif
         </ul>
-        {{-- Admin tidak perlu: dialah adminnya. --}}
-        @unless (auth()->user()->isAdmin())
-            <div class="mt-4 border-t border-slate-100 pt-4">
-                <x-hubungi-admin ringkas />
-            </div>
-        @endunless
     </nav>
 
     <div class="border-t border-slate-100 px-4 py-4 bg-white/50">

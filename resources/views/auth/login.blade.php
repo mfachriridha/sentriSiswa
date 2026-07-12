@@ -64,10 +64,6 @@
             <p class="mt-8 text-center text-xs font-semibold text-slate-400">
                 Belum terdaftar? <a href="{{ route('register') }}" class="text-primary hover:text-primary-dark hover:underline transition-colors font-bold">Daftar di sini</a>
             </p>
-
-            <div class="mt-6 border-t border-slate-100 pt-4">
-                <x-hubungi-admin pesan="Tidak bisa masuk? Hubungi admin sekolah." />
-            </div>
         </div>
     </div>
 </div>
