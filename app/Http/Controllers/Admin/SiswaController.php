@@ -95,6 +95,7 @@ class SiswaController extends Controller
             $user->profilSiswa()->create([
                 'nisn' => $request->nisn,
                 'nis' => $request->nis,
+                'jenis_kelamin' => $request->jenis_kelamin,
                 'kelas_id' => $request->kelas_id,
                 'telepon' => $request->telepon,
                 'alamat' => $request->alamat,
@@ -131,6 +132,7 @@ class SiswaController extends Controller
                 [
                     'nisn' => $request->nisn,
                     'nis' => $request->nis,
+                    'jenis_kelamin' => $request->jenis_kelamin,
                     'kelas_id' => $request->kelas_id,
                     'telepon' => $request->telepon,
                     'alamat' => $request->alamat,

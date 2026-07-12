@@ -54,7 +54,11 @@ class ImporSiswaController extends Controller
 
         $fullPath = storage_path('app/private/'.$path);
         $rows = Excel::toArray(new ImporSiswa, $fullPath);
-        $allRows = $rows[0] ?? [];
+
+        // Tinjauan memakai aturan yang sama persis dengan proses impor, supaya
+        // baris yang di sini ditandai bermasalah memang benar-benar dilewati.
+        $allRows = array_map(ImporSiswa::rapikanBaris(...), $rows[0] ?? []);
+        $dilewati = count(array_filter($allRows, fn (array $row): bool => $row['alasan_dilewati'] !== null));
 
         $page = (int) $request->get('page', 1);
         $total = count($allRows);
@@ -70,6 +74,7 @@ class ImporSiswaController extends Controller
         return view('admin.siswa.import-preview', [
             'previewRows' => $paginated,
             'totalRows' => $total,
+            'skippedRows' => $dilewati,
             'filePath' => $path,
         ]);
     }

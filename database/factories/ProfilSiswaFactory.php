@@ -15,6 +15,7 @@ class ProfilSiswaFactory extends Factory
         return [
             'nisn' => fake()->unique()->numerify('##########'),
             'nis' => fake()->unique()->numerify('#####'),
+            'jenis_kelamin' => fake()->randomElement(['L', 'P']),
             'kelas_id' => null,
             'telepon' => null,
             'alamat' => null,

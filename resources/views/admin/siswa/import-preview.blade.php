@@ -15,7 +15,14 @@
 
 <div class="rounded-xl border border-gray-200 bg-white p-6">
     <h1 class="mb-2 text-2xl font-bold text-gray-900">Pratinjau Impor</h1>
-    <p class="mb-6 text-sm text-gray-500">Total {{ $totalRows }} baris akan diproses. Halaman {{ $previewRows->currentPage() }} dari {{ $previewRows->lastPage() }}.</p>
+    <p class="mb-4 text-sm text-gray-500">Total {{ $totalRows }} baris akan diproses. Halaman {{ $previewRows->currentPage() }} dari {{ $previewRows->lastPage() }}.</p>
+
+    @if ($skippedRows > 0)
+        <div class="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            <span class="font-semibold">{{ $skippedRows }} baris akan dilewati</span> karena datanya belum benar.
+            Baris yang dilewati ditandai di kolom Status beserta alasannya. Baris lainnya tetap diimpor seperti biasa.
+        </div>
+    @endif
 
     <div class="overflow-hidden rounded-lg border border-gray-200">
         <div class="overflow-x-auto">
@@ -26,6 +33,7 @@
                         <th class="px-4 py-3 font-semibold text-gray-600">Nama</th>
                         <th class="px-4 py-3 font-semibold text-gray-600">NIS</th>
                         <th class="px-4 py-3 font-semibold text-gray-600">NISN</th>
+                        <th class="px-4 py-3 font-semibold text-gray-600">Jenis Kelamin</th>
                         <th class="px-4 py-3 font-semibold text-gray-600">Kelas</th>
                         <th class="px-4 py-3 font-semibold text-gray-600">Status</th>
                     </tr>
@@ -34,14 +42,15 @@
                     @foreach ($previewRows as $index => $row)
                         <tr>
                             <td class="px-4 py-3 text-gray-500">{{ ($previewRows->currentPage() - 1) * 25 + $index + 1 }}</td>
-                            <td class="px-4 py-3 font-medium text-gray-900">{{ $row['nama'] ?? '-' }}</td>
+                            <td class="px-4 py-3 font-medium text-gray-900">{{ $row['nama'] !== '' ? $row['nama'] : '-' }}</td>
                             <td class="px-4 py-3 text-gray-700">{{ $row['nis'] ?? '-' }}</td>
                             <td class="px-4 py-3 text-gray-700">{{ $row['nisn'] ?? '-' }}</td>
-                            <td class="px-4 py-3 text-gray-700">{{ $row['kelas'] ?? '-' }}</td>
+                            <td class="px-4 py-3 text-gray-700">{{ App\Models\ProfilSiswa::labelJenisKelamin()[$row['jenis_kelamin']] ?? '-' }}</td>
+                            <td class="px-4 py-3 text-gray-700">{{ $row['kelas'] !== '' ? $row['kelas'] : '-' }}</td>
                             <td class="px-4 py-3">
-                                @if (empty(trim($row['nama'] ?? '')))
-                                    <span class="inline-flex items-center gap-1 rounded-full bg-red-50 px-3 py-1 text-sm font-medium text-red-700">✗ Nama kosong</span>
-                                @elseif (empty(trim($row['kelas'] ?? '')))
+                                @if ($row['alasan_dilewati'])
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-red-50 px-3 py-1 text-sm font-medium text-red-700">✗ Dilewati: {{ $row['alasan_dilewati'] }}</span>
+                                @elseif (empty($row['kelas']))
                                     <span class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-3 py-1 text-sm font-medium text-amber-700">⚠ Kelas kosong</span>
                                 @else
                                     <span class="inline-flex items-center gap-1 rounded-full bg-green-50 px-3 py-1 text-sm font-medium text-green-700">✓ Valid</span>

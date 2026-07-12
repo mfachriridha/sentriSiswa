@@ -58,6 +58,7 @@ test('admin berhasil menambah siswa dengan data yang lengkap dan benar', functio
             'nama' => 'Ahmad Fauzi',
             'nisn' => '1234567890',
             'nis' => '10001',
+            'jenis_kelamin' => 'L',
             'kelas_id' => (string) $kelas->id,
             'telepon' => '081234567890',
             'alamat' => 'Jalan Melati Nomor 10',
@@ -75,6 +76,7 @@ test('admin berhasil menambah siswa tanpa mengisi kelas', function () {
             'nama' => 'Siti Aminah',
             'nisn' => '1234567891',
             'nis' => '10002',
+            'jenis_kelamin' => 'L',
         ])
         ->assertSee('Siswa berhasil ditambahkan.')
         ->assertSee('Siti Aminah');
@@ -91,6 +93,7 @@ test('admin gagal menambah siswa karena nisn sudah dipakai siswa lain', function
             'nama' => 'Siswa Kembar',
             'nisn' => '1234567892',
             'nis' => '10004',
+            'jenis_kelamin' => 'L',
         ])
         ->assertSee('NISN sudah digunakan.')
         ->assertDontSee('Siswa berhasil ditambahkan.');
@@ -107,6 +110,7 @@ test('admin gagal menambah siswa karena nis sudah dipakai siswa lain', function 
             'nama' => 'Siswa Kembar',
             'nisn' => '1234567894',
             'nis' => '10005',
+            'jenis_kelamin' => 'L',
         ])
         ->assertSee('NIS sudah digunakan.');
 });
@@ -121,6 +125,7 @@ test('admin gagal menambah siswa karena nama mengandung angka', function () {
             'nama' => 'Siswa 123',
             'nisn' => '1234567895',
             'nis' => '10006',
+            'jenis_kelamin' => 'L',
         ])
         ->assertSee('Format Nama tidak valid.');
 });
@@ -135,6 +140,7 @@ test('admin gagal menambah siswa karena nis mengandung huruf', function () {
             'nama' => 'Rina Marlina',
             'nisn' => '1234567896',
             'nis' => 'ABC12',
+            'jenis_kelamin' => 'L',
         ])
         ->assertSee('Format NIS tidak valid.');
 });
@@ -149,6 +155,7 @@ test('admin gagal menambah siswa karena nomor hp mengandung huruf', function () 
             'nama' => 'Rina Marlina',
             'nisn' => '1234567897',
             'nis' => '10007',
+            'jenis_kelamin' => 'L',
             'telepon' => 'nomor-saya',
         ])
         ->assertSee('Format Nomor HP tidak valid.');
@@ -166,6 +173,7 @@ test('admin berhasil mengubah data siswa yang sudah ada', function () {
             'nama' => 'Nama Baru',
             'nisn' => '1234567898',
             'nis' => '10008',
+            'jenis_kelamin' => 'L',
         ])
         ->assertSee('Siswa berhasil diperbarui.')
         ->assertSee('Nama Baru')
@@ -221,9 +229,45 @@ test('admin menyaring daftar siswa yang belum mendaftar akun', function () {
         'pengguna_id' => $sudahDaftar->id,
         'nisn' => '1234567805',
         'nis' => '10015',
+        'jenis_kelamin' => 'L',
     ]);
 
     $this->get('/admin/siswa?status=unregistered')
         ->assertSee('Siswa Belum Daftar')
         ->assertDontSee('Siswa Sudah Daftar');
+});
+
+// TS.SIS.013 / TC.SIS.013.001 — Positive
+test('jenis kelamin siswa tampil di halaman rinciannya', function () {
+    adminDataSiswa();
+
+    $this->followingRedirects()
+        ->post('/admin/siswa', [
+            'nama' => 'Siti Aminah',
+            'nisn' => '1234567806',
+            'nis' => '10016',
+            'jenis_kelamin' => 'P',
+        ])
+        ->assertSee('Siswa berhasil ditambahkan.');
+
+    $siswa = Pengguna::where('nama', 'Siti Aminah')->first();
+
+    $this->get("/admin/siswa/{$siswa->id}")
+        ->assertSee('Jenis Kelamin')
+        ->assertSee('Perempuan');
+});
+
+// TS.SIS.014 / TC.SIS.014.001 — Negative
+test('siswa ditolak ketika jenis kelaminnya belum dipilih', function () {
+    adminDataSiswa();
+
+    $this->from('/admin/siswa/create')
+        ->followingRedirects()
+        ->post('/admin/siswa', [
+            'nama' => 'Ahmad Fauzi',
+            'nisn' => '1234567807',
+            'nis' => '10017',
+            'jenis_kelamin' => '',
+        ])
+        ->assertSee('Jenis kelamin wajib dipilih.');
 });

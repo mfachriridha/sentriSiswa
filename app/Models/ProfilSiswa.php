@@ -2,16 +2,17 @@
 
 namespace App\Models;
 
+use Database\Factories\ProfilSiswaFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['nisn', 'nis', 'kelas_id', 'telepon', 'alamat', 'foto'])]
+#[Fillable(['nisn', 'nis', 'jenis_kelamin', 'kelas_id', 'telepon', 'alamat', 'foto'])]
 class ProfilSiswa extends Model
 {
-    /** @use HasFactory<\Database\Factories\ProfilSiswaFactory> */
+    /** @use HasFactory<ProfilSiswaFactory> */
     use HasFactory;
 
     protected $table = 'profil_siswa';
@@ -25,6 +26,23 @@ class ProfilSiswa extends Model
     public $incrementing = false;
 
     protected $keyType = 'string';
+
+    /**
+     * @return array<string, string>
+     */
+    public static function labelJenisKelamin(): array
+    {
+        return [
+            'L' => 'Laki-laki',
+            'P' => 'Perempuan',
+        ];
+    }
+
+    /** Jenis kelamin siap tampil; tanda hubung kalau memang belum terisi. */
+    public function getLabelJenisKelaminAttribute(): string
+    {
+        return self::labelJenisKelamin()[$this->jenis_kelamin] ?? '-';
+    }
 
     public function pengguna(): BelongsTo
     {

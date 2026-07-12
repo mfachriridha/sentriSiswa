@@ -17,9 +17,21 @@ class StoreSiswaRequest extends FormRequest
             'nama' => ['required', 'string', 'min:3', 'max:100', "regex:/^[\pL\s.\'-]+$/u"],
             'nisn' => ['required', 'digits:10', 'unique:profil_siswa,nisn'],
             'nis' => ['required', 'regex:/^[0-9]+$/', 'max:15', 'unique:profil_siswa,nis'],
+            'jenis_kelamin' => ['required', 'in:L,P'],
             'kelas_id' => ['nullable', 'string', 'exists:kelas,id'],
             'telepon' => ['nullable', 'string', 'min:10', 'max:15', 'regex:/^[0-9+\-\s()]*$/'],
             'alamat' => ['nullable', 'string'],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'jenis_kelamin.required' => 'Jenis kelamin wajib dipilih.',
+            'jenis_kelamin.in' => 'Jenis kelamin tidak valid.',
         ];
     }
 }

@@ -40,22 +40,31 @@ function adminImporSiswa(): Pengguna
 /**
  * Berkas impor siswa, sebagaimana yang disusun admin dari templat yang diunduh.
  *
- * @param  list<array{nama: string, nisn: string, nis: string, kelas?: string}>  $barisSiswa
+ * @param  list<array{nama: string, nisn: string, nis: string, l_p?: string, kelas?: string}>  $barisSiswa
  */
 function berkasImporSiswa(array $barisSiswa): UploadedFile
 {
-    $baris = [['nama', 'nisn', 'nis', 'kelas']];
+    $baris = [['nama', 'nisn', 'nis', 'l_p', 'kelas']];
 
     foreach ($barisSiswa as $siswa) {
         $baris[] = [
             $siswa['nama'],
             $siswa['nisn'],
             $siswa['nis'],
+            $siswa['l_p'] ?? '',
             $siswa['kelas'] ?? '',
         ];
     }
 
     return berkasExcel('impor-siswa.xlsx', $baris);
+}
+
+/** Membuka halaman tinjauan impor setelah berkasnya diunggah. */
+function tinjauImporSiswa(UploadedFile $berkas): TestResponse
+{
+    test()->post('/admin/siswa/impor/unggah', ['file' => $berkas]);
+
+    return test()->get('/admin/siswa/impor/pratinjau');
 }
 
 /**
@@ -187,4 +196,79 @@ test('admin mengunduh templat berkas impor siswa', function () {
     $this->get('/admin/siswa/impor/template')->assertSuccessful();
 
     Excel::assertDownloaded('template-impor-siswa.xlsx');
+});
+
+// TS.IMS.009 / TC.IMS.009.001 — Positive
+test('jenis kelamin ikut terbaca dari kolom L per P', function () {
+    adminImporSiswa();
+
+    jalankanImporSiswa(berkasImporSiswa([
+        ['nama' => 'Ahmad Fauzi', 'nisn' => '1234567890', 'nis' => '10001', 'l_p' => 'L'],
+        ['nama' => 'Siti Aminah', 'nisn' => '1234567891', 'nis' => '10002', 'l_p' => 'P'],
+    ]))->assertSee('Impor berhasil');
+
+    $this->get('/admin/siswa?search=Ahmad')->assertSee('Ahmad Fauzi');
+
+    $siswa = Pengguna::where('nama', 'Ahmad Fauzi')->first();
+    $this->get("/admin/siswa/{$siswa->id}")
+        ->assertSee('Jenis Kelamin')
+        ->assertSee('Laki-laki');
+});
+
+// TS.IMS.010 / TC.IMS.010.001 — Positive
+test('baris tanpa jenis kelamin tetap diimpor', function () {
+    adminImporSiswa();
+
+    // Berkas data dari sekolah kadang punya baris yang kolom L/P-nya belum terisi.
+    jalankanImporSiswa(berkasImporSiswa([
+        ['nama' => 'Ahmad Fauzi', 'nisn' => '1234567890', 'nis' => '10001', 'l_p' => ''],
+    ]))
+        ->assertSee('Impor berhasil')
+        ->assertSee('1 siswa baru dibuat');
+});
+
+// TS.IMS.011 / TC.IMS.011.001 — Positive
+test('NISN yang diawali tanda kutip dibersihkan dulu sebelum disimpan', function () {
+    adminImporSiswa();
+
+    // Sel Excel yang diformat sebagai teks sering menyimpan tanda kutip di depan angkanya.
+    jalankanImporSiswa(berkasImporSiswa([
+        ['nama' => 'Reyshandi', 'nisn' => "'0084814788", 'nis' => '232410220', 'l_p' => 'L'],
+    ]))
+        ->assertSee('Impor berhasil')
+        ->assertSee('1 siswa baru dibuat');
+
+    // NISN tersimpan utuh sepuluh angka, tanpa tanda kutip dan tanpa angka yang hilang.
+    $this->get('/admin/siswa?search=0084814788')->assertSee('Reyshandi');
+});
+
+// TS.IMS.012 / TC.IMS.012.001 — Negative
+test('baris yang NISN-nya mengandung huruf dilewati', function () {
+    adminImporSiswa();
+
+    jalankanImporSiswa(berkasImporSiswa([
+        ['nama' => 'Ahmad Fauzi', 'nisn' => '12345ABCDE', 'nis' => '10001'],
+    ]))
+        ->assertSee('Impor berhasil')
+        ->assertSee('0 siswa baru dibuat')
+        ->assertSee('NISN harus berupa angka');
+});
+
+// TS.IMS.013 / TC.IMS.013.001 — Positive
+test('tinjauan menandai baris bermasalah beserta alasannya sebelum impor dijalankan', function () {
+    adminImporSiswa();
+
+    $tinjauan = tinjauImporSiswa(berkasImporSiswa([
+        ['nama' => 'Ahmad Fauzi', 'nisn' => '1234567890', 'nis' => '10001', 'l_p' => 'L', 'kelas' => '10 IPA 1'],
+        ['nama' => 'Tanpa NISN', 'nisn' => '', 'nis' => '10002'],
+        ['nama' => 'Tanpa NIS', 'nisn' => '1234567891', 'nis' => ''],
+    ]));
+
+    // Tinjauan harus memakai aturan yang sama dengan impor, supaya tidak ada baris
+    // yang ditandai layak lalu diam-diam dilewati.
+    $tinjauan
+        ->assertSee('2 baris akan dilewati')
+        ->assertSee('Dilewati: NISN kosong')
+        ->assertSee('Dilewati: NIS kosong')
+        ->assertSee('Valid');
 });

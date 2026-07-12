@@ -40,38 +40,20 @@ class ImporSiswa implements ToCollection, WithChunkReading, WithHeadingRow
 
         foreach ($rows as $row) {
             $this->rowIndex++;
-            $nama = trim((string) ($row['nama'] ?? ''));
-            $nisRaw = isset($row['nis']) ? trim((string) $row['nis']) : null;
-            $nis = $nisRaw ? mb_substr($nisRaw, 0, 15) : null;
-            $nisnRaw = isset($row['nisn']) ? trim((string) $row['nisn']) : null;
-            $nisnRaw = is_numeric($nisnRaw) ? str_pad((string) $nisnRaw, 10, '0', STR_PAD_LEFT) : $nisnRaw;
-            $nisn = $nisnRaw ? mb_substr((string) $nisnRaw, 0, 10) : null;
-            $kelas = isset($row['kelas']) ? trim((string) $row['kelas']) : null;
+            $baris = self::rapikanBaris($row);
+            $nama = $baris['nama'];
+            $nis = $baris['nis'];
+            $nisn = $baris['nisn'];
+            $jenisKelamin = $baris['jenis_kelamin'];
+            $kelas = $baris['kelas'];
 
-            if (empty($nama)) {
+            if ($baris['alasan_dilewati'] !== null) {
                 $this->errors++;
-                $this->errorDetails[] = ['row' => $this->rowIndex, 'nama' => '(kosong)', 'reason' => 'Nama kosong'];
-
-                continue;
-            }
-
-            if (empty($nisn)) {
-                $this->errors++;
-                $this->errorDetails[] = ['row' => $this->rowIndex, 'nama' => $nama, 'reason' => 'NISN kosong'];
-
-                continue;
-            }
-
-            if (empty($nis)) {
-                $this->errors++;
-                $this->errorDetails[] = ['row' => $this->rowIndex, 'nama' => $nama, 'reason' => 'NIS kosong'];
-
-                continue;
-            }
-
-            if (! ctype_digit($nis)) {
-                $this->errors++;
-                $this->errorDetails[] = ['row' => $this->rowIndex, 'nama' => $nama, 'reason' => 'NIS harus berupa angka ('.$nis.')'];
+                $this->errorDetails[] = [
+                    'row' => $this->rowIndex,
+                    'nama' => $nama === '' ? '(kosong)' : $nama,
+                    'reason' => $baris['alasan_dilewati'],
+                ];
 
                 continue;
             }
@@ -103,6 +85,7 @@ class ImporSiswa implements ToCollection, WithChunkReading, WithHeadingRow
                 'nama' => $nama,
                 'nisn' => $nisn,
                 'nis' => $nis,
+                'jenis_kelamin' => $jenisKelamin,
                 'kelas_id' => $kelasId,
                 'row' => $this->rowIndex,
             ];
@@ -144,6 +127,7 @@ class ImporSiswa implements ToCollection, WithChunkReading, WithHeadingRow
                         'pengguna_id' => $existingProfiles[$nisn],
                         'nisn' => $nisn,
                         'nis' => $profile['nis'],
+                        'jenis_kelamin' => $profile['jenis_kelamin'],
                         'kelas_id' => $profile['kelas_id'],
                         'diperbarui_pada' => now(),
                     ];
@@ -153,6 +137,7 @@ class ImporSiswa implements ToCollection, WithChunkReading, WithHeadingRow
                         'pengguna_id' => null,
                         'nisn' => $nisn,
                         'nis' => $profile['nis'],
+                        'jenis_kelamin' => $profile['jenis_kelamin'],
                         'kelas_id' => $profile['kelas_id'],
                     ];
                 }
@@ -187,6 +172,7 @@ class ImporSiswa implements ToCollection, WithChunkReading, WithHeadingRow
                         'pengguna_id' => $newUserOffset + $newIdx - 1,
                         'nisn' => $profile['nisn'],
                         'nis' => $profile['nis'],
+                        'jenis_kelamin' => $profile['jenis_kelamin'],
                         'kelas_id' => $profile['kelas_id'],
                         'dibuat_pada' => now(),
                         'diperbarui_pada' => now(),
@@ -196,6 +182,7 @@ class ImporSiswa implements ToCollection, WithChunkReading, WithHeadingRow
                         'pengguna_id' => $profile['pengguna_id'],
                         'nisn' => $profile['nisn'],
                         'nis' => $profile['nis'],
+                        'jenis_kelamin' => $profile['jenis_kelamin'],
                         'kelas_id' => $profile['kelas_id'],
                         'diperbarui_pada' => now(),
                     ];
@@ -203,9 +190,94 @@ class ImporSiswa implements ToCollection, WithChunkReading, WithHeadingRow
             }
 
             foreach (array_chunk($inserts, 500) as $chunk) {
-                ProfilSiswa::upsert($chunk, ['nisn'], ['pengguna_id', 'nis', 'kelas_id', 'diperbarui_pada']);
+                ProfilSiswa::upsert($chunk, ['nisn'], ['pengguna_id', 'nis', 'jenis_kelamin', 'kelas_id', 'diperbarui_pada']);
             }
         });
+    }
+
+    /**
+     * Membaca satu baris berkas impor apa adanya, lalu memutuskan apakah baris
+     * itu bisa diimpor atau harus dilewati.
+     *
+     * Halaman tinjauan memakai fungsi yang sama persis dengan proses impor,
+     * supaya keduanya tidak pernah berbeda pendapat: yang ditandai bermasalah di
+     * tinjauan pasti dilewati saat impor, dan sebaliknya.
+     *
+     * @param  array<string, mixed>|Collection<string, mixed>  $row
+     * @return array{nama: string, nis: ?string, nisn: ?string, jenis_kelamin: ?string, kelas: ?string, alasan_dilewati: ?string}
+     */
+    public static function rapikanBaris(mixed $row): array
+    {
+        $nama = trim((string) ($row['nama'] ?? ''));
+        $nis = self::bersihkanNomor($row['nis'] ?? null);
+        $nisn = self::bersihkanNomor($row['nisn'] ?? null);
+        $nisn = $nisn !== null ? str_pad($nisn, 10, '0', STR_PAD_LEFT) : null;
+
+        $alasan = match (true) {
+            $nama === '' => 'Nama kosong',
+            $nisn === null => 'NISN kosong',
+            $nis === null => 'NIS kosong',
+            ! ctype_digit($nis) => 'NIS harus berupa angka ('.$nis.')',
+            ! ctype_digit($nisn) => 'NISN harus berupa angka ('.$nisn.')',
+            mb_strlen($nis) > 15 => 'NIS terlalu panjang, maksimal 15 angka ('.$nis.')',
+            mb_strlen($nisn) > 10 => 'NISN terlalu panjang, maksimal 10 angka ('.$nisn.')',
+            default => null,
+        };
+
+        return [
+            'nama' => $nama,
+            'nis' => $nis,
+            'nisn' => $nisn,
+            'jenis_kelamin' => self::bacaJenisKelamin($row),
+            'kelas' => isset($row['kelas']) ? trim((string) $row['kelas']) : null,
+            'alasan_dilewati' => $alasan,
+        ];
+    }
+
+    /**
+     * Membersihkan NIS/NISN dari sisa penulisan Excel.
+     *
+     * Sel yang diformat sebagai teks sering menyimpan tanda kutip di depan
+     * angkanya ('0084814788). Tanda itu, spasi, dan pemisah ribuan dibuang dulu
+     * supaya angkanya bisa diperiksa apa adanya, bukan ikut tersimpan ke data.
+     */
+    private static function bersihkanNomor(mixed $nilai): ?string
+    {
+        if ($nilai === null) {
+            return null;
+        }
+
+        $bersih = trim((string) $nilai);
+        $bersih = trim($bersih, "'`\"\u{2018}\u{2019}");
+        $bersih = str_replace([' ', '.', ',', "\u{00A0}"], '', $bersih);
+
+        return $bersih === '' ? null : $bersih;
+    }
+
+    /**
+     * Membaca jenis kelamin dari kolom mana pun yang dipakai sekolah, entah
+     * berjudul "L/P", "Jenis Kelamin", atau "Gender", dan menerima isian
+     * "L"/"P" maupun "Laki-laki"/"Perempuan".
+     *
+     * @param  array<string, mixed>|Collection<string, mixed>  $row
+     */
+    private static function bacaJenisKelamin(mixed $row): ?string
+    {
+        foreach (['jenis_kelamin', 'l_p', 'lp', 'gender'] as $kolom) {
+            $nilai = trim((string) ($row[$kolom] ?? ''));
+
+            if ($nilai === '') {
+                continue;
+            }
+
+            return match (mb_strtolower($nilai)) {
+                'l', 'laki-laki', 'laki laki', 'pria' => 'L',
+                'p', 'perempuan', 'wanita' => 'P',
+                default => null,
+            };
+        }
+
+        return null;
     }
 
     public function chunkSize(): int

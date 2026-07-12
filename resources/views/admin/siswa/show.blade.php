@@ -65,6 +65,11 @@
         </div>
 
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
+            <p class="text-sm font-medium text-gray-500">Jenis Kelamin</p>
+            <p class="mt-1.5 text-sm text-gray-900">{{ $siswa->profilSiswa?->label_jenis_kelamin ?? '-' }}</p>
+        </div>
+
+        <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
             <p class="text-sm font-medium text-gray-500">Kelas</p>
             <p class="mt-1.5 text-sm">
                 @if ($siswa->profilSiswa?->kelas)

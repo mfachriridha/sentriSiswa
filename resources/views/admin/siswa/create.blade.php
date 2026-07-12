@@ -52,6 +52,21 @@
             </div>
 
             <div>
+                <label for="jenis_kelamin" class="block text-sm font-medium text-gray-700">Jenis Kelamin <span class="text-red-500">*</span></label>
+                <select id="jenis_kelamin" name="jenis_kelamin" required
+                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
+                               focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
+                    <option value="">Pilih jenis kelamin</option>
+                    @foreach (App\Models\ProfilSiswa::labelJenisKelamin() as $kode => $label)
+                        <option value="{{ $kode }}" {{ old('jenis_kelamin') === $kode ? 'selected' : '' }}>{{ $label }}</option>
+                    @endforeach
+                </select>
+                @error('jenis_kelamin')
+                    <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div>
                 <label for="class_id" class="block text-sm font-medium text-gray-700">Kelas</label>
                 <select id="class_id" name="kelas_id"
                         class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
