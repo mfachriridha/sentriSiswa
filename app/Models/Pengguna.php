@@ -11,7 +11,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Schema;
 
-#[Fillable(['nama', 'email', 'password', 'peran', 'status', 'foto', 'nomor_wa', 'id_google'])]
+#[Fillable(['nama', 'email', 'password', 'peran', 'status', 'foto', 'nomor_wa'])]
 #[Hidden(['password', 'remember_token'])]
 class Pengguna extends Authenticatable
 {
@@ -41,11 +41,6 @@ class Pengguna extends Authenticatable
     public function hasPassword(): bool
     {
         return $this->password !== null;
-    }
-
-    public function punyaGoogle(): bool
-    {
-        return $this->id_google !== null;
     }
 
     /**

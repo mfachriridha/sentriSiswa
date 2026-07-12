@@ -90,10 +90,6 @@
             <p class="mt-1.5 text-sm text-gray-900">{{ $student->profilSiswa?->alamat ?? '-' }}</p>
         </div>
     </div>
-
-    <div class="mt-5">
-        <x-kartu-google :pengguna="$student" />
-    </div>
 </div>
 
 @endsection

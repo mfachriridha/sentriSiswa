@@ -12,7 +12,6 @@ use App\Http\Controllers\Admin\ProfilController as AdminProfilController;
 use App\Http\Controllers\Admin\RiwayatPesanController;
 use App\Http\Controllers\Admin\SiswaController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
-use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Auth\OtpController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ResetPasswordController;
@@ -77,22 +76,10 @@ Route::middleware('guest')->group(function () {
     Route::get('/reset-sandi/{token}', [ResetPasswordController::class, 'create'])->name('password.reset');
     Route::post('/reset-sandi', [ResetPasswordController::class, 'store'])->name('password.update');
 
-    // Masuk & daftar lewat Google
-    Route::get('/google/masuk', [GoogleController::class, 'masuk'])->name('google.masuk');
-    Route::post('/google/daftar', [GoogleController::class, 'daftar'])->name('google.daftar');
 });
-
-// Alamat balik dari Google. Sengaja di luar grup tamu maupun grup auth: yang
-// mendaftar dan yang masuk masih tamu saat kembali, sedangkan yang menghubungkan
-// akunnya justru sudah masuk.
-Route::get('/google/callback', [GoogleController::class, 'callback'])->name('google.callback');
 
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AdminLoginController::class, 'destroy'])->name('logout');
-
-    // Hubungkan atau putuskan akun Google dari halaman profil
-    Route::get('/google/hubungkan', [GoogleController::class, 'hubungkan'])->name('google.hubungkan');
-    Route::delete('/google/putuskan', [GoogleController::class, 'putuskan'])->name('google.putuskan');
 
     // OTP verifikasi (shared semua role)
     Route::get('/otp/verifikasi', [OtpController::class, 'show'])->name('otp.show');
