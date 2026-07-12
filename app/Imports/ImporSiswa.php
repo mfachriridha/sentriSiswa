@@ -28,6 +28,14 @@ class ImporSiswa implements ToCollection, WithChunkReading, WithHeadingRow
 
     protected int $rowIndex = 0;
 
+    /**
+     * NISN yang sudah dipakai baris sebelumnya di berkas yang sama, beserta nomor
+     * barisnya. Dipakai untuk menangkap NISN ganda di dalam satu berkas.
+     *
+     * @var array<string, int>
+     */
+    protected array $nisnTerpakai = [];
+
     public function __construct()
     {
         $this->defaultPassword = Hash::make('password');
@@ -57,6 +65,23 @@ class ImporSiswa implements ToCollection, WithChunkReading, WithHeadingRow
 
                 continue;
             }
+
+            // NISN adalah penanda siswa yang harus unik. Kalau satu berkas memuat
+            // dua baris ber-NISN sama, baris kedua tidak boleh ikut masuk: dulu
+            // akunnya tetap dibuat tetapi profilnya menimpa profil baris pertama,
+            // sehingga siswa yang pertama hilang tanpa peringatan apa pun.
+            if (isset($this->nisnTerpakai[$nisn])) {
+                $this->errors++;
+                $this->errorDetails[] = [
+                    'row' => $this->rowIndex,
+                    'nama' => $nama,
+                    'reason' => 'NISN ganda di dalam berkas ('.$nisn.'), sudah dipakai baris '.$this->nisnTerpakai[$nisn],
+                ];
+
+                continue;
+            }
+
+            $this->nisnTerpakai[$nisn] = $this->rowIndex;
 
             $kelasId = null;
             if ($kelas) {
@@ -196,12 +221,46 @@ class ImporSiswa implements ToCollection, WithChunkReading, WithHeadingRow
     }
 
     /**
-     * Membaca satu baris berkas impor apa adanya, lalu memutuskan apakah baris
-     * itu bisa diimpor atau harus dilewati.
+     * Membaca seluruh isi berkas impor, lalu memutuskan baris mana yang bisa
+     * diimpor dan baris mana yang harus dilewati beserta alasannya.
      *
      * Halaman tinjauan memakai fungsi yang sama persis dengan proses impor,
      * supaya keduanya tidak pernah berbeda pendapat: yang ditandai bermasalah di
-     * tinjauan pasti dilewati saat impor, dan sebaliknya.
+     * tinjauan pasti dilewati saat impor, dan sebaliknya. NISN ganda hanya bisa
+     * ditemukan dengan melihat seluruh berkas sekaligus, bukan baris per baris,
+     * jadi pemeriksaannya dikerjakan di sini.
+     *
+     * @param  list<array<string, mixed>>  $rows
+     * @return list<array{nama: string, nis: ?string, nisn: ?string, jenis_kelamin: ?string, kelas: ?string, alasan_dilewati: ?string}>
+     */
+    public static function rapikanBerkas(array $rows): array
+    {
+        $hasil = [];
+        $nisnTerpakai = [];
+
+        foreach ($rows as $indeks => $row) {
+            $baris = self::rapikanBaris($row);
+            $nomorBaris = $indeks + 1;
+            $nisn = $baris['nisn'];
+
+            if ($baris['alasan_dilewati'] === null && isset($nisnTerpakai[$nisn])) {
+                $baris['alasan_dilewati'] = 'NISN ganda di dalam berkas ('.$nisn.'), sudah dipakai baris '.$nisnTerpakai[$nisn];
+            } elseif ($baris['alasan_dilewati'] === null) {
+                $nisnTerpakai[$nisn] = $nomorBaris;
+            }
+
+            $hasil[] = $baris;
+        }
+
+        return $hasil;
+    }
+
+    /**
+     * Membaca satu baris berkas impor apa adanya, lalu memutuskan apakah baris
+     * itu bisa diimpor atau harus dilewati.
+     *
+     * Pemeriksaan NISN ganda tidak ada di sini, karena butuh melihat baris lain.
+     * Lihat rapikanBerkas().
      *
      * @param  array<string, mixed>|Collection<string, mixed>  $row
      * @return array{nama: string, nis: ?string, nisn: ?string, jenis_kelamin: ?string, kelas: ?string, alasan_dilewati: ?string}

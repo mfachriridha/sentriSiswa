@@ -272,3 +272,27 @@ test('tinjauan menandai baris bermasalah beserta alasannya sebelum impor dijalan
         ->assertSee('Dilewati: NIS kosong')
         ->assertSee('Valid');
 });
+
+// TS.IMS.014 / TC.IMS.014.001 — Negative
+test('dua baris ber-NISN sama hanya menghasilkan satu siswa', function () {
+    adminImporSiswa();
+
+    // NISN adalah penanda siswa yang harus unik. Kalau berkasnya memuat dua siswa
+    // berbeda dengan NISN sama, yang kedua tidak boleh diam-diam menimpa yang pertama.
+    $berkas = [
+        ['nama' => 'Ibrahim Candra', 'nisn' => '1234567890', 'nis' => '10001', 'l_p' => 'L'],
+        ['nama' => 'Reihan Badillah', 'nisn' => '1234567890', 'nis' => '10002', 'l_p' => 'L'],
+    ];
+
+    tinjauImporSiswa(berkasImporSiswa($berkas))
+        ->assertSee('1 baris akan dilewati')
+        ->assertSee('Dilewati: NISN ganda di dalam berkas');
+
+    jalankanImporSiswa(berkasImporSiswa($berkas))
+        ->assertSee('1 siswa baru dibuat')
+        ->assertSee('NISN ganda di dalam berkas');
+
+    // Siswa pertama yang dipakai; siswa kedua dilewati, bukan menimpa.
+    $this->get('/admin/siswa?search=Ibrahim')->assertSee('Ibrahim Candra');
+    $this->get('/admin/siswa?search=Reihan')->assertDontSee('Reihan Badillah');
+});
