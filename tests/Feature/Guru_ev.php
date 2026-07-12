@@ -61,7 +61,6 @@ test('admin berhasil menambah guru wali kelas dengan data yang benar', function 
             'nama' => 'Raka Pradipta',
             'nip' => '198501012020121001',
             'peran' => 'wali_kelas',
-            'telepon' => '081234567890',
         ])
         ->assertSee('Guru berhasil ditambahkan.')
         ->assertSee('Raka Pradipta');

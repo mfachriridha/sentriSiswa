@@ -87,42 +87,7 @@ test('nip tiga puluh satu karakter ditolak karena melebihi batas maksimum', func
         ->assertSee('NIP maksimal 30 karakter.');
 });
 
-// ── Batas panjang nomor HP: 10 sampai 15 karakter ──────────────────────────
-
-// TS.GUR.016 / TC.GUR.016.001 — Negative
-test('nomor hp guru sembilan digit ditolak karena kurang dari batas minimum', function () {
-    adminDataGuru();
-
-    $this->from('/admin/guru/create')
-        ->followingRedirects()
-        ->post('/admin/guru', dataGuruSah(['telepon' => '081234567']))
-        ->assertSee('Nomor HP minimal 10 karakter.');
-});
-
-// TS.GUR.016 / TC.GUR.016.002 — Positive
-test('nomor hp guru sepuluh digit diterima karena tepat di batas minimum', function () {
-    adminDataGuru();
-
-    $this->followingRedirects()
-        ->post('/admin/guru', dataGuruSah(['telepon' => '0812345678']))
-        ->assertSee('Guru berhasil ditambahkan.');
-});
-
-// TS.GUR.017 / TC.GUR.017.001 — Positive
-test('nomor hp guru lima belas digit diterima karena tepat di batas maksimum', function () {
-    adminDataGuru();
-
-    $this->followingRedirects()
-        ->post('/admin/guru', dataGuruSah(['telepon' => '081234567890123']))
-        ->assertSee('Guru berhasil ditambahkan.');
-});
-
-// TS.GUR.017 / TC.GUR.017.002 — Negative
-test('nomor hp guru enam belas digit ditolak karena melebihi batas maksimum', function () {
-    adminDataGuru();
-
-    $this->from('/admin/guru/create')
-        ->followingRedirects()
-        ->post('/admin/guru', dataGuruSah(['telepon' => '0812345678901234']))
-        ->assertSee('Nomor HP maksimal 15 karakter.');
-});
+/*
+| Nomor HP guru tidak lagi diisi admin. Guru sendiri yang mengisinya, dan wajib,
+| saat mendaftarkan akunnya. Batas panjangnya diuji di halaman Daftar.
+*/

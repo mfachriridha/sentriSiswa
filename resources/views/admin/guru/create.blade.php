@@ -89,16 +89,6 @@
                 </div>
             </div>
 
-            <div>
-                <label for="phone" class="block text-sm font-medium text-gray-700">Telepon</label>
-                <input id="phone" type="text" name="telepon" value="{{ old('telepon') }}"
-                       class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
-                              placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
-                @error('telepon')
-                    <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
-
         </div>
 
         <div class="flex items-center gap-4 pt-2">

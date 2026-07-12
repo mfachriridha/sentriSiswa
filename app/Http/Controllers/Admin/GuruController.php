@@ -103,10 +103,9 @@ class GuruController extends Controller
             $user = Pengguna::create($data);
 
             $user->profilGuru()->create([
-                'nip'      => $request->nip,
-                'telepon'  => $request->telepon,
-                'tipe_guru'=> $request->peran,
-                'tingkat'  => $request->peran === 'bk' ? $request->tingkat : null,
+                'nip' => $request->nip,
+                'tipe_guru' => $request->peran,
+                'tingkat' => $request->peran === 'bk' ? $request->tingkat : null,
             ]);
 
             if ($request->peran === 'wali_kelas' && $request->kelas_id) {
@@ -145,10 +144,9 @@ class GuruController extends Controller
             $guru->profilGuru()->updateOrCreate(
                 ['pengguna_id' => $guru->id],
                 [
-                    'nip'       => $request->nip,
-                    'telepon'   => $request->telepon,
+                    'nip' => $request->nip,
                     'tipe_guru' => $request->peran,
-                    'tingkat'   => $request->peran === 'bk' ? $request->tingkat : null,
+                    'tingkat' => $request->peran === 'bk' ? $request->tingkat : null,
                 ],
             );
 
