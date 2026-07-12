@@ -25,19 +25,4 @@ class ViolationReportFilterRequest extends FormRequest
             'kategori' => ['nullable', Rule::in(['ringan', 'sedang', 'berat', 'sangat_berat'])],
         ];
     }
-
-    /**
-     * @return array<string, string>
-     */
-    public function messages(): array
-    {
-        return [
-            'mulai.date_format' => 'Tanggal mulai tidak valid.',
-            'selesai.date_format' => 'Tanggal selesai tidak valid.',
-            'selesai.after_or_equal' => 'Tanggal selesai harus sama dengan atau setelah tanggal mulai.',
-            'kelas_id.exists' => 'Kelas tidak valid.',
-            'tingkat.in' => 'Tingkat tidak valid.',
-            'kategori.in' => 'Kategori tidak valid.',
-        ];
-    }
 }

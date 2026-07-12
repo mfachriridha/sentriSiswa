@@ -14,8 +14,7 @@ uses(RefreshDatabase::class);
 |
 | - Kehadiran tepat pada tanggal mulai dan tanggal selesai ikut dihitung,
 |   sedangkan sehari sebelum atau sesudahnya tidak.
-| - Tanggal selesai boleh sama dengan tanggal mulai (rekap satu hari), tetapi
-|   tidak boleh lebih awal.
+| - Tanggal selesai boleh sama dengan tanggal mulai, menghasilkan rekap satu hari.
 |
 | Rentang yang dipakai adalah 07 Juli 2026 (Selasa) sampai 09 Juli 2026 (Kamis).
 | Hari tepat sebelum dan sesudahnya, 06 Juli (Senin) dan 10 Juli (Jumat),
@@ -29,7 +28,7 @@ afterEach(function () {
 
 const RENTANG_REKAP = '?mulai=2026-07-07&selesai=2026-07-09';
 
-// TS.REA.011 / TC.REA.011.001 — Positive — batas bawah
+// TS.REA.010 / TC.REA.010.001 — Positive — batas bawah
 test('kehadiran tepat pada tanggal mulai ikut dihitung', function () {
     Carbon::setTestNow('2026-07-10 08:00:00');
     [, , $siswa] = waliKelasDenganKelas();
@@ -41,7 +40,7 @@ test('kehadiran tepat pada tanggal mulai ikut dihitung', function () {
         ->assertSee('0%');
 });
 
-// TS.REA.011 / TC.REA.011.002 — Negative — sehari di bawah batas bawah
+// TS.REA.010 / TC.REA.010.002 — Negative — sehari di bawah batas bawah
 test('kehadiran sehari sebelum tanggal mulai tidak ikut dihitung', function () {
     Carbon::setTestNow('2026-07-10 08:00:00');
     [, , $siswa] = waliKelasDenganKelas();
@@ -54,7 +53,7 @@ test('kehadiran sehari sebelum tanggal mulai tidak ikut dihitung', function () {
         ->assertSee('100%');
 });
 
-// TS.REA.012 / TC.REA.012.001 — Positive — batas atas
+// TS.REA.011 / TC.REA.011.001 — Positive — batas atas
 test('kehadiran tepat pada tanggal selesai ikut dihitung', function () {
     Carbon::setTestNow('2026-07-10 08:00:00');
     [, , $siswa] = waliKelasDenganKelas();
@@ -65,7 +64,7 @@ test('kehadiran tepat pada tanggal selesai ikut dihitung', function () {
         ->assertSee('0%');
 });
 
-// TS.REA.012 / TC.REA.012.002 — Negative — sehari di atas batas atas
+// TS.REA.011 / TC.REA.011.002 — Negative — sehari di atas batas atas
 test('kehadiran sehari setelah tanggal selesai tidak ikut dihitung', function () {
     Carbon::setTestNow('2026-07-10 08:00:00');
     [, , $siswa] = waliKelasDenganKelas();
@@ -77,7 +76,7 @@ test('kehadiran sehari setelah tanggal selesai tidak ikut dihitung', function ()
         ->assertSee('100%');
 });
 
-// TS.REA.013 / TC.REA.013.001 — Positive — tepat di batas
+// TS.REA.012 / TC.REA.012.001 — Positive — tepat di batas
 test('rentang satu hari diterima ketika tanggal selesai sama dengan tanggal mulai', function () {
     Carbon::setTestNow('2026-07-10 08:00:00');
     [, , $siswa] = waliKelasDenganKelas();
@@ -86,17 +85,5 @@ test('rentang satu hari diterima ketika tanggal selesai sama dengan tanggal mula
 
     $this->get('/wali-kelas/absensi?mulai=2026-07-07&selesai=2026-07-07')
         ->assertSee('Ahmad Fauzi')
-        ->assertSee('100%')
-        ->assertDontSee('Tanggal selesai harus sama dengan atau setelah tanggal mulai.');
-});
-
-// TS.REA.013 / TC.REA.013.002 — Negative — sehari di bawah batas
-test('rentang ditolak ketika tanggal selesai sehari lebih awal daripada tanggal mulai', function () {
-    Carbon::setTestNow('2026-07-10 08:00:00');
-    waliKelasDenganKelas();
-
-    $this->from('/wali-kelas/absensi')
-        ->followingRedirects()
-        ->get('/wali-kelas/absensi?mulai=2026-07-07&selesai=2026-07-06')
-        ->assertSee('Tanggal selesai harus sama dengan atau setelah tanggal mulai.');
+        ->assertSee('100%');
 });

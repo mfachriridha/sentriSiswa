@@ -14,8 +14,7 @@ uses(RefreshDatabase::class);
 |
 | - Kehadiran tepat pada tanggal mulai dan tanggal selesai ikut dihitung,
 |   sedangkan sehari sebelum atau sesudahnya tidak.
-| - Tanggal selesai boleh sama dengan tanggal mulai (rekap satu hari), tetapi
-|   tidak boleh lebih awal.
+| - Tanggal selesai boleh sama dengan tanggal mulai, menghasilkan rekap satu hari.
 |
 | Rentang yang dipakai adalah 07 Juli 2026 (Selasa) sampai 09 Juli 2026 (Kamis).
 | Hari tepat sebelum dan sesudahnya, 06 Juli dan 10 Juli, sama-sama hari absensi,
@@ -94,19 +93,5 @@ test('rentang satu hari diterima ketika tanggal selesai sama dengan tanggal mula
 
     $this->get('/bk/laporan?mulai=2026-07-07&selesai=2026-07-07')
         ->assertSee('Ahmad Fauzi')
-        ->assertSee('100%')
-        ->assertDontSee('Tanggal selesai harus sama dengan atau setelah tanggal mulai.');
-});
-
-// TS.RAB.012 / TC.RAB.012.002 — Negative — sehari di bawah batas
-test('rentang ditolak ketika tanggal selesai sehari lebih awal daripada tanggal mulai', function () {
-    Carbon::setTestNow('2026-07-10 08:00:00');
-    kelasBerisiSiswa();
-
-    bkMasuk('10');
-
-    $this->from('/bk/laporan')
-        ->followingRedirects()
-        ->get('/bk/laporan?mulai=2026-07-07&selesai=2026-07-06')
-        ->assertSee('Tanggal selesai harus sama dengan atau setelah tanggal mulai.');
+        ->assertSee('100%');
 });

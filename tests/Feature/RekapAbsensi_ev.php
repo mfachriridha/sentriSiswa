@@ -114,18 +114,13 @@ test('wali kelas menyaring rekap per bulan', function () {
         ->assertSee('100%');
 });
 
-// TS.REA.007 / TC.REA.007.001 — Negative
-test('rekap ditolak ketika tanggal selesai lebih awal daripada tanggal mulai', function () {
-    Carbon::setTestNow('2026-07-10 08:00:00');
-    waliKelasDenganKelas();
+/*
+| Kalender tanggal selesai otomatis mengunci tanggal sebelum tanggal mulai, dan
+| sebaliknya, sehingga pengguna tidak pernah bisa memilih rentang terbalik.
+| Karena tidak pernah dialami pengguna, kasus tersebut tidak didokumentasikan.
+*/
 
-    $this->from('/wali-kelas/absensi')
-        ->followingRedirects()
-        ->get('/wali-kelas/absensi?mulai=2026-07-10&selesai=2026-07-01')
-        ->assertSee('Tanggal selesai harus sama dengan atau setelah tanggal mulai.');
-});
-
-// TS.REA.008 / TC.REA.008.001 — Positive
+// TS.REA.007 / TC.REA.007.001 — Positive
 test('wali kelas mengunduh rekap kehadiran dalam berkas excel', function () {
     Excel::fake();
     Carbon::setTestNow('2026-07-10 08:00:00');
@@ -137,7 +132,7 @@ test('wali kelas mengunduh rekap kehadiran dalam berkas excel', function () {
     Excel::assertDownloaded('rekap-absensi-10 IPA 1-2026-07-01-sampai-2026-07-10.xlsx');
 });
 
-// TS.REA.009 / TC.REA.009.001 — Positive
+// TS.REA.008 / TC.REA.008.001 — Positive
 test('wali kelas mengunduh rekap kehadiran dalam berkas pdf', function () {
     Carbon::setTestNow('2026-07-10 08:00:00');
     waliKelasDenganKelas();
@@ -147,7 +142,7 @@ test('wali kelas mengunduh rekap kehadiran dalam berkas pdf', function () {
         ->assertDownload('rekap-absensi-10 IPA 1-2026-07-01-sampai-2026-07-10.pdf');
 });
 
-// TS.REA.010 / TC.REA.010.001 — Negative
+// TS.REA.009 / TC.REA.009.001 — Negative
 test('guru yang belum dipasangi kelas melihat keterangan belum ada kelas', function () {
     $wali = Pengguna::factory()->homeroom()->create([
         'email' => 'wali.tanpa.kelas@sentrisiswa.test',

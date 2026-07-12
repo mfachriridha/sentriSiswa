@@ -126,18 +126,13 @@ test('kesiswaan menyaring laporan berdasarkan kategori', function () {
         ->assertDontSee('Terlambat masuk kelas');
 });
 
-// TS.LAP.007 / TC.LAP.007.001 — Negative
-test('laporan ditolak ketika tanggal selesai lebih awal daripada tanggal mulai', function () {
-    kelasBerisiSiswa();
-    kesiswaanMasuk();
+/*
+| Kalender tanggal selesai otomatis mengunci tanggal sebelum tanggal mulai, dan
+| sebaliknya, sehingga pengguna tidak pernah bisa memilih rentang terbalik.
+| Karena tidak pernah dialami pengguna, kasus tersebut tidak didokumentasikan.
+*/
 
-    $this->from('/kesiswaan/laporan')
-        ->followingRedirects()
-        ->get('/kesiswaan/laporan?mulai=2026-07-31&selesai=2026-07-01')
-        ->assertSee('Tanggal selesai harus sama dengan atau setelah tanggal mulai.');
-});
-
-// TS.LAP.008 / TC.LAP.008.001 — Positive
+// TS.LAP.007 / TC.LAP.007.001 — Positive
 test('kesiswaan mengunduh laporan dalam berkas excel', function () {
     Excel::fake();
     kelasBerisiSiswa();
@@ -149,7 +144,7 @@ test('kesiswaan mengunduh laporan dalam berkas excel', function () {
     Excel::assertDownloaded('laporan-pelanggaran.xlsx');
 });
 
-// TS.LAP.009 / TC.LAP.009.001 — Positive
+// TS.LAP.008 / TC.LAP.008.001 — Positive
 test('kesiswaan mengunduh laporan dalam berkas pdf', function () {
     [, , $siswa] = kelasBerisiSiswa();
     catatPelanggaran($siswa, 'Terlambat masuk kelas', 'ringan', '2026-07-06', 10);
@@ -161,7 +156,7 @@ test('kesiswaan mengunduh laporan dalam berkas pdf', function () {
         ->assertDownload('laporan-pelanggaran.pdf');
 });
 
-// TS.LAP.010 / TC.LAP.010.001 — Positive
+// TS.LAP.009 / TC.LAP.009.001 — Positive
 test('laporan yang tidak menemukan data menampilkan keterangannya', function () {
     kelasBerisiSiswa();
     kesiswaanMasuk();

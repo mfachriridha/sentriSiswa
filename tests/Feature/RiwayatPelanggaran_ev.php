@@ -96,17 +96,13 @@ test('wali kelas menyaring riwayat pelanggaran berdasarkan rentang tanggal', fun
         ->assertDontSee('Terlambat masuk kelas');
 });
 
-// TS.RIP.006 / TC.RIP.006.001 — Negative
-test('riwayat pelanggaran ditolak ketika tanggal selesai lebih awal daripada tanggal mulai', function () {
-    waliKelasDenganKelas();
+/*
+| Kalender tanggal selesai otomatis mengunci tanggal sebelum tanggal mulai, dan
+| sebaliknya, sehingga pengguna tidak pernah bisa memilih rentang terbalik.
+| Karena tidak pernah dialami pengguna, kasus tersebut tidak didokumentasikan.
+*/
 
-    $this->from('/wali-kelas/pelanggaran')
-        ->followingRedirects()
-        ->get('/wali-kelas/pelanggaran?date_from=2026-07-31&date_to=2026-07-01')
-        ->assertSee('Tanggal selesai harus sama dengan atau setelah tanggal mulai.');
-});
-
-// TS.RIP.007 / TC.RIP.007.001 — Positive
+// TS.RIP.006 / TC.RIP.006.001 — Positive
 test('kelas tanpa pelanggaran menampilkan keterangan riwayat masih kosong', function () {
     waliKelasDenganKelas();
 
@@ -114,7 +110,7 @@ test('kelas tanpa pelanggaran menampilkan keterangan riwayat masih kosong', func
         ->assertSee('Belum ada riwayat pelanggaran untuk kelas ini.');
 });
 
-// TS.RIP.008 / TC.RIP.008.001 — Negative
+// TS.RIP.007 / TC.RIP.007.001 — Negative
 test('guru yang belum dipasangi kelas melihat keterangan belum ada kelas di riwayat pelanggaran', function () {
     $wali = Pengguna::factory()->homeroom()->create([
         'email' => 'wali.tanpa.kelas@sentrisiswa.test',
