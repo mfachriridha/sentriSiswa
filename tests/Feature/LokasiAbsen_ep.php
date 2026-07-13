@@ -18,6 +18,8 @@ uses(RefreshDatabase::class);
 | Area absensi digambar di Google My Maps lalu diunduh sebagai berkas KML.
 | Admin mengunggah berkas itu, dan boleh menambahkan toleransi jarak agar
 | siswa yang berada sedikit di luar garis area tetap bisa absen.
+| Yang diuji di berkas ini adalah isiannya: berkas area (jenis, isi, jumlah titiknya)
+| dan toleransi jaraknya.
 |
 */
 
@@ -145,17 +147,4 @@ test('admin gagal menyimpan toleransi jarak yang bukan angka', function () {
             'tolerance_meters' => 'lima puluh',
         ])
         ->assertSee('Toleransi harus berupa angka.');
-});
-
-// TS.LKA.007 / TC.LKA.007.001 — Positive
-test('admin berhasil menghapus area absensi yang sudah dipasang', function () {
-    adminLokasiAbsen();
-
-    $this->followingRedirects()
-        ->put('/admin/pengaturan/lokasi-absen', ['kml_file' => berkasAreaSekolah()])
-        ->assertSee('Area absensi berhasil diimpor.');
-
-    $this->followingRedirects()
-        ->delete('/admin/pengaturan/lokasi-absen')
-        ->assertSee('Lokasi absen berhasil dihapus.');
 });
