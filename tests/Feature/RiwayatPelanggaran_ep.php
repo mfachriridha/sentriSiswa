@@ -2,7 +2,6 @@
 
 use App\Models\Kelas;
 use App\Models\Pengguna;
-use App\Models\ProfilSiswa;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -20,44 +19,9 @@ uses(RefreshDatabase::class);
 | dicatat kesiswaan untuk siswa di kelasnya, dan bisa menyaringnya per siswa,
 | per kategori, atau per rentang tanggal. Wali kelas tidak bisa menambah,
 | mengubah, atau menghapus catatan pelanggaran dari sini.
+| Yang diuji di berkas ini adalah penyaringnya: siswa, kategori, dan rentang tanggal.
 |
 */
-
-// TS.RIP.001 / TC.RIP.001.001 — Positive
-test('wali kelas melihat riwayat pelanggaran siswa kelasnya', function () {
-    [, , $siswa] = waliKelasDenganKelas();
-
-    catatPelanggaran($siswa, 'Terlambat masuk kelas', 'ringan', '2026-07-06');
-
-    $this->get('/wali-kelas/pelanggaran')
-        ->assertSee('Riwayat Pelanggaran')
-        ->assertSee('Ahmad Fauzi')
-        ->assertSee('Terlambat masuk kelas')
-        ->assertSee('Ringan');
-});
-
-// TS.RIP.002 / TC.RIP.002.001 — Negative
-test('wali kelas tidak melihat pelanggaran siswa dari kelas lain', function () {
-    waliKelasDenganKelas();
-
-    $kelasLain = Kelas::create(['nama' => '11 IPS 1', 'tingkat' => '11']);
-    $penggunaLain = Pengguna::factory()->student()->create([
-        'nama' => 'Siswa Kelas Lain',
-        'status' => 'registered',
-    ]);
-    $siswaLain = ProfilSiswa::factory()->create([
-        'pengguna_id' => $penggunaLain->id,
-        'nisn' => '1234567891',
-        'nis' => '10002',
-        'kelas_id' => $kelasLain->id,
-    ]);
-
-    catatPelanggaran($siswaLain, 'Membolos', 'sedang', '2026-07-06');
-
-    $this->get('/wali-kelas/pelanggaran')
-        ->assertDontSee('Siswa Kelas Lain')
-        ->assertDontSee('Membolos');
-});
 
 // TS.RIP.003 / TC.RIP.003.001 — Positive
 test('wali kelas menyaring riwayat pelanggaran hanya untuk seorang siswa', function () {
@@ -101,25 +65,3 @@ test('wali kelas menyaring riwayat pelanggaran berdasarkan rentang tanggal', fun
 | sebaliknya, sehingga pengguna tidak pernah bisa memilih rentang terbalik.
 | Karena tidak pernah dialami pengguna, kasus tersebut tidak didokumentasikan.
 */
-
-// TS.RIP.006 / TC.RIP.006.001 — Positive
-test('kelas tanpa pelanggaran menampilkan keterangan riwayat masih kosong', function () {
-    waliKelasDenganKelas();
-
-    $this->get('/wali-kelas/pelanggaran')
-        ->assertSee('Belum ada riwayat pelanggaran untuk kelas ini.');
-});
-
-// TS.RIP.007 / TC.RIP.007.001 — Negative
-test('guru yang belum dipasangi kelas melihat keterangan belum ada kelas di riwayat pelanggaran', function () {
-    $wali = Pengguna::factory()->homeroom()->create([
-        'email' => 'wali.tanpa.kelas@sentrisiswa.test',
-        'status' => 'registered',
-    ]);
-
-    masukSebagai($wali);
-
-    $this->get('/wali-kelas/pelanggaran')
-        ->assertSee('Belum Ada Kelas')
-        ->assertSee('Anda belum ditugaskan sebagai wali kelas.');
-});

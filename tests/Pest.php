@@ -213,6 +213,19 @@ function catatKehadiranBerselfie(string $nisn, string $tanggal, string $jamMasuk
     ]);
 }
 
+/** Sebuah pengajuan poin yang sudah disetujui pada tanggal tertentu. */
+function pengajuanPoinDisetujui(string $nisn, int $waliId, string $alasan, int $jumlahPoin, string $tanggalPersetujuan): PengajuanPoin
+{
+    return PengajuanPoin::create([
+        'profil_siswa_id' => $nisn,
+        'diajukan_oleh_id' => $waliId,
+        'alasan' => $alasan,
+        'status' => 'approved',
+        'jumlah_poin' => $jumlahPoin,
+        'disetujui_pada' => $tanggalPersetujuan,
+    ]);
+}
+
 /** Isian catatan pelanggaran yang sah. */
 function dataPelanggaranSiswa(ProfilSiswa $siswa, JenisPelanggaran $jenis, array $ubahan = []): array
 {
