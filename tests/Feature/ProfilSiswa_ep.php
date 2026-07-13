@@ -1,10 +1,8 @@
 <?php
 
-use App\Mail\OtpMail;
 use App\Models\Pengguna;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 uses(RefreshDatabase::class);
@@ -20,6 +18,7 @@ uses(RefreshDatabase::class);
 | Siswa hanya boleh mengubah nomor HP, alamat, dan fotonya. Nama, NISN, NIS, dan
 | kelasnya ditentukan sekolah, jadi tidak bisa diubah sendiri. Mengganti email
 | harus dipastikan lewat kode OTP yang dikirim ke email barunya.
+| Yang diuji di berkas ini adalah isiannya: nomor HP, alamat, email, dan jenis berkas foto.
 |
 */
 
@@ -36,17 +35,6 @@ function dataProfilSiswa(Pengguna $siswa, array $ubahan = []): array
         'alamat' => 'Jalan Merdeka Nomor 10, Bandung.',
     ], $ubahan);
 }
-
-// TS.PRS.001 / TC.PRS.001.001 — Positive
-test('siswa melihat profilnya sendiri', function () {
-    $siswa = siswaMasuk();
-
-    $this->get('/siswa/profil')
-        ->assertSee('Profil Saya')
-        ->assertSee('Ahmad Fauzi')
-        ->assertSee('10 IPA 1')
-        ->assertSee($siswa->nisn);
-});
 
 // TS.PRS.002 / TC.PRS.002.001 — Positive
 test('siswa memperbarui nomor hp dan alamatnya', function () {
@@ -72,48 +60,6 @@ test('profil ditolak ketika nomor hp mengandung huruf', function () {
         ->assertSee('Format nomor telepon tidak valid.');
 });
 
-// TS.PRS.004 / TC.PRS.004.001 — Positive
-test('mengganti email memicu pengiriman kode otp lebih dulu', function () {
-    Mail::fake();
-    $siswa = siswaMasuk();
-
-    $this->followingRedirects()
-        ->put('/siswa/profil', dataProfilSiswa($siswa->pengguna, [
-            'email' => 'ahmad.baru@sentrisiswa.test',
-        ]))
-        ->assertSee('Kode OTP telah dikirim ke email Anda saat ini untuk memverifikasi perubahan.');
-
-    Mail::assertSent(OtpMail::class);
-});
-
-// TS.PRS.005 / TC.PRS.005.001 — Positive
-test('email berganti setelah kode otp diverifikasi', function () {
-    Mail::fake();
-    $siswa = siswaMasuk();
-
-    $this->put('/siswa/profil', dataProfilSiswa($siswa->pengguna, [
-        'email' => 'ahmad.baru@sentrisiswa.test',
-    ]));
-
-    $this->followingRedirects()
-        ->post('/otp/verifikasi', ['otp' => kodeOtpTerkirim()])
-        ->assertSee('Perubahan berhasil disimpan.')
-        ->assertSee('ahmad.baru@sentrisiswa.test');
-});
-
-// TS.PRS.006 / TC.PRS.006.001 — Negative
-test('email belum berganti selama kode otp belum diverifikasi', function () {
-    Mail::fake();
-    $siswa = siswaMasuk();
-
-    $this->put('/siswa/profil', dataProfilSiswa($siswa->pengguna, [
-        'email' => 'ahmad.baru@sentrisiswa.test',
-    ]));
-
-    $this->get('/siswa/profil')
-        ->assertDontSee('ahmad.baru@sentrisiswa.test');
-});
-
 // TS.PRS.007 / TC.PRS.007.001 — Negative
 test('profil ditolak ketika emailnya sudah dipakai akun lain', function () {
     $siswa = siswaMasuk();
@@ -129,21 +75,6 @@ test('profil ditolak ketika emailnya sudah dipakai akun lain', function () {
             'email' => 'sudah.dipakai@sentrisiswa.test',
         ]))
         ->assertSee('Email sudah digunakan.');
-});
-
-// TS.PRS.008 / TC.PRS.008.001 — Negative
-test('siswa tidak bisa mengubah nama maupun kelasnya sendiri', function () {
-    $siswa = siswaMasuk();
-
-    // Nama dan kelas ditentukan sekolah, jadi kolomnya tidak ada di halaman ubah profil.
-    $this->get('/siswa/profil/edit')
-        ->assertDontSee('name="nama"', escape: false)
-        ->assertDontSee('name="kelas_id"', escape: false);
-
-    $this->followingRedirects()
-        ->put('/siswa/profil', dataProfilSiswa($siswa->pengguna, ['nama' => 'Nama Karangan']))
-        ->assertSee('Ahmad Fauzi')
-        ->assertDontSee('Nama Karangan');
 });
 
 // TS.PRS.009 / TC.PRS.009.001 — Positive

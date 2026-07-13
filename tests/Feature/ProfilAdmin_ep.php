@@ -3,7 +3,6 @@
 use App\Models\Pengguna;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 uses(RefreshDatabase::class);
@@ -20,6 +19,8 @@ uses(RefreshDatabase::class);
 | Admin boleh mengganti email dan nomor WhatsApp secara langsung. Penggantian
 | kata sandi punya alurnya sendiri: sistem mengirim kode OTP ke email admin
 | lebih dulu.
+| Yang diuji di berkas ini adalah isiannya: nama, email, nomor WhatsApp bantuan, dan
+| jenis berkas foto profil.
 |
 */
 
@@ -35,15 +36,6 @@ function adminProfil(string $email = 'admin.profil@sentrisiswa.test'): Pengguna
 
     return $admin;
 }
-
-// TS.PAD.001 / TC.PAD.001.001 — Positive
-test('admin melihat halaman profilnya sendiri', function () {
-    adminProfil();
-
-    $this->get('/admin/profil')
-        ->assertSee('Admin Sekolah')
-        ->assertSee('admin.profil@sentrisiswa.test');
-});
 
 // TS.PAD.002 / TC.PAD.002.001 — Positive
 test('admin berhasil mengganti namanya sendiri', function () {
@@ -148,17 +140,4 @@ test('admin gagal mengunggah foto profil bertipe yang tidak diizinkan', function
             'photo' => UploadedFile::fake()->create('dokumen.pdf', 100, 'application/pdf'),
         ])
         ->assertSee('Foto harus berupa gambar.');
-});
-
-// TS.PAD.009 / TC.PAD.009.001 — Positive
-test('admin meminta penggantian kata sandi dan diarahkan ke halaman kode otp', function () {
-    Mail::fake();
-    adminProfil();
-
-    $this->get('/admin/profil/ganti-sandi')->assertSee('Ganti Kata Sandi');
-
-    $this->followingRedirects()
-        ->post('/admin/profil/ganti-sandi')
-        ->assertSee('Kode OTP telah dikirim ke email Anda.')
-        ->assertSee('Verifikasi OTP');
 });

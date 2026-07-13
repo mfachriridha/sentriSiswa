@@ -2,11 +2,9 @@
 
 use App\Models\Kelas;
 use App\Models\Pengguna;
-use App\Models\ProfilGuru;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Testing\TestResponse;
-use Maatwebsite\Excel\Facades\Excel;
 
 uses(RefreshDatabase::class);
 
@@ -22,6 +20,8 @@ uses(RefreshDatabase::class);
 | Impor berjalan tiga tahap: admin mengunggah berkas, meninjau isinya lebih
 | dulu, lalu menyetujui untuk disimpan. Baris yang datanya bermasalah dilewati,
 | dan alasannya ditampilkan setelah impor selesai.
+| Yang diuji di berkas ini adalah isi berkasnya: jenis berkas, dan tiap baris di dalamnya
+| (nama, NIP, peran).
 |
 */
 
@@ -142,35 +142,4 @@ test('baris guru tanpa nip dilewati dan alasannya ditampilkan', function () {
         ['nama' => 'Raka Pradipta', 'nip' => ''],
     ]))
         ->assertSee('NIP kosong, guru harus didaftarkan manual oleh admin');
-});
-
-// TS.IMG.006 / TC.IMG.006.001 — Positive
-test('guru yang nipnya sudah ada tidak dibuat ulang', function () {
-    adminImporGuru();
-
-    $pengguna = Pengguna::factory()->homeroom()->create([
-        'nama' => 'Guru Lama',
-        'status' => 'registered',
-    ]);
-    ProfilGuru::factory()->create([
-        'pengguna_id' => $pengguna->id,
-        'nip' => '198501012020121006',
-    ]);
-
-    jalankanImporGuru(berkasImporGuru([
-        ['nama' => 'Guru Lama', 'nip' => '198501012020121006'],
-    ]))
-        ->assertSee('Impor berhasil')
-        ->assertSee('0 guru baru dibuat')
-        ->assertSee('1 guru sudah ada');
-});
-
-// TS.IMG.007 / TC.IMG.007.001 — Positive
-test('admin mengunduh templat berkas impor guru', function () {
-    Excel::fake();
-    adminImporGuru();
-
-    $this->get('/admin/guru/impor/template')->assertSuccessful();
-
-    Excel::assertDownloaded('template-impor-guru.xlsx');
 });

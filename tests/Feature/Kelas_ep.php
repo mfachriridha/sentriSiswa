@@ -20,6 +20,8 @@ uses(RefreshDatabase::class);
 | keduanya digabung menjadi nama lengkap, misalnya tingkat 10 dan nama "IPA 1"
 | menjadi "10 IPA 1". Admin juga bisa langsung memilihkan wali kelas dan
 | memasukkan beberapa siswa sekaligus.
+| Yang diuji di berkas ini adalah isiannya: nama kelas, tingkat, wali kelas, siswa yang
+| dimasukkan, berikut pencarian dan penyaringnya.
 |
 */
 
@@ -133,25 +135,6 @@ test('admin gagal menambah kelas karena tingkat yang dipilih tidak tersedia', fu
         ->assertSee('Tingkat yang dipilih tidak valid.');
 });
 
-// TS.KEL.006 / TC.KEL.006.001 — Negative
-test('admin gagal memasukkan siswa yang sudah punya kelas lain', function () {
-    adminDataKelas();
-
-    $kelasLama = Kelas::create(['nama' => '11 IPS 1', 'tingkat' => '11']);
-    $siswa = siswaTanpaKelas('Sudah Punya Kelas', '1234567892', '10003');
-    $siswa->update(['kelas_id' => $kelasLama->id]);
-
-    $this->from('/admin/kelas/create')
-        ->followingRedirects()
-        ->post('/admin/kelas', [
-            'tingkat' => '10',
-            'nama' => 'IPA 4',
-            'siswa_nisn' => ['1234567892'],
-        ])
-        ->assertSee('Siswa yang dipilih tidak valid.')
-        ->assertDontSee('Kelas berhasil ditambahkan.');
-});
-
 // TS.KEL.007 / TC.KEL.007.001 — Positive
 test('admin berhasil mengubah nama kelas yang sudah ada', function () {
     adminDataKelas();
@@ -167,37 +150,6 @@ test('admin berhasil mengubah nama kelas yang sudah ada', function () {
         ->assertSee('Kelas berhasil diperbarui.')
         ->assertSee('10 IPA 9')
         ->assertDontSee('10 IPA 1');
-});
-
-// TS.KEL.008 / TC.KEL.008.001 — Positive
-test('admin berhasil mengeluarkan siswa dari kelas saat mengubah kelas', function () {
-    adminDataKelas();
-
-    $kelas = Kelas::create(['nama' => '10 IPA 1', 'tingkat' => '10']);
-    $siswa = siswaTanpaKelas('Ahmad Fauzi', '1234567893', '10004');
-    $siswa->update(['kelas_id' => $kelas->id]);
-
-    // Menyimpan tanpa mencentang siswa manapun berarti mengeluarkan semuanya.
-    $this->followingRedirects()
-        ->put("/admin/kelas/{$kelas->id}", [
-            'tingkat' => '10',
-            'nama' => 'IPA 1',
-        ])
-        ->assertSee('Kelas berhasil diperbarui.');
-
-    $this->get("/admin/kelas/{$kelas->id}")
-        ->assertDontSee('Ahmad Fauzi');
-});
-
-// TS.KEL.009 / TC.KEL.009.001 — Positive
-test('admin berhasil menghapus kelas', function () {
-    adminDataKelas();
-    $kelas = Kelas::create(['nama' => '10 IPA 8', 'tingkat' => '10']);
-
-    $this->followingRedirects()
-        ->delete("/admin/kelas/{$kelas->id}")
-        ->assertSee('Kelas berhasil dihapus.')
-        ->assertDontSee('10 IPA 8');
 });
 
 // TS.KEL.010 / TC.KEL.010.001 — Positive

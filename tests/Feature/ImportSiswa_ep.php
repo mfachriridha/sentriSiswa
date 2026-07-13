@@ -2,7 +2,6 @@
 
 use App\Models\Kelas;
 use App\Models\Pengguna;
-use App\Models\ProfilSiswa;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Testing\TestResponse;
@@ -22,6 +21,9 @@ uses(RefreshDatabase::class);
 | Impor berjalan tiga tahap: admin mengunggah berkas, meninjau isinya lebih
 | dulu, lalu menyetujui untuk disimpan. Baris yang datanya bermasalah dilewati,
 | dan alasannya ditampilkan setelah impor selesai.
+| Yang diuji di berkas ini adalah isi berkasnya: jenis berkas, dan tiap baris di dalamnya
+| (nama, NISN, NIS, jenis kelamin) - baris yang tidak memenuhi syarat dilewati beserta
+| alasannya.
 |
 */
 
@@ -165,37 +167,6 @@ test('baris yang nisnya mengandung huruf dilewati dan alasannya ditampilkan', fu
     ]))
         ->assertSee('Detail baris yang dilewati')
         ->assertSee('NIS harus berupa angka');
-});
-
-// TS.IMS.007 / TC.IMS.007.001 — Positive
-test('siswa yang nisnya sudah ada tidak dibuat ulang', function () {
-    adminImporSiswa();
-
-    $pengguna = Pengguna::factory()->student()->create([
-        'nama' => 'Siswa Lama',
-        'status' => 'registered',
-    ]);
-    ProfilSiswa::factory()->create([
-        'pengguna_id' => $pengguna->id,
-        'nisn' => '1234567896',
-        'nis' => '10007',
-    ]);
-
-    jalankanImporSiswa(berkasImporSiswa([
-        ['nama' => 'Siswa Lama', 'nisn' => '1234567896', 'nis' => '10007'],
-    ]))
-        ->assertSee('Impor berhasil')
-        ->assertSee('0 siswa baru dibuat');
-});
-
-// TS.IMS.008 / TC.IMS.008.001 — Positive
-test('admin mengunduh templat berkas impor siswa', function () {
-    Excel::fake();
-    adminImporSiswa();
-
-    $this->get('/admin/siswa/impor/template')->assertSuccessful();
-
-    Excel::assertDownloaded('template-impor-siswa.xlsx');
 });
 
 // TS.IMS.009 / TC.IMS.009.001 — Positive

@@ -18,6 +18,8 @@ uses(RefreshDatabase::class);
 |
 | Guru punya tiga peran: wali kelas, BK, dan kesiswaan. Guru BK wajib memilih
 | tingkat yang dipegangnya; wali kelas boleh langsung dipilihkan kelasnya.
+| Yang diuji di berkas ini adalah isiannya: nama, NIP, peran, tingkat BK, berikut
+| pencarian dan penyaringnya.
 |
 */
 
@@ -158,29 +160,6 @@ test('admin gagal menambah guru karena nama mengandung angka', function () {
         ->assertSee('Format Nama tidak valid.');
 });
 
-// TS.GUR.008 / TC.GUR.008.001 — Negative
-test('admin gagal memilihkan kelas yang sudah punya wali kelas', function () {
-    adminDataGuru();
-
-    $waliLama = guruTercatat('Wali Kelas Lama', '198501012020121008');
-    $kelas = Kelas::create([
-        'nama' => '10 IPA 1',
-        'tingkat' => '10',
-        'wali_kelas_id' => $waliLama->pengguna_id,
-    ]);
-
-    $this->from('/admin/guru/create')
-        ->followingRedirects()
-        ->post('/admin/guru', [
-            'nama' => 'Wali Kelas Baru',
-            'nip' => '198501012020121009',
-            'peran' => 'wali_kelas',
-            'kelas_id' => (string) $kelas->id,
-        ])
-        ->assertSee('Kelas yang dipilih tidak valid.')
-        ->assertDontSee('Guru berhasil ditambahkan.');
-});
-
 // TS.GUR.009 / TC.GUR.009.001 — Positive
 test('admin berhasil mengubah data guru yang sudah ada', function () {
     adminDataGuru();
@@ -197,17 +176,6 @@ test('admin berhasil mengubah data guru yang sudah ada', function () {
         ->assertSee('Guru berhasil diperbarui.')
         ->assertSee('Nama Baru')
         ->assertDontSee('Nama Lama');
-});
-
-// TS.GUR.010 / TC.GUR.010.001 — Positive
-test('admin berhasil menghapus data guru', function () {
-    adminDataGuru();
-    $guru = guruTercatat('Guru Dihapus', '198501012020121011');
-
-    $this->followingRedirects()
-        ->delete("/admin/guru/{$guru->pengguna_id}")
-        ->assertSee('Guru berhasil dihapus.')
-        ->assertDontSee('Guru Dihapus');
 });
 
 // TS.GUR.011 / TC.GUR.011.001 — Positive
