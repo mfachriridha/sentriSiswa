@@ -22,7 +22,7 @@ uses(RefreshDatabase::class);
 /** Menempuh tahap pertama pendaftaran untuk siswa yang datanya sudah disiapkan. */
 function lanjutkanPendaftaranSiswa(string $nisn): void
 {
-    test()->post('/daftar/verifikasi', [
+    test()->followingRedirects()->post('/daftar/verifikasi', [
         'peran' => 'student',
         'identity' => $nisn,
     ])->assertSee('Lengkapi Profil');
@@ -31,7 +31,7 @@ function lanjutkanPendaftaranSiswa(string $nisn): void
 /** Menempuh tahap pertama pendaftaran untuk guru yang datanya sudah disiapkan. */
 function lanjutkanPendaftaranGuru(string $nip): void
 {
-    test()->post('/daftar/verifikasi', [
+    test()->followingRedirects()->post('/daftar/verifikasi', [
         'peran' => 'teacher',
         'identity' => $nip,
     ])->assertSee('Nomor HP');
@@ -44,8 +44,7 @@ test('kata sandi tujuh karakter ditolak karena kurang dari batas minimum', funct
     siswaBelumPunyaAkun(nisn: '2234567890', nis: '20001');
     lanjutkanPendaftaranSiswa('2234567890');
 
-    $this->from('/daftar/lengkapi')
-        ->followingRedirects()
+    $this->followingRedirects()
         ->post('/daftar/lengkapi', [
             'email' => 'sandi.tujuh@sentrisiswa.test',
             'password' => 'Rahas12',
@@ -75,8 +74,7 @@ test('nomor hp guru sembilan digit ditolak karena kurang dari batas minimum', fu
     guruBelumPunyaAkun(nip: '198501012020122001');
     lanjutkanPendaftaranGuru('198501012020122001');
 
-    $this->from('/daftar/lengkapi')
-        ->followingRedirects()
+    $this->followingRedirects()
         ->post('/daftar/lengkapi', [
             'email' => 'hp.sembilan@sentrisiswa.test',
             'password' => 'Rahasia123',
@@ -121,8 +119,7 @@ test('nomor hp guru enam belas digit ditolak karena melebihi batas maksimum', fu
     guruBelumPunyaAkun(nip: '198501012020122004');
     lanjutkanPendaftaranGuru('198501012020122004');
 
-    $this->from('/daftar/lengkapi')
-        ->followingRedirects()
+    $this->followingRedirects()
         ->post('/daftar/lengkapi', [
             'email' => 'hp.enambelas@sentrisiswa.test',
             'password' => 'Rahasia123',

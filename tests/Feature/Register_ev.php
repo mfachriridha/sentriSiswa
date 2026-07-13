@@ -64,7 +64,7 @@ test('siswa berhasil mendaftar menggunakan nisn', function () {
 
     $this->get('/daftar')->assertSee('Nomor Identitas');
 
-    $this->post('/daftar/verifikasi', [
+    $this->followingRedirects()->post('/daftar/verifikasi', [
         'peran' => 'student',
         'identity' => '1234567890',
     ])->assertSee('Lengkapi Profil');
@@ -82,7 +82,7 @@ test('siswa berhasil mendaftar menggunakan nisn', function () {
 test('siswa berhasil mendaftar menggunakan nis', function () {
     siswaBelumPunyaAkun(nisn: '1234567891', nis: '10002');
 
-    $this->post('/daftar/verifikasi', [
+    $this->followingRedirects()->post('/daftar/verifikasi', [
         'peran' => 'student',
         'identity' => '10002',
     ])->assertSee('Lengkapi Profil');
@@ -100,7 +100,7 @@ test('siswa berhasil mendaftar menggunakan nis', function () {
 test('guru berhasil mendaftar dan diminta mengisi nomor hp', function () {
     guruBelumPunyaAkun(nip: '198501012020121001');
 
-    $this->post('/daftar/verifikasi', [
+    $this->followingRedirects()->post('/daftar/verifikasi', [
         'peran' => 'teacher',
         'identity' => '198501012020121001',
     ])->assertSee('Nomor HP');
@@ -119,7 +119,7 @@ test('guru berhasil mendaftar dan diminta mengisi nomor hp', function () {
 test('siswa yang baru mendaftar bisa langsung masuk memakai akunnya', function () {
     siswaBelumPunyaAkun(nisn: '1234567892', nis: '10003');
 
-    $this->post('/daftar/verifikasi', [
+    $this->followingRedirects()->post('/daftar/verifikasi', [
         'peran' => 'student',
         'identity' => '1234567892',
     ])->assertSee('Lengkapi Profil');
@@ -227,19 +227,21 @@ test('pendaftaran ditolak karena email sudah dipakai akun lain', function () {
         'status' => 'registered',
     ]);
 
-    $this->post('/daftar/verifikasi', [
+    $this->followingRedirects()->post('/daftar/verifikasi', [
         'peran' => 'student',
         'identity' => '1234567894',
     ])->assertSee('Lengkapi Profil');
 
-    $this->from('/daftar/lengkapi')
-        ->followingRedirects()
+    $this->followingRedirects()
         ->post('/daftar/lengkapi', [
             'email' => 'sudah.dipakai@sentrisiswa.test',
             'password' => 'Rahasia123',
             'password_confirmation' => 'Rahasia123',
         ])
         ->assertSee('Email sudah terdaftar.')
+        // Pendaftarnya tetap di formulir langkah 2, bukan dilempar balik ke
+        // langkah 1 dengan formulir kosong.
+        ->assertSee('Lengkapi Profil')
         ->assertDontSee('Pendaftaran berhasil. Silakan masuk dengan akun Anda.');
 });
 
@@ -247,36 +249,74 @@ test('pendaftaran ditolak karena email sudah dipakai akun lain', function () {
 test('pendaftaran ditolak karena kata sandi tidak mengandung angka', function () {
     siswaBelumPunyaAkun(nisn: '1234567895', nis: '10006');
 
-    $this->post('/daftar/verifikasi', [
+    $this->followingRedirects()->post('/daftar/verifikasi', [
         'peran' => 'student',
         'identity' => '1234567895',
     ])->assertSee('Lengkapi Profil');
 
-    $this->from('/daftar/lengkapi')
-        ->followingRedirects()
+    $this->followingRedirects()
         ->post('/daftar/lengkapi', [
             'email' => 'tanpa.angka@sentrisiswa.test',
             'password' => 'RahasiaSaja',
             'password_confirmation' => 'RahasiaSaja',
         ])
-        ->assertSee('Kata sandi harus mengandung huruf dan angka.');
+        ->assertSee('Kata sandi harus mengandung huruf dan angka.')
+        ->assertSee('Lengkapi Profil');
 });
 
 // TS.REG.012 / TC.REG.012.001 — Negative
 test('pendaftaran ditolak karena ulangi kata sandi tidak sama', function () {
     siswaBelumPunyaAkun(nisn: '1234567896', nis: '10007');
 
-    $this->post('/daftar/verifikasi', [
+    $this->followingRedirects()->post('/daftar/verifikasi', [
         'peran' => 'student',
         'identity' => '1234567896',
     ])->assertSee('Lengkapi Profil');
 
-    $this->from('/daftar/lengkapi')
-        ->followingRedirects()
+    $this->followingRedirects()
         ->post('/daftar/lengkapi', [
             'email' => 'beda.sandi@sentrisiswa.test',
             'password' => 'Rahasia123',
             'password_confirmation' => 'Rahasia456',
         ])
-        ->assertSee('Konfirmasi kata sandi tidak cocok.');
+        ->assertSee('Konfirmasi kata sandi tidak cocok.')
+        ->assertSee('Lengkapi Profil');
+});
+
+// TS.REG.016 / TC.REG.016.001 — Negative
+test('pendaftar yang salah mengisi kata sandi tetap di formulirnya, tidak dilempar balik', function () {
+    siswaBelumPunyaAkun(nisn: '1234567897', nis: '10008');
+
+    $this->followingRedirects()->post('/daftar/verifikasi', [
+        'peran' => 'student',
+        'identity' => '1234567897',
+    ])->assertSee('Lengkapi Profil');
+
+    $this->followingRedirects()
+        ->post('/daftar/lengkapi', [
+            'email' => 'sandi.salah@sentrisiswa.test',
+            'password' => 'rahasiasaja',
+            'password_confirmation' => 'rahasiasaja',
+        ])
+        // Alasan penolakannya terbaca, dan identitas yang tadi diverifikasi masih
+        // tertera. Bukan dilempar balik ke formulir nomor identitas yang kosong.
+        ->assertSee('Kata sandi harus mengandung huruf dan angka.')
+        ->assertSee('Lengkapi Profil')
+        ->assertSee('1234567897')
+        ->assertDontSee('Verifikasi Identitas');
+});
+
+// TS.REG.017 / TC.REG.017.001 — Negative
+test('guru yang salah mengetik nip dilempar balik dengan pilihan Guru yang tetap terpilih', function () {
+    $this->from('/daftar')
+        ->followingRedirects()
+        ->post('/daftar/verifikasi', [
+            'peran' => 'teacher',
+            'identity' => '199999999999999999',
+        ])
+        ->assertSee('NIP tidak ditemukan.')
+        // Pilihan perannya tidak boleh berubah sendiri jadi Siswa: kalau berubah,
+        // guru yang mengetik ulang NIP-nya justru dicari di data siswa, lalu
+        // diberi tahu "NISN/NIS tidak ditemukan" padahal NIP-nya benar.
+        ->assertSee('<input type="radio" name="peran" value="teacher" checked', escape: false);
 });

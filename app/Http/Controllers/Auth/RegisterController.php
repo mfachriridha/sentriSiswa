@@ -19,7 +19,7 @@ class RegisterController extends Controller
         return view('auth.register');
     }
 
-    public function verify(VerifyIdentityRequest $request): RedirectResponse|View
+    public function verify(VerifyIdentityRequest $request): RedirectResponse
     {
         $role = $request->peran;
         $identity = $request->identity;
@@ -27,13 +27,11 @@ class RegisterController extends Controller
         if ($role === 'teacher') {
             $profile = ProfilGuru::where('nip', $identity)->first();
             if (! $profile) {
-                return back()
-                    ->withErrors(['identity' => 'NIP tidak ditemukan.'])
-                    ->onlyInput('identity', 'role');
+                return $this->kembaliKeVerifikasi('NIP tidak ditemukan.');
             }
 
             if ($profile->pengguna && $profile->pengguna->isRegistered()) {
-                return back()->withErrors(['identity' => 'NIP sudah terdaftar. Silakan masuk.'])->onlyInput('identity', 'role');
+                return $this->kembaliKeVerifikasi('NIP sudah terdaftar. Silakan masuk.');
             }
         } else {
             $profile = ProfilSiswa::where('nisn', $identity)
@@ -41,26 +39,39 @@ class RegisterController extends Controller
                 ->first();
 
             if (! $profile) {
-                return back()
-                    ->withErrors(['identity' => 'NISN/NIS tidak ditemukan.'])
-                    ->onlyInput('identity', 'role');
+                return $this->kembaliKeVerifikasi('NISN/NIS tidak ditemukan.');
             }
 
             if ($profile->pengguna && $profile->pengguna->isRegistered()) {
-                return back()->withErrors(['identity' => 'NISN/NIS sudah terdaftar. Silakan masuk.'])->onlyInput('identity', 'role');
+                return $this->kembaliKeVerifikasi('NISN/NIS sudah terdaftar. Silakan masuk.');
             }
         }
-
-        $name = $profile->pengguna?->nama ?? '';
 
         session([
             'register_role' => $role,
             'register_user_id' => $profile->pengguna_id,
             'register_identity' => $identity,
-            'register_name' => $name,
+            'register_name' => $profile->pengguna?->nama ?? '',
         ]);
 
-        return view('auth.register-step2', compact('role', 'identity', 'name'));
+        // Diarahkan, bukan langsung dirender: kalau halaman langkah 2 tampil dari
+        // POST ini, alamat "halaman sebelumnya" milik peramban ikut menunjuk ke
+        // sini. Formulir langkah 2 yang gagal validasi akan dilempar balik ke situ
+        // - dan alamat itu cuma mengarahkan ulang ke langkah 1, sehingga pesan
+        // galatnya hilang dan formulirnya kosong lagi.
+        return redirect()->route('register.step2');
+    }
+
+    /**
+     * Kembali ke formulir langkah 1 beserta alasannya. Peran yang tadi dipilih ikut
+     * dibawa; tanpa itu, guru yang salah ketik NIP dilempar balik dengan pilihan
+     * yang sudah berubah sendiri jadi Siswa.
+     */
+    private function kembaliKeVerifikasi(string $pesan): RedirectResponse
+    {
+        return back()
+            ->withErrors(['identity' => $pesan])
+            ->onlyInput('identity', 'peran');
     }
 
     public function showForm(): RedirectResponse|View
