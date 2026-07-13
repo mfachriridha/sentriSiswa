@@ -6,6 +6,7 @@ use App\Models\Absensi;
 use App\Models\JenisPelanggaran;
 use App\Models\Kelas;
 use App\Models\PelanggaranSiswa;
+use App\Models\PengajuanPoin;
 use App\Models\Pengguna;
 use App\Models\ProfilGuru;
 use App\Models\ProfilSiswa;
@@ -208,6 +209,17 @@ function catatKehadiranBerselfie(string $nisn, string $tanggal, string $jamMasuk
         'status' => 'hadir',
         'waktu_masuk' => $tanggal.' '.$jamMasuk.':00',
         'path_selfie' => "attendance-selfies/{$nisn}/{$tanggal}.jpg",
+    ]);
+}
+
+/** Sebuah pengajuan poin dari wali kelas yang masih menunggu keputusan kesiswaan. */
+function pengajuanPoinMenunggu(ProfilSiswa $siswa, int $waliId, string $alasan = 'Juara lomba cerdas cermat.'): PengajuanPoin
+{
+    return PengajuanPoin::create([
+        'profil_siswa_id' => $siswa->nisn,
+        'diajukan_oleh_id' => $waliId,
+        'alasan' => $alasan,
+        'status' => 'pending',
     ]);
 }
 
