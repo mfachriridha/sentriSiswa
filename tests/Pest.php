@@ -10,6 +10,7 @@ use App\Models\PengajuanPoin;
 use App\Models\Pengguna;
 use App\Models\ProfilGuru;
 use App\Models\ProfilSiswa;
+use App\Models\TataTertib;
 use App\Models\TokenAksesAbsensi;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -209,6 +210,39 @@ function catatKehadiranBerselfie(string $nisn, string $tanggal, string $jamMasuk
         'status' => 'hadir',
         'waktu_masuk' => $tanggal.' '.$jamMasuk.':00',
         'path_selfie' => "attendance-selfies/{$nisn}/{$tanggal}.jpg",
+    ]);
+}
+
+/** Isian catatan pelanggaran yang sah. */
+function dataPelanggaranSiswa(ProfilSiswa $siswa, JenisPelanggaran $jenis, array $ubahan = []): array
+{
+    return array_merge([
+        'profil_siswa_id' => $siswa->nisn,
+        'jenis_pelanggaran_id' => $jenis->id,
+        'tanggal_pelanggaran' => '2026-07-06',
+        'catatan' => 'Terlambat 20 menit tanpa keterangan.',
+    ], $ubahan);
+}
+
+/** Isian jenis pelanggaran yang sah. */
+function dataJenisPelanggaran(array $ubahan = []): array
+{
+    return array_merge([
+        'nama' => 'Terlambat masuk kelas',
+        'kategori' => 'ringan',
+        'pengurangan_poin' => 10,
+        'keterangan' => 'Datang setelah bel masuk berbunyi.',
+        'aktif' => 1,
+    ], $ubahan);
+}
+
+/** Sebuah tata tertib yang sudah ada di daftar. */
+function tataTertibTersimpan(string $judul, bool $dipublikasikan = false): TataTertib
+{
+    return TataTertib::create([
+        'judul' => $judul,
+        'path_file' => 'school-rules/'.md5($judul).'.pdf',
+        'dipublikasikan' => $dipublikasikan,
     ]);
 }
 

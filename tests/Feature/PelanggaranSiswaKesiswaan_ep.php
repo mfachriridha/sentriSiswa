@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\JenisPelanggaran;
 use App\Models\Pengguna;
 use App\Models\ProfilSiswa;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -13,34 +12,23 @@ uses(RefreshDatabase::class);
 | Fitur Pelanggaran Siswa (Kesiswaan) — Equivalence Partitioning
 |--------------------------------------------------------------------------
 |
-| Pengujian black box: kesiswaan masuk lewat halaman masuk, lalu mencatat
-| pelanggaran seorang siswa. Hasilnya diperiksa dari apa yang muncul di layar,
-| bukan dari basis data.
-|
 | Kesiswaan memilih siswa, memilih jenis pelanggaran, dan mengisi tanggal
 | kejadiannya. Poin yang dikurangi mengikuti jenis pelanggaran yang dipilih,
-| tidak diisi manual. Pelanggaran yang dicatat langsung berlaku dan memotong
-| poin siswa, tanpa perlu persetujuan siapa pun.
+| tidak diisi manual.
 |
-| Siswa yang belum mendaftarkan akunnya belum bisa dicatat pelanggarannya, dan
-| jenis pelanggaran yang sudah dinonaktifkan tidak boleh dipilih lagi.
+| Yang diuji di berkas ini adalah isiannya: siswa yang dipilih (sudah mendaftar
+| atau belum), tanggal kejadian (sampai hari ini atau melampauinya), serta kata
+| kunci pencarian dan pilihan penyaring.
+|
+| Poin yang berpindah naik-turun mengikuti catatan, dan jenis pelanggaran yang
+| sudah dinonaktifkan, diuji di PelanggaranSiswaKesiswaan_stt.php; batas tanggal
+| dan poin di _bva.php; serta rincian dan daftar kosong di _uc.php.
 |
 */
 
 afterEach(function () {
     Carbon::setTestNow();
 });
-
-/** Isian catatan pelanggaran yang sah. */
-function dataPelanggaranSiswa(ProfilSiswa $siswa, JenisPelanggaran $jenis, array $ubahan = []): array
-{
-    return array_merge([
-        'profil_siswa_id' => $siswa->nisn,
-        'jenis_pelanggaran_id' => $jenis->id,
-        'tanggal_pelanggaran' => '2026-07-06',
-        'catatan' => 'Terlambat 20 menit tanpa keterangan.',
-    ], $ubahan);
-}
 
 // TS.PLS.001 / TC.PLS.001.001 — Positive
 test('kesiswaan mencatat pelanggaran seorang siswa', function () {
@@ -54,20 +42,6 @@ test('kesiswaan mencatat pelanggaran seorang siswa', function () {
         ->assertSee('Pelanggaran siswa berhasil dicatat.')
         ->assertSee('Ahmad Fauzi')
         ->assertSee('Terlambat masuk kelas');
-});
-
-// TS.PLS.002 / TC.PLS.002.001 — Positive
-test('poin siswa berkurang sesuai jenis pelanggaran yang dipilih', function () {
-    Carbon::setTestNow('2026-07-10 08:00:00');
-    [, , $siswa] = kelasBerisiSiswa();
-    $pelanggaran = catatPelanggaran($siswa, 'Terlambat masuk kelas', 'ringan', '2026-07-06', 10);
-
-    kesiswaanMasuk();
-
-    // Poin siswa mulai dari 100, jadi setelah dipotong 10 sisanya 90.
-    $this->get("/kesiswaan/pelanggaran-siswa/{$pelanggaran->id}")
-        ->assertSee('10 poin')
-        ->assertSee('Sisa Poin: 90');
 });
 
 // TS.PLS.003 / TC.PLS.003.001 — Negative
@@ -93,19 +67,6 @@ test('pelanggaran ditolak ketika siswanya belum mendaftarkan akun', function () 
         ->followingRedirects()
         ->post('/kesiswaan/pelanggaran-siswa', dataPelanggaranSiswa($siswaBelumDaftar, $jenis))
         ->assertSee('Siswa belum terdaftar, belum bisa dicatat pelanggarannya.');
-});
-
-// TS.PLS.004 / TC.PLS.004.001 — Negative
-test('pelanggaran ditolak ketika jenis pelanggarannya sudah dinonaktifkan', function () {
-    Carbon::setTestNow('2026-07-10 08:00:00');
-    [, , $siswa] = kelasBerisiSiswa();
-    kesiswaanMasuk();
-    $jenisNonaktif = jenisPelanggaranTersedia(['aktif' => false]);
-
-    $this->from('/kesiswaan/pelanggaran-siswa/create')
-        ->followingRedirects()
-        ->post('/kesiswaan/pelanggaran-siswa', dataPelanggaranSiswa($siswa, $jenisNonaktif))
-        ->assertSee('Jenis pelanggaran tidak aktif dan tidak dapat dipilih.');
 });
 
 // TS.PLS.005 / TC.PLS.005.001 — Negative
@@ -166,38 +127,4 @@ test('kesiswaan menyaring catatan pelanggaran berdasarkan tanggal kejadian', fun
     $this->get('/kesiswaan/pelanggaran-siswa?tanggal_pelanggaran=2026-07-07')
         ->assertSee('60 poin')
         ->assertDontSee('10 poin');
-});
-
-// TS.PLS.009 / TC.PLS.009.001 — Positive
-test('kesiswaan melihat rincian sebuah catatan pelanggaran', function () {
-    [, , $siswa] = kelasBerisiSiswa();
-    $pelanggaran = catatPelanggaran($siswa, 'Terlambat masuk kelas', 'ringan', '2026-07-06');
-
-    kesiswaanMasuk();
-
-    $this->get("/kesiswaan/pelanggaran-siswa/{$pelanggaran->id}")
-        ->assertSee('Ahmad Fauzi')
-        ->assertSee('Terlambat masuk kelas')
-        ->assertSee('10 IPA 1');
-});
-
-// TS.PLS.010 / TC.PLS.010.001 — Positive
-test('kesiswaan menghapus catatan pelanggaran yang salah dicatat', function () {
-    [, , $siswa] = kelasBerisiSiswa();
-    $pelanggaran = catatPelanggaran($siswa, 'Terlambat masuk kelas', 'ringan', '2026-07-06');
-
-    kesiswaanMasuk();
-
-    $this->followingRedirects()
-        ->delete("/kesiswaan/pelanggaran-siswa/{$pelanggaran->id}")
-        ->assertSee('Pelanggaran siswa berhasil dihapus.')
-        ->assertSee('Belum ada catatan pelanggaran siswa.');
-});
-
-// TS.PLS.011 / TC.PLS.011.001 — Positive
-test('daftar pelanggaran siswa yang masih kosong menampilkan keterangannya', function () {
-    kesiswaanMasuk();
-
-    $this->get('/kesiswaan/pelanggaran-siswa')
-        ->assertSee('Belum ada catatan pelanggaran siswa.');
 });

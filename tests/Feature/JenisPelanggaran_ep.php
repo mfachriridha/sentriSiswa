@@ -22,22 +22,15 @@ uses(RefreshDatabase::class);
 |   Sanksi Berat          51 - 75 poin
 |   Sanksi Sangat Berat   76 - 100 poin
 |
-| Jenis yang sudah dipakai pada catatan pelanggaran siswa tidak bisa dihapus,
-| hanya bisa dinonaktifkan.
+| Yang diuji di berkas ini adalah isiannya: nama (baru atau sudah dipakai), poin
+| (di dalam rentang kategorinya, di luar rentang, atau berisi huruf), serta kata
+| kunci pencarian dan pilihan kategori pada penyaring.
+|
+| Keadaan jenis pelanggaran - aktif, nonaktif, dan sudah dipakai sehingga tak bisa
+| dihapus - diuji di JenisPelanggaran_stt.php; batas poin tiap kategori di _bva.php;
+| serta menghapus dan daftar kosong di _uc.php.
 |
 */
-
-/** Isian jenis pelanggaran yang sah. */
-function dataJenisPelanggaran(array $ubahan = []): array
-{
-    return array_merge([
-        'nama' => 'Terlambat masuk kelas',
-        'kategori' => 'ringan',
-        'pengurangan_poin' => 10,
-        'keterangan' => 'Datang setelah bel masuk berbunyi.',
-        'aktif' => 1,
-    ], $ubahan);
-}
 
 // TS.JEP.001 / TC.JEP.001.001 — Positive
 test('kesiswaan menambah jenis pelanggaran baru', function () {
@@ -99,43 +92,6 @@ test('kesiswaan mengubah jenis pelanggaran yang sudah ada', function () {
         ->assertSee('Terlambat lebih dari 15 menit');
 });
 
-// TS.JEP.006 / TC.JEP.006.001 — Positive
-test('kesiswaan menghapus jenis pelanggaran yang belum pernah dipakai', function () {
-    kesiswaanMasuk();
-    $jenis = JenisPelanggaran::create(dataJenisPelanggaran());
-
-    $this->followingRedirects()
-        ->delete("/kesiswaan/jenis-pelanggaran/{$jenis->id}")
-        ->assertSee('Jenis pelanggaran berhasil dihapus.')
-        ->assertSee('Belum ada data jenis pelanggaran.');
-});
-
-// TS.JEP.007 / TC.JEP.007.001 — Negative
-test('jenis pelanggaran yang sudah dipakai tidak bisa dihapus', function () {
-    [, , $siswa] = kelasBerisiSiswa();
-    $pelanggaran = catatPelanggaran($siswa, 'Terlambat masuk kelas', 'ringan', '2026-07-06');
-
-    kesiswaanMasuk();
-
-    $this->followingRedirects()
-        ->delete("/kesiswaan/jenis-pelanggaran/{$pelanggaran->jenis_pelanggaran_id}")
-        ->assertSee('Jenis pelanggaran sudah dipakai pada data pelanggaran siswa. Nonaktifkan jika tidak ingin digunakan lagi.')
-        ->assertSee('Terlambat masuk kelas');
-});
-
-// TS.JEP.008 / TC.JEP.008.001 — Positive
-test('kesiswaan menonaktifkan jenis pelanggaran agar tidak dipakai lagi', function () {
-    kesiswaanMasuk();
-    $jenis = JenisPelanggaran::create(dataJenisPelanggaran());
-
-    $this->followingRedirects()
-        ->put("/kesiswaan/jenis-pelanggaran/{$jenis->id}", dataJenisPelanggaran(['aktif' => 0]))
-        ->assertSee('Jenis pelanggaran berhasil diperbarui.');
-
-    $this->get('/kesiswaan/jenis-pelanggaran?status=inactive')
-        ->assertSee('Terlambat masuk kelas');
-});
-
 // TS.JEP.009 / TC.JEP.009.001 — Positive
 test('kesiswaan mencari jenis pelanggaran berdasarkan nama', function () {
     kesiswaanMasuk();
@@ -164,12 +120,4 @@ test('kesiswaan menyaring jenis pelanggaran berdasarkan kategori', function () {
     $this->get('/kesiswaan/jenis-pelanggaran?category=berat')
         ->assertSee('Berkelahi')
         ->assertDontSee('Terlambat masuk kelas');
-});
-
-// TS.JEP.011 / TC.JEP.011.001 — Positive
-test('daftar jenis pelanggaran yang masih kosong menampilkan keterangannya', function () {
-    kesiswaanMasuk();
-
-    $this->get('/kesiswaan/jenis-pelanggaran')
-        ->assertSee('Belum ada data jenis pelanggaran.');
 });
