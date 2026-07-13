@@ -10,8 +10,13 @@
         </testsuite>
         <testsuite name="Feature">
             <directory suffix="Test.php">tests/Feature</directory>
-            <directory suffix="_ev.php">tests/Feature</directory>
+            <!-- Akhiran berkas menandakan teknik pengujiannya: Equivalence
+                 Partitioning, Boundary Value Analysis, State Transition, dan
+                 Use Case. -->
+            <directory suffix="_ep.php">tests/Feature</directory>
             <directory suffix="_bva.php">tests/Feature</directory>
+            <directory suffix="_stt.php">tests/Feature</directory>
+            <directory suffix="_uc.php">tests/Feature</directory>
         </testsuite>
     </testsuites>
     <source>
