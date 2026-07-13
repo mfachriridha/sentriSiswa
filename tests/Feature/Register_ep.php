@@ -1,8 +1,6 @@
 <?php
 
 use App\Models\Pengguna;
-use App\Models\ProfilGuru;
-use App\Models\ProfilSiswa;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -16,10 +14,12 @@ uses(RefreshDatabase::class);
 |   1. Verifikasi identitas — pilih peran, isi nomor identitas.
 |   2. Lengkapi pendaftaran — isi email, kata sandi, dan nomor HP untuk guru.
 |
-| Sekolah lebih dulu memasukkan data siswa dan guru. Pendaftaran hanya
-| mengaktifkan akun yang datanya memang sudah ada, jadi setiap pengujian
-| menyiapkan kondisi awal itu, lalu menempuh kedua tahap seperti pengguna.
-| Hasilnya diperiksa dari apa yang muncul di layar, bukan dari basis data.
+| Yang diuji di berkas ini adalah nilai yang diisi di kedua tahap itu: nomor
+| identitas (ditemukan, tidak ditemukan, berisi huruf), email (baru, sudah dipakai
+| akun lain), dan kata sandi (mengandung angka, konfirmasinya cocok).
+|
+| Akun yang sudah pernah didaftarkan ada di Register_stt.php, dan alur daftar
+| sampai bisa masuk ada di Register_uc.php.
 |
 | Catatan mengenai kolom yang dikosongkan dan format email yang salah:
 | Semua kolom pada formulir ditandai wajib, dan kolom email bertipe email.
@@ -28,35 +28,6 @@ uses(RefreshDatabase::class);
 | dialami pengguna, kasus tersebut tidak didokumentasikan.
 |
 */
-
-/** Siswa yang datanya sudah ada di sekolah tetapi akunnya belum diaktifkan. */
-function siswaBelumPunyaAkun(string $nisn, string $nis): void
-{
-    $pengguna = Pengguna::factory()->student()->create([
-        'email' => null,
-        'status' => 'unregistered',
-    ]);
-
-    ProfilSiswa::factory()->create([
-        'pengguna_id' => $pengguna->id,
-        'nisn' => $nisn,
-        'nis' => $nis,
-    ]);
-}
-
-/** Guru yang datanya sudah ada di sekolah tetapi akunnya belum diaktifkan. */
-function guruBelumPunyaAkun(string $nip): void
-{
-    $pengguna = Pengguna::factory()->homeroom()->create([
-        'email' => null,
-        'status' => 'unregistered',
-    ]);
-
-    ProfilGuru::factory()->create([
-        'pengguna_id' => $pengguna->id,
-        'nip' => $nip,
-    ]);
-}
 
 // TS.REG.001 / TC.REG.001.001 — Positive
 test('siswa berhasil mendaftar menggunakan nisn', function () {
@@ -115,31 +86,6 @@ test('guru berhasil mendaftar dan diminta mengisi nomor hp', function () {
         ->assertSee('Pendaftaran berhasil. Silakan masuk dengan akun Anda.');
 });
 
-// TS.REG.004 / TC.REG.004.001 — Positive
-test('siswa yang baru mendaftar bisa langsung masuk memakai akunnya', function () {
-    siswaBelumPunyaAkun(nisn: '1234567892', nis: '10003');
-
-    $this->followingRedirects()->post('/daftar/verifikasi', [
-        'peran' => 'student',
-        'identity' => '1234567892',
-    ])->assertSee('Lengkapi Profil');
-
-    $this->followingRedirects()
-        ->post('/daftar/lengkapi', [
-            'email' => 'siswa.langsung@sentrisiswa.test',
-            'password' => 'Rahasia123',
-            'password_confirmation' => 'Rahasia123',
-        ])
-        ->assertSee('Pendaftaran berhasil. Silakan masuk dengan akun Anda.');
-
-    $this->followingRedirects()
-        ->post('/login', [
-            'email' => 'siswa.langsung@sentrisiswa.test',
-            'password' => 'Rahasia123',
-        ])
-        ->assertSee('Dashboard Siswa');
-});
-
 // TS.REG.005 / TC.REG.005.001 — Negative
 test('pendaftaran ditolak karena nomor identitas siswa tidak ditemukan', function () {
     $this->from('/daftar')
@@ -162,49 +108,6 @@ test('pendaftaran ditolak karena nomor identitas guru tidak ditemukan', function
         ])
         ->assertSee('NIP tidak ditemukan.')
         ->assertDontSee('Lengkapi Profil');
-});
-
-// TS.REG.007 / TC.REG.007.001 — Negative
-test('pendaftaran ditolak karena identitas siswa sudah pernah didaftarkan', function () {
-    $pengguna = Pengguna::factory()->student()->create([
-        'email' => 'sudah.punya.akun@sentrisiswa.test',
-        'status' => 'registered',
-    ]);
-
-    ProfilSiswa::factory()->create([
-        'pengguna_id' => $pengguna->id,
-        'nisn' => '1234567893',
-        'nis' => '10004',
-    ]);
-
-    $this->from('/daftar')
-        ->followingRedirects()
-        ->post('/daftar/verifikasi', [
-            'peran' => 'student',
-            'identity' => '1234567893',
-        ])
-        ->assertSee('NISN/NIS sudah terdaftar. Silakan masuk.');
-});
-
-// TS.REG.008 / TC.REG.008.001 — Negative
-test('pendaftaran ditolak karena identitas guru sudah pernah didaftarkan', function () {
-    $pengguna = Pengguna::factory()->homeroom()->create([
-        'email' => 'guru.sudah.punya@sentrisiswa.test',
-        'status' => 'registered',
-    ]);
-
-    ProfilGuru::factory()->create([
-        'pengguna_id' => $pengguna->id,
-        'nip' => '198501012020121002',
-    ]);
-
-    $this->from('/daftar')
-        ->followingRedirects()
-        ->post('/daftar/verifikasi', [
-            'peran' => 'teacher',
-            'identity' => '198501012020121002',
-        ])
-        ->assertSee('NIP sudah terdaftar. Silakan masuk.');
 });
 
 // TS.REG.009 / TC.REG.009.001 — Negative

@@ -10,9 +10,11 @@ use App\Models\Pengguna;
 use App\Models\ProfilGuru;
 use App\Models\ProfilSiswa;
 use App\Models\TokenAksesAbsensi;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use Tests\TestCase;
@@ -206,6 +208,59 @@ function catatKehadiranBerselfie(string $nisn, string $tanggal, string $jamMasuk
         'status' => 'hadir',
         'waktu_masuk' => $tanggal.' '.$jamMasuk.':00',
         'path_selfie' => "attendance-selfies/{$nisn}/{$tanggal}.jpg",
+    ]);
+}
+
+/** Pengguna yang sudah punya akun, dipakai pengujian pemulihan kata sandi. */
+function penggunaLupaSandi(): Pengguna
+{
+    return Pengguna::factory()->student()->create([
+        'nama' => 'Ahmad Fauzi',
+        'email' => 'ahmad@sentrisiswa.test',
+        'status' => 'registered',
+    ]);
+}
+
+/** Tautan pemulihan yang diterima pengguna lewat email. */
+function tautanPemulihan(Pengguna $pengguna): string
+{
+    $tautan = '';
+
+    Notification::assertSentTo($pengguna, ResetPassword::class, function (ResetPassword $notifikasi) use (&$tautan): bool {
+        $tautan = "/reset-sandi/{$notifikasi->token}";
+
+        return true;
+    });
+
+    return $tautan;
+}
+
+/** Siswa yang datanya sudah ada di sekolah tetapi akunnya belum diaktifkan. */
+function siswaBelumPunyaAkun(string $nisn, string $nis): void
+{
+    $pengguna = Pengguna::factory()->student()->create([
+        'email' => null,
+        'status' => 'unregistered',
+    ]);
+
+    ProfilSiswa::factory()->create([
+        'pengguna_id' => $pengguna->id,
+        'nisn' => $nisn,
+        'nis' => $nis,
+    ]);
+}
+
+/** Guru yang datanya sudah ada di sekolah tetapi akunnya belum diaktifkan. */
+function guruBelumPunyaAkun(string $nip): void
+{
+    $pengguna = Pengguna::factory()->homeroom()->create([
+        'email' => null,
+        'status' => 'unregistered',
+    ]);
+
+    ProfilGuru::factory()->create([
+        'pengguna_id' => $pengguna->id,
+        'nip' => $nip,
     ]);
 }
 
