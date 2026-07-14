@@ -9,8 +9,8 @@
     <form method="POST" action="{{ route('wali-kelas.pengajuan-poin.store') }}" class="space-y-5">
         @csrf
         <div>
-            <label for="profil_siswa_id" class="block text-sm font-medium text-gray-700">Siswa</label>
-            <select id="profil_siswa_id" name="profil_siswa_id" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
+            <label for="profil_siswa_id" class="block text-sm font-medium text-gray-700">Siswa <span class="text-red-500">*</span></label>
+            <select id="profil_siswa_id" name="profil_siswa_id" required class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
                 <option value="">Pilih siswa</option>
                 @foreach ($students as $student)
                     <option value="{{ $student->nisn }}" {{ old('profil_siswa_id') == $student->nisn ? 'selected' : '' }}>{{ $student->pengguna?->nama }}</option>
@@ -19,8 +19,8 @@
             @error('profil_siswa_id') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
         </div>
         <div>
-            <label for="alasan" class="block text-sm font-medium text-gray-700">Alasan</label>
-            <textarea id="alasan" name="alasan" rows="4" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">{{ old('alasan') }}</textarea>
+            <label for="alasan" class="block text-sm font-medium text-gray-700">Alasan <span class="text-red-500">*</span></label>
+            <textarea id="alasan" name="alasan" rows="4" required class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">{{ old('alasan') }}</textarea>
             @error('alasan') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
         </div>
         <div class="flex justify-end gap-2">

@@ -10,7 +10,7 @@ class DashboardController extends Controller
 {
     public function index(): View
     {
-        $student = Auth::user()->loadMissing('profilSiswa.absensi', 'profilSiswa.pelanggaranSiswa');
+        $student = Auth::user()->loadMissing('profilSiswa.absensi', 'profilSiswa.pelanggaranSiswa', 'profilSiswa.kelas');
         $profile = $student->profilSiswa;
         $points = $profile?->poin ?? 100;
         $attendances = $profile?->absensi ?? collect();
@@ -22,6 +22,12 @@ class DashboardController extends Controller
             'alpha' => $attendances->where('status', 'alpha')->count(),
         ];
 
-        return view('siswa.dashboard', compact('stats'));
+        $identitas = [
+            'kelas' => $profile?->kelas?->nama,
+            'nisn' => $profile?->nisn,
+            'nis' => $profile?->nis,
+        ];
+
+        return view('siswa.dashboard', compact('stats', 'identitas'));
     }
 }

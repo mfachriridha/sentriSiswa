@@ -32,8 +32,8 @@
             </div>
 
             <div>
-                <label for="nip" class="block text-sm font-medium text-gray-700">NIP</label>
-                <input id="nip" type="text" name="nip" value="{{ old('nip') }}"
+                <label for="nip" class="block text-sm font-medium text-gray-700">NIP <span class="text-red-500">*</span></label>
+                <input id="nip" type="text" name="nip" value="{{ old('nip') }}" required
                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm
                               placeholder:text-gray-400 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                 @error('nip')

@@ -110,6 +110,10 @@ test('siswa melihat sisa poin dan rekap kehadirannya sendiri di dashboard', func
 
     $this->get('/siswa/dashboard')
         ->assertSee('Dashboard Siswa')
+        // Kelasnya sendiri: kalau kelasnya keliru, semua yang lain ikut keliru -
+        // wali kelasnya, rekapnya, sampai laporan ke orang tuanya.
+        ->assertSeeInOrder(['Kelas', '10 IPA 1'])
+        ->assertSeeInOrder(['NISN', $siswa->nisn])
         // Poin awal 100, dipotong 10 karena pelanggaran.
         ->assertSeeInOrder(['Sisa Poin', '90'])
         ->assertSeeInOrder(['Hadir', '1'])
