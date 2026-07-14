@@ -150,29 +150,6 @@
                                 <div class="mt-2 space-y-1 text-xs">
                                     <p x-cloak x-show="gpsLoading" class="text-gray-500">Mengambil lokasi...</p>
                                     <p x-cloak x-show="gpsError" x-text="gpsError" class="text-red-600"></p>
-
-                                    {{-- Izin yang sudah diblokir tidak bisa diminta ulang dari halaman ini:
-                                         peramban mengingat blokirnya dan tidak akan memunculkan dialog lagi.
-                                         Menyuruh siswa "aktifkan di pengaturan browser" tanpa memberi tahu
-                                         caranya sama saja membiarkannya buntu - dan ia tercatat alpha
-                                         padahal hadir di sekolah. --}}
-                                    <div x-cloak x-show="gpsDiblokir"
-                                         class="mt-2 rounded-lg border border-red-200 bg-red-50 p-3 text-red-800">
-                                        <p class="font-semibold">Cara membukanya kembali:</p>
-                                        <ol class="mt-1 list-decimal space-y-0.5 pl-4">
-                                            <li>Ketuk ikon gembok atau <span class="font-semibold">&#8942;</span> di sebelah alamat situs.</li>
-                                            <li>Pilih <span class="font-semibold">Izin situs</span> atau <span class="font-semibold">Setelan situs</span>.</li>
-                                            <li>Pilih <span class="font-semibold">Lokasi</span>, lalu ubah jadi <span class="font-semibold">Izinkan</span>.</li>
-                                            <li>Muat ulang halaman ini, lalu tekan Aktifkan GPS lagi.</li>
-                                        </ol>
-                                        <button type="button" @click="window.location.reload()"
-                                                class="mt-3 inline-flex items-center rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-700">
-                                            Muat Ulang Halaman
-                                        </button>
-                                        <p class="mt-2 text-red-700">
-                                            Kalau masih terblokir, laporkan ke wali kelas supaya absensimu hari ini dicatat manual.
-                                        </p>
-                                    </div>
                                     <template x-if="gpsReady">
                                         <div>
                                             <p x-cloak x-show="locationStatus" class="font-medium" :class="{
@@ -397,7 +374,6 @@
             gpsReady: false,
             gpsLoading: false,
             gpsError: '',
-            gpsDiblokir: false,
             latitude: '',
             longitude: '',
             accuracy: '',
@@ -467,7 +443,6 @@
 
             getGpsLocation() {
                 this.gpsError = '';
-                this.gpsDiblokir = false;
                 this.gpsLoading = true;
                 this.locationStatus = '';
                 this.locationMessage = '';
@@ -492,12 +467,7 @@
                     this.gpsReady = false;
 
                     if (error.code === error.PERMISSION_DENIED) {
-                        // Sekali diblokir, peramban mengingatnya untuk situs ini: menekan
-                        // Aktifkan GPS lagi tidak akan memunculkan dialog izin apa pun.
-                        // Satu-satunya jalan keluar ada di setelan peramban - jadi
-                        // kalimatnya harus memberi tahu caranya, bukan cuma menyuruh.
-                        this.gpsDiblokir = true;
-                        this.gpsError = 'Izin lokasi diblokir untuk situs ini.';
+                        this.gpsError = 'Izin lokasi ditolak. Aktifkan izin lokasi di pengaturan browser.';
                     } else if (error.code === error.TIMEOUT) {
                         this.gpsError = 'Waktu habis saat mengambil lokasi. Tekan Refresh Lokasi.';
                     } else {
