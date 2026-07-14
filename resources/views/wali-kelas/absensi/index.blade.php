@@ -3,6 +3,8 @@
 @section('title', 'Rekap Absensi')
 
 @section('content')
+<x-alert type="error" :message="session('error')" />
+
 <div class="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
     <div>
         <h1 class="text-2xl font-bold text-gray-900">Rekap Absensi</h1>

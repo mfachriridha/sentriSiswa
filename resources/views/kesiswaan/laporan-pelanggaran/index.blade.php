@@ -5,6 +5,8 @@
 @section('content')
 <x-page-header :title="$title" description="Rekap pelanggaran siswa dengan filter dan export laporan." />
 
+<x-alert type="error" :message="session('error')" />
+
 <div class="mb-4 rounded-xl border border-gray-200 bg-white p-4">
     <form method="GET" action="{{ route($routeName.'.index') }}" class="grid gap-3 md:grid-cols-3 xl:grid-cols-6">
         <input id="start_date" type="date" name="mulai" value="{{ $filters['mulai'] ?? '' }}" class="rounded-lg border border-gray-300 px-3 py-2 text-sm">

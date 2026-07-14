@@ -87,6 +87,24 @@ test('wali kelas mengunduh rekap kehadiran dalam berkas excel', function () {
     Excel::assertDownloaded('rekap-absensi-10 IPA 1-2026-07-01-sampai-2026-07-10.xlsx');
 });
 
+// TS.REA.013 / TC.REA.013.001 — Negative
+test('ekspor ditolak ketika penyaringnya tidak menemukan siswa satu pun', function () {
+    Excel::fake();
+    Carbon::setTestNow('2026-07-10 08:00:00');
+    [, , $siswa] = waliKelasDenganKelas();
+    catatKehadiran($siswa->nisn, '2026-07-06', 'hadir');
+
+    // Disaring "hanya yang pernah alpha", padahal tidak ada yang alpha. Tanpa
+    // penjagaan ini, berkasnya tetap terunduh - cuma berisi judul kolom - dan wali
+    // kelas mengira ekspornya berhasil.
+    $this->followingRedirects()
+        ->get('/wali-kelas/absensi/ekspor-excel?mulai=2026-07-01&selesai=2026-07-10&status=alpha')
+        ->assertSee('Tidak ada siswa yang cocok dengan penyaring ini, jadi tidak ada yang bisa diekspor.');
+
+    // Kalau berkasnya benar-benar terunduh, yang diterima peramban adalah berkas -
+    // bukan halaman - dan pesan di atas tidak akan pernah muncul.
+});
+
 // TS.REA.008 / TC.REA.008.001 — Positive
 test('wali kelas membuka halaman cetak rekap kehadiran kelasnya', function () {
     Carbon::setTestNow('2026-07-10 08:00:00');

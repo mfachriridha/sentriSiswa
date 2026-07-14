@@ -61,13 +61,31 @@ test('laporan memuat penambahan poin yang sudah disetujui', function () {
 // TS.LAP.007 / TC.LAP.007.001 — Positive
 test('kesiswaan mengunduh laporan dalam berkas excel', function () {
     Excel::fake();
-    kelasBerisiSiswa();
+    [, , $siswa] = kelasBerisiSiswa();
+    catatPelanggaran($siswa, 'Terlambat masuk kelas', 'ringan', '2026-07-06', 10);
+
     kesiswaanMasuk();
 
     $this->get('/kesiswaan/laporan/ekspor-excel')
         ->assertSuccessful();
 
     Excel::assertDownloaded('laporan-pelanggaran.xlsx');
+});
+
+// TS.LAP.013 / TC.LAP.013.001 — Negative
+test('ekspor laporan ditolak ketika tidak ada pelanggaran yang cocok', function () {
+    Excel::fake();
+    kelasBerisiSiswa();
+    kesiswaanMasuk();
+
+    // Belum ada pelanggaran sama sekali. Tanpa penjagaan ini, berkasnya tetap
+    // terunduh - cuma berisi judul kolom - dan kesiswaan mengira ekspornya berhasil.
+    $this->followingRedirects()
+        ->get('/kesiswaan/laporan/ekspor-excel')
+        ->assertSee('Tidak ada pelanggaran yang cocok dengan penyaring ini, jadi tidak ada yang bisa diekspor.');
+
+    // Kalau berkasnya benar-benar terunduh, yang diterima peramban adalah berkas -
+    // bukan halaman - dan pesan di atas tidak akan pernah muncul.
 });
 
 // TS.LAP.008 / TC.LAP.008.001 — Positive

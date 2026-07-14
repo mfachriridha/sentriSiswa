@@ -94,6 +94,24 @@ test('guru bk mengunduh rekap kehadiran dalam berkas excel', function () {
     Excel::assertDownloaded('rekap-absensi-tingkat-10-2026-07-01-sampai-2026-07-10.xlsx');
 });
 
+// TS.RAB.013 / TC.RAB.013.001 — Negative
+test('ekspor rekap bk ditolak ketika penyaringnya tidak menemukan siswa satu pun', function () {
+    Excel::fake();
+    Carbon::setTestNow('2026-07-10 08:00:00');
+    [, , $siswa] = kelasBerisiSiswa();
+    catatKehadiran($siswa->nisn, '2026-07-06', 'hadir');
+
+    bkMasuk('10');
+
+    // Disaring "hanya yang pernah alpha", padahal tidak ada yang alpha.
+    $this->followingRedirects()
+        ->get('/bk/laporan/ekspor-excel?mulai=2026-07-01&selesai=2026-07-10&status=alpha')
+        ->assertSee('Tidak ada siswa yang cocok dengan penyaring ini, jadi tidak ada yang bisa diekspor.');
+
+    // Kalau berkasnya benar-benar terunduh, yang diterima peramban adalah berkas -
+    // bukan halaman - dan pesan di atas tidak akan pernah muncul.
+});
+
 // TS.RAB.008 / TC.RAB.008.001 — Positive
 test('halaman cetak rekap bk menyebutkan kelas tiap siswa', function () {
     Carbon::setTestNow('2026-07-10 08:00:00');

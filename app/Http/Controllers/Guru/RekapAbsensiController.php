@@ -9,6 +9,7 @@ use App\Models\Absensi;
 use App\Models\Pengaturan;
 use App\Models\ProfilSiswa;
 use Carbon\Carbon;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -39,7 +40,7 @@ class RekapAbsensiController extends Controller
         return view('wali-kelas.absensi.index', compact('class', 'students', 'filterStudents', 'stats', 'startDate', 'endDate', 'statusFilter', 'selectedStudent', 'selectedMonth'));
     }
 
-    public function exportExcel(AttendanceRecapFilterRequest $request): BinaryFileResponse
+    public function exportExcel(AttendanceRecapFilterRequest $request): BinaryFileResponse|RedirectResponse
     {
         $class = Auth::user()->kelasWali;
 
@@ -66,6 +67,15 @@ class RekapAbsensiController extends Controller
                 $stat['percentage'].'%',
             ];
         })->values()->all();
+
+        // Berkas kosong tidak menolong siapa pun: penggunanya mengira ekspornya
+        // berhasil, lalu bingung membuka berkas yang cuma berisi judul kolom. Lebih
+        // baik ia tetap di halamannya dan tahu penyaringnya yang perlu dibetulkan.
+        if ($rows === []) {
+            return redirect()
+                ->route('wali-kelas.absensi.index', $request->query())
+                ->with('error', 'Tidak ada siswa yang cocok dengan penyaring ini, jadi tidak ada yang bisa diekspor.');
+        }
 
         return Excel::download(
             new RekapAbsensiExport($rows),

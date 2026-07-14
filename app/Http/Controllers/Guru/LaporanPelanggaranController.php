@@ -12,6 +12,7 @@ use App\Models\PengajuanPoin;
 use App\Models\Pengguna;
 use App\Models\ProfilSiswa;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
@@ -33,9 +34,20 @@ class LaporanPelanggaranController extends Controller
         return view('kesiswaan.laporan-pelanggaran.index', compact('violations', 'filters', 'classes', 'categoryLabels', 'pengajuanPoin', 'routeName', 'title'));
     }
 
-    public function exportExcel(ViolationReportFilterRequest $request): BinaryFileResponse
+    public function exportExcel(ViolationReportFilterRequest $request): BinaryFileResponse|RedirectResponse
     {
         [$violations] = $this->reportData($request, paginated: false);
+
+        // Berkas kosong tidak menolong siapa pun: penggunanya mengira ekspornya
+        // berhasil, lalu bingung membuka berkas yang cuma berisi judul kolom. Lebih
+        // baik ia tetap di halamannya dan tahu penyaringnya yang perlu dibetulkan.
+        if ($violations->isEmpty()) {
+            $routeName = Auth::user()->isBk() ? 'bk.laporan' : 'kesiswaan.laporan';
+
+            return redirect()
+                ->route($routeName.'.index', $request->query())
+                ->with('error', 'Tidak ada pelanggaran yang cocok dengan penyaring ini, jadi tidak ada yang bisa diekspor.');
+        }
 
         $remainingPoints = $this->remainingPointsByStudent($violations);
 

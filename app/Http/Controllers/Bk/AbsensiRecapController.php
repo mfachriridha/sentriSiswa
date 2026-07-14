@@ -10,6 +10,7 @@ use App\Models\Kelas;
 use App\Models\Pengaturan;
 use App\Models\ProfilSiswa;
 use Carbon\Carbon;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -48,7 +49,7 @@ class AbsensiRecapController extends Controller
         ));
     }
 
-    public function exportExcel(AttendanceRecapFilterRequest $request): BinaryFileResponse
+    public function exportExcel(AttendanceRecapFilterRequest $request): BinaryFileResponse|RedirectResponse
     {
         $bkGrade = Auth::user()->loadMissing('profilGuru')->profilGuru?->tingkat;
 
@@ -79,6 +80,14 @@ class AbsensiRecapController extends Controller
                 $stat['percentage'].'%',
             ];
         })->values()->all();
+
+        // Berkas kosong tidak menolong siapa pun: penggunanya mengira ekspornya
+        // berhasil, lalu bingung membuka berkas yang cuma berisi judul kolom.
+        if ($rows === []) {
+            return redirect()
+                ->route('bk.laporan.index', $request->query())
+                ->with('error', 'Tidak ada siswa yang cocok dengan penyaring ini, jadi tidak ada yang bisa diekspor.');
+        }
 
         return Excel::download(
             new ArrayExport(['NIS', 'Nama', 'Kelas', 'Hadir', 'Izin', 'Sakit', 'Alpha', 'Kehadiran'], $rows),
