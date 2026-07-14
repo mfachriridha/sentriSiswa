@@ -8,6 +8,7 @@ use App\Models\TataTertib;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class TataTertibController extends Controller
@@ -27,14 +28,34 @@ class TataTertibController extends Controller
             TataTertib::query()->update(['dipublikasikan' => false]);
         }
 
+        $judul = (string) $request->string('judul');
+
         TataTertib::create([
-            'judul' => (string) $request->string('judul'),
-            'path_file' => $request->file('file_pdf')->store('school-rules', 'public'),
+            'judul' => $judul,
+            'path_file' => $request->file('file_pdf')->storeAs(
+                'school-rules',
+                $this->namaBerkas($judul),
+                'public',
+            ),
             'dipublikasikan' => $request->boolean('dipublikasikan'),
             'diunggah_oleh_id' => Auth::id(),
         ]);
 
         return redirect()->route('kesiswaan.tata-tertib.index')->with('success', 'Tata tertib berhasil diunggah.');
+    }
+
+    /**
+     * Nama berkas diturunkan dari judulnya, bukan diacak. Siswa membukanya lewat
+     * peramban ponsel, dan yang tertulis di sana adalah nama berkasnya - kalau ia
+     * berupa deretan huruf acak, tidak ada petunjuk sama sekali bahwa itu berkas
+     * yang benar.
+     *
+     * Waktu unggahnya ditempelkan supaya dua tata tertib berjudul sama tidak saling
+     * menimpa.
+     */
+    private function namaBerkas(string $judul): string
+    {
+        return Str::slug($judul).'-'.now()->format('YmdHis').'.pdf';
     }
 
     public function publish(TataTertib $tataTertib): RedirectResponse

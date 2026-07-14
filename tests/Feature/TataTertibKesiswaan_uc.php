@@ -37,3 +37,25 @@ test('daftar tata tertib yang masih kosong menampilkan keterangannya', function 
     $this->get('/kesiswaan/tata-tertib')
         ->assertSee('Belum ada file tata tertib.');
 });
+
+// TS.TTK.014 / TC.TTK.014.001 — Positive
+test('berkas tata tertib yang dibuka siswa bernama sesuai judulnya', function () {
+    [, , $siswa] = kelasBerisiSiswa();
+
+    kesiswaanMasuk();
+    $this->post('/kesiswaan/tata-tertib', [
+        'judul' => 'Tata Tertib Sekolah 2026',
+        'file_pdf' => berkasTataTertib(),
+        'dipublikasikan' => 1,
+    ]);
+    $this->post('/logout');
+
+    masukSebagai($siswa->pengguna);
+
+    // Siswa membukanya lewat peramban ponsel, dan yang tertulis di sana adalah nama
+    // berkasnya. Kalau ia berupa deretan huruf acak, tidak ada petunjuk sama sekali
+    // bahwa itu berkas yang benar.
+    $this->get('/siswa/tata-tertib')
+        ->assertSee('Tata Tertib Sekolah 2026')
+        ->assertSee('tata-tertib-sekolah-2026', escape: false);
+});
