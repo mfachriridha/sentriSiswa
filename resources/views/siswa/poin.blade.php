@@ -5,7 +5,7 @@
 @section('content')
 <div class="mb-6">
     <h1 class="text-2xl font-bold text-gray-900">Poin Saya</h1>
-    <p class="mt-2 text-sm text-gray-500">Pantau sisa poin disiplin dan riwayat pelanggaran Anda.</p>
+    <p class="mt-2 text-sm text-gray-500">Pantau sisa poin disiplin Anda, beserta pelanggaran yang mengurangi dan prestasi yang menambahnya.</p>
 </div>
 
 {{-- Kartu Poin --}}
@@ -21,7 +21,13 @@
             <div>
                 <p class="text-sm font-semibold uppercase tracking-wider opacity-75">Sisa Poin Disiplin</p>
                 <p class="mt-2 text-5xl font-bold tracking-tight">{{ $totalPoints }}</p>
-                <p class="mt-2 text-sm opacity-75">Dari 100 poin · {{ $totalDeductions }} poin terpakai</p>
+                {{-- Perhitungannya ditulis apa adanya supaya siswa bisa mencocokkan
+                     angka di atas dengan kedua daftar di bawah. --}}
+                <p class="mt-2 text-sm opacity-75">
+                    Mulai dari 100 poin
+                    · <span class="font-semibold">-{{ $totalDeductions }}</span> dari pelanggaran
+                    · <span class="font-semibold">+{{ $totalAdditions }}</span> dari penambahan poin
+                </p>
             </div>
             <div class="text-right">
                 <span class="inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold {{ $levelBadgeClass }}">
@@ -72,6 +78,41 @@
                 @empty
                     <tr>
                         <td colspan="5" class="px-6 py-16 text-center text-sm text-gray-500">Belum ada catatan pelanggaran untuk Anda.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{{-- Penambahan Poin --}}
+<div class="mt-6 rounded-xl border border-gray-200 bg-white">
+    <div class="border-b border-gray-200 px-4 py-3">
+        <h2 class="text-lg font-bold text-gray-900">Penambahan Poin</h2>
+        <p class="mt-1 text-sm text-gray-500">Diajukan wali kelas Anda dan disetujui kesiswaan.</p>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="min-w-full text-left text-sm">
+            <thead class="border-b border-gray-200 bg-gray-50">
+                <tr>
+                    <th class="px-4 py-3 font-semibold text-gray-600">Tanggal Disetujui</th>
+                    <th class="px-4 py-3 font-semibold text-gray-600">Alasan</th>
+                    <th class="px-4 py-3 font-semibold text-gray-600">Poin</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                @forelse ($additions as $addition)
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="whitespace-nowrap px-4 py-3 text-gray-700">
+                            {{ $addition->disetujui_pada?->translatedFormat('d F Y') ?? '-' }}
+                        </td>
+                        <td class="px-4 py-3 font-medium text-gray-900">{{ $addition->alasan }}</td>
+                        <td class="px-4 py-3 text-center font-bold text-green-600">+{{ $addition->jumlah_poin }}</td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="3" class="px-6 py-16 text-center text-sm text-gray-500">Belum ada penambahan poin untuk Anda.</td>
                     </tr>
                 @endforelse
             </tbody>

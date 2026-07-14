@@ -51,5 +51,11 @@ test('poin siswa bertambah setelah pengajuan poinnya disetujui', function () {
 
     // Poin awal 100, dipotong 20 karena pelanggaran, ditambah 5 dari pengajuan.
     $this->get('/siswa/poin')
-        ->assertSee('85');
+        ->assertSee('85')
+        // Angkanya saja tidak cukup: siswa harus bisa mencocokkannya dengan
+        // alasan penambahannya, persis seperti ia bisa membaca pelanggarannya.
+        // Tanpa daftar ini, sisa poinnya tidak pernah cocok dengan yang ia baca.
+        ->assertSee('Penambahan Poin')
+        ->assertSee('Juara lomba cerdas cermat.')
+        ->assertSee('+5');
 });

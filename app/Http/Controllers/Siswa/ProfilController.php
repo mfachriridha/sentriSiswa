@@ -17,16 +17,33 @@ class ProfilController extends Controller
     public function poin(): View
     {
         $student = Auth::user();
-        $student->loadMissing(['profilSiswa.pelanggaranSiswa' => function ($q) {
-            $q->disetujui()->latest('tanggal_pelanggaran');
-        }]);
+        $student->loadMissing([
+            'profilSiswa.pelanggaranSiswa' => function ($q) {
+                $q->disetujui()->latest('tanggal_pelanggaran');
+            },
+            // Poin siswa tidak hanya berkurang: ia juga bertambah lewat pengajuan
+            // wali kelas yang disetujui kesiswaan. Tanpa daftar ini, angka sisa
+            // poinnya tidak cocok dengan riwayat yang dibacanya.
+            'profilSiswa.pengajuanPoin' => function ($q) {
+                $q->disetujui()->latest('disetujui_pada');
+            },
+        ]);
 
         $profile = $student->profilSiswa;
         $violations = $profile?->pelanggaranSiswa ?? collect();
+        $additions = $profile?->pengajuanPoin ?? collect();
         $totalPoints = $profile?->poin ?? 100;
         $totalDeductions = $violations->sum('pengurangan_poin');
+        $totalAdditions = $additions->sum('jumlah_poin');
 
-        return view('siswa.poin', compact('profile', 'violations', 'totalPoints', 'totalDeductions'));
+        return view('siswa.poin', compact(
+            'profile',
+            'violations',
+            'additions',
+            'totalPoints',
+            'totalDeductions',
+            'totalAdditions',
+        ));
     }
 
     public function show(): View

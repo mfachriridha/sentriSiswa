@@ -70,7 +70,7 @@ test('poin berhenti di nol ketika potongannya pas menghabiskan poin', function (
 
     $this->get('/siswa/poin')
         ->assertSeeInOrder(['Sisa Poin Disiplin', '0'])
-        ->assertSee('Dari 100 poin · 100 poin terpakai')
+        ->assertSeeInOrder(['Mulai dari 100 poin', '-100', 'dari pelanggaran'])
         ->assertSee('Perhatian');
 });
 
@@ -85,6 +85,6 @@ test('poin tetap nol dan tidak minus ketika potongannya melebihi poin yang tersi
     // Meski potongannya 110, sisa poinnya berhenti di nol, bukan angka minus.
     $this->get('/siswa/poin')
         ->assertSeeInOrder(['Sisa Poin Disiplin', '0'])
-        ->assertSee('Dari 100 poin · 110 poin terpakai')
+        ->assertSeeInOrder(['Mulai dari 100 poin', '-110', 'dari pelanggaran'])
         ->assertSee('Perhatian');
 });
