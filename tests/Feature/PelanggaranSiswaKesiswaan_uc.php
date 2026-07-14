@@ -34,3 +34,22 @@ test('daftar pelanggaran siswa yang masih kosong menampilkan keterangannya', fun
     $this->get('/kesiswaan/pelanggaran-siswa')
         ->assertSee('Belum ada catatan pelanggaran siswa.');
 });
+
+// TS.PLS.014 / TC.PLS.014.001 — Negative — alur pengecualian: jenis pelanggaran belum ada
+test('mencatat pelanggaran ketika jenis pelanggarannya belum ada sama sekali', function () {
+    kelasBerisiSiswa();
+    kesiswaanMasuk();
+
+    // Keadaan yang dialami setiap sekolah yang baru memasang aplikasinya. Tanpa
+    // penjagaan ini, formulirnya tetap tampil utuh - tetapi kolom jenis pelanggarannya
+    // kosong dan wajib diisi, jadi formulir itu mustahil diselesaikan. Penggunanya
+    // terjebak tanpa tahu bahwa yang kurang adalah data yang harus ia buat sendiri.
+    // Judul halamannya tetap "Catat Pelanggaran Siswa" - itu nama menunya. Yang
+    // membuktikan formulirnya benar-benar tidak ditampilkan adalah hilangnya tombol
+    // Simpan dan kolom isiannya.
+    $this->get('/kesiswaan/pelanggaran-siswa/create')
+        ->assertSee('Belum Ada Jenis Pelanggaran')
+        ->assertSee('Tambah Jenis Pelanggaran')
+        ->assertDontSee('Simpan')
+        ->assertDontSee('Cari nama, NIS, atau NISN siswa...');
+});

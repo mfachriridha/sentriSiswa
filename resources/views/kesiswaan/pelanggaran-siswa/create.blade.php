@@ -13,6 +13,37 @@
     </a>
 </div>
 
+{{-- Pesan penolakan dari sistem harus tetap terbaca, termasuk ketika halamannya
+     jatuh ke keadaan kosong di bawah - misalnya satu-satunya jenis pelanggaran
+     ternyata sudah dinonaktifkan. --}}
+@if ($errors->any())
+    <div class="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+        <ul class="list-disc pl-4 text-sm text-red-700 space-y-1">
+            @foreach ($errors->all() as $pesan)
+                <li>{{ $pesan }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
+{{-- Tanpa satu pun jenis pelanggaran, formulir ini mustahil diselesaikan: kolom
+     jenisnya wajib diisi, tetapi tidak ada yang bisa dipilih. Menampilkan formulirnya
+     apa adanya hanya menjebak penggunanya - ia mengisi siswa dan tanggal, lalu buntu
+     tanpa tahu bahwa yang kurang adalah data yang harus ia buat sendiri lebih dulu.
+     Keadaan ini dialami setiap sekolah yang baru memasang aplikasinya. --}}
+@if ($violationTypes->isEmpty())
+    <div class="rounded-xl border border-amber-200 bg-amber-50 p-8 text-center">
+        <h1 class="text-xl font-bold text-amber-900">Belum Ada Jenis Pelanggaran</h1>
+        <p class="mx-auto mt-2 max-w-lg text-sm text-amber-800">
+            Pelanggaran dicatat dengan memilih jenisnya, dan poin yang dipotong mengikuti
+            jenis itu. Jadi jenis pelanggarannya harus ditambahkan lebih dulu.
+        </p>
+        <a href="{{ route('kesiswaan.jenis-pelanggaran.create') }}"
+           class="mt-6 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-dark transition-colors">
+            Tambah Jenis Pelanggaran
+        </a>
+    </div>
+@else
 <div class="rounded-xl border border-gray-200 bg-white p-6">
     <h1 class="mb-6 text-2xl font-bold text-gray-900">Catat Pelanggaran Siswa</h1>
 
@@ -108,4 +139,5 @@
         </div>
     </form>
 </div>
+@endif
 @endsection
