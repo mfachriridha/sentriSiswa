@@ -115,6 +115,23 @@ test('kesiswaan menyaring catatan pelanggaran berdasarkan kategori', function ()
         ->assertDontSee('10 poin');
 });
 
+// TS.PLS.015 / TC.PLS.015.001 — Positive
+test('pilihan jenis pelanggaran menyempit mengikuti kategori yang dipilih', function () {
+    kesiswaanMasuk();
+
+    jenisPelanggaranTersedia(['nama' => 'Terlambat masuk kelas', 'kategori' => 'ringan', 'pengurangan_poin' => 10]);
+    jenisPelanggaranTersedia(['nama' => 'Membolos pelajaran', 'kategori' => 'sedang', 'pengurangan_poin' => 30]);
+
+    // Belum ada satu pun catatan pelanggaran, jadi nama jenis yang tampil di halaman
+    // ini hanya datang dari kolom penyaingnya - bukan dari tabelnya.
+    $this->get('/kesiswaan/pelanggaran-siswa?kategori=sedang')
+        ->assertSee('Membolos pelajaran')
+        // Jenis dari kategori lain tidak boleh ditawarkan. Kalau ia tetap ada, kesiswaan
+        // bisa memilih kategori Sedang berpasangan dengan jenis Ringan - kombinasi yang
+        // mustahil, yang hasilnya kosong tanpa satu pun penjelasan.
+        ->assertDontSee('Terlambat masuk kelas');
+});
+
 // TS.PLS.008 / TC.PLS.008.001 — Positive
 test('kesiswaan menyaring catatan pelanggaran berdasarkan tanggal kejadian', function () {
     [, , $siswa] = kelasBerisiSiswa();

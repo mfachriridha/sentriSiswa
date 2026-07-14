@@ -53,23 +53,52 @@
             @endforeach
         </select>
 
-        <select name="kategori"
-                class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-700 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors">
-            <option value="">Semua Kategori</option>
-            @foreach ($categoryLabels as $category => $label)
-                <option value="{{ $category }}" {{ $filterCategory === $category ? 'selected' : '' }}>{{ $label }}</option>
-            @endforeach
-        </select>
+        {{-- Pilihan jenis mengikuti kategori yang dipilih. Tanpa itu, penyaringnya
+             menawarkan kombinasi yang mustahil - kategori Sedang berpasangan dengan
+             jenis yang kategorinya Ringan - dan hasilnya kosong tanpa penjelasan.
 
-        <select name="jenis_pelanggaran_id"
-                class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-700 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors">
-            <option value="">Semua Jenis</option>
-            @foreach ($violationTypes as $violationType)
-                <option value="{{ $violationType->id }}" {{ (string) $filterViolationType === (string) $violationType->id ? 'selected' : '' }}>
-                    {{ $violationType->nama }} ({{ $violationType->pengurangan_poin }} poin)
-                </option>
-            @endforeach
-        </select>
+             Penyempitannya dikerjakan dua kali. Di sini, supaya daftarnya menyempit
+             seketika begitu kategorinya diganti, tanpa memuat ulang halaman. Dan di
+             sisi server, supaya daftar yang dikirim ke halaman ini memang sudah bersih
+             sejak awal - jadi kombinasi yang mustahil itu tidak pernah sampai ke layar,
+             bahkan lewat alamat yang diketik langsung. --}}
+        <div class="contents"
+             x-data="{
+                 kategori: @js($filterCategory),
+                 jenis: @js((string) $filterViolationType),
+                 semuaJenis: @js($violationTypes->map(fn ($jenis) => [
+                     'id' => (string) $jenis->id,
+                     'kategori' => $jenis->kategori,
+                     'label' => $jenis->nama.' ('.$jenis->pengurangan_poin.' poin)',
+                 ])->values()),
+                 get jenisTersedia() {
+                     return this.kategori
+                         ? this.semuaJenis.filter(j => j.kategori === this.kategori)
+                         : this.semuaJenis;
+                 },
+                 gantiKategori() {
+                     // Jenis yang tadi dipilih bisa jadi bukan milik kategori yang baru.
+                     if (! this.jenisTersedia.some(j => j.id === this.jenis)) {
+                         this.jenis = '';
+                     }
+                 },
+             }">
+            <select name="kategori" x-model="kategori" @change="gantiKategori()"
+                    class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-700 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors">
+                <option value="">Semua Kategori</option>
+                @foreach ($categoryLabels as $category => $label)
+                    <option value="{{ $category }}">{{ $label }}</option>
+                @endforeach
+            </select>
+
+            <select name="jenis_pelanggaran_id" x-model="jenis"
+                    class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-700 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors">
+                <option value="">Semua Jenis</option>
+                <template x-for="jenisPelanggaran in jenisTersedia" :key="jenisPelanggaran.id">
+                    <option :value="jenisPelanggaran.id" x-text="jenisPelanggaran.label"></option>
+                </template>
+            </select>
+        </div>
 
         <input type="date" name="tanggal_pelanggaran" value="{{ $filterDate }}"
                class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-700 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors">

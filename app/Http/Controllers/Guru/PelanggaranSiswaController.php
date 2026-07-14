@@ -77,8 +77,16 @@ class PelanggaranSiswaController extends Controller
         ]);
 
         $classes = Kelas::orderBy('tingkat')->orderBy('nama')->get();
-        $violationTypes = $this->violationTypes();
         $categoryLabels = JenisPelanggaran::categoryLabels();
+
+        // Pilihan jenis mengikuti kategori yang sedang dipilih. Kalau tidak, penyaringnya
+        // menawarkan kombinasi yang mustahil - kategori Sedang berpasangan dengan jenis
+        // yang kategorinya Ringan - dan hasilnya kosong tanpa satu pun penjelasan.
+        $violationTypes = $this->violationTypes()
+            ->when(
+                array_key_exists($filterCategory, $categoryLabels),
+                fn (Collection $types): Collection => $types->where('kategori', $filterCategory)->values(),
+            );
 
         return view('kesiswaan.pelanggaran-siswa.index', compact('studentViolations', 'classes', 'violationTypes', 'categoryLabels', 'sort', 'direction', 'search', 'filterClass', 'filterCategory', 'filterViolationType', 'filterDate'));
     }
