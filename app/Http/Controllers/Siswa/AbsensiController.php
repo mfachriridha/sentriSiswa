@@ -116,7 +116,13 @@ class AbsensiController extends Controller
             ]);
         }
 
-        if ($attendance->status !== 'belum_absen') {
+        // Yang ditolak adalah siswa yang kehadirannya memang sudah tercatat. Siswa
+        // yang terlanjur dicap Alpha tetap boleh absen selama jam absennya masih
+        // dibuka - misalnya karena admin memperpanjang jamnya, atau karena perintah
+        // terjadwal sempat mendahului siswa yang sedang mengirim selfie-nya.
+        //
+        // Izin dan Sakit tidak bisa ditimpa siswa: itu wewenang wali kelas.
+        if (in_array($attendance->status, ['hadir', 'izin', 'sakit'], strict: true)) {
             return redirect()->route('siswa.absensi')->with('error', 'Anda sudah absen hari ini.');
         }
 

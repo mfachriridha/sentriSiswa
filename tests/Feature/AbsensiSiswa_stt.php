@@ -16,7 +16,17 @@ uses(RefreshDatabase::class);
 |
 |   belum absen --(siswa absen di dalam jam absen)--> hadir
 |   belum absen --(jam absen lewat, tak ada yang datang)--> alpha
+|   alpha       --(absen selagi jam absen masih dibuka)--> hadir
 |   hadir       --(absen lagi)--> DITOLAK
+|   izin/sakit  --(absen lagi)--> DITOLAK
+|
+| Alpha bukan keadaan mati: ia hanya berarti "sampai detik ini belum ada yang datang".
+| Selama jam absennya masih dibuka - misalnya karena admin memperpanjangnya, atau
+| karena perintah terjadwal sempat mendahului siswa yang sedang mengirim selfie-nya -
+| siswa itu masih boleh absen dan statusnya kembali jadi Hadir.
+|
+| Izin dan Sakit lain perkara: keduanya ditetapkan wali kelas, dan siswa tidak boleh
+| menimpanya.
 |
 | Ditambah keadaan jendela absensinya sendiri: belum dibuka → dibuka → ditutup,
 | dan hari yang memang bukan hari absensi. Tombol absen hanya hidup dalam keadaan
@@ -95,6 +105,38 @@ test('siswa yang tidak absen sampai jam absen berakhir tercatat alpha', function
     // Statusnya berpindah sendiri jadi Alpha, dan siswa membacanya di riwayatnya.
     $this->get('/siswa/absensi/riwayat')
         ->assertSee('Alpha');
+});
+
+// TS.ABS.017 / TC.ABS.017.001 — Positive — alpha → hadir, selagi jam absen masih dibuka
+test('siswa yang terlanjur dicap alpha tetap bisa absen selama jam absennya masih dibuka', function () {
+    Carbon::setTestNow('2026-07-06 06:35:00');
+    $siswa = siswaMasuk();
+
+    // Ia terlanjur dicap Alpha - misalnya jam absen tadinya ditutup pukul 06:30, lalu
+    // admin memperpanjangnya sampai 07:00 karena ada upacara.
+    catatKehadiran($siswa->nisn, '2026-07-06', 'alpha');
+
+    $this->followingRedirects()
+        ->post('/siswa/absensi', ['selfie' => selfieAbsensi()])
+        ->assertSee('Absen berhasil: Hadir.')
+        ->assertDontSee('Anda sudah absen hari ini.');
+
+    $this->get('/siswa/absensi/riwayat')
+        ->assertSee('Hadir');
+});
+
+// TS.ABS.018 / TC.ABS.018.001 — Negative — izin ditetapkan wali kelas, tak bisa ditimpa siswa
+test('siswa tidak bisa menimpa status izin yang sudah ditetapkan wali kelasnya', function () {
+    Carbon::setTestNow('2026-07-06 06:35:00');
+    $siswa = siswaMasuk();
+
+    // Wali kelas sudah menandainya izin karena surat izinnya sudah masuk.
+    catatKehadiran($siswa->nisn, '2026-07-06', 'izin');
+
+    $this->followingRedirects()
+        ->post('/siswa/absensi', ['selfie' => selfieAbsensi()])
+        ->assertSee('Anda sudah absen hari ini.')
+        ->assertDontSee('Absen berhasil: Hadir.');
 });
 
 // TS.ABS.015 / TC.ABS.015.001 — Positive — hadir tidak ikut berubah jadi alpha
