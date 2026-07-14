@@ -34,7 +34,37 @@
 <x-alert type="success" :message="session('success')" />
 <x-alert type="error" :message="session('error')" />
 
-<form method="GET" action="{{ route('kesiswaan.pelanggaran-siswa.index') }}" class="mb-4 rounded-xl border border-gray-200 bg-white p-4">
+{{-- Pilihan jenis mengikuti kategori yang dipilih. Tanpa itu, penyaringnya menawarkan
+     kombinasi yang mustahil - kategori Sedang berpasangan dengan jenis yang kategorinya
+     Ringan - dan hasilnya kosong tanpa penjelasan.
+
+     Penyempitannya dikerjakan dua kali. Di sini, supaya daftarnya menyempit seketika
+     begitu kategorinya diganti, tanpa memuat ulang halaman. Dan di sisi server, supaya
+     daftar yang dikirim ke halaman ini memang sudah bersih sejak awal - jadi kombinasi
+     yang mustahil itu tidak pernah sampai ke layar, bahkan lewat alamat yang diketik
+     langsung. --}}
+<form method="GET" action="{{ route('kesiswaan.pelanggaran-siswa.index') }}"
+      class="mb-4 rounded-xl border border-gray-200 bg-white p-4"
+      x-data="{
+          kategori: @js($filterCategory),
+          jenis: @js((string) $filterViolationType),
+          semuaJenis: @js($violationTypes->map(fn ($jenis) => [
+              'id' => (string) $jenis->id,
+              'kategori' => $jenis->kategori,
+              'label' => $jenis->nama.' ('.$jenis->pengurangan_poin.' poin)',
+          ])->values()),
+          get jenisTersedia() {
+              return this.kategori
+                  ? this.semuaJenis.filter(j => j.kategori === this.kategori)
+                  : this.semuaJenis;
+          },
+          gantiKategori() {
+              // Jenis yang tadi dipilih bisa jadi bukan milik kategori yang baru.
+              if (! this.jenisTersedia.some(j => j.id === this.jenis)) {
+                  this.jenis = '';
+              }
+          },
+      }">
     <div class="grid grid-cols-1 gap-3 lg:grid-cols-6">
         <div class="relative lg:col-span-2">
             <svg class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -53,52 +83,21 @@
             @endforeach
         </select>
 
-        {{-- Pilihan jenis mengikuti kategori yang dipilih. Tanpa itu, penyaringnya
-             menawarkan kombinasi yang mustahil - kategori Sedang berpasangan dengan
-             jenis yang kategorinya Ringan - dan hasilnya kosong tanpa penjelasan.
+        <select name="kategori" x-model="kategori" @change="gantiKategori()"
+                class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-700 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors">
+            <option value="">Semua Kategori</option>
+            @foreach ($categoryLabels as $category => $label)
+                <option value="{{ $category }}">{{ $label }}</option>
+            @endforeach
+        </select>
 
-             Penyempitannya dikerjakan dua kali. Di sini, supaya daftarnya menyempit
-             seketika begitu kategorinya diganti, tanpa memuat ulang halaman. Dan di
-             sisi server, supaya daftar yang dikirim ke halaman ini memang sudah bersih
-             sejak awal - jadi kombinasi yang mustahil itu tidak pernah sampai ke layar,
-             bahkan lewat alamat yang diketik langsung. --}}
-        <div class="contents"
-             x-data="{
-                 kategori: @js($filterCategory),
-                 jenis: @js((string) $filterViolationType),
-                 semuaJenis: @js($violationTypes->map(fn ($jenis) => [
-                     'id' => (string) $jenis->id,
-                     'kategori' => $jenis->kategori,
-                     'label' => $jenis->nama.' ('.$jenis->pengurangan_poin.' poin)',
-                 ])->values()),
-                 get jenisTersedia() {
-                     return this.kategori
-                         ? this.semuaJenis.filter(j => j.kategori === this.kategori)
-                         : this.semuaJenis;
-                 },
-                 gantiKategori() {
-                     // Jenis yang tadi dipilih bisa jadi bukan milik kategori yang baru.
-                     if (! this.jenisTersedia.some(j => j.id === this.jenis)) {
-                         this.jenis = '';
-                     }
-                 },
-             }">
-            <select name="kategori" x-model="kategori" @change="gantiKategori()"
-                    class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-700 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors">
-                <option value="">Semua Kategori</option>
-                @foreach ($categoryLabels as $category => $label)
-                    <option value="{{ $category }}">{{ $label }}</option>
-                @endforeach
-            </select>
-
-            <select name="jenis_pelanggaran_id" x-model="jenis"
-                    class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-700 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors">
-                <option value="">Semua Jenis</option>
-                <template x-for="jenisPelanggaran in jenisTersedia" :key="jenisPelanggaran.id">
-                    <option :value="jenisPelanggaran.id" x-text="jenisPelanggaran.label"></option>
-                </template>
-            </select>
-        </div>
+        <select name="jenis_pelanggaran_id" x-model="jenis"
+                class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-700 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors">
+            <option value="">Semua Jenis</option>
+            <template x-for="jenisPelanggaran in jenisTersedia" :key="jenisPelanggaran.id">
+                <option :value="jenisPelanggaran.id" x-text="jenisPelanggaran.label"></option>
+            </template>
+        </select>
 
         <input type="date" name="tanggal_pelanggaran" value="{{ $filterDate }}"
                class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-700 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors">
