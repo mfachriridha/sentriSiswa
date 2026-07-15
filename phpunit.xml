@@ -18,6 +18,15 @@
             <directory suffix="_stt.php">tests/Feature</directory>
             <directory suffix="_uc.php">tests/Feature</directory>
         </testsuite>
+        <!-- Hanya pengujian yang ada di dokumen test case (empat teknik). Perintah
+             terjadwal dan seeder (berakhiran Test.php) tidak ikut. Jalankan dengan
+             opsi testsuite Dokumen. -->
+        <testsuite name="Dokumen">
+            <directory suffix="_ep.php">tests/Feature</directory>
+            <directory suffix="_bva.php">tests/Feature</directory>
+            <directory suffix="_stt.php">tests/Feature</directory>
+            <directory suffix="_uc.php">tests/Feature</directory>
+        </testsuite>
     </testsuites>
     <source>
         <include>
