@@ -27,12 +27,12 @@
         <form method="GET" action="{{ route('wali-kelas.absensi.index') }}" class="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
             <div>
                 <label for="start_date" class="block text-sm font-medium text-gray-700">Tanggal Mulai</label>
-                <input id="start_date" type="date" name="mulai" value="{{ $startDate }}"
+                <input id="start_date" type="date" name="mulai" value="{{ $startDate }}" min="2025-01-01"
                        class="mt-1 w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
             </div>
             <div>
                 <label for="end_date" class="block text-sm font-medium text-gray-700">Tanggal Selesai</label>
-                <input id="end_date" type="date" name="selesai" value="{{ $endDate }}"
+                <input id="end_date" type="date" name="selesai" value="{{ $endDate }}" min="2025-01-01"
                        class="mt-1 w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
             </div>
             <div>

@@ -37,7 +37,7 @@
     </div>
     <div>
         <label class="block text-xs font-medium text-gray-600 mb-1">Tanggal</label>
-        <input type="date" name="tanggal" value="{{ request('tanggal') }}"
+        <input type="date" name="tanggal" value="{{ request('tanggal') }}" min="2025-01-01"
                class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary">
     </div>
     <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg text-sm font-semibold hover:bg-primary/90">Filter</button>

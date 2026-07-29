@@ -84,7 +84,7 @@
 
             <div>
                 <label for="tanggal_pelanggaran" class="block text-sm font-medium text-gray-700">Tanggal Pelanggaran <span class="text-red-500">*</span></label>
-                <input id="tanggal_pelanggaran" type="date" name="tanggal_pelanggaran" value="{{ old('tanggal_pelanggaran', now()->toDateString()) }}" max="{{ now()->toDateString() }}" required
+                <input id="tanggal_pelanggaran" type="date" name="tanggal_pelanggaran" value="{{ old('tanggal_pelanggaran', now()->toDateString()) }}" min="2025-01-01" max="{{ now()->toDateString() }}" required
                        class="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm text-gray-900 shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors">
                 @error('tanggal_pelanggaran')
                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>

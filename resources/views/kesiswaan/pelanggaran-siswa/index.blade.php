@@ -99,7 +99,7 @@
             </template>
         </select>
 
-        <input type="date" name="tanggal_pelanggaran" value="{{ $filterDate }}"
+        <input type="date" name="tanggal_pelanggaran" value="{{ $filterDate }}" min="2025-01-01"
                class="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-700 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors">
     </div>
 
