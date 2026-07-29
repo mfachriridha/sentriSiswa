@@ -39,9 +39,9 @@
 <div class="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4">
     <p class="text-sm font-semibold text-amber-800">Perubahan berlaku langsung</p>
     <p class="mt-1 text-sm text-amber-700">
-        Begitu disimpan, jam dan hari aktif baru langsung dipakai sistem - termasuk buat siswa yang jendela absennya
-        lagi berjalan saat ini. Mempersempit jam selesai bisa langsung menandai siswa yang belum sempat absen
-        sebagai Alpha tanpa toleransi.
+        Pengaturan baru akan langsung terintegrasi ke sistem saat ini juga.
+        Harap diperhatikan bahwa memajukan jam selesai bisa menyebabkan siswa yang belum sempat
+        mengisi presensi otomatis tercatat Alpha.
     </p>
 </div>
 

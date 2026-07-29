@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
-@section('title', 'Profil Admin')
+@section('title', 'Profil')
 
 @section('content')
 <div class="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
     <div>
-        <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Profil Admin</h1>
+        <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Profil</h1>
         <p class="mt-1 text-xs font-semibold text-slate-500">Informasi akun bantuan dan pengaturan akses aplikasi.</p>
     </div>
     <a href="{{ route('admin.profil.edit') }}"
