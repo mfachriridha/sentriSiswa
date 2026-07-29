@@ -91,13 +91,9 @@
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 text-sm">
                                 @php
-                                    $categoryConfig = [
-                                        'light' => ['bg-green-100 text-green-800', 'Ringan'],
-                                        'medium' => ['bg-yellow-100 text-yellow-800', 'Sedang'],
-                                        'heavy' => ['bg-orange-100 text-orange-800', 'Berat'],
-                                        'severe' => ['bg-red-100 text-red-800', 'Sangat Berat'],
-                                    ];
-                                    [$badgeClass, $categoryLabel] = $categoryConfig[$violation->kategori_pelanggaran] ?? ['bg-gray-100 text-gray-800', $violation->kategori_pelanggaran];
+                                    $kategori = $violation->kategori_pelanggaran;
+                                    $badgeClass = \App\Models\JenisPelanggaran::categoryBadgeClasses()[$kategori] ?? 'bg-gray-100 text-gray-800';
+                                    $categoryLabel = \App\Models\JenisPelanggaran::categoryLabels()[$kategori] ?? $kategori;
                                 @endphp
                                 <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {{ $badgeClass }}">
                                     {{ $categoryLabel }}

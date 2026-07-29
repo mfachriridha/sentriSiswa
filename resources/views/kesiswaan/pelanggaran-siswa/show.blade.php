@@ -4,12 +4,7 @@
 
 @section('content')
 @php
-    $categoryBadgeClasses = [
-        'ringan' => 'bg-green-50 text-green-700',
-        'sedang' => 'bg-amber-50 text-amber-700',
-        'berat' => 'bg-orange-50 text-orange-700',
-        'sangat_berat' => 'bg-red-50 text-red-700',
-    ];
+    $categoryBadgeClasses = \App\Models\JenisPelanggaran::categoryBadgeClasses();
 @endphp
 
 <div class="mb-5">
