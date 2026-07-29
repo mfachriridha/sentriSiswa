@@ -111,7 +111,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="3" class="px-6 py-8 text-center text-gray-500">Belum ada catatan pelanggaran approved.</td>
+                                <td colspan="3" class="px-6 py-8 text-center text-gray-500">Belum ada catatan pelanggaran.</td>
                             </tr>
                         @endforelse
                     </tbody>

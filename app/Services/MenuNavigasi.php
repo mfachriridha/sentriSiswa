@@ -88,7 +88,7 @@ class MenuNavigasi
             ['label' => 'Absensi', 'route' => 'siswa.absensi', 'icon' => 'absensi', 'aktif' => ['siswa.absensi', 'siswa.absensi.*'], 'grup' => 'Akademik'],
             ['label' => 'Poin Saya', 'route' => 'siswa.poin', 'icon' => 'bintang', 'aktif' => ['siswa.poin'], 'grup' => 'Akademik'],
             ['label' => 'Tata Tertib', 'route' => 'siswa.tata-tertib.index', 'icon' => 'dokumen-peringatan', 'aktif' => ['siswa.tata-tertib.*'], 'grup' => 'Akademik'],
-            ['label' => 'Profil', 'route' => 'siswa.profil', 'icon' => 'profil', 'aktif' => ['siswa.profil', 'siswa.profil.*'], 'grup' => 'Akun'],
+            ['label' => 'Profil Saya', 'route' => 'siswa.profil', 'icon' => 'profil', 'aktif' => ['siswa.profil', 'siswa.profil.*'], 'grup' => 'Akun'],
         ];
     }
 
