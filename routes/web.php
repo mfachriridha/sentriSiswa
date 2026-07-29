@@ -101,8 +101,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/guru/impor/unggah', [ImporGuruController::class, 'upload'])->name('guru.impor.unggah');
     Route::get('/guru/impor/pratinjau', [ImporGuruController::class, 'preview'])->name('guru.impor.pratinjau');
     Route::post('/guru/impor', [ImporGuruController::class, 'store'])->name('guru.impor.store');
+    Route::post('/guru/hapus-semua/pratinjau', [GuruController::class, 'previewDeleteAll'])->name('guru.hapus-semua.pratinjau');
     Route::delete('/guru/hapus-semua', [GuruController::class, 'deleteAll'])->name('guru.hapus-semua');
     Route::resource('guru', GuruController::class);
+    Route::post('/siswa/hapus-semua/pratinjau', [SiswaController::class, 'previewDeleteAll'])->name('siswa.hapus-semua.pratinjau');
     Route::delete('/siswa/hapus-semua', [SiswaController::class, 'deleteAll'])->name('siswa.hapus-semua');
     Route::get('/siswa/impor', [ImporSiswaController::class, 'create'])->name('siswa.impor');
     Route::get('/siswa/impor/template', [ImporSiswaController::class, 'template'])->name('siswa.impor.template');
@@ -110,6 +112,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/siswa/impor/pratinjau', [ImporSiswaController::class, 'preview'])->name('siswa.impor.pratinjau');
     Route::post('/siswa/impor', [ImporSiswaController::class, 'store'])->name('siswa.impor.store');
     Route::resource('siswa', SiswaController::class);
+    Route::post('/kelas/hapus-semua/pratinjau', [KelasController::class, 'previewDeleteAll'])->name('kelas.hapus-semua.pratinjau');
     Route::delete('/kelas/hapus-semua', [KelasController::class, 'deleteAll'])->name('kelas.hapus-semua');
     Route::resource('kelas', KelasController::class)->parameters(['kelas' => 'kelas']);
     Route::get('/pengaturan/waktu-absen', [PengaturanController::class, 'attendanceTime'])->name('pengaturan.waktu-absen.index');

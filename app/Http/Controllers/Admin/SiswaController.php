@@ -8,6 +8,8 @@ use App\Http\Requests\Siswa\UpdateSiswaRequest;
 use App\Models\Kelas;
 use App\Models\Pengguna;
 use App\Models\ProfilSiswa;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -152,11 +154,88 @@ class SiswaController extends Controller
         return redirect()->route('admin.siswa.index')->with('success', 'Siswa berhasil dihapus.');
     }
 
-    public function deleteAll(): RedirectResponse
+    /**
+     * Hitung berapa siswa yang cocok dengan kriteria yang dicentang, dipakai
+     * modal buat nampilin pratinjau sebelum admin benar-benar menghapus.
+     */
+    public function previewDeleteAll(Request $request): JsonResponse
     {
-        ProfilSiswa::whereHas('pengguna', fn ($q) => $q->where('peran', 'siswa'))->delete();
-        Pengguna::where('peran', 'siswa')->delete();
+        $filters = $this->deleteAllFilters($request);
 
-        return redirect()->route('admin.siswa.index')->with('success', 'Semua siswa berhasil dihapus.');
+        return response()->json(['count' => $this->deleteAllQuery($filters)->count()]);
+    }
+
+    public function deleteAll(Request $request): RedirectResponse
+    {
+        $filters = $this->deleteAllFilters($request);
+
+        if ($filters['status'] === [] && $filters['tingkat'] === []) {
+            return redirect()->route('admin.siswa.index')->with('error', 'Pilih minimal satu kriteria yang mau dihapus.');
+        }
+
+        $ids = $this->deleteAllQuery($filters)->pluck('id');
+
+        if ($ids->isEmpty()) {
+            return redirect()->route('admin.siswa.index')->with('error', 'Tidak ada siswa yang cocok dengan kriteria yang dipilih.');
+        }
+
+        DB::transaction(function () use ($ids) {
+            ProfilSiswa::whereIn('pengguna_id', $ids)->delete();
+            Pengguna::whereIn('id', $ids)->delete();
+        });
+
+        return redirect()->route('admin.siswa.index')->with('success', "{$ids->count()} siswa berhasil dihapus.");
+    }
+
+    /**
+     * Siswa yang boleh dihapus massal disaring dari kriteria yang dicentang di
+     * modal - checkbox kosong di satu grup berarti grup itu tidak membatasi
+     * (cocok semua), bukan berarti "tidak ada yang dihapus".
+     *
+     * @return array{status: list<string>, tingkat: list<string>}
+     */
+    private function deleteAllFilters(Request $request): array
+    {
+        $validated = $request->validate([
+            'status' => ['array'],
+            'status.*' => ['in:registered,unregistered'],
+            'tingkat' => ['array'],
+            'tingkat.*' => ['in:10,11,12,tanpa_kelas'],
+        ]);
+
+        return [
+            'status' => $validated['status'] ?? [],
+            'tingkat' => $validated['tingkat'] ?? [],
+        ];
+    }
+
+    /**
+     * @param  array{status: list<string>, tingkat: list<string>}  $filters
+     * @return Builder<Pengguna>
+     */
+    private function deleteAllQuery(array $filters): Builder
+    {
+        $query = Pengguna::where('peran', 'siswa');
+
+        if ($filters['status'] !== []) {
+            $query->whereIn('status', $filters['status']);
+        }
+
+        if ($filters['tingkat'] !== []) {
+            $tanpaKelas = in_array('tanpa_kelas', $filters['tingkat'], true);
+            $angka = array_values(array_diff($filters['tingkat'], ['tanpa_kelas']));
+
+            $query->where(function ($q) use ($tanpaKelas, $angka) {
+                if ($tanpaKelas) {
+                    $q->orWhereHas('profilSiswa', fn ($q2) => $q2->whereNull('kelas_id'));
+                }
+
+                if ($angka !== []) {
+                    $q->orWhereHas('profilSiswa.kelas', fn ($q2) => $q2->whereIn('tingkat', $angka));
+                }
+            });
+        }
+
+        return $query;
     }
 }

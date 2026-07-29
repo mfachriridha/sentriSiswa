@@ -18,25 +18,62 @@
             </svg>
             Impor Excel
         </a>
-        <button type="button"
-                onclick="window.dispatchEvent(new CustomEvent('open-confirm-modal', {
-                    detail: {
-                        title: 'Hapus Semua Guru',
-                        message: 'Anda akan menghapus semua data guru. Tindakan ini akan menghapus semua guru beserta data profilnya.',
-                        secondMessage: 'PERINGATAN: Tindakan ini tidak dapat diurungkan! Semua data guru akan hilang permanen.',
-                        formId: 'delete-all-form'
-                    }
-                }))"
-                @disabled($teachers->isEmpty())
-                class="inline-flex items-center gap-2 rounded-lg border border-red-200 px-4 py-2.5 text-sm font-medium text-red-600 shadow-sm
-                       hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-300 transition-colors cursor-pointer
-                       disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent">
-            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-            </svg>
-            Hapus Semua
-        </button>
+        <x-hapus-massal-modal
+            title="Hapus Lanjutan Data Guru"
+            :action="route('admin.guru.hapus-semua')"
+            :preview-url="route('admin.guru.hapus-semua.pratinjau')"
+            entity-label="guru"
+            :disabled="$teachers->isEmpty()">
+            <div x-data="{ bkChecked: false }"
+                 x-effect="if (!bkChecked) { $el.querySelectorAll('[data-conditional]:checked').forEach(cb => { cb.checked = false; cb.dispatchEvent(new Event('change', {bubbles: true})); }); }">
+                <p class="mb-2 text-sm font-medium text-gray-700">Role</p>
+                <div class="flex flex-wrap gap-4">
+                    <label class="inline-flex items-center gap-2 text-sm text-gray-700">
+                        <input type="checkbox" name="peran[]" value="wali_kelas" class="rounded border-gray-300 text-primary focus:ring-primary/30">
+                        Wali Kelas
+                    </label>
+                    <label class="inline-flex items-center gap-2 text-sm text-gray-700">
+                        <input type="checkbox" name="peran[]" value="bk" x-model="bkChecked" class="rounded border-gray-300 text-primary focus:ring-primary/30">
+                        BK
+                    </label>
+                    <label class="inline-flex items-center gap-2 text-sm text-gray-700">
+                        <input type="checkbox" name="peran[]" value="kesiswaan" class="rounded border-gray-300 text-primary focus:ring-primary/30">
+                        Kesiswaan
+                    </label>
+                </div>
+
+                <div x-show="bkChecked" class="mt-4">
+                    <p class="mb-2 text-sm font-medium text-gray-700">Tingkat (khusus BK)</p>
+                    <div class="flex flex-wrap gap-4">
+                        <label class="inline-flex items-center gap-2 text-sm text-gray-700">
+                            <input type="checkbox" name="tingkat[]" value="10" data-conditional class="rounded border-gray-300 text-primary focus:ring-primary/30">
+                            10
+                        </label>
+                        <label class="inline-flex items-center gap-2 text-sm text-gray-700">
+                            <input type="checkbox" name="tingkat[]" value="11" data-conditional class="rounded border-gray-300 text-primary focus:ring-primary/30">
+                            11
+                        </label>
+                        <label class="inline-flex items-center gap-2 text-sm text-gray-700">
+                            <input type="checkbox" name="tingkat[]" value="12" data-conditional class="rounded border-gray-300 text-primary focus:ring-primary/30">
+                            12
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <p class="mb-2 text-sm font-medium text-gray-700">Status</p>
+                <div class="flex flex-wrap gap-4">
+                    <label class="inline-flex items-center gap-2 text-sm text-gray-700">
+                        <input type="checkbox" name="status[]" value="registered" class="rounded border-gray-300 text-primary focus:ring-primary/30">
+                        Terdaftar
+                    </label>
+                    <label class="inline-flex items-center gap-2 text-sm text-gray-700">
+                        <input type="checkbox" name="status[]" value="unregistered" class="rounded border-gray-300 text-primary focus:ring-primary/30">
+                        Belum Terdaftar
+                    </label>
+                </div>
+            </div>
+        </x-hapus-massal-modal>
         <a href="{{ route('admin.guru.create') }}"
            class="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm
                   hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 transition-colors">
@@ -49,6 +86,7 @@
 </div>
 
 <x-alert type="success" :message="session('success')" />
+<x-alert type="error" :message="session('error')" />
 
 <x-search-filter-form
     :action="route('admin.guru.index')"
@@ -229,8 +267,4 @@
     @endif
 </div>
 
-<form id="delete-all-form" method="POST" action="{{ route('admin.guru.hapus-semua') }}" class="hidden">
-    @csrf
-    @method('DELETE')
-</form>
 @endsection

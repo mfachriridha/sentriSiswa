@@ -8,6 +8,8 @@ use App\Http\Requests\Guru\UpdateGuruRequest;
 use App\Models\Kelas;
 use App\Models\Pengguna;
 use App\Models\ProfilGuru;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -167,11 +169,84 @@ class GuruController extends Controller
         return redirect()->route('admin.guru.index')->with('success', 'Guru berhasil dihapus.');
     }
 
-    public function deleteAll(): RedirectResponse
+    /**
+     * Hitung berapa guru yang cocok dengan kriteria yang dicentang, dipakai
+     * modal buat nampilin pratinjau sebelum admin benar-benar menghapus.
+     */
+    public function previewDeleteAll(Request $request): JsonResponse
     {
-        ProfilGuru::whereHas('pengguna', fn ($q) => $q->whereIn('peran', ['wali_kelas', 'bk', 'kesiswaan']))->delete();
-        Pengguna::whereIn('peran', ['wali_kelas', 'bk', 'kesiswaan'])->delete();
+        $filters = $this->deleteAllFilters($request);
 
-        return redirect()->route('admin.guru.index')->with('success', 'Semua guru berhasil dihapus.');
+        return response()->json(['count' => $this->deleteAllQuery($filters)->count()]);
+    }
+
+    public function deleteAll(Request $request): RedirectResponse
+    {
+        $filters = $this->deleteAllFilters($request);
+
+        if ($filters['peran'] === [] && $filters['status'] === [] && $filters['tingkat'] === []) {
+            return redirect()->route('admin.guru.index')->with('error', 'Pilih minimal satu kriteria yang mau dihapus.');
+        }
+
+        $ids = $this->deleteAllQuery($filters)->pluck('id');
+
+        if ($ids->isEmpty()) {
+            return redirect()->route('admin.guru.index')->with('error', 'Tidak ada guru yang cocok dengan kriteria yang dipilih.');
+        }
+
+        DB::transaction(function () use ($ids) {
+            ProfilGuru::whereIn('pengguna_id', $ids)->delete();
+            Pengguna::whereIn('id', $ids)->delete();
+        });
+
+        return redirect()->route('admin.guru.index')->with('success', "{$ids->count()} guru berhasil dihapus.");
+    }
+
+    /**
+     * Guru yang boleh dihapus massal disaring dari kriteria yang dicentang di
+     * modal - checkbox kosong di satu grup berarti grup itu tidak membatasi
+     * (cocok semua), bukan berarti "tidak ada yang dihapus".
+     *
+     * @return array{peran: list<string>, status: list<string>, tingkat: list<string>}
+     */
+    private function deleteAllFilters(Request $request): array
+    {
+        $validated = $request->validate([
+            'peran' => ['array'],
+            'peran.*' => ['in:wali_kelas,bk,kesiswaan'],
+            'status' => ['array'],
+            'status.*' => ['in:registered,unregistered'],
+            'tingkat' => ['array'],
+            'tingkat.*' => ['in:10,11,12'],
+        ]);
+
+        return [
+            'peran' => $validated['peran'] ?? [],
+            'status' => $validated['status'] ?? [],
+            'tingkat' => $validated['tingkat'] ?? [],
+        ];
+    }
+
+    /**
+     * @param  array{peran: list<string>, status: list<string>, tingkat: list<string>}  $filters
+     * @return Builder<Pengguna>
+     */
+    private function deleteAllQuery(array $filters): Builder
+    {
+        $query = Pengguna::whereIn('peran', ['wali_kelas', 'bk', 'kesiswaan']);
+
+        if ($filters['peran'] !== []) {
+            $query->whereIn('peran', $filters['peran']);
+        }
+
+        if ($filters['status'] !== []) {
+            $query->whereIn('status', $filters['status']);
+        }
+
+        if ($filters['tingkat'] !== []) {
+            $query->whereHas('profilGuru', fn ($q) => $q->whereIn('tingkat', $filters['tingkat']));
+        }
+
+        return $query;
     }
 }

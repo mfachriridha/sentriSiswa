@@ -8,6 +8,8 @@ use App\Http\Requests\Kelas\UpdateKelasRequest;
 use App\Models\Kelas;
 use App\Models\Pengguna;
 use App\Models\ProfilSiswa;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -153,10 +155,85 @@ class KelasController extends Controller
         return redirect()->route('admin.kelas.index')->with('success', 'Kelas berhasil dihapus.');
     }
 
-    public function deleteAll(): RedirectResponse
+    /**
+     * Hitung berapa kelas yang cocok dengan kriteria yang dicentang, dipakai
+     * modal buat nampilin pratinjau sebelum admin benar-benar menghapus.
+     */
+    public function previewDeleteAll(Request $request): JsonResponse
     {
-        Kelas::query()->delete();
+        $filters = $this->deleteAllFilters($request);
 
-        return redirect()->route('admin.kelas.index')->with('success', 'Semua kelas berhasil dihapus.');
+        return response()->json(['count' => $this->deleteAllQuery($filters)->count()]);
+    }
+
+    public function deleteAll(Request $request): RedirectResponse
+    {
+        $filters = $this->deleteAllFilters($request);
+
+        if ($filters['tingkat'] === [] && $filters['wali'] === []) {
+            return redirect()->route('admin.kelas.index')->with('error', 'Pilih minimal satu kriteria yang mau dihapus.');
+        }
+
+        $ids = $this->deleteAllQuery($filters)->pluck('id');
+
+        if ($ids->isEmpty()) {
+            return redirect()->route('admin.kelas.index')->with('error', 'Tidak ada kelas yang cocok dengan kriteria yang dipilih.');
+        }
+
+        Kelas::whereIn('id', $ids)->delete();
+
+        return redirect()->route('admin.kelas.index')->with('success', "{$ids->count()} kelas berhasil dihapus.");
+    }
+
+    /**
+     * Kelas yang boleh dihapus massal disaring dari kriteria yang dicentang di
+     * modal - checkbox kosong di satu grup berarti grup itu tidak membatasi
+     * (cocok semua), bukan berarti "tidak ada yang dihapus".
+     *
+     * @return array{tingkat: list<string>, wali: list<string>}
+     */
+    private function deleteAllFilters(Request $request): array
+    {
+        $validated = $request->validate([
+            'tingkat' => ['array'],
+            'tingkat.*' => ['in:10,11,12'],
+            'wali' => ['array'],
+            'wali.*' => ['in:ada,tidak'],
+        ]);
+
+        return [
+            'tingkat' => $validated['tingkat'] ?? [],
+            'wali' => $validated['wali'] ?? [],
+        ];
+    }
+
+    /**
+     * @param  array{tingkat: list<string>, wali: list<string>}  $filters
+     * @return Builder<Kelas>
+     */
+    private function deleteAllQuery(array $filters): Builder
+    {
+        $query = Kelas::query();
+
+        if ($filters['tingkat'] !== []) {
+            $query->whereIn('tingkat', $filters['tingkat']);
+        }
+
+        if ($filters['wali'] !== []) {
+            $adaWali = in_array('ada', $filters['wali'], true);
+            $tanpaWali = in_array('tidak', $filters['wali'], true);
+
+            $query->where(function ($q) use ($adaWali, $tanpaWali) {
+                if ($adaWali) {
+                    $q->orWhereNotNull('wali_kelas_id');
+                }
+
+                if ($tanpaWali) {
+                    $q->orWhereNull('wali_kelas_id');
+                }
+            });
+        }
+
+        return $query;
     }
 }
