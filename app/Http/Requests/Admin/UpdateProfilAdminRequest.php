@@ -22,6 +22,7 @@ class UpdateProfilAdminRequest extends FormRequest
             'email' => ['required', 'email', 'max:255', Rule::unique('pengguna', 'email')->ignore($this->user())],
             'whatsapp_number' => ['nullable', 'string', 'min:10', 'max:20', 'regex:/^[0-9+\-\s()]*$/'],
             'photo' => ['nullable', 'image', 'max:2048', 'mimes:jpg,jpeg,png'],
+            'delete_photo' => ['nullable', 'boolean'],
         ];
     }
 

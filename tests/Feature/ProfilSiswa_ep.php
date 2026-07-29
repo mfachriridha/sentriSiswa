@@ -112,3 +112,31 @@ test('siswa menghapus foto profilnya', function () {
         ->delete('/siswa/profil/photo')
         ->assertSee('Foto berhasil dihapus.');
 });
+
+// TS.PRS.012 / TC.PRS.012.001 — Positive
+test('siswa mengunggah foto lewat form edit profil, satu form sekaligus dengan data lain', function () {
+    $siswa = siswaMasuk();
+
+    $this->followingRedirects()
+        ->put('/siswa/profil', dataProfilSiswa($siswa->pengguna, [
+            'photo' => UploadedFile::fake()->image('foto.jpg'),
+        ]))
+        ->assertSee('Profil berhasil diperbarui.')
+        ->assertSee('storage/photos/students/');
+});
+
+// TS.PRS.013 / TC.PRS.013.001 — Positive
+test('siswa menghapus foto lewat form edit profil', function () {
+    $siswa = siswaMasuk();
+
+    $this->put('/siswa/profil', dataProfilSiswa($siswa->pengguna, [
+        'photo' => UploadedFile::fake()->image('foto.jpg'),
+    ]));
+
+    $this->followingRedirects()
+        ->put('/siswa/profil', dataProfilSiswa($siswa->pengguna, [
+            'delete_photo' => '1',
+        ]))
+        ->assertSee('Profil berhasil diperbarui.')
+        ->assertDontSee('storage/photos/students/');
+});

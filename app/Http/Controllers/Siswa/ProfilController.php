@@ -65,8 +65,22 @@ class ProfilController extends Controller
     public function update(UpdateSiswaProfilRequest $request): RedirectResponse
     {
         $student = Auth::user();
+        $profile = $student->profilSiswa;
 
-        $student->profilSiswa->update([
+        if ($request->has('delete_photo') && filter_var($request->input('delete_photo'), FILTER_VALIDATE_BOOLEAN)) {
+            if ($profile->foto) {
+                Storage::disk('public')->delete($profile->foto);
+                $profile->update(['foto' => null]);
+            }
+        } elseif ($request->hasFile('photo')) {
+            if ($profile->foto) {
+                Storage::disk('public')->delete($profile->foto);
+            }
+            $path = $request->file('photo')->store('photos/students', 'public');
+            $profile->update(['foto' => $path]);
+        }
+
+        $profile->update([
             'telepon' => $request->telepon,
             'alamat' => $request->alamat,
         ]);

@@ -141,3 +141,24 @@ test('admin gagal mengunggah foto profil bertipe yang tidak diizinkan', function
         ])
         ->assertSee('Foto harus berupa gambar.');
 });
+
+// TS.PAD.009 / TC.PAD.009.001 — Positive
+test('admin menghapus foto profil lewat form edit, satu form sekaligus dengan data lain', function () {
+    Storage::fake('public');
+    adminProfil();
+
+    $this->put('/admin/profil', [
+        'nama' => 'Admin Sekolah',
+        'email' => 'admin.profil@sentrisiswa.test',
+        'photo' => UploadedFile::fake()->image('foto.jpg'),
+    ]);
+
+    $this->followingRedirects()
+        ->put('/admin/profil', [
+            'nama' => 'Admin Sekolah',
+            'email' => 'admin.profil@sentrisiswa.test',
+            'delete_photo' => '1',
+        ])
+        ->assertSee('Profil admin berhasil diperbarui.')
+        ->assertDontSee('storage/photos/admins/');
+});

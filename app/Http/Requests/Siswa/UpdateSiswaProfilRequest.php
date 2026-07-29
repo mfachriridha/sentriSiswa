@@ -21,6 +21,8 @@ class UpdateSiswaProfilRequest extends FormRequest
             'telepon' => ['nullable', 'string', 'min:10', 'max:15', 'regex:/^[0-9+\-\s()]*$/'],
             'alamat' => ['nullable', 'string'],
             'password' => ['nullable', 'string', 'min:8', 'regex:/[a-z]/i', 'regex:/[0-9]/'],
+            'photo' => ['nullable', 'image', 'max:2048', 'mimes:jpg,jpeg,png'],
+            'delete_photo' => ['nullable', 'boolean'],
         ];
     }
 
@@ -35,6 +37,9 @@ class UpdateSiswaProfilRequest extends FormRequest
             'telepon.regex' => 'Format nomor telepon tidak valid.',
             'password.min' => 'Kata sandi minimal 8 karakter.',
             'password.regex' => 'Kata sandi harus memuat huruf dan angka.',
+            'photo.image' => 'Foto harus berupa file gambar.',
+            'photo.max' => 'Ukuran foto maksimal 2MB.',
+            'photo.mimes' => 'Format foto hanya diperbolehkan JPG, JPEG, atau PNG.',
         ];
     }
 }

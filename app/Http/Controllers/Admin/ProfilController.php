@@ -36,7 +36,12 @@ class ProfilController extends Controller
         $admin->nama = $data['nama'];
         $admin->nomor_wa = $data['whatsapp_number'] ?? null;
 
-        if ($request->hasFile('photo')) {
+        if ($request->has('delete_photo') && filter_var($request->input('delete_photo'), FILTER_VALIDATE_BOOLEAN)) {
+            if ($admin->foto) {
+                Storage::disk('public')->delete($admin->foto);
+                $admin->foto = null;
+            }
+        } elseif ($request->hasFile('photo')) {
             if ($admin->foto) {
                 Storage::disk('public')->delete($admin->foto);
             }
