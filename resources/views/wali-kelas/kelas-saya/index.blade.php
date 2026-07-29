@@ -24,7 +24,7 @@
 
 @unless($isWeekday)
     <div class="mb-6 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700">
-        Hari ini bukan hari aktif absensi. Absensi siswa hanya tersedia pada hari Senin sampai Jumat.
+        Hari ini bukan hari aktif absensi. Absensi siswa hanya tersedia pada hari {{ $activeDaysLabel }}.
     </div>
 @endunless
 

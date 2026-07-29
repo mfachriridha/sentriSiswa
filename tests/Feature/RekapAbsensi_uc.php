@@ -63,16 +63,18 @@ test('persentase kehadiran dihitung dari hari yang sudah punya keputusan', funct
 });
 
 // TS.REA.003 / TC.REA.003.001 — Positive
-test('kehadiran di hari yang bukan hari absensi tidak ikut dihitung', function () {
+test('rekap menghitung baris absensi apa adanya, tidak bergantung pengaturan hari aktif saat ini', function () {
     Carbon::setTestNow('2026-07-10 08:00:00');
     [, , $siswa] = waliKelasDenganKelas();
 
     catatKehadiran($siswa->nisn, '2026-07-06', 'hadir');  // Senin, hari absensi.
-    catatKehadiran($siswa->nisn, '2026-07-05', 'alpha');  // Minggu, bukan hari absensi.
+    catatKehadiran($siswa->nisn, '2026-07-05', 'alpha');  // Minggu, di luar hari aktif baku.
 
-    // Alpha di hari libur diabaikan, jadi kehadirannya tetap penuh.
+    // Baris yang sudah tercatat di DB dihitung apa adanya - bukan disaring ulang
+    // berdasar pengaturan hari aktif SAAT laporan dibuka. Kalau tidak, mengubah
+    // pengaturan itu bisa mengubah rekap tanggal-tanggal lampau secara retroaktif.
     $this->get('/wali-kelas/absensi?mulai=2026-07-01&selesai=2026-07-10')
-        ->assertSee('100%');
+        ->assertSee('50%');
 });
 
 // TS.REA.007 / TC.REA.007.001 — Positive

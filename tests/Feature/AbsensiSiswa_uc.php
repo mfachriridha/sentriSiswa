@@ -52,7 +52,7 @@ test('halaman absensi memberi tahu siswa bahwa hari ini bukan hari absensi', fun
     siswaMasuk();
 
     $this->get('/siswa/absensi')
-        ->assertSee('Absensi hanya tersedia pada hari Senin sampai Jumat.');
+        ->assertSee('Absensi hanya tersedia pada hari Senin, Selasa, Rabu, Kamis dan Jumat.');
 });
 
 // TS.ABS.009 / TC.ABS.009.001 — Positive

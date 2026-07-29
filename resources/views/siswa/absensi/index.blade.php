@@ -284,17 +284,22 @@
                             </div>
                         </div>
 
-                        <div class="flex flex-col-reverse gap-3 border-t border-gray-200 px-4 py-3 sm:flex-row sm:justify-end">
-                            <button type="button"
-                                    @click="cancelSelfieModal()"
-                                    class="inline-flex items-center justify-center rounded-lg border border-gray-300 px-5 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
-                                Batal
-                            </button>
-                            <button type="submit"
-                                    :disabled="!canSubmit"
-                                    class="inline-flex items-center justify-center rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:cursor-not-allowed disabled:bg-gray-300">
-                                Absen Sekarang
-                            </button>
+                        <div class="border-t border-gray-200 px-4 py-3">
+                            <p x-cloak x-show="previewUrl" class="mb-3 text-xs font-medium text-amber-700">
+                                Setelah ditekan, absen hari ini tidak bisa diubah sendiri. Kalau salah, hubungi wali kelas.
+                            </p>
+                            <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                                <button type="button"
+                                        @click="cancelSelfieModal()"
+                                        class="inline-flex items-center justify-center rounded-lg border border-gray-300 px-5 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
+                                    Batal
+                                </button>
+                                <button type="submit"
+                                        :disabled="!canSubmit"
+                                        class="inline-flex items-center justify-center rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:cursor-not-allowed disabled:bg-gray-300">
+                                    Absen Sekarang
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -310,7 +315,7 @@
                 </svg>
                 <p class="text-sm font-medium text-gray-500">
                     @if(! $isWeekday)
-                        Absensi hanya tersedia pada hari Senin sampai Jumat.
+                        Absensi hanya tersedia pada hari {{ $activeDaysLabel }}.
                     @elseif(now()->format('H:i') < $startTime)
                         Belum waktunya absen. Absen dimulai pukul {{ $startTime }}.
                     @else

@@ -25,6 +25,7 @@ class ClassRosterController extends Controller
 
         $today = now()->toDateString();
         $isWeekday = Pengaturan::hariAbsenAktif();
+        $activeDaysLabel = Pengaturan::labelHariAbsen();
         $studentIds = $class->siswa()->pluck('profil_siswa.nisn');
         $attendances = Absensi::query()
             ->whereIn('profil_siswa_id', $studentIds)
@@ -59,7 +60,7 @@ class ClassRosterController extends Controller
             $stats[$status]++;
         }
 
-        return view('wali-kelas.kelas-saya.index', compact('class', 'students', 'attendances', 'stats', 'isWeekday'));
+        return view('wali-kelas.kelas-saya.index', compact('class', 'students', 'attendances', 'stats', 'isWeekday', 'activeDaysLabel'));
     }
 
     public function statusAbsensi(): JsonResponse

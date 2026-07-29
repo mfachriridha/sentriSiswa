@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Siswa;
 use App\Http\Controllers\Controller;
 use App\Models\Pengaturan;
 use App\Services\GeofenceValidator;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -30,6 +31,7 @@ class AbsensiController extends Controller
         $currentTimeLabel = $now->format('H:i');
         $isWeekday = Pengaturan::hariAbsenAktif($now);
         $canCheckIn = $isWeekday && $currentTime >= $startTime && $currentTime <= $endTime;
+        $activeDaysLabel = Pengaturan::labelHariAbsen();
 
         $geofenceData = Pengaturan::get('attendance_geofence_data');
         $geofenceActive = false;
@@ -65,6 +67,7 @@ class AbsensiController extends Controller
             'geofenceActive',
             'currentTimeLabel',
             'isWeekday',
+            'activeDaysLabel',
         ));
     }
 
@@ -110,10 +113,21 @@ class AbsensiController extends Controller
         $attendance = $profile->absensi()->whereDate('tanggal', $today)->first();
 
         if (! $attendance) {
-            $attendance = $profile->absensi()->create([
-                'tanggal' => $today,
-                'status' => 'belum_absen',
-            ]);
+            // Dua request nyaris bersamaan (double-tap) bisa sama-sama lolos cek "belum
+            // ada row" di atas - constraint unique di DB yang jaga integritasnya, di sini
+            // tinggal ambil ulang baris yang menang, bukan biarkan exception-nya bocor.
+            try {
+                $attendance = $profile->absensi()->create([
+                    'tanggal' => $today,
+                    'status' => 'belum_absen',
+                ]);
+            } catch (QueryException $e) {
+                $attendance = $profile->absensi()->whereDate('tanggal', $today)->first();
+
+                if (! $attendance) {
+                    throw $e;
+                }
+            }
         }
 
         // Yang ditolak adalah siswa yang kehadirannya memang sudah tercatat. Siswa
