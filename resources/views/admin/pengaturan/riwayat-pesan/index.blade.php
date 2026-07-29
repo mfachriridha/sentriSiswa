@@ -103,11 +103,16 @@
                         <div class="inline-flex items-center gap-2">
                             <a href="{{ route('admin.pengaturan.whatsapp.riwayat.show', $p) }}"
                                class="inline-flex items-center rounded-lg border border-gray-300 px-2.5 py-1 text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Detail</a>
-                            <form method="POST" action="{{ route('admin.pengaturan.whatsapp.riwayat.kirim-ulang', $p) }}">
-                                @csrf
-                                <button type="submit"
-                                        class="inline-flex items-center rounded-lg border border-red-300 bg-white px-2.5 py-1 text-xs font-semibold text-red-700 hover:bg-red-50 transition-colors">Kirim Ulang</button>
-                            </form>
+                            @if ($p->dibuat_pada->isToday())
+                                <form method="POST" action="{{ route('admin.pengaturan.whatsapp.riwayat.kirim-ulang', $p) }}">
+                                    @csrf
+                                    <button type="submit"
+                                            class="inline-flex items-center rounded-lg border border-red-300 bg-white px-2.5 py-1 text-xs font-semibold text-red-700 hover:bg-red-50 transition-colors">Kirim Ulang</button>
+                                </form>
+                            @else
+                                <span class="inline-flex items-center rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-semibold text-gray-400"
+                                      title="Pesan dari hari lain, datanya sudah kedaluwarsa">Kirim Ulang</span>
+                            @endif
                         </div>
                     </td>
                 </tr>

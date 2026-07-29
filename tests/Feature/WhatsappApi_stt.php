@@ -1,11 +1,17 @@
 <?php
 
+use App\Models\Absensi;
 use App\Models\Pengaturan;
 use App\Models\Pengguna;
 use App\Models\PesanWhatsapp;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 
 uses(RefreshDatabase::class);
+
+afterEach(function () {
+    Carbon::setTestNow();
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -96,4 +102,59 @@ test('admin mengirim ulang pesan whatsapp dari riwayat', function () {
     $this->followingRedirects()
         ->post("/admin/pengaturan/whatsapp/riwayat/{$pesan->id}/kirim-ulang")
         ->assertSee('Pesan sedang diproses ulang.');
+});
+
+// TS.WAP.009 / TC.WAP.009.001 — Negative
+test('admin gagal mengirim ulang pesan yang dibuat di hari lain', function () {
+    Carbon::setTestNow('2026-07-05 08:00:00');
+    $pesan = PesanWhatsapp::create([
+        'telepon_penerima' => '081234567890',
+        'nama_penerima' => 'Raka Pradipta',
+        'tipe_pesan' => 'attendance_report',
+        'isi_pesan' => 'Laporan absensi harian.',
+        'status' => 'failed',
+    ]);
+
+    Carbon::setTestNow('2026-07-06 08:00:00');
+    adminWhatsapp();
+    Pengaturan::set('fonnte_token', 'token-yang-sah');
+    layananWhatsappBerhasil();
+
+    $this->followingRedirects()
+        ->post("/admin/pengaturan/whatsapp/riwayat/{$pesan->id}/kirim-ulang")
+        ->assertSee('Pesan ini dibuat di hari lain, datanya sudah kedaluwarsa. Kirim ulang tidak tersedia untuk pesan lama.');
+});
+
+// TS.WAP.010 / TC.WAP.010.001 — Positive
+test('kirim ulang laporan absensi menyusun ulang isi pesan dari kondisi absensi terkini', function () {
+    Carbon::setTestNow('2026-07-06 08:00:00'); // Senin, hari absensi.
+    [$wali, $kelas, $siswa] = kelasBerisiSiswa();
+    catatKehadiran($siswa->nisn, '2026-07-06', 'alpha');
+
+    $pesan = PesanWhatsapp::create([
+        'kelas_id' => $kelas->id,
+        'telepon_penerima' => '081234567890',
+        'nama_penerima' => $wali->nama,
+        'tipe_pesan' => 'attendance_report',
+        'isi_pesan' => 'Isi lama: Ahmad Fauzi belum absen.',
+        'status' => 'sent',
+        'dikirim_pada' => now(),
+    ]);
+
+    // Wali kelas mengoreksi status siswa dari Alpha jadi Hadir setelah laporan
+    // pertama terkirim.
+    Absensi::where('profil_siswa_id', $siswa->nisn)
+        ->whereDate('tanggal', '2026-07-06')
+        ->update(['status' => 'hadir']);
+
+    adminWhatsapp();
+    Pengaturan::set('fonnte_token', 'token-yang-sah');
+    layananWhatsappBerhasil();
+
+    // Isi pesan yang dikirim ulang mengikuti kondisi absensi SEKARANG (semua
+    // sudah hadir), bukan teks lama yang masih menyebut siswa itu belum absen.
+    $this->followingRedirects()
+        ->post("/admin/pengaturan/whatsapp/riwayat/{$pesan->id}/kirim-ulang")
+        ->assertSee('Seluruh siswa telah absen hari ini')
+        ->assertDontSee('Isi lama');
 });

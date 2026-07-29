@@ -3,11 +3,10 @@
 namespace App\Console\Commands;
 
 use App\Jobs\SendWhatsAppNotification;
-use App\Models\Absensi;
 use App\Models\Kelas;
 use App\Models\Pengaturan;
 use App\Models\PesanWhatsapp;
-use App\Models\TokenAksesAbsensi;
+use App\Services\AttendanceReportMessageBuilder;
 use App\Services\FonnteService;
 use Illuminate\Console\Command;
 
@@ -18,7 +17,7 @@ class SendAttendanceReport extends Command
 
     protected $description = 'Kirim laporan absensi harian ke wali kelas via WhatsApp';
 
-    public function handle(FonnteService $whatsapp): int
+    public function handle(FonnteService $whatsapp, AttendanceReportMessageBuilder $messageBuilder): int
     {
         if (! Pengaturan::hariAbsenAktif()) {
             $this->info('Hari ini bukan hari aktif absensi. Laporan tidak dikirim.');
@@ -67,15 +66,6 @@ class SendAttendanceReport extends Command
         $delaySeconds = 0;
 
         foreach ($classes as $kelas) {
-            $waliKelas = $kelas->waliKelas;
-            $phone = $waliKelas?->profilGuru?->telepon;
-
-            if (blank($phone)) {
-                $this->warn("Wali kelas {$kelas->nama} tidak punya nomor HP. Lewati.");
-
-                continue;
-            }
-
             $alreadySent = PesanWhatsapp::where('kelas_id', $kelas->id)
                 ->where('tipe_pesan', 'attendance_report')
                 ->whereDate('dibuat_pada', $today)
@@ -86,64 +76,24 @@ class SendAttendanceReport extends Command
                 continue;
             }
 
-            $studentProfiles = $kelas->siswa;
-            $totalStudents = $studentProfiles->count();
+            $built = $messageBuilder->build($kelas, $today);
 
-            if ($totalStudents === 0) {
+            if ($built === null) {
                 continue;
             }
 
-            $profileIds = $studentProfiles->pluck('nisn');
-            $attendances = Absensi::whereIn('profil_siswa_id', $profileIds)
-                ->whereDate('tanggal', $today)
-                ->get()
-                ->keyBy('profil_siswa_id');
+            if (blank($built['telepon_penerima'])) {
+                $this->warn("Wali kelas {$kelas->nama} tidak punya nomor HP. Link absensi tetap dibuat, laporan WA dilewati.");
 
-            $sudahAbsen = $studentProfiles->filter(fn ($sp) => $attendances->has($sp->nisn)
-                && in_array($attendances[$sp->nisn]->status, ['hadir', 'izin', 'sakit']));
-
-            $belumAbsen = $studentProfiles->reject(fn ($sp) => $attendances->has($sp->nisn)
-                && in_array($attendances[$sp->nisn]->status, ['hadir', 'izin', 'sakit']));
-
-            $sudahCount = $sudahAbsen->count();
-            $belumCount = $belumAbsen->count();
-
-            $aksesToken = TokenAksesAbsensi::buatAtauPerbarui($kelas->id, $today);
-            $linkAbsensi = route('absensi.publik', $aksesToken->token);
-
-            $hari = now()->locale('id')->translatedFormat('l');
-            $tanggal = now()->locale('id')->translatedFormat('d F Y');
-            $waktu = now()->format('H:i').' WIB';
-
-            $message = "📋 *LAPORAN ABSENSI HARIAN*\n";
-            $message .= "🏫 Kelas *{$kelas->nama}*\n";
-            $message .= "👤 Wali Kelas: {$waliKelas->nama}\n";
-            $message .= "📅 {$hari}, {$tanggal} · {$waktu}\n";
-            $message .= "\n";
-            $message .= "━━━━━━━━━━━━━━━━\n";
-            $message .= "✅ Sudah absen : *{$sudahCount}* siswa\n";
-            $message .= "❌ Belum absen : *{$belumCount}* siswa\n";
-            $message .= "📊 Total          : *{$totalStudents}* siswa\n";
-            $message .= "━━━━━━━━━━━━━━━━\n";
-
-            if ($belumCount === 0) {
-                $message .= "\n🎉 Seluruh siswa telah absen hari ini!\n";
-            } else {
-                $message .= "\n📌 *Belum absen:*\n";
-                foreach ($belumAbsen as $sp) {
-                    $message .= '• '.($sp->pengguna?->nama ?? 'Siswa NISN '.$sp->nisn)."\n";
-                }
+                continue;
             }
-
-            // Isinya hasil absensi, bukan formulir input.
-            $message .= "\n🔗 Cek hasil absensi:\n{$linkAbsensi}\n";
 
             $pesanWa = PesanWhatsapp::create([
                 'kelas_id' => $kelas->id,
-                'telepon_penerima' => $phone,
-                'nama_penerima' => $waliKelas->nama,
+                'telepon_penerima' => $built['telepon_penerima'],
+                'nama_penerima' => $built['nama_penerima'],
                 'tipe_pesan' => 'attendance_report',
-                'isi_pesan' => $message,
+                'isi_pesan' => $built['isi_pesan'],
                 'status' => 'pending',
             ]);
 

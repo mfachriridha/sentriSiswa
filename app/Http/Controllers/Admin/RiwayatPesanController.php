@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Jobs\SendWhatsAppNotification;
 use App\Models\Kelas;
 use App\Models\PesanWhatsapp;
+use App\Services\AttendanceReportMessageBuilder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -41,14 +42,35 @@ class RiwayatPesanController extends Controller
         return view('admin.pengaturan.riwayat-pesan.show', compact('pesanWhatsapp'));
     }
 
-    public function resend(PesanWhatsapp $pesanWhatsapp): RedirectResponse
+    public function resend(PesanWhatsapp $pesanWhatsapp, AttendanceReportMessageBuilder $messageBuilder): RedirectResponse
     {
-        $pesanWhatsapp->update([
-            'status' => 'pending',
-            'percobaan' => 0,
-            'respons' => null,
-            'dikirim_pada' => null,
-        ]);
+        // Pesan yang dibuat di hari lain sudah pasti basi - tanggal, hitungan
+        // sudah/belum absen, dan link absensinya semua mengacu ke hari itu, bukan
+        // hari ini. Mengirim ulang apa adanya cuma menyesatkan penerimanya.
+        if (! $pesanWhatsapp->dibuat_pada->isToday()) {
+            return redirect()->route('admin.pengaturan.whatsapp.riwayat.show', $pesanWhatsapp)
+                ->with('error', 'Pesan ini dibuat di hari lain, datanya sudah kedaluwarsa. Kirim ulang tidak tersedia untuk pesan lama.');
+        }
+
+        if ($pesanWhatsapp->tipe_pesan === 'attendance_report' && $pesanWhatsapp->kelas) {
+            // Isi pesan disusun ulang dari kondisi absensi TERKINI, bukan sekadar
+            // mengirim ulang teks lama yang mungkin sudah tidak sesuai kalau status
+            // absensi ada yang diubah wali kelas setelah laporan pertama terkirim.
+            $refreshed = $messageBuilder->build($pesanWhatsapp->kelas, $pesanWhatsapp->dibuat_pada->toDateString());
+
+            if ($refreshed === null || blank($refreshed['telepon_penerima'])) {
+                return redirect()->route('admin.pengaturan.whatsapp.riwayat.show', $pesanWhatsapp)
+                    ->with('error', 'Pesan tidak bisa disusun ulang: kelas ini tidak lagi punya siswa atau wali kelasnya tidak punya nomor HP.');
+            }
+
+            $pesanWhatsapp->fill($refreshed);
+        }
+
+        $pesanWhatsapp->status = 'pending';
+        $pesanWhatsapp->percobaan = 0;
+        $pesanWhatsapp->respons = null;
+        $pesanWhatsapp->dikirim_pada = null;
+        $pesanWhatsapp->save();
 
         SendWhatsAppNotification::dispatch($pesanWhatsapp);
 
