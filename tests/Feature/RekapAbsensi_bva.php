@@ -35,9 +35,11 @@ test('kehadiran tepat pada tanggal mulai ikut dihitung', function () {
 
     catatKehadiran($siswa->nisn, '2026-07-07', 'alpha');
 
-    // Alpha satu-satunya di dalam rentang, jadi kehadirannya nol persen.
-    $this->get('/wali-kelas/absensi'.RENTANG_REKAP)
-        ->assertSee('0%');
+    // Alpha satu-satunya yang masuk rentang, jadi hanya alpha yang terhitung.
+    $respons = $this->get('/wali-kelas/absensi'.RENTANG_REKAP);
+
+    expect(rekapBarisSiswa($respons, 'Ahmad Fauzi'))
+        ->toBe(['hadir' => 0, 'izin' => 0, 'sakit' => 0, 'alpha' => 1]);
 });
 
 // TS.REA.010 / TC.REA.010.002 — Negative — sehari di bawah batas bawah
@@ -48,9 +50,11 @@ test('kehadiran sehari sebelum tanggal mulai tidak ikut dihitung', function () {
     catatKehadiran($siswa->nisn, '2026-07-06', 'alpha');  // Sehari sebelum rentang.
     catatKehadiran($siswa->nisn, '2026-07-08', 'hadir');
 
-    // Alpha di luar rentang diabaikan, jadi kehadirannya tetap penuh.
-    $this->get('/wali-kelas/absensi'.RENTANG_REKAP)
-        ->assertSee('100%');
+    // Alpha di luar rentang diabaikan, jadi yang tercatat hanya hadirnya.
+    $respons = $this->get('/wali-kelas/absensi'.RENTANG_REKAP);
+
+    expect(rekapBarisSiswa($respons, 'Ahmad Fauzi'))
+        ->toBe(['hadir' => 1, 'izin' => 0, 'sakit' => 0, 'alpha' => 0]);
 });
 
 // TS.REA.011 / TC.REA.011.001 — Positive — batas atas
@@ -60,8 +64,10 @@ test('kehadiran tepat pada tanggal selesai ikut dihitung', function () {
 
     catatKehadiran($siswa->nisn, '2026-07-09', 'alpha');
 
-    $this->get('/wali-kelas/absensi'.RENTANG_REKAP)
-        ->assertSee('0%');
+    $respons = $this->get('/wali-kelas/absensi'.RENTANG_REKAP);
+
+    expect(rekapBarisSiswa($respons, 'Ahmad Fauzi'))
+        ->toBe(['hadir' => 0, 'izin' => 0, 'sakit' => 0, 'alpha' => 1]);
 });
 
 // TS.REA.011 / TC.REA.011.002 — Negative — sehari di atas batas atas
@@ -72,8 +78,10 @@ test('kehadiran sehari setelah tanggal selesai tidak ikut dihitung', function ()
     catatKehadiran($siswa->nisn, '2026-07-08', 'hadir');
     catatKehadiran($siswa->nisn, '2026-07-10', 'alpha');  // Sehari setelah rentang.
 
-    $this->get('/wali-kelas/absensi'.RENTANG_REKAP)
-        ->assertSee('100%');
+    $respons = $this->get('/wali-kelas/absensi'.RENTANG_REKAP);
+
+    expect(rekapBarisSiswa($respons, 'Ahmad Fauzi'))
+        ->toBe(['hadir' => 1, 'izin' => 0, 'sakit' => 0, 'alpha' => 0]);
 });
 
 // TS.REA.012 / TC.REA.012.001 — Positive — tepat di batas
@@ -83,7 +91,9 @@ test('rentang satu hari diterima ketika tanggal selesai sama dengan tanggal mula
 
     catatKehadiran($siswa->nisn, '2026-07-07', 'hadir');
 
-    $this->get('/wali-kelas/absensi?mulai=2026-07-07&selesai=2026-07-07')
-        ->assertSee('Ahmad Fauzi')
-        ->assertSee('100%');
+    $respons = $this->get('/wali-kelas/absensi?mulai=2026-07-07&selesai=2026-07-07')
+        ->assertSee('Ahmad Fauzi');
+
+    expect(rekapBarisSiswa($respons, 'Ahmad Fauzi'))
+        ->toBe(['hadir' => 1, 'izin' => 0, 'sakit' => 0, 'alpha' => 0]);
 });

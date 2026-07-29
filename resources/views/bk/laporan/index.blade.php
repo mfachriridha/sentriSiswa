@@ -87,7 +87,6 @@
                     <th class="px-4 py-2.5 text-center text-xs font-medium uppercase tracking-wider text-gray-500">I</th>
                     <th class="px-4 py-2.5 text-center text-xs font-medium uppercase tracking-wider text-gray-500">S</th>
                     <th class="px-4 py-2.5 text-center text-xs font-medium uppercase tracking-wider text-gray-500">A</th>
-                    <th class="px-4 py-2.5 text-center text-xs font-medium uppercase tracking-wider text-gray-500">%</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200 bg-white">
@@ -102,14 +101,10 @@
                         <td class="whitespace-nowrap px-4 py-3 text-center text-sm font-medium text-blue-600">{{ $stat['izin'] }}</td>
                         <td class="whitespace-nowrap px-4 py-3 text-center text-sm font-medium text-purple-600">{{ $stat['sakit'] }}</td>
                         <td class="whitespace-nowrap px-4 py-3 text-center text-sm font-medium text-red-600">{{ $stat['alpha'] }}</td>
-                        <td class="whitespace-nowrap px-4 py-3 text-center text-sm font-medium
-                            {{ $stat['percentage'] >= 80 ? 'text-green-600' : ($stat['percentage'] >= 60 ? 'text-yellow-600' : 'text-red-600') }}">
-                            {{ $stat['percentage'] }}%
-                        </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="10" class="px-6 py-12 text-center text-sm text-gray-500">Belum ada data absensi untuk periode ini.</td>
+                        <td colspan="8" class="px-6 py-12 text-center text-sm text-gray-500">Belum ada data absensi untuk periode ini.</td>
                     </tr>
                 @endforelse
             </tbody>

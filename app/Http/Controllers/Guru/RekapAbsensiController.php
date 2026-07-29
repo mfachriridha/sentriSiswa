@@ -63,7 +63,6 @@ class RekapAbsensiController extends Controller
                 $stat['izin'],
                 $stat['sakit'],
                 $stat['alpha'],
-                $stat['percentage'].'%',
             ];
         })->values()->all();
 
@@ -166,7 +165,7 @@ class RekapAbsensiController extends Controller
     /**
      * @param  Collection<int, ProfilSiswa>  $students
      * @param  Collection<int, Collection<int, Absensi>>  $attendances
-     * @return array<int, array{hadir: int, izin: int, sakit: int, alpha: int, percentage: float}>
+     * @return array<int, array{hadir: int, izin: int, sakit: int, alpha: int}>
      */
     private function calculateStats(Collection $students, Collection $attendances): array
     {
@@ -175,16 +174,12 @@ class RekapAbsensiController extends Controller
         foreach ($students as $student) {
             $studentAttendances = $attendances->get($student->nisn, collect());
             $finalAttendances = $studentAttendances->whereIn('status', ['hadir', 'izin', 'sakit', 'alpha']);
-            $finalAttendanceCount = $finalAttendances->count();
 
             $stats[$student->nisn] = [
                 'hadir' => $finalAttendances->where('status', 'hadir')->count(),
                 'izin' => $finalAttendances->where('status', 'izin')->count(),
                 'sakit' => $finalAttendances->where('status', 'sakit')->count(),
                 'alpha' => $finalAttendances->where('status', 'alpha')->count(),
-                'percentage' => $finalAttendanceCount > 0
-                    ? round(($finalAttendances->where('status', 'hadir')->count() / $finalAttendanceCount) * 100, 1)
-                    : 0,
             ];
         }
 

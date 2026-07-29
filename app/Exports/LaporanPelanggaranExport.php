@@ -27,7 +27,7 @@ class LaporanPelanggaranExport implements WithMultipleSheets
                 'Tanggal', 'NIS', 'Nama', 'Kelas', 'Pelanggaran', 'Kategori', 'Poin', 'Dicatat Oleh',
             ], $this->violationRows),
             new ArraySheetExport('Ringkasan Poin', [
-                'NIS', 'Nama', 'Kelas', 'Sisa Poin', 'Keterangan',
+                'NIS', 'Nama', 'Kelas', 'Sisa Poin',
             ], $this->pointsSummaryRows),
             new ArraySheetExport('Penambahan Poin', [
                 'Tanggal Disetujui', 'NIS', 'Nama', 'Kelas', 'Alasan', 'Poin',

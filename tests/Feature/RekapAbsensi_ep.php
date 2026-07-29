@@ -68,9 +68,11 @@ test('wali kelas menyaring rekap per bulan', function () {
     catatKehadiran($siswa->nisn, '2026-06-01', 'alpha');  // Bulan lain.
     catatKehadiran($siswa->nisn, '2026-07-06', 'hadir');  // Bulan yang dipilih.
 
-    // Alpha di bulan Juni tidak ikut terhitung, jadi Juli tampil penuh.
-    $this->get('/wali-kelas/absensi?month=2026-07')
-        ->assertSee('100%');
+    // Alpha di bulan Juni tidak ikut terhitung, jadi Juli hanya berisi hadirnya.
+    $respons = $this->get('/wali-kelas/absensi?month=2026-07');
+
+    expect(rekapBarisSiswa($respons, 'Ahmad Fauzi'))
+        ->toBe(['hadir' => 1, 'izin' => 0, 'sakit' => 0, 'alpha' => 0]);
 });
 
 /*

@@ -43,10 +43,12 @@ test('guru bk melihat rekap kehadiran seluruh siswa di tingkatnya', function () 
 
     bkMasuk('10');
 
-    $this->get('/bk/laporan?mulai=2026-07-06&selesai=2026-07-10')
+    $respons = $this->get('/bk/laporan?mulai=2026-07-06&selesai=2026-07-10')
         ->assertSee('Rekap Absensi Tingkat 10')
-        ->assertSee('Ahmad Fauzi')
-        ->assertSee('100%');
+        ->assertSee('Ahmad Fauzi');
+
+    expect(rekapBarisSiswa($respons, 'Ahmad Fauzi'))
+        ->toBe(['hadir' => 2, 'izin' => 0, 'sakit' => 0, 'alpha' => 0]);
 });
 
 // TS.RAB.002 / TC.RAB.002.001 — Negative
@@ -65,19 +67,21 @@ test('rekap bk tidak memuat siswa dari tingkat lain', function () {
 });
 
 // TS.RAB.003 / TC.RAB.003.001 — Positive
-test('persentase kehadiran dihitung dari hari yang sudah punya keputusan', function () {
+test('tiap status kehadiran dihitung terpisah pada rekap', function () {
     Carbon::setTestNow('2026-07-10 08:00:00');
     [, , $siswa] = kelasBerisiSiswa();
 
     catatKehadiran($siswa->nisn, '2026-07-06', 'hadir');
     catatKehadiran($siswa->nisn, '2026-07-07', 'hadir');
-    catatKehadiran($siswa->nisn, '2026-07-08', 'alpha');
+    catatKehadiran($siswa->nisn, '2026-07-08', 'izin');
     catatKehadiran($siswa->nisn, '2026-07-09', 'alpha');
 
     bkMasuk('10');
 
-    $this->get('/bk/laporan?mulai=2026-07-06&selesai=2026-07-10')
-        ->assertSee('50%');
+    $respons = $this->get('/bk/laporan?mulai=2026-07-06&selesai=2026-07-10');
+
+    expect(rekapBarisSiswa($respons, 'Ahmad Fauzi'))
+        ->toBe(['hadir' => 2, 'izin' => 1, 'sakit' => 0, 'alpha' => 1]);
 });
 
 // TS.RAB.007 / TC.RAB.007.001 — Positive

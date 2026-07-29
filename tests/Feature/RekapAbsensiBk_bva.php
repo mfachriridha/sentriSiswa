@@ -37,8 +37,10 @@ test('kehadiran tepat pada tanggal mulai ikut dihitung', function () {
 
     bkMasuk('10');
 
-    $this->get('/bk/laporan'.RENTANG_REKAP_BK)
-        ->assertSee('0%');
+    $respons = $this->get('/bk/laporan'.RENTANG_REKAP_BK);
+
+    expect(rekapBarisSiswa($respons, 'Ahmad Fauzi'))
+        ->toBe(['hadir' => 0, 'izin' => 0, 'sakit' => 0, 'alpha' => 1]);
 });
 
 // TS.RAB.010 / TC.RAB.010.002 — Negative — sehari di bawah batas bawah
@@ -51,8 +53,10 @@ test('kehadiran sehari sebelum tanggal mulai tidak ikut dihitung', function () {
 
     bkMasuk('10');
 
-    $this->get('/bk/laporan'.RENTANG_REKAP_BK)
-        ->assertSee('100%');
+    $respons = $this->get('/bk/laporan'.RENTANG_REKAP_BK);
+
+    expect(rekapBarisSiswa($respons, 'Ahmad Fauzi'))
+        ->toBe(['hadir' => 1, 'izin' => 0, 'sakit' => 0, 'alpha' => 0]);
 });
 
 // TS.RAB.011 / TC.RAB.011.001 — Positive — batas atas
@@ -64,8 +68,10 @@ test('kehadiran tepat pada tanggal selesai ikut dihitung', function () {
 
     bkMasuk('10');
 
-    $this->get('/bk/laporan'.RENTANG_REKAP_BK)
-        ->assertSee('0%');
+    $respons = $this->get('/bk/laporan'.RENTANG_REKAP_BK);
+
+    expect(rekapBarisSiswa($respons, 'Ahmad Fauzi'))
+        ->toBe(['hadir' => 0, 'izin' => 0, 'sakit' => 0, 'alpha' => 1]);
 });
 
 // TS.RAB.011 / TC.RAB.011.002 — Negative — sehari di atas batas atas
@@ -78,8 +84,10 @@ test('kehadiran sehari setelah tanggal selesai tidak ikut dihitung', function ()
 
     bkMasuk('10');
 
-    $this->get('/bk/laporan'.RENTANG_REKAP_BK)
-        ->assertSee('100%');
+    $respons = $this->get('/bk/laporan'.RENTANG_REKAP_BK);
+
+    expect(rekapBarisSiswa($respons, 'Ahmad Fauzi'))
+        ->toBe(['hadir' => 1, 'izin' => 0, 'sakit' => 0, 'alpha' => 0]);
 });
 
 // TS.RAB.012 / TC.RAB.012.001 — Positive — tepat di batas
@@ -91,7 +99,9 @@ test('rentang satu hari diterima ketika tanggal selesai sama dengan tanggal mula
 
     bkMasuk('10');
 
-    $this->get('/bk/laporan?mulai=2026-07-07&selesai=2026-07-07')
-        ->assertSee('Ahmad Fauzi')
-        ->assertSee('100%');
+    $respons = $this->get('/bk/laporan?mulai=2026-07-07&selesai=2026-07-07')
+        ->assertSee('Ahmad Fauzi');
+
+    expect(rekapBarisSiswa($respons, 'Ahmad Fauzi'))
+        ->toBe(['hadir' => 1, 'izin' => 0, 'sakit' => 0, 'alpha' => 0]);
 });

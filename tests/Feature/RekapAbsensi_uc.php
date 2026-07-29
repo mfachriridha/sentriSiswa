@@ -40,26 +40,29 @@ test('wali kelas melihat rekap kehadiran kelasnya', function () {
     catatKehadiran($siswa->nisn, '2026-07-07', 'hadir');
     catatKehadiran($siswa->nisn, '2026-07-08', 'hadir');
 
-    $this->get('/wali-kelas/absensi?mulai=2026-07-06&selesai=2026-07-10')
+    $respons = $this->get('/wali-kelas/absensi?mulai=2026-07-06&selesai=2026-07-10')
         ->assertSee('Rekap Absensi')
         ->assertSee('10 IPA 1')
-        ->assertSee('Ahmad Fauzi')
-        ->assertSee('100%');
+        ->assertSee('Ahmad Fauzi');
+
+    expect(rekapBarisSiswa($respons, 'Ahmad Fauzi'))
+        ->toBe(['hadir' => 3, 'izin' => 0, 'sakit' => 0, 'alpha' => 0]);
 });
 
 // TS.REA.002 / TC.REA.002.001 — Positive
-test('persentase kehadiran dihitung dari hari yang sudah punya keputusan', function () {
+test('tiap status kehadiran dihitung terpisah pada rekap', function () {
     Carbon::setTestNow('2026-07-10 08:00:00');
     [, , $siswa] = waliKelasDenganKelas();
 
-    // Dua hari hadir dan dua hari alpha, sehingga kehadirannya separuh.
     catatKehadiran($siswa->nisn, '2026-07-06', 'hadir');
     catatKehadiran($siswa->nisn, '2026-07-07', 'hadir');
-    catatKehadiran($siswa->nisn, '2026-07-08', 'alpha');
+    catatKehadiran($siswa->nisn, '2026-07-08', 'izin');
     catatKehadiran($siswa->nisn, '2026-07-09', 'alpha');
 
-    $this->get('/wali-kelas/absensi?mulai=2026-07-06&selesai=2026-07-10')
-        ->assertSee('50%');
+    $respons = $this->get('/wali-kelas/absensi?mulai=2026-07-06&selesai=2026-07-10');
+
+    expect(rekapBarisSiswa($respons, 'Ahmad Fauzi'))
+        ->toBe(['hadir' => 2, 'izin' => 1, 'sakit' => 0, 'alpha' => 1]);
 });
 
 // TS.REA.003 / TC.REA.003.001 — Positive
@@ -73,8 +76,10 @@ test('rekap menghitung baris absensi apa adanya, tidak bergantung pengaturan har
     // Baris yang sudah tercatat di DB dihitung apa adanya - bukan disaring ulang
     // berdasar pengaturan hari aktif SAAT laporan dibuka. Kalau tidak, mengubah
     // pengaturan itu bisa mengubah rekap tanggal-tanggal lampau secara retroaktif.
-    $this->get('/wali-kelas/absensi?mulai=2026-07-01&selesai=2026-07-10')
-        ->assertSee('50%');
+    $respons = $this->get('/wali-kelas/absensi?mulai=2026-07-01&selesai=2026-07-10');
+
+    expect(rekapBarisSiswa($respons, 'Ahmad Fauzi'))
+        ->toBe(['hadir' => 1, 'izin' => 0, 'sakit' => 0, 'alpha' => 1]);
 });
 
 // TS.REA.007 / TC.REA.007.001 — Positive

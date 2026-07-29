@@ -70,7 +70,6 @@ class LaporanPelanggaranController extends Controller
                 $row['nama'],
                 $row['kelas'],
                 $row['sisa_poin'],
-                $row['sisa_poin'] <= 50 ? 'Perhatian' : '-',
             ])->all();
 
         $pointAdditionRows = $this->approvedPengajuanPoinQuery($filters, $user)->get()

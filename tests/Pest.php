@@ -18,6 +18,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Testing\TestResponse;
 use Maatwebsite\Excel\Facades\Excel;
 use Tests\TestCase;
 
@@ -446,4 +447,40 @@ function catatPelanggaran(
         'pengurangan_poin' => $pengurangan,
         'status' => 'approved',
     ]);
+}
+
+/**
+ * Membaca angka Hadir, Izin, Sakit, dan Alpha milik seorang siswa langsung dari
+ * baris tabel rekap absensi.
+ *
+ * Dipakai supaya pengujian membuktikan angkanya secara tepat, bukan sekadar
+ * "ada angka sekian di suatu tempat di halaman" - angka satu digit terlalu
+ * mudah cocok dengan bagian halaman lain. Empat kolom terakhir selalu H/I/S/A,
+ * baik di rekap wali kelas maupun BK yang punya kolom Kelas tambahan.
+ *
+ * @return array{hadir: int, izin: int, sakit: int, alpha: int}
+ */
+function rekapBarisSiswa(TestResponse $respons, string $nama): array
+{
+    preg_match_all('/<tr[^>]*>(.*?)<\/tr>/s', $respons->getContent(), $barisTabel);
+
+    foreach ($barisTabel[1] as $baris) {
+        if (! str_contains(strip_tags($baris), $nama)) {
+            continue;
+        }
+
+        preg_match_all('/<td[^>]*>(.*?)<\/td>/s', $baris, $sel);
+
+        $nilai = array_map(fn (string $isi): string => trim(strip_tags($isi)), $sel[1]);
+        [$hadir, $izin, $sakit, $alpha] = array_slice($nilai, -4);
+
+        return [
+            'hadir' => (int) $hadir,
+            'izin' => (int) $izin,
+            'sakit' => (int) $sakit,
+            'alpha' => (int) $alpha,
+        ];
+    }
+
+    throw new RuntimeException("Baris rekap untuk siswa \"{$nama}\" tidak ditemukan di halaman.");
 }

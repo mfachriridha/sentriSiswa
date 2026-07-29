@@ -30,19 +30,15 @@
                     <th class="{{ $th }}">Nama</th>
                     <th class="{{ $th }}">Kelas</th>
                     <th class="{{ $th }}">Sisa Poin</th>
-                    <th class="{{ $th }}">Keterangan</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach ($pointsSummary as $row)
-                    <tr class="{{ $row['sisa_poin'] <= 50 ? 'bg-red-50' : '' }}">
+                    <tr>
                         <td class="{{ $td }}">{{ $row['nis'] }}</td>
                         <td class="{{ $td }}">{{ $row['nama'] }}</td>
                         <td class="{{ $td }}">{{ $row['kelas'] }}</td>
                         <td class="{{ $td }}">{{ $row['sisa_poin'] }}</td>
-                        <td class="{{ $td }} {{ $row['sisa_poin'] <= 50 ? 'font-bold text-red-700' : '' }}">
-                            {{ $row['sisa_poin'] <= 50 ? 'Perhatian' : '-' }}
-                        </td>
                     </tr>
                 @endforeach
             </tbody>
@@ -74,7 +70,7 @@
                     <td class="{{ $td }}">{{ $violation->profilSiswa?->kelas?->nama ?? '-' }}</td>
                     <td class="{{ $td }}">{{ $violation->nama_pelanggaran }}</td>
                     <td class="{{ $td }}">{{ $categoryLabels[$violation->kategori_pelanggaran] ?? $violation->kategori_pelanggaran }}</td>
-                    <td class="{{ $td }} font-semibold text-red-700">-{{ $violation->pengurangan_poin }}</td>
+                    <td class="{{ $td }}">-{{ $violation->pengurangan_poin }}</td>
                     <td class="{{ $td }}">{{ $violation->dicatatOleh?->nama ?? '-' }}</td>
                 </tr>
             @empty
@@ -107,7 +103,7 @@
                     <td class="{{ $td }}">{{ $pengajuan->profilSiswa?->pengguna?->nama ?? '-' }}</td>
                     <td class="{{ $td }}">{{ $pengajuan->profilSiswa?->kelas?->nama ?? '-' }}</td>
                     <td class="{{ $td }}">{{ $pengajuan->alasan }}</td>
-                    <td class="{{ $td }} font-semibold text-green-700">+{{ $pengajuan->jumlah_poin }}</td>
+                    <td class="{{ $td }}">+{{ $pengajuan->jumlah_poin }}</td>
                 </tr>
             @empty
                 <tr>

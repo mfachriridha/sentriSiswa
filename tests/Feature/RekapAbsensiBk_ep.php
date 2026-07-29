@@ -72,7 +72,9 @@ test('guru bk menyaring rekap per bulan', function () {
 
     bkMasuk('10');
 
-    // Alpha di bulan Juni tidak ikut terhitung, jadi Juli tampil penuh.
-    $this->get('/bk/laporan?month=2026-07')
-        ->assertSee('100%');
+    // Alpha di bulan Juni tidak ikut terhitung, jadi Juli hanya berisi hadirnya.
+    $respons = $this->get('/bk/laporan?month=2026-07');
+
+    expect(rekapBarisSiswa($respons, 'Ahmad Fauzi'))
+        ->toBe(['hadir' => 1, 'izin' => 0, 'sakit' => 0, 'alpha' => 0]);
 });

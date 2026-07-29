@@ -4,8 +4,10 @@ namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithStrictNullComparison;
 
-class ArrayExport implements FromArray, WithHeadings
+/** Lihat catatan WithStrictNullComparison di RekapAbsensiExport: tanpa itu angka 0 hilang. */
+class ArrayExport implements FromArray, WithHeadings, WithStrictNullComparison
 {
     /**
      * @param  list<string>  $headings
