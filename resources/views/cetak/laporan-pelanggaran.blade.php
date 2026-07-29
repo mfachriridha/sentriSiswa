@@ -56,6 +56,7 @@
         <thead>
             <tr class="bg-slate-100">
                 <th class="{{ $th }}">Tanggal</th>
+                <th class="{{ $th }}">NIS</th>
                 <th class="{{ $th }}">Siswa</th>
                 <th class="{{ $th }}">Kelas</th>
                 <th class="{{ $th }}">Pelanggaran</th>
@@ -68,6 +69,7 @@
             @forelse ($violations as $violation)
                 <tr>
                     <td class="{{ $td }}">{{ $violation->tanggal_pelanggaran->locale('id')->translatedFormat('d F Y') }}</td>
+                    <td class="{{ $td }}">{{ $violation->profilSiswa?->nis ?? '-' }}</td>
                     <td class="{{ $td }}">{{ $violation->profilSiswa?->pengguna?->nama ?? '-' }}</td>
                     <td class="{{ $td }}">{{ $violation->profilSiswa?->kelas?->nama ?? '-' }}</td>
                     <td class="{{ $td }}">{{ $violation->nama_pelanggaran }}</td>
@@ -77,7 +79,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td class="{{ $td }} text-center text-slate-500" colspan="7">Tidak ada data laporan.</td>
+                    <td class="{{ $td }} text-center text-slate-500" colspan="8">Tidak ada data laporan.</td>
                 </tr>
             @endforelse
         </tbody>
@@ -85,11 +87,12 @@
 </section>
 
 <section>
-    <h2 class="mb-2 text-sm font-bold text-slate-800">Penambahan Poin (Disetujui)</h2>
+    <h2 class="mb-2 text-sm font-bold text-slate-800">Penambahan Poin</h2>
     <table class="w-full border-collapse text-xs">
         <thead>
             <tr class="bg-slate-100">
                 <th class="{{ $th }}">Tanggal Disetujui</th>
+                <th class="{{ $th }}">NIS</th>
                 <th class="{{ $th }}">Siswa</th>
                 <th class="{{ $th }}">Kelas</th>
                 <th class="{{ $th }}">Alasan</th>
@@ -100,6 +103,7 @@
             @forelse ($pengajuanPoin as $pengajuan)
                 <tr>
                     <td class="{{ $td }}">{{ $pengajuan->disetujui_pada?->locale('id')->translatedFormat('d F Y') ?? '-' }}</td>
+                    <td class="{{ $td }}">{{ $pengajuan->profilSiswa?->nis ?? '-' }}</td>
                     <td class="{{ $td }}">{{ $pengajuan->profilSiswa?->pengguna?->nama ?? '-' }}</td>
                     <td class="{{ $td }}">{{ $pengajuan->profilSiswa?->kelas?->nama ?? '-' }}</td>
                     <td class="{{ $td }}">{{ $pengajuan->alasan }}</td>
@@ -107,7 +111,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td class="{{ $td }} text-center text-slate-500" colspan="5">
+                    <td class="{{ $td }} text-center text-slate-500" colspan="6">
                         Tidak ada penambahan poin disetujui pada rentang ini.
                     </td>
                 </tr>

@@ -65,7 +65,7 @@
 
 <div class="mt-6 overflow-hidden rounded-xl border border-gray-200 bg-white">
     <div class="border-b border-gray-200 p-4">
-        <h2 class="text-base font-semibold text-gray-900">Penambahan Poin (Disetujui)</h2>
+        <h2 class="text-base font-semibold text-gray-900">Penambahan Poin</h2>
     </div>
     <div class="overflow-x-auto">
         <table class="min-w-full text-left text-sm">

@@ -53,7 +53,7 @@ test('laporan memuat penambahan poin yang sudah disetujui', function () {
     kesiswaanMasuk();
 
     $this->get('/kesiswaan/laporan')
-        ->assertSee('Penambahan Poin (Disetujui)')
+        ->assertSee('Penambahan Poin')
         ->assertSee('Juara lomba cerdas cermat.')
         ->assertSee('+5');
 });
@@ -69,7 +69,7 @@ test('kesiswaan mengunduh laporan dalam berkas excel', function () {
     $this->get('/kesiswaan/laporan/ekspor-excel')
         ->assertSuccessful();
 
-    Excel::assertDownloaded('laporan-pelanggaran.xlsx');
+    Excel::assertDownloaded('laporan-pelanggaran-semua-tanggal.xlsx');
 });
 
 // TS.LAP.013 / TC.LAP.013.001 — Negative
@@ -100,7 +100,7 @@ test('kesiswaan membuka halaman cetak laporan', function () {
         ->assertSee('Laporan Kesiswaan')
         ->assertSee('Ahmad Fauzi')
         ->assertSee('10 IPA 1')
-        ->assertSee('Penambahan Poin (Disetujui)')
+        ->assertSee('Penambahan Poin')
         ->assertSee('Cetak / Simpan PDF');
 });
 
