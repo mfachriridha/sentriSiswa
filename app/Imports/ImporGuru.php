@@ -5,6 +5,7 @@ namespace App\Imports;
 use App\Models\Kelas;
 use App\Models\Pengguna;
 use App\Models\ProfilGuru;
+use App\Services\FormatNama;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -181,7 +182,7 @@ class ImporGuru implements ToCollection, WithChunkReading, WithHeadingRow
     protected function parseRow(Collection $row): array
     {
         if ($this->isOldFormat) {
-            $nama = trim((string) ($row['walas'] ?? ''));
+            $nama = FormatNama::rapikan((string) ($row['walas'] ?? ''));
             $nipRaw = isset($row['nip']) && $row['nip'] !== '-' ? trim((string) $row['nip']) : null;
             $nip = $nipRaw ? str_replace(' ', '', $nipRaw) : null;
             $className = trim((string) ($row['kelas'] ?? ''));
@@ -201,7 +202,7 @@ class ImporGuru implements ToCollection, WithChunkReading, WithHeadingRow
             ];
         }
 
-        $nama = trim((string) ($row['nama'] ?? ''));
+        $nama = FormatNama::rapikan((string) ($row['nama'] ?? ''));
         $nipRaw = isset($row['nip']) && $row['nip'] !== '-' ? trim((string) $row['nip']) : null;
         $nip = $nipRaw ? str_replace(' ', '', $nipRaw) : null;
         $className = trim((string) ($row['kelas'] ?? ''));

@@ -17,7 +17,7 @@ class UpdateGuruRequest extends FormRequest
         $user = $this->route('guru');
 
         return [
-            'nama' => ['required', 'string', 'min:3', 'max:100', "regex:/^[\pL\s.\'-]+$/u"],
+            'nama' => ['required', 'string', 'min:3', 'max:100', "regex:/^[\pL\s.,\'-]+$/u"],
             'nip' => ['required', 'string', 'max:30', "unique:profil_guru,nip,{$user->profilGuru?->nip},nip"],
             'peran' => ['required', 'in:wali_kelas,bk,kesiswaan'],
             'tingkat' => ['nullable', 'required_if:peran,bk', 'in:10,11,12'],

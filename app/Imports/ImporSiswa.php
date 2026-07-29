@@ -5,6 +5,7 @@ namespace App\Imports;
 use App\Models\Kelas;
 use App\Models\Pengguna;
 use App\Models\ProfilSiswa;
+use App\Services\FormatNama;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -267,7 +268,7 @@ class ImporSiswa implements ToCollection, WithChunkReading, WithHeadingRow
      */
     public static function rapikanBaris(mixed $row): array
     {
-        $nama = trim((string) ($row['nama'] ?? ''));
+        $nama = FormatNama::rapikan((string) ($row['nama'] ?? ''));
         $nis = self::bersihkanNomor($row['nis'] ?? null);
         $nisn = self::bersihkanNomor($row['nisn'] ?? null);
         $nisn = $nisn !== null ? str_pad($nisn, 10, '0', STR_PAD_LEFT) : null;

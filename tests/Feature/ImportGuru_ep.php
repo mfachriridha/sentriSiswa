@@ -143,3 +143,22 @@ test('baris guru tanpa nip dilewati dan alasannya ditampilkan', function () {
     ]))
         ->assertSee('NIP kosong, guru harus didaftarkan manual oleh admin');
 });
+
+// TS.IMG.006 / TC.IMG.006.001 — Positive
+test('nama guru dari berkas dirapikan tanpa merusak penulisan gelarnya', function () {
+    adminImporGuru();
+
+    // Berkas sekolah menulis nama dengan HURUF BESAR SEMUA, tetapi gelarnya
+    // sudah ditulis benar. Gelar punya kapitalisasi yang tidak mengikuti pola
+    // kata biasa, jadi tidak boleh ikut diseragamkan.
+    jalankanImporGuru(berkasImporGuru([
+        ['nama' => 'SRI RAHAYU, S.Pd', 'nip' => '198501012020121006'],
+        ['nama' => 'FARHAH SYARIFAH, S.PdI', 'nip' => '198501012020121007'],
+        ['nama' => 'NURWANTI PUJI L , ST., S.Pd', 'nip' => '198501012020121008'],
+    ]))->assertSee('3 guru baru dibuat');
+
+    $this->get('/admin/guru')
+        ->assertSee('Sri Rahayu, S.Pd')
+        ->assertSee('Farhah Syarifah, S.PdI')
+        ->assertSee('Nurwanti Puji L, ST., S.Pd');
+});
