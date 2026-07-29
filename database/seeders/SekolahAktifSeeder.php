@@ -33,9 +33,6 @@ use Illuminate\Support\Facades\Storage;
  */
 class SekolahAktifSeeder extends Seeder
 {
-    /** Kelas ini sengaja dibiarkan mentah, untuk memperagakan alur impor dari nol. */
-    private const KELAS_DIKECUALIKAN = '11 IPA 6';
-
     private const HARI_KE_BELAKANG = 30;
 
     private const JUMLAH_POTRET = 70;
@@ -55,7 +52,7 @@ class SekolahAktifSeeder extends Seeder
             return;
         }
 
-        $this->command?->info("Menghidupkan {$siswa->count()} siswa (kelas ".self::KELAS_DIKECUALIKAN.' sengaja dilewati).');
+        $this->command?->info("Menghidupkan {$siswa->count()} siswa di semua kelas.");
 
         $this->daftarkanSiswa($siswa);
         $this->catatAbsensi($siswa);
@@ -64,8 +61,7 @@ class SekolahAktifSeeder extends Seeder
     }
 
     /**
-     * Seluruh siswa yang ikut dihidupkan: semua kelas kecuali kelas yang
-     * sengaja dibiarkan mentah.
+     * Seluruh siswa yang ikut dihidupkan, semua kelas.
      *
      * @return Collection<int, ProfilSiswa>
      */
@@ -74,7 +70,6 @@ class SekolahAktifSeeder extends Seeder
         return ProfilSiswa::query()
             ->with('pengguna')
             ->whereHas('pengguna', fn ($query) => $query->where('peran', 'siswa'))
-            ->whereDoesntHave('kelas', fn ($query) => $query->where('nama', self::KELAS_DIKECUALIKAN))
             ->orderBy('nisn')
             ->get();
     }
@@ -92,15 +87,22 @@ class SekolahAktifSeeder extends Seeder
 
         // Kata sandinya sama untuk semua, jadi cukup di-hash sekali. Meng-hash
         // 1.500 kali akan makan waktu berpuluh detik tanpa manfaat apa pun.
-        $sandi = Hash::make('password');
+        $sandi = Hash::make('password123');
 
-        DB::transaction(function () use ($belumDaftar, $sandi): void {
+        // Nomor urut emailnya diambil dari posisi siswa di daftar PENUH (bukan
+        // cuma yang belum daftar), supaya urutannya stabil walau seeder diulang
+        // setelah sebagian siswa sudah terdaftar duluan.
+        $nomorUrut = $siswa->values()->mapWithKeys(fn (ProfilSiswa $s, int $i): array => [$s->nisn => $i + 1]);
+
+        DB::transaction(function () use ($belumDaftar, $sandi, $nomorUrut): void {
             foreach ($belumDaftar as $profil) {
+                $nomor = str_pad((string) $nomorUrut[$profil->nisn], 3, '0', STR_PAD_LEFT);
+
                 DB::table('pengguna')
                     ->where('id', $profil->pengguna_id)
                     ->update([
                         'status' => 'registered',
-                        'email' => "siswa{$profil->nis}@sentrisiswa.test",
+                        'email' => "siswa{$nomor}@sentrisiswa.test",
                         'password' => $sandi,
                         'diperbarui_pada' => now(),
                     ]);
@@ -292,7 +294,6 @@ class SekolahAktifSeeder extends Seeder
         ];
 
         $kelas = Kelas::query()
-            ->where('nama', '!=', self::KELAS_DIKECUALIKAN)
             ->whereNotNull('wali_kelas_id')
             ->with('siswa')
             ->get();

@@ -23,8 +23,8 @@ uses(RefreshDatabase::class);
 | absensi sebulan terakhir dibuat, sebagian siswa diberi pelanggaran, dan antrean
 | pengajuan poin diisi.
 |
-| Dua janji yang harus dipegang: seeder tidak pernah menghapus apa pun, dan kelas
-| 11 IPA 6 dibiarkan mentah supaya bisa dipakai memperagakan alur impor dari nol.
+| Janji yang harus dipegang: seeder tidak pernah menghapus apa pun, dan
+| SEMUA kelas ikut dihidupkan - tidak ada kelas yang sengaja dilewati.
 |
 */
 
@@ -32,14 +32,14 @@ afterEach(function () {
     Carbon::setTestNow();
 });
 
-/** Sekolah kecil dengan satu kelas biasa dan satu kelas yang dikecualikan. */
+/** Sekolah kecil dengan dua kelas biasa, keduanya harus ikut dihidupkan. */
 function sekolahSebelumDihidupkan(): array
 {
     $kesiswaan = Pengguna::factory()->studentAffairs()->create(['status' => 'registered']);
 
     $wali = Pengguna::factory()->homeroom()->create(['status' => 'registered']);
-    $kelas = Kelas::create(['nama' => '10 IPA 1', 'tingkat' => '10', 'wali_kelas_id' => $wali->id]);
-    $kelasDikecualikan = Kelas::create(['nama' => '11 IPA 6', 'tingkat' => '11', 'wali_kelas_id' => $wali->id]);
+    $kelasA = Kelas::create(['nama' => '10 IPA 1', 'tingkat' => '10', 'wali_kelas_id' => $wali->id]);
+    $kelasB = Kelas::create(['nama' => '11 IPA 6', 'tingkat' => '11', 'wali_kelas_id' => $wali->id]);
 
     JenisPelanggaran::create([
         'nama' => 'Terlambat masuk kelas',
@@ -63,10 +63,10 @@ function sekolahSebelumDihidupkan(): array
         ]);
     };
 
-    $siswa = collect(range(1, 24))->map(fn (int $n) => $buatSiswa($kelas, $n));
-    $siswaDikecualikan = collect(range(101, 103))->map(fn (int $n) => $buatSiswa($kelasDikecualikan, $n));
+    $siswaA = collect(range(1, 24))->map(fn (int $n) => $buatSiswa($kelasA, $n));
+    $siswaB = collect(range(101, 103))->map(fn (int $n) => $buatSiswa($kelasB, $n));
 
-    return [$kesiswaan, $kelas, $siswa, $siswaDikecualikan];
+    return [$kesiswaan, $kelasA, $siswaA, $siswaB];
 }
 
 test('seeder mendaftarkan siswa dan mengisi absensi, pelanggaran, serta pengajuan poin', function () {
@@ -109,25 +109,20 @@ test('seeder mendaftarkan siswa dan mengisi absensi, pelanggaran, serta pengajua
         ->and(PengajuanPoin::where('status', 'approved')->exists())->toBeTrue();
 });
 
-test('kelas 11 IPA 6 dibiarkan mentah tanpa akun, absensi, maupun pelanggaran', function () {
+test('seeder menghidupkan semua kelas, tidak ada yang dilewati', function () {
     Carbon::setTestNow('2026-07-10 08:00:00');
-    [, , , $siswaDikecualikan] = sekolahSebelumDihidupkan();
+    [, , , $siswaKelasKedua] = sekolahSebelumDihidupkan();
 
     $this->seed(SekolahAktifSeeder::class);
 
-    $nisnDikecualikan = $siswaDikecualikan->pluck('nisn');
+    $nisnKelasKedua = $siswaKelasKedua->pluck('nisn');
 
-    $terdaftar = Pengguna::whereIn('id', $siswaDikecualikan->pluck('pengguna_id'))
+    $terdaftar = Pengguna::whereIn('id', $siswaKelasKedua->pluck('pengguna_id'))
         ->where('status', 'registered')
         ->count();
 
-    expect($terdaftar)->toBe(0)
-        ->and(Absensi::whereIn('profil_siswa_id', $nisnDikecualikan)->exists())->toBeFalse()
-        ->and(PelanggaranSiswa::whereIn('profil_siswa_id', $nisnDikecualikan)->exists())->toBeFalse()
-        ->and(PengajuanPoin::whereIn('profil_siswa_id', $nisnDikecualikan)->exists())->toBeFalse();
-
-    // Siswanya sendiri tetap ada; seeder tidak pernah menghapus apa pun.
-    expect(ProfilSiswa::whereIn('nisn', $nisnDikecualikan)->count())->toBe($siswaDikecualikan->count());
+    expect($terdaftar)->toBe($siswaKelasKedua->count())
+        ->and(Absensi::whereIn('profil_siswa_id', $nisnKelasKedua)->exists())->toBeTrue();
 });
 
 test('seeder yang dijalankan dua kali tidak menggandakan data', function () {
