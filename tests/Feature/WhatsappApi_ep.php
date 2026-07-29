@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Pengaturan;
 use App\Models\Pengguna;
 use App\Models\PesanWhatsapp;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -40,21 +41,59 @@ function adminWhatsapp(): Pengguna
 function layananWhatsappBerhasil(): void
 {
     Http::fake([
+        // Profil perangkat: token berlaku dan perangkatnya tersambung.
+        'api.fonnte.com/device' => Http::response([
+            'status' => true,
+            'device' => '6281234567890',
+            'device_status' => 'connect',
+            'name' => 'Perangkat Sekolah',
+            'package' => 'Reguler',
+            'quota' => '100',
+            'expired' => '18 November 2029',
+        ], 200),
         'api.fonnte.com/*' => Http::response(['status' => true, 'id' => ['123']], 200),
+    ]);
+}
+
+/** Meniru layanan pengirim WhatsApp yang menolak tokennya. */
+function layananWhatsappMenolakToken(): void
+{
+    Http::fake([
+        'api.fonnte.com/*' => Http::response(['status' => false, 'reason' => 'token invalid'], 200),
     ]);
 }
 
 // TS.WAP.001 / TC.WAP.001.001 — Positive
 test('admin berhasil menyimpan token layanan pengirim whatsapp', function () {
     adminWhatsapp();
+    layananWhatsappBerhasil();
 
     $this->get('/admin/pengaturan/whatsapp')->assertSee('WhatsApp');
 
+    // Token diuji dulu ke layanannya sebelum disimpan, karena token tidak punya
+    // pola yang bisa diperiksa sendiri.
     $this->followingRedirects()
         ->put('/admin/pengaturan/whatsapp', [
             'fonnte_token' => 'token-rahasia-sekolah',
         ])
-        ->assertSee('Konfigurasi WhatsApp berhasil disimpan.');
+        ->assertSee('Token Fonnte berhasil disimpan dan sudah diverifikasi.');
+});
+
+// TS.WAP.001 / TC.WAP.001.002 — Negative
+test('token yang ditolak layanan pengirim tidak ikut tersimpan', function () {
+    adminWhatsapp();
+    Pengaturan::set('fonnte_token', 'token-lama-yang-masih-benar');
+    layananWhatsappMenolakToken();
+
+    $this->from('/admin/pengaturan/whatsapp')
+        ->followingRedirects()
+        ->put('/admin/pengaturan/whatsapp', [
+            'fonnte_token' => 'token-ngawur',
+        ])
+        ->assertSee('Token ditolak Fonnte');
+
+    // Token lama tidak ikut tergusur oleh token yang ternyata salah.
+    expect(Pengaturan::get('fonnte_token'))->toBe('token-lama-yang-masih-benar');
 });
 
 // TS.WAP.008 / TC.WAP.008.001 — Positive

@@ -155,16 +155,20 @@ class PengaturanController extends Controller
         return redirect()->route('admin.pengaturan.lokasi-absen.index')->with('success', 'Lokasi absen berhasil dihapus.');
     }
 
-    public function whatsapp(): View
+    public function whatsapp(FonnteService $whatsapp): View
     {
+        $token = Pengaturan::get('fonnte_token', '');
+
         return view('admin.pengaturan.whatsapp', [
-            'config' => [
-                'token' => Pengaturan::get('fonnte_token', ''),
-            ],
+            'config' => ['token' => $token],
+            // Kondisi perangkat ditanyakan langsung ke Fonnte: token yang benar
+            // pun tidak menjamin pesan terkirim kalau perangkatnya terputus,
+            // kuotanya habis, atau masa aktifnya lewat.
+            'perangkat' => filled($token) ? $whatsapp->deviceProfile() : null,
         ]);
     }
 
-    public function whatsappUpdate(Request $request): RedirectResponse
+    public function whatsappUpdate(Request $request, FonnteService $whatsapp): RedirectResponse
     {
         $validated = $request->validate([
             'fonnte_token' => ['nullable', 'string', 'max:255'],
@@ -175,11 +179,49 @@ class PengaturanController extends Controller
 
         if ($request->boolean('clear_fonnte_token')) {
             Pengaturan::set('fonnte_token', '');
-        } elseif (filled($validated['fonnte_token'] ?? null) || blank(Pengaturan::get('fonnte_token', ''))) {
-            Pengaturan::set('fonnte_token', $validated['fonnte_token'] ?? '');
+
+            return redirect()->route('admin.pengaturan.whatsapp.index')->with('success', 'Token Fonnte berhasil dihapus.');
         }
 
-        return redirect()->route('admin.pengaturan.whatsapp.index')->with('success', 'Konfigurasi WhatsApp berhasil disimpan.');
+        $tokenBaru = $validated['fonnte_token'] ?? '';
+
+        if (blank($tokenBaru) && filled(Pengaturan::get('fonnte_token', ''))) {
+            return redirect()->route('admin.pengaturan.whatsapp.index')->with('success', 'Konfigurasi WhatsApp berhasil disimpan.');
+        }
+
+        // Token tidak punya pola yang bisa diperiksa sendiri, jadi diuji langsung
+        // ke Fonnte. Token ngawur yang lolos tersimpan baru ketahuan salah saat
+        // laporan absensi gagal terkirim - jauh setelah admin meninggalkan
+        // halaman ini.
+        $hasil = $whatsapp->deviceProfile($tokenBaru);
+
+        if ($hasil['success']) {
+            Pengaturan::set('fonnte_token', $tokenBaru);
+
+            return redirect()->route('admin.pengaturan.whatsapp.index')
+                ->with('success', 'Token Fonnte berhasil disimpan dan sudah diverifikasi.');
+        }
+
+        // Gangguan jaringan bukan salah tokennya, jadi admin tidak dikunci karena
+        // itu: tokennya tetap disimpan, tapi diberi tahu bahwa belum terverifikasi.
+        if (self::gagalKarenaJaringan($hasil['error'] ?? '')) {
+            Pengaturan::set('fonnte_token', $tokenBaru);
+
+            return redirect()->route('admin.pengaturan.whatsapp.index')
+                ->with('warning', 'Token disimpan, tapi belum bisa diverifikasi: '.$hasil['error'].' Cek lagi nanti lewat halaman ini.');
+        }
+
+        return redirect()->route('admin.pengaturan.whatsapp.index')
+            ->withErrors(['fonnte_token' => 'Token ditolak Fonnte: '.$hasil['error'].' Token lama tetap dipakai.']);
+    }
+
+    /** Bedakan "token memang salah" dari "Fonnte-nya yang tidak bisa dihubungi". */
+    private static function gagalKarenaJaringan(string $pesan): bool
+    {
+        return str_contains($pesan, 'timeout')
+            || str_contains($pesan, 'tidak bisa dijangkau')
+            || str_contains($pesan, 'kesalahan saat menghubungi')
+            || str_contains($pesan, 'respons yang tidak valid');
     }
 
     public function whatsappTest(Request $request, FonnteService $whatsapp): JsonResponse

@@ -41,7 +41,7 @@ test('admin berhasil menghapus token yang tersimpan', function () {
         ->put('/admin/pengaturan/whatsapp', [
             'clear_fonnte_token' => '1',
         ])
-        ->assertSee('Konfigurasi WhatsApp berhasil disimpan.');
+        ->assertSee('Token Fonnte berhasil dihapus.');
 });
 
 // TS.WAP.003 / TC.WAP.003.001 — Positive

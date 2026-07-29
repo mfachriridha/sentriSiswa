@@ -19,11 +19,21 @@
 
 <x-alert type="success" :message="session('success')" />
 <x-alert type="error" :message="session('error')" />
+<x-alert type="warning" :message="session('warning')" />
 
 @php
     $hasToken = filled($config['token']);
     $isConfigured = $hasToken;
     $maskedToken = $hasToken ? '********'.substr($config['token'], -4) : 'Belum tersimpan';
+
+    $tokenBerlaku = $perangkat['success'] ?? false;
+    $tersambung = $perangkat['tersambung'] ?? false;
+    $profil = $perangkat['profil'] ?? null;
+    $galatPerangkat = $perangkat['error'] ?? null;
+
+    // Siap dipakai bukan cuma soal token tersimpan: perangkatnya juga harus
+    // benar-benar tersambung ke WhatsApp.
+    $siapDipakai = $hasToken && $tokenBerlaku && $tersambung;
 @endphp
 
 <div class="grid gap-6 lg:grid-cols-[1fr_0.9fr]">
@@ -34,10 +44,17 @@
                     <h2 class="text-lg font-semibold text-gray-900">Status Koneksi</h2>
                     <p class="mt-1 text-sm text-gray-500">Token Fonnte diambil dari dashboard Fonnte (Device menu).</p>
                 </div>
-                <span class="inline-flex w-fit items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium
-                    {{ $isConfigured ? 'border-green-200 bg-green-50 text-green-700' : 'border-gray-200 bg-gray-50 text-gray-500' }}">
-                    <span class="h-2 w-2 rounded-full {{ $isConfigured ? 'bg-green-500' : 'bg-gray-400' }}"></span>
-                    {{ $isConfigured ? 'Siap dipakai' : 'Belum lengkap' }}
+                @php
+                    [$labelStatus, $kelasStatus, $kelasTitik] = match (true) {
+                        ! $hasToken => ['Belum lengkap', 'border-gray-200 bg-gray-50 text-gray-500', 'bg-gray-400'],
+                        $siapDipakai => ['Siap dipakai', 'border-green-200 bg-green-50 text-green-700', 'bg-green-500'],
+                        $tokenBerlaku => ['Perangkat terputus', 'border-amber-200 bg-amber-50 text-amber-700', 'bg-amber-500'],
+                        default => ['Bermasalah', 'border-red-200 bg-red-50 text-red-700', 'bg-red-500'],
+                    };
+                @endphp
+                <span class="inline-flex w-fit items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium {{ $kelasStatus }}">
+                    <span class="h-2 w-2 rounded-full {{ $kelasTitik }}"></span>
+                    {{ $labelStatus }}
                 </span>
             </div>
 
@@ -46,11 +63,45 @@
                 <p class="mt-0.5 break-all text-xs {{ $hasToken ? 'text-green-700' : 'text-gray-500' }}">{{ $maskedToken }}</p>
             </div>
 
-            @unless ($isConfigured)
+            @unless ($hasToken)
                 <div class="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
                     Token Fonnte belum diisi. Laporan absensi tidak akan dikirim sampai token tersedia.
                 </div>
             @endunless
+
+            @if ($hasToken && $profil)
+                <dl class="mt-4 grid grid-cols-2 gap-3 text-sm">
+                    <div class="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
+                        <dt class="text-xs font-medium text-gray-500">Nomor Perangkat</dt>
+                        <dd class="mt-0.5 font-semibold text-gray-900">{{ $profil['device'] ?? '-' }}</dd>
+                    </div>
+                    <div class="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
+                        <dt class="text-xs font-medium text-gray-500">Status Perangkat</dt>
+                        <dd class="mt-0.5 font-semibold {{ $tersambung ? 'text-green-700' : 'text-amber-700' }}">
+                            {{ $tersambung ? 'Tersambung' : ($profil['status_perangkat'] ?? 'Tidak diketahui') }}
+                        </dd>
+                    </div>
+                    <div class="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
+                        <dt class="text-xs font-medium text-gray-500">Sisa Kuota</dt>
+                        <dd class="mt-0.5 font-semibold text-gray-900">{{ $profil['kuota'] ?? '-' }}</dd>
+                    </div>
+                    <div class="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
+                        <dt class="text-xs font-medium text-gray-500">Masa Aktif</dt>
+                        <dd class="mt-0.5 font-semibold text-gray-900">{{ $profil['kedaluwarsa'] ?? '-' }}</dd>
+                    </div>
+                </dl>
+
+                @unless ($tersambung)
+                    <div class="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+                        Tokennya berlaku, tapi perangkat WhatsApp-nya sedang tidak tersambung. Pesan tidak akan sampai
+                        sampai perangkatnya disambungkan lagi lewat dashboard Fonnte.
+                    </div>
+                @endunless
+            @elseif ($hasToken && $galatPerangkat)
+                <div class="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                    Tidak bisa memastikan kondisi perangkat: {{ $galatPerangkat }}
+                </div>
+            @endif
         </div>
 
         <form method="POST" action="{{ route('admin.pengaturan.whatsapp.update') }}" class="space-y-4"

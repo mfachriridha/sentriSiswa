@@ -13,6 +13,8 @@ class FonnteService
 
     private const ENDPOINT = 'https://api.fonnte.com/send';
 
+    private const ENDPOINT_DEVICE = 'https://api.fonnte.com/device';
+
     private const TIMEOUT_SECONDS = 60;
 
     private const CONNECT_TIMEOUT_SECONDS = 10;
@@ -99,6 +101,68 @@ class FonnteService
             'success' => false,
             'error' => $body['reason'] ?? 'Gagal mengirim pesan WhatsApp melalui Fonnte.',
             'response' => $body,
+        ];
+    }
+
+    /**
+     * Menanyakan profil perangkat ke Fonnte. Dipakai untuk memastikan token yang
+     * dimasukkan admin benar-benar berlaku - tidak ada pola token yang bisa
+     * diperiksa sendiri, satu-satunya cara tahu ya dengan menanyakannya.
+     *
+     * Sekalian membawa kondisi perangkat (tersambung atau tidak, sisa kuota, masa
+     * aktif), yang selama ini jadi penyebab pesan gagal terkirim tanpa admin tahu.
+     *
+     * Kalau tokennya diisi lewat parameter, token itu yang diperiksa - bukan yang
+     * tersimpan. Ini yang dipakai saat admin menyimpan token baru.
+     *
+     * @return array{success: bool, error?: string, tersambung?: bool, profil?: array<string, mixed>}
+     */
+    public function deviceProfile(?string $token = null): array
+    {
+        $token ??= $this->token();
+
+        if (blank($token)) {
+            return ['success' => false, 'error' => 'Token Fonnte belum diisi.'];
+        }
+
+        $request = Http::asMultipart()
+            ->connectTimeout(self::CONNECT_TIMEOUT_SECONDS)
+            ->timeout(15)
+            ->withHeader('Authorization', $token);
+
+        if (app()->environment('local')) {
+            $request->withoutVerifying();
+        }
+
+        try {
+            $response = $request->post(self::ENDPOINT_DEVICE);
+        } catch (ConnectionException) {
+            return ['success' => false, 'error' => 'Koneksi ke Fonnte timeout atau tidak bisa dijangkau.'];
+        } catch (Throwable) {
+            return ['success' => false, 'error' => 'Terjadi kesalahan saat menghubungi Fonnte.'];
+        }
+
+        $body = $response->json();
+
+        if (! is_array($body)) {
+            return ['success' => false, 'error' => 'Fonnte mengembalikan respons yang tidak valid.'];
+        }
+
+        if (! $response->successful() || ($body['status'] ?? false) !== true) {
+            return ['success' => false, 'error' => $body['reason'] ?? 'Token Fonnte tidak berlaku.'];
+        }
+
+        return [
+            'success' => true,
+            'tersambung' => ($body['device_status'] ?? null) === 'connect',
+            'profil' => [
+                'device' => $body['device'] ?? null,
+                'nama' => $body['name'] ?? null,
+                'status_perangkat' => $body['device_status'] ?? null,
+                'paket' => $body['package'] ?? null,
+                'kuota' => $body['quota'] ?? null,
+                'kedaluwarsa' => $body['expired'] ?? null,
+            ],
         ];
     }
 

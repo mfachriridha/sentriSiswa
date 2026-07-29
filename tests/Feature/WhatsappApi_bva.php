@@ -21,12 +21,13 @@ uses(RefreshDatabase::class);
 // TS.WAP.009 / TC.WAP.009.001 — Positive
 test('token dua ratus lima puluh lima karakter diterima karena tepat di batas maksimum', function () {
     adminWhatsapp();
+    layananWhatsappBerhasil();
 
     $this->followingRedirects()
         ->put('/admin/pengaturan/whatsapp', [
             'fonnte_token' => str_repeat('a', 255),
         ])
-        ->assertSee('Konfigurasi WhatsApp berhasil disimpan.');
+        ->assertSee('Token Fonnte berhasil disimpan dan sudah diverifikasi.');
 });
 
 // TS.WAP.009 / TC.WAP.009.002 — Negative
