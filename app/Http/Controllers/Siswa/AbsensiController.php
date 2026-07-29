@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Siswa;
 
 use App\Http\Controllers\Controller;
 use App\Models\Pengaturan;
-use App\Services\GeofenceValidator;
+use App\Services\PemeriksaLokasiAbsensi;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -216,19 +216,7 @@ class AbsensiController extends Controller
      */
     private function attendancePolygon(): ?array
     {
-        $geofenceData = Pengaturan::get('attendance_geofence_data');
-
-        if (! is_string($geofenceData) || $geofenceData === '') {
-            return null;
-        }
-
-        $decoded = json_decode($geofenceData, true);
-
-        if (! is_array($decoded) || ! isset($decoded['coordinates']) || ! is_array($decoded['coordinates']) || count($decoded['coordinates']) < 3) {
-            return null;
-        }
-
-        return $decoded['coordinates'];
+        return app(PemeriksaLokasiAbsensi::class)->poligon();
     }
 
     /**
@@ -236,46 +224,7 @@ class AbsensiController extends Controller
      */
     private function evaluateLocation(float $latitude, float $longitude): array
     {
-        $polygon = $this->attendancePolygon();
-
-        if ($polygon === null) {
-            return [
-                'allowed' => true,
-                'status' => 'inactive',
-                'distance_meters' => null,
-                'message' => 'Area absensi belum dikonfigurasi.',
-            ];
-        }
-
-        $validator = new GeofenceValidator;
-
-        if ($validator->isInsidePolygon($latitude, $longitude, $polygon)) {
-            return [
-                'allowed' => true,
-                'status' => 'inside',
-                'distance_meters' => 0,
-                'message' => 'Lokasi Anda berada di dalam area absensi.',
-            ];
-        }
-
-        $distanceMeters = $validator->distanceToPolygonEdge($latitude, $longitude, $polygon);
-        $toleranceMeters = (int) Pengaturan::get('attendance_tolerance_meters', '0');
-
-        if ($distanceMeters <= $toleranceMeters) {
-            return [
-                'allowed' => true,
-                'status' => 'tolerance',
-                'distance_meters' => round($distanceMeters, 2),
-                'message' => 'Lokasi Anda masih dalam toleransi akurasi GPS.',
-            ];
-        }
-
-        return [
-            'allowed' => false,
-            'status' => 'outside',
-            'distance_meters' => round($distanceMeters, 2),
-            'message' => 'Lokasi Anda di luar area absensi dan tidak bisa absen.',
-        ];
+        return app(PemeriksaLokasiAbsensi::class)->periksa($latitude, $longitude);
     }
 
     public function riwayat(Request $request): View
