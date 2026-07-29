@@ -69,6 +69,15 @@
                     </button>
                 </form>
             </div>
+
+            <div class="mt-4 text-center">
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="text-xs font-semibold text-slate-400 transition-colors hover:text-slate-600 hover:underline">
+                        Batalkan &amp; Keluar
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 </div>

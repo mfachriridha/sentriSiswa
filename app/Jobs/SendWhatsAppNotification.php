@@ -33,7 +33,7 @@ class SendWhatsAppNotification implements ShouldQueue
 
         $normalized = $whatsapp->normalizePhone($this->whatsappMessage->telepon_penerima);
 
-        if (! preg_match('/^62\d{8,13}$/', $normalized)) {
+        if (! $whatsapp->isValidPhoneFormat($normalized)) {
             $this->whatsappMessage->update([
                 'status' => 'failed',
                 'respons' => json_encode(['error' => 'Nomor tidak valid: '.$normalized]),

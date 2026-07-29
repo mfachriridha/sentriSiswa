@@ -194,6 +194,14 @@ class PengaturanController extends Controller
         ]);
 
         $normalizedPhone = $whatsapp->normalizePhone($validated['phone']);
+
+        if (! $whatsapp->isValidPhoneFormat($normalizedPhone)) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Nomor HP tidak valid: '.$normalizedPhone,
+            ], 422);
+        }
+
         $cooldownKey = 'whatsapp:test:cooldown:'.sha1($normalizedPhone);
         $availableAt = Cache::get($cooldownKey);
 

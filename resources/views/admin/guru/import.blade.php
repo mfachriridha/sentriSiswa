@@ -37,6 +37,11 @@
         </a>
     </div>
 
+    <p class="mb-6 text-center text-sm text-gray-500">
+        Kolom "Tipe" diisi salah satu: <span class="font-medium text-gray-700">Wali Kelas</span>,
+        <span class="font-medium text-gray-700">BK</span>, atau <span class="font-medium text-gray-700">Kesiswaan</span>.
+    </p>
+
     <form method="POST" action="{{ route('admin.guru.impor.unggah') }}" enctype="multipart/form-data" class="space-y-6"
           x-data="{ loading: false }" @submit="loading = true">
         @csrf

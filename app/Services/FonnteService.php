@@ -21,9 +21,16 @@ class FonnteService
 
     private const DELAY_MAX_SECONDS = 30;
 
+    private const PHONE_FORMAT = '/^62\d{8,13}$/';
+
     public function isConfigured(): bool
     {
         return filled($this->token());
+    }
+
+    public function isValidPhoneFormat(string $normalizedPhone): bool
+    {
+        return (bool) preg_match(self::PHONE_FORMAT, $normalizedPhone);
     }
 
     /**
