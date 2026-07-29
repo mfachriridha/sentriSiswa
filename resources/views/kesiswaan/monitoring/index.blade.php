@@ -81,7 +81,7 @@
                         <td class="px-4 py-3">
                             @php
                                 $todayAttendance = $student->absensi->first();
-                                $status = $todayAttendance ? $todayAttendance->status : 'none';
+                                $status = $todayAttendance ? $todayAttendance->status : 'belum_absen';
                             @endphp
                             @php
                                 $statusMeta = $statusLabels[$status] ?? ['-', 'bg-gray-100 text-gray-600'];

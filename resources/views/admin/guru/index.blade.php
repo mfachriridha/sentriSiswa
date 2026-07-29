@@ -116,11 +116,11 @@
         <thead class="border-b border-gray-200 bg-gray-50">
             <tr>
                 <th class="px-4 py-3"><x-sort-link label="NIP" column="nip" :sort="$sort" :direction="$direction" /></th>
-                <th class="px-4 py-3"><x-sort-link label="Nama" column="name" :sort="$sort" :direction="$direction" /></th>
+                <th class="px-4 py-3"><x-sort-link label="Nama" column="nama" :sort="$sort" :direction="$direction" /></th>
                 <th class="hidden px-4 py-3 lg:table-cell"><x-sort-link label="Email" column="email" :sort="$sort" :direction="$direction" /></th>
-                <th class="hidden px-4 py-3 md:table-cell"><x-sort-link label="Role" column="role" :sort="$sort" :direction="$direction" /></th>
+                <th class="hidden px-4 py-3 md:table-cell"><x-sort-link label="Role" column="peran" :sort="$sort" :direction="$direction" /></th>
                 <th class="hidden px-4 py-3 lg:table-cell"><x-sort-link label="Kelas" column="class_name" :sort="$sort" :direction="$direction" /></th>
-                <th class="hidden px-4 py-3 xl:table-cell"><x-sort-link label="Telepon" column="phone" :sort="$sort" :direction="$direction" /></th>
+                <th class="hidden px-4 py-3 xl:table-cell"><x-sort-link label="Telepon" column="telepon" :sort="$sort" :direction="$direction" /></th>
                 <th class="px-4 py-3 text-gray-600 font-semibold">Status</th>
                 <th class="px-4 py-3 text-gray-600 font-semibold">Aksi</th>
             </tr>

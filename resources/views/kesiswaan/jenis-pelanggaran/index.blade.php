@@ -47,10 +47,10 @@
         <table class="min-w-full text-left text-sm">
             <thead class="border-b border-gray-200 bg-gray-50">
                 <tr>
-                    <th class="px-4 py-3"><x-sort-link label="Nama" column="name" :sort="$sort" :direction="$direction" /></th>
-                    <th class="px-4 py-3"><x-sort-link label="Kategori" column="category" :sort="$sort" :direction="$direction" /></th>
-                    <th class="px-4 py-3"><x-sort-link label="Poin" column="point_deduction" :sort="$sort" :direction="$direction" /></th>
-                    <th class="px-4 py-3"><x-sort-link label="Status" column="is_active" :sort="$sort" :direction="$direction" /></th>
+                    <th class="px-4 py-3"><x-sort-link label="Nama" column="nama" :sort="$sort" :direction="$direction" /></th>
+                    <th class="px-4 py-3"><x-sort-link label="Kategori" column="kategori" :sort="$sort" :direction="$direction" /></th>
+                    <th class="px-4 py-3"><x-sort-link label="Poin" column="pengurangan_poin" :sort="$sort" :direction="$direction" /></th>
+                    <th class="px-4 py-3"><x-sort-link label="Status" column="aktif" :sort="$sort" :direction="$direction" /></th>
                     <th class="px-4 py-3 text-gray-600 font-semibold">Aksi</th>
                 </tr>
             </thead>

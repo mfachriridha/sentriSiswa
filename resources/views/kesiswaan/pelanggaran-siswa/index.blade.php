@@ -123,12 +123,12 @@
         <table class="min-w-full text-left text-sm">
             <thead class="border-b border-gray-200 bg-gray-50">
                 <tr>
-                    <th class="px-4 py-3"><x-sort-link label="Tanggal" column="violation_date" :sort="$sort" :direction="$direction" /></th>
+                    <th class="px-4 py-3"><x-sort-link label="Tanggal" column="tanggal_pelanggaran" :sort="$sort" :direction="$direction" /></th>
                     <th class="px-4 py-3 text-gray-600 font-semibold">Siswa</th>
                     <th class="px-4 py-3 text-gray-600 font-semibold">Kelas</th>
-                    <th class="px-4 py-3"><x-sort-link label="Pelanggaran" column="violation_name" :sort="$sort" :direction="$direction" /></th>
-                    <th class="px-4 py-3"><x-sort-link label="Kategori" column="violation_category" :sort="$sort" :direction="$direction" /></th>
-                    <th class="px-4 py-3"><x-sort-link label="Poin" column="point_deduction" :sort="$sort" :direction="$direction" /></th>
+                    <th class="px-4 py-3"><x-sort-link label="Pelanggaran" column="nama_pelanggaran" :sort="$sort" :direction="$direction" /></th>
+                    <th class="px-4 py-3"><x-sort-link label="Kategori" column="kategori_pelanggaran" :sort="$sort" :direction="$direction" /></th>
+                    <th class="px-4 py-3"><x-sort-link label="Poin" column="pengurangan_poin" :sort="$sort" :direction="$direction" /></th>
                     <th class="px-4 py-3 text-gray-600 font-semibold">Sisa Poin</th>
                     <th class="px-4 py-3 text-gray-600 font-semibold">Aksi</th>
                 </tr>

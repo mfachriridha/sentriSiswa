@@ -55,7 +55,7 @@
     :search="$search"
     placeholder="Cari nama, NISN, atau NIS..."
     :filters="[
-        ['name' => 'tingkat', 'label' => 'Tingkat', 'value' => $filterGrade, 'options' => ['' => 'Semua Tingkat', '10' => '10', '11' => '11', '12' => '12']],
+        ['name' => 'tingkat', 'label' => 'Tingkat', 'value' => $filterGrade, 'options' => ['' => 'Semua Tingkat', '10' => '10', '11' => '11', '12' => '12', 'tanpa_kelas' => 'Belum Ada Kelas']],
         ['name' => 'status', 'label' => 'Status', 'value' => $filterStatus, 'options' => ['' => 'Semua Status', 'registered' => 'Terdaftar', 'unregistered' => 'Belum Terdaftar']],
     ]"
     :sort="$sort"
@@ -109,7 +109,7 @@
             <tr>
                 <th class="hidden px-4 py-3 md:table-cell"><x-sort-link label="NISN" column="nisn" :sort="$sort" :direction="$direction" /></th>
                 <th class="px-4 py-3"><x-sort-link label="NIS" column="nis" :sort="$sort" :direction="$direction" /></th>
-                <th class="px-4 py-3"><x-sort-link label="Nama" column="name" :sort="$sort" :direction="$direction" /></th>
+                <th class="px-4 py-3"><x-sort-link label="Nama" column="nama" :sort="$sort" :direction="$direction" /></th>
                 <th class="px-4 py-3"><x-sort-link label="Kelas" column="class_name" :sort="$sort" :direction="$direction" /></th>
                 <th class="px-4 py-3 text-gray-600 font-semibold">Status</th>
                 <th class="px-4 py-3 text-gray-600 font-semibold">Aksi</th>

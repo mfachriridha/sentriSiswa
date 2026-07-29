@@ -39,7 +39,9 @@ class SiswaController extends Controller
             });
         }
 
-        if ($filterGrade) {
+        if ($filterGrade === 'tanpa_kelas') {
+            $students->whereHas('profilSiswa', fn ($q) => $q->whereNull('kelas_id'));
+        } elseif ($filterGrade) {
             $students->whereHas('profilSiswa.kelas', fn ($q) => $q->where('tingkat', $filterGrade));
         }
 
