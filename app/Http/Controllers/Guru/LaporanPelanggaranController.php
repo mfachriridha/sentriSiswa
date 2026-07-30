@@ -10,7 +10,6 @@ use App\Models\Kelas;
 use App\Models\PelanggaranSiswa;
 use App\Models\PengajuanPoin;
 use App\Models\Pengguna;
-use App\Models\ProfilSiswa;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -50,9 +49,9 @@ class LaporanPelanggaranController extends Controller
                 ->with('error', 'Tidak ada pelanggaran yang cocok dengan penyaring ini, jadi tidak ada yang bisa diekspor.');
         }
 
-        // Isi & susunan sheet ini sengaja disamakan dengan 3 bagian di laporan cetak
-        // PDF (Ringkasan, Pelanggaran, Penambahan Poin) supaya keduanya nampilin
-        // informasi yang sama, cuma beda format berkas.
+        // Isi & susunan sheet ini sengaja disamakan dengan bagian di laporan cetak
+        // PDF (Pelanggaran, Penambahan Poin) supaya keduanya nampilin informasi
+        // yang sama, cuma beda format berkas.
         $violationRows = $violations->map(fn (PelanggaranSiswa $violation): array => [
             $violation->tanggal_pelanggaran->format('Y-m-d'),
             $violation->profilSiswa?->nis ?? '-',
@@ -63,14 +62,6 @@ class LaporanPelanggaranController extends Controller
             '-'.$violation->pengurangan_poin,
             $violation->dicatatOleh?->nama ?? '-',
         ])->values()->all();
-
-        $pointsSummaryRows = collect($this->allStudentsPointsSummary($filters, $user))
-            ->map(fn (array $row): array => [
-                $row['nis'],
-                $row['nama'],
-                $row['kelas'],
-                $row['sisa_poin'],
-            ])->all();
 
         $pointAdditionRows = $this->approvedPengajuanPoinQuery($filters, $user)->get()
             ->map(fn (PengajuanPoin $pengajuan): array => [
@@ -87,7 +78,7 @@ class LaporanPelanggaranController extends Controller
             : 'semua-tanggal';
 
         return Excel::download(
-            new LaporanPelanggaranExport($violationRows, $pointsSummaryRows, $pointAdditionRows),
+            new LaporanPelanggaranExport($violationRows, $pointAdditionRows),
             "laporan-pelanggaran-{$periode}.xlsx",
         );
     }
@@ -106,7 +97,6 @@ class LaporanPelanggaranController extends Controller
             'violations' => $violations,
             'filters' => $filters,
             'pengajuanPoin' => $this->approvedPengajuanPoinQuery($filters, $user)->get(),
-            'pointsSummary' => $this->allStudentsPointsSummary($filters, $user),
             'categoryLabels' => JenisPelanggaran::categoryLabels(),
         ]);
     }
@@ -157,37 +147,5 @@ class LaporanPelanggaranController extends Controller
         }
 
         return $query->latest('disetujui_pada');
-    }
-
-    /**
-     * Snapshot sisa poin siswa yang poinnya sudah berubah dari 100 (bukan cuma yang punya
-     * pelanggaran di filter tanggal/kategori yang lagi jalan) - discope ke kelas/tingkat aja,
-     * karena ini kondisi sekarang bukan riwayat kejadian.
-     *
-     * @return list<array{nama: string, nis: string, kelas: string, sisa_poin: int}>
-     */
-    private function allStudentsPointsSummary(array $filters, Pengguna $user): array
-    {
-        $query = ProfilSiswa::with(['pengguna', 'kelas'])
-            ->withSum(['pelanggaranSiswa' => fn ($query) => $query->disetujui()], 'pengurangan_poin')
-            ->withSum(['pengajuanPoin' => fn ($query) => $query->disetujui()], 'jumlah_poin')
-            ->when($filters['kelas_id'] ?? null, fn ($query, $classId) => $query->where('kelas_id', $classId))
-            ->when($filters['tingkat'] ?? null, fn ($query, $grade) => $query->whereHas('kelas', fn ($classQuery) => $classQuery->where('tingkat', $grade)));
-
-        if ($user->isBk()) {
-            $query->whereHas('kelas', fn (Builder $classQuery) => $classQuery->where('tingkat', $user->profilGuru?->tingkat));
-        }
-
-        return $query->get()
-            ->filter(fn (ProfilSiswa $student): bool => $student->poin !== 100)
-            ->map(fn (ProfilSiswa $student): array => [
-                'nama' => $student->pengguna?->nama ?? '-',
-                'nis' => $student->nis ?? '-',
-                'kelas' => $student->kelas?->nama ?? '-',
-                'sisa_poin' => $student->poin,
-            ])
-            ->sortBy('sisa_poin')
-            ->values()
-            ->all();
     }
 }

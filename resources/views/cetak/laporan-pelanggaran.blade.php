@@ -17,35 +17,6 @@
     </p>
 </header>
 
-@if (! empty($pointsSummary))
-    <section class="mb-8">
-        <h2 class="mb-2 text-sm font-bold text-slate-800">
-            Ringkasan Sisa Poin Seluruh Siswa
-            <span class="font-normal text-slate-500">(diurutkan dari poin tersisa terkecil)</span>
-        </h2>
-        <table class="w-full border-collapse text-xs">
-            <thead>
-                <tr class="bg-slate-100">
-                    <th class="{{ $th }}">NIS</th>
-                    <th class="{{ $th }}">Nama</th>
-                    <th class="{{ $th }}">Kelas</th>
-                    <th class="{{ $th }}">Sisa Poin</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($pointsSummary as $row)
-                    <tr>
-                        <td class="{{ $td }}">{{ $row['nis'] }}</td>
-                        <td class="{{ $td }}">{{ $row['nama'] }}</td>
-                        <td class="{{ $td }}">{{ $row['kelas'] }}</td>
-                        <td class="{{ $td }}">{{ $row['sisa_poin'] }}</td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </section>
-@endif
-
 <section class="mb-8">
     <h2 class="mb-2 text-sm font-bold text-slate-800">Pelanggaran</h2>
     <table class="w-full border-collapse text-xs">
