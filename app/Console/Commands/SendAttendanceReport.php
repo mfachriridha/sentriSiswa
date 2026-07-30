@@ -35,8 +35,29 @@ class SendAttendanceReport extends Command
 
         if (! $this->option('force')) {
             $graceMinutes = 5;
+            $akhirHari = now()->endOfDay();
             $sendAfter = now()->setTimeFromTimeString($endTime)->addMinutes($graceMinutes);
-            $sendBefore = now()->setTimeFromTimeString($endTime)->addMinutes(30);
+
+            // Laporannya memuat absensi HARI INI, jadi jendela kirimnya tidak boleh
+            // menyeberang tengah malam - kalau menyeberang, tanggal yang dilaporkan
+            // sudah berganti dan isinya jadi salah hari. Batas atasnya dipotong di
+            // penghujung hari.
+            $sendBefore = now()->setTimeFromTimeString($endTime)->addMinutes(30)->min($akhirHari);
+
+            // Jam absen yang ditutup terlalu malam (23:30 ke atas) membuat jendela
+            // kirimnya jatuh setelah tengah malam, dan itu tidak akan pernah
+            // tercapai. Dulu keadaan ini cuma menghasilkan pesan "belum waktunya"
+            // tiap lima menit tanpa pernah benar-benar mengirim, jadi tidak ada yang
+            // tahu laporannya mati. Sekarang dikatakan terus terang.
+            if ($sendAfter->greaterThan($akhirHari)) {
+                $this->warn(
+                    'Jam selesai absen ('.$endTime.') terlalu malam: jendela kirim laporan jatuh '.
+                    'sesudah tengah malam, jadi laporan tidak akan pernah terkirim. '.
+                    'Ubah jam selesai absen ke waktu yang menyisakan minimal '.$graceMinutes.' menit sebelum 00:00.'
+                );
+
+                return self::SUCCESS;
+            }
 
             if (now()->lessThan($sendAfter)) {
                 $this->info('Belum waktunya kirim laporan (sesudah '.$endTime.' + '.$graceMinutes.' menit).');
@@ -45,7 +66,7 @@ class SendAttendanceReport extends Command
             }
 
             if (now()->greaterThan($sendBefore)) {
-                $this->info('Lewat batas waktu pengiriman (30 menit setelah '.$endTime.').');
+                $this->info('Lewat batas waktu pengiriman ('.$sendBefore->format('H:i').').');
 
                 return self::SUCCESS;
             }
