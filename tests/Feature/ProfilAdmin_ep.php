@@ -142,7 +142,7 @@ test('admin gagal mengunggah foto profil bertipe yang tidak diizinkan', function
         ->assertSee('Foto harus berupa gambar.');
 });
 
-// TS.PAD.009 / TC.PAD.009.001 — Positive
+// TS.PAD.013 / TC.PAD.013.001 — Positive
 test('admin menghapus foto profil lewat form edit, satu form sekaligus dengan data lain', function () {
     Storage::fake('public');
     adminProfil();

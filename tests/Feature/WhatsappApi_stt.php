@@ -104,7 +104,7 @@ test('admin mengirim ulang pesan whatsapp dari riwayat', function () {
         ->assertSee('Pesan sedang diproses ulang.');
 });
 
-// TS.WAP.009 / TC.WAP.009.001 — Negative
+// TS.WAP.011 / TC.WAP.011.001 — Negative
 test('admin gagal mengirim ulang pesan yang dibuat di hari lain', function () {
     Carbon::setTestNow('2026-07-05 08:00:00');
     $pesan = PesanWhatsapp::create([
@@ -125,7 +125,7 @@ test('admin gagal mengirim ulang pesan yang dibuat di hari lain', function () {
         ->assertSee('Pesan ini dibuat di hari lain, datanya sudah kedaluwarsa. Kirim ulang tidak tersedia untuk pesan lama.');
 });
 
-// TS.WAP.010 / TC.WAP.010.001 — Positive
+// TS.WAP.012 / TC.WAP.012.001 — Positive
 test('kirim ulang laporan absensi menyusun ulang isi pesan dari kondisi absensi terkini', function () {
     Carbon::setTestNow('2026-07-06 08:00:00'); // Senin, hari absensi.
     [$wali, $kelas, $siswa] = kelasBerisiSiswa();

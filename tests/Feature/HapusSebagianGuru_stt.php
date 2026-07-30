@@ -34,6 +34,7 @@ function guruUntukHapusSebagian(string $nama, string $peran, string $status, ?st
     return $guru;
 }
 
+// TS.GUR.016 / TC.GUR.016.001 — Positive
 test('admin menghapus guru berdasarkan role yang dicentang, role lain tetap ada', function () {
     adminDataGuru();
     guruUntukHapusSebagian('Wali Kelas Satu', 'wali_kelas', 'registered');
@@ -46,6 +47,7 @@ test('admin menghapus guru berdasarkan role yang dicentang, role lain tetap ada'
         ->assertDontSee('Wali Kelas Satu');
 });
 
+// TS.GUR.017 / TC.GUR.017.001 — Positive
 test('admin menghapus guru BK tingkat tertentu saja', function () {
     adminDataGuru();
     guruUntukHapusSebagian('BK Sepuluh', 'bk', 'registered', '10');
@@ -58,6 +60,7 @@ test('admin menghapus guru BK tingkat tertentu saja', function () {
         ->assertDontSee('BK Sepuluh');
 });
 
+// TS.GUR.018 / TC.GUR.018.001 — Positive
 test('admin menghapus guru berdasarkan status pendaftaran', function () {
     adminDataGuru();
     guruUntukHapusSebagian('Kesiswaan Belum Daftar', 'kesiswaan', 'unregistered');
@@ -70,6 +73,7 @@ test('admin menghapus guru berdasarkan status pendaftaran', function () {
         ->assertDontSee('Kesiswaan Belum Daftar');
 });
 
+// TS.GUR.019 / TC.GUR.019.001 — Negative
 test('admin gagal menghapus guru kalau tidak ada kriteria yang dicentang', function () {
     adminDataGuru();
     guruUntukHapusSebagian('Guru Aman', 'wali_kelas', 'registered');

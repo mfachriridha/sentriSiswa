@@ -144,7 +144,7 @@ test('baris guru tanpa nip dilewati dan alasannya ditampilkan', function () {
         ->assertSee('NIP kosong, guru harus didaftarkan manual oleh admin');
 });
 
-// TS.IMG.006 / TC.IMG.006.001 — Positive
+// TS.IMG.008 / TC.IMG.008.001 — Positive
 test('nama guru dari berkas dirapikan tanpa merusak penulisan gelarnya', function () {
     adminImporGuru();
 

@@ -36,6 +36,7 @@ function siswaUntukHapusSebagian(string $nama, string $nisn, string $status, ?Ke
     ]);
 }
 
+// TS.SIS.022 / TC.SIS.022.001 — Positive
 test('pratinjau menghitung siswa yang cocok tanpa menghapus apa pun', function () {
     adminDataSiswa();
     $kelas10 = Kelas::create(['nama' => '10 IPA 1', 'tingkat' => '10']);
@@ -48,6 +49,7 @@ test('pratinjau menghitung siswa yang cocok tanpa menghapus apa pun', function (
     expect(Pengguna::where('peran', 'siswa')->count())->toBe(2);
 });
 
+// TS.SIS.023 / TC.SIS.023.001 — Positive
 test('admin menghapus siswa berdasarkan status yang dicentang, sisanya tetap ada', function () {
     adminDataSiswa();
     siswaUntukHapusSebagian('Belum Daftar', '3000000003', 'unregistered');
@@ -60,6 +62,7 @@ test('admin menghapus siswa berdasarkan status yang dicentang, sisanya tetap ada
         ->assertDontSee('Belum Daftar');
 });
 
+// TS.SIS.024 / TC.SIS.024.001 — Positive
 test('admin menghapus siswa berdasarkan tingkat, kelas lain tidak ikut terhapus', function () {
     adminDataSiswa();
     $kelas10 = Kelas::create(['nama' => '10 IPA 1', 'tingkat' => '10']);
@@ -74,6 +77,7 @@ test('admin menghapus siswa berdasarkan tingkat, kelas lain tidak ikut terhapus'
         ->assertDontSee('Siswa Sepuluh');
 });
 
+// TS.SIS.025 / TC.SIS.025.001 — Positive
 test('kombinasi status dan tingkat digabung dengan AND, bukan OR', function () {
     adminDataSiswa();
     $kelas10 = Kelas::create(['nama' => '10 IPA 1', 'tingkat' => '10']);
@@ -92,6 +96,7 @@ test('kombinasi status dan tingkat digabung dengan AND, bukan OR', function () {
         ->assertDontSee('Cocok Dua Kriteria');
 });
 
+// TS.SIS.026 / TC.SIS.026.001 — Positive
 test('siswa tanpa kelas ikut terhapus kalau kriteria tanpa_kelas dicentang', function () {
     adminDataSiswa();
     siswaUntukHapusSebagian('Tanpa Kelas', '3000000010', 'registered', null);
@@ -104,6 +109,7 @@ test('siswa tanpa kelas ikut terhapus kalau kriteria tanpa_kelas dicentang', fun
         ->assertDontSee('Tanpa Kelas');
 });
 
+// TS.SIS.027 / TC.SIS.027.001 — Negative
 test('admin gagal menghapus kalau tidak ada kriteria yang dicentang', function () {
     adminDataSiswa();
     siswaUntukHapusSebagian('Siswa Aman', '3000000012', 'registered');

@@ -113,7 +113,7 @@ test('siswa menghapus foto profilnya', function () {
         ->assertSee('Foto berhasil dihapus.');
 });
 
-// TS.PRS.012 / TC.PRS.012.001 — Positive
+// TS.PRS.015 / TC.PRS.015.001 — Positive
 test('siswa mengunggah foto lewat form edit profil, satu form sekaligus dengan data lain', function () {
     $siswa = siswaMasuk();
 
@@ -125,7 +125,7 @@ test('siswa mengunggah foto lewat form edit profil, satu form sekaligus dengan d
         ->assertSee('storage/photos/students/');
 });
 
-// TS.PRS.013 / TC.PRS.013.001 — Positive
+// TS.PRS.016 / TC.PRS.016.001 — Positive
 test('siswa menghapus foto lewat form edit profil', function () {
     $siswa = siswaMasuk();
 

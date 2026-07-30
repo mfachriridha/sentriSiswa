@@ -17,6 +17,7 @@ uses(RefreshDatabase::class);
 |
 */
 
+// TS.KEL.015 / TC.KEL.015.001 — Positive
 test('admin menghapus kelas berdasarkan tingkat, tingkat lain tetap ada', function () {
     adminDataKelas();
     Kelas::create(['nama' => '10 IPA 1', 'tingkat' => '10']);
@@ -29,6 +30,7 @@ test('admin menghapus kelas berdasarkan tingkat, tingkat lain tetap ada', functi
         ->assertDontSee('10 IPA 1');
 });
 
+// TS.KEL.016 / TC.KEL.016.001 — Positive
 test('admin menghapus kelas yang belum ada wali kelasnya saja', function () {
     adminDataKelas();
     $wali = Pengguna::factory()->homeroom()->create(['status' => 'registered']);
@@ -42,6 +44,7 @@ test('admin menghapus kelas yang belum ada wali kelasnya saja', function () {
         ->assertDontSee('10 IPA 2');
 });
 
+// TS.KEL.017 / TC.KEL.017.001 — Negative
 test('admin gagal menghapus kelas kalau tidak ada kriteria yang dicentang', function () {
     adminDataKelas();
     Kelas::create(['nama' => '10 IPA 1', 'tingkat' => '10']);
