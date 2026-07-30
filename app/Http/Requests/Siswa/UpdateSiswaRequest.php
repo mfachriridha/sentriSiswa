@@ -17,7 +17,7 @@ class UpdateSiswaRequest extends FormRequest
 
         return [
             'nama' => ['required', 'string', 'min:3', 'max:100', "regex:/^[\pL\s.\'-]+$/u"],
-            'nisn' => ['required', 'digits:10', "unique:profil_siswa,nisn,{$user->profilSiswa?->nisn},nisn"],
+            'nisn' => ['required', 'digits_between:10,12', "unique:profil_siswa,nisn,{$user->profilSiswa?->nisn},nisn"],
             'nis' => ['required', 'regex:/^[0-9]+$/', 'max:15', "unique:profil_siswa,nis,{$user->profilSiswa?->nis},nis"],
             'jenis_kelamin' => ['required', 'in:L,P'],
             'kelas_id' => ['nullable', 'string', 'exists:kelas,id'],

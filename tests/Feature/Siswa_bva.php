@@ -68,20 +68,20 @@ test('nama seratus satu karakter ditolak karena melebihi batas maksimum', functi
         ->assertSee('Nama maksimal 100 karakter.');
 });
 
-// ── Panjang NISN: tepat 10 angka ───────────────────────────────────────────
+// ── Batas panjang NISN: 10 sampai 12 angka ─────────────────────────────────
 
-// TS.SIS.017 / TC.SIS.017.001 — Negative
-test('nisn sembilan angka ditolak karena kurang dari panjang yang ditentukan', function () {
+// TS.SIS.017 / TC.SIS.017.001 — Negative — sedigit di bawah batas bawah
+test('nisn sembilan angka ditolak karena kurang dari batas minimum', function () {
     adminDataSiswa();
 
     $this->from('/admin/siswa/create')
         ->followingRedirects()
         ->post('/admin/siswa', dataSiswaSah(['nisn' => '123456789']))
-        ->assertSee('NISN harus terdiri dari 10 angka.');
+        ->assertSee('NISN harus terdiri dari 10 sampai 12 angka.');
 });
 
-// TS.SIS.017 / TC.SIS.017.002 — Positive
-test('nisn sepuluh angka diterima karena sesuai panjang yang ditentukan', function () {
+// TS.SIS.017 / TC.SIS.017.002 — Positive — tepat di batas bawah
+test('nisn sepuluh angka diterima karena tepat di batas minimum', function () {
     adminDataSiswa();
 
     $this->followingRedirects()
@@ -89,14 +89,23 @@ test('nisn sepuluh angka diterima karena sesuai panjang yang ditentukan', functi
         ->assertSee('Siswa berhasil ditambahkan.');
 });
 
-// TS.SIS.018 / TC.SIS.018.001 — Negative
-test('nisn sebelas angka ditolak karena melebihi panjang yang ditentukan', function () {
+// TS.SIS.018 / TC.SIS.018.001 — Positive — tepat di batas atas
+test('nisn dua belas angka diterima karena tepat di batas maksimum', function () {
+    adminDataSiswa();
+
+    $this->followingRedirects()
+        ->post('/admin/siswa', dataSiswaSah(['nisn' => '123456789012']))
+        ->assertSee('Siswa berhasil ditambahkan.');
+});
+
+// TS.SIS.018 / TC.SIS.018.002 — Negative — sedigit di atas batas atas
+test('nisn tiga belas angka ditolak karena melebihi batas maksimum', function () {
     adminDataSiswa();
 
     $this->from('/admin/siswa/create')
         ->followingRedirects()
-        ->post('/admin/siswa', dataSiswaSah(['nisn' => '12345678901']))
-        ->assertSee('NISN harus terdiri dari 10 angka.');
+        ->post('/admin/siswa', dataSiswaSah(['nisn' => '1234567890123']))
+        ->assertSee('NISN harus terdiri dari 10 sampai 12 angka.');
 });
 
 // ── Batas panjang NIS: maksimal 15 angka ───────────────────────────────────

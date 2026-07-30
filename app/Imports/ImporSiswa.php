@@ -271,6 +271,11 @@ class ImporSiswa implements ToCollection, WithChunkReading, WithHeadingRow
         $nama = FormatNama::rapikan((string) ($row['nama'] ?? ''));
         $nis = self::bersihkanNomor($row['nis'] ?? null);
         $nisn = self::bersihkanNomor($row['nisn'] ?? null);
+        // Dipadankan ke 10, bukan ke lebar kolom yang sekarang 12. NISN resmi
+        // panjangnya 10 dan angka nol depannya sering hilang saat Excel membaca
+        // selnya sebagai angka, jadi yang dipulihkan ya ke 10. Kalau dipadankan
+        // ke 12, NISN yang sudah tersimpan (10 karakter) tidak akan cocok lagi
+        // dengan hasil impor berikutnya, dan siswanya jadi terdaftar dua kali.
         $nisn = $nisn !== null ? str_pad($nisn, 10, '0', STR_PAD_LEFT) : null;
 
         $alasan = match (true) {
@@ -280,7 +285,7 @@ class ImporSiswa implements ToCollection, WithChunkReading, WithHeadingRow
             ! ctype_digit($nis) => 'NIS harus berupa angka ('.$nis.')',
             ! ctype_digit($nisn) => 'NISN harus berupa angka ('.$nisn.')',
             mb_strlen($nis) > 15 => 'NIS terlalu panjang, maksimal 15 angka ('.$nis.')',
-            mb_strlen($nisn) > 10 => 'NISN terlalu panjang, maksimal 10 angka ('.$nisn.')',
+            mb_strlen($nisn) > 12 => 'NISN terlalu panjang, maksimal 12 angka ('.$nisn.')',
             default => null,
         };
 
