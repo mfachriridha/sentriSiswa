@@ -11,6 +11,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class AbsensiController extends Controller
@@ -53,6 +54,7 @@ class AbsensiController extends Controller
             'hadir' => $monthAttendances->where('status', 'hadir')->count(),
             'izin' => $monthAttendances->where('status', 'izin')->count(),
             'sakit' => $monthAttendances->where('status', 'sakit')->count(),
+            'dispensasi' => $monthAttendances->where('status', 'dispensasi')->count(),
             'alpha' => $monthAttendances->where('status', 'alpha')->count(),
         ];
 
@@ -135,8 +137,8 @@ class AbsensiController extends Controller
         // dibuka - misalnya karena admin memperpanjang jamnya, atau karena perintah
         // terjadwal sempat mendahului siswa yang sedang mengirim selfie-nya.
         //
-        // Izin dan Sakit tidak bisa ditimpa siswa: itu wewenang wali kelas.
-        if (in_array($attendance->status, ['hadir', 'izin', 'sakit'], strict: true)) {
+        // Izin, Sakit, dan Dispensasi tidak bisa ditimpa siswa: itu wewenang wali kelas.
+        if (in_array($attendance->status, ['hadir', 'izin', 'sakit', 'dispensasi'], strict: true)) {
             return redirect()->route('siswa.absensi')->with('error', 'Anda sudah absen hari ini.');
         }
 
@@ -149,7 +151,8 @@ class AbsensiController extends Controller
         }
 
         $rules = [
-            'selfie' => ['required', 'image', 'mimes:jpeg,jpg,webp', 'max:300'],
+            'status' => ['required', Rule::in(['hadir', 'sakit', 'izin', 'dispensasi'])],
+            'selfie' => ['required', 'image', 'mimes:jpeg,jpg,webp', 'max:1024'],
             'latitude' => ['nullable', 'numeric', 'between:-90,90'],
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
             'accuracy' => ['nullable', 'numeric'],
@@ -164,10 +167,12 @@ class AbsensiController extends Controller
         }
 
         $validated = $request->validate($rules, [
-            'selfie.required' => 'Selfie wajib diambil.',
+            'status.required' => 'Status kehadiran wajib dipilih.',
+            'status.in' => 'Status kehadiran tidak valid.',
+            'selfie.required' => 'Selfie/Foto bukti wajib diambil.',
             'selfie.image' => 'File harus berupa gambar.',
             'selfie.mimes' => 'Format foto harus JPEG atau WebP.',
-            'selfie.max' => 'Ukuran foto maksimal 300 KB.',
+            'selfie.max' => 'Ukuran foto maksimal 1 MB.',
             'latitude.required' => 'Lokasi GPS wajib diaktifkan untuk absen.',
             'latitude.numeric' => 'Data GPS tidak valid.',
             'longitude.required' => 'Lokasi GPS wajib diaktifkan untuk absen.',
@@ -187,7 +192,7 @@ class AbsensiController extends Controller
             $accuracy = (float) $validated['accuracy'];
             $locationCheck = $this->evaluateLocation($latitude, $longitude);
 
-            if (! $locationCheck['allowed']) {
+            if ($validated['status'] === 'hadir' && ! $locationCheck['allowed']) {
                 return redirect()->route('siswa.absensi')->with('error', $locationCheck['message']);
             }
 
@@ -199,7 +204,7 @@ class AbsensiController extends Controller
         $selfiePath = $request->file('selfie')->store('attendance-selfies/'.$profile->nisn, 'public');
 
         $attendance->update([
-            'status' => 'hadir',
+            'status' => $validated['status'],
             'waktu_masuk' => $currentTime,
             'path_selfie' => $selfiePath,
             'latitude' => $latitude,
@@ -208,7 +213,14 @@ class AbsensiController extends Controller
             'jarak_meter' => $distanceMeters,
         ]);
 
-        return redirect()->route('siswa.absensi')->with('success', 'Absen berhasil: Hadir.');
+        $statusLabels = [
+            'hadir' => 'Hadir',
+            'sakit' => 'Sakit',
+            'izin' => 'Izin',
+            'dispensasi' => 'Dispensasi',
+        ];
+
+        return redirect()->route('siswa.absensi')->with('success', 'Absen berhasil: '.$statusLabels[$validated['status']].'.');
     }
 
     /**
