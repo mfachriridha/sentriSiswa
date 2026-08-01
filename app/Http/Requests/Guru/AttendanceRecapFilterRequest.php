@@ -22,7 +22,7 @@ class AttendanceRecapFilterRequest extends FormRequest
             'mulai' => ['nullable', 'date_format:Y-m-d'],
             'selesai' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:mulai'],
             'month' => ['nullable', 'date_format:Y-m'],
-            'status' => ['nullable', Rule::in(['hadir', 'izin', 'sakit', 'alpha'])],
+            'status' => ['nullable', Rule::in(['hadir', 'izin', 'sakit', 'dispensasi', 'alpha'])],
             'profil_siswa_id' => ['nullable', 'string', Rule::exists('profil_siswa', 'nisn')],
         ];
     }
