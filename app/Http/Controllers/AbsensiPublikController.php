@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Absensi;
+use App\Models\Pengaturan;
 use App\Models\ProfilSiswa;
 use App\Models\TokenAksesAbsensi;
 use Illuminate\Http\RedirectResponse;
@@ -49,11 +50,25 @@ class AbsensiPublikController extends Controller
             ->where('tanggal', $aksesToken->tanggal)
             ->first();
 
+        [$startDate, $endDate] = Pengaturan::rentangTanggalPeriodeAktif();
+        $alphaCount = Absensi::where('profil_siswa_id', $siswa->nisn)
+            ->where('status', 'alpha')
+            ->whereBetween('tanggal', [$startDate->toDateString(), $endDate->toDateString()])
+            ->count();
+
+        $maxAlpha = Pengaturan::batasMaksimalAlpha();
+        $statusAlpha = Pengaturan::statusPeringatanAlpha($alphaCount);
+
         return view('publik.absensi.hasil', [
             'siswa' => $siswa,
             'absensi' => $absensi,
             'aksesToken' => $aksesToken,
             'poin' => $siswa->poin,
+            'alphaCount' => $alphaCount,
+            'maxAlpha' => $maxAlpha,
+            'sisaAlpha' => max(0, $maxAlpha - $alphaCount),
+            'statusAlpha' => $statusAlpha,
+            'tahunAjaran' => Pengaturan::tahunAjaran(),
         ]);
     }
 }

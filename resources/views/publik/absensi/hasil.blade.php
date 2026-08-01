@@ -63,8 +63,8 @@
             </div>
         </div>
 
-        {{-- Data anak beserta sisa poinnya. --}}
-        <div class="bg-white rounded-2xl shadow-xl border border-slate-100 p-6">
+        {{-- Data anak beserta sisa poin & jatah alpha. --}}
+        <div class="bg-white rounded-2xl shadow-xl border border-slate-100 p-6 space-y-5">
             <div class="flex items-center gap-4 pb-5 border-b border-slate-100">
                 @if ($siswa->foto)
                     <img src="{{ asset('storage/' . $siswa->foto) }}" alt="{{ $siswa->pengguna->nama }}"
@@ -80,15 +80,52 @@
                 </div>
             </div>
 
-            <div class="pt-5">
-                <p class="text-sm font-medium text-slate-500">Sisa Poin</p>
-                <p class="mt-1 text-3xl font-bold {{ $warnaPoin }}">
-                    {{ $poin }}<span class="text-base font-normal text-slate-400">/100</span>
-                </p>
-                <p class="mt-1 text-xs text-slate-400">
-                    Setiap siswa mulai dari 100 poin. Poin berkurang bila melanggar tata tertib.
-                </p>
+            <div class="grid grid-cols-2 gap-4 pb-5 border-b border-slate-100">
+                <div>
+                    <p class="text-sm font-medium text-slate-500">Sisa Poin Disiplin</p>
+                    <p class="mt-1 text-2xl font-bold {{ $warnaPoin }}">
+                        {{ $poin }}<span class="text-xs font-normal text-slate-400">/100</span>
+                    </p>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-slate-500">Akumulasi Alpha</p>
+                    <p class="mt-1 text-2xl font-bold text-red-600">
+                        {{ $alphaCount }}<span class="text-xs font-normal text-slate-400">/{{ $maxAlpha }}x</span>
+                    </p>
+                    <p class="text-xs text-red-600 font-medium">Sisa Jatah: {{ $sisaAlpha }}x</p>
+                </div>
             </div>
+
+            @if($statusAlpha['kode'] !== 'normal')
+                <div class="rounded-xl border p-3.5 text-xs {{ match($statusAlpha['kode']) {
+                    'wakasis' => 'border-red-200 bg-red-50 text-red-800',
+                    'sp2' => 'border-rose-200 bg-rose-50 text-rose-800',
+                    'sp1' => 'border-amber-200 bg-amber-50 text-amber-800',
+                    default => 'border-yellow-200 bg-yellow-50 text-yellow-800',
+                } }}">
+                    <p class="font-bold flex items-center gap-1.5 mb-1">
+                        <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.07 19h13.86a2 2 0 001.74-2.99L13.74 4a2 2 0 00-3.48 0L3.33 16.01A2 2 0 005.07 19z"/>
+                        </svg>
+                        Status Peringatan: {{ $statusAlpha['label'] }}
+                    </p>
+                    <p class="leading-relaxed">
+                        @if($statusAlpha['kode'] === 'wakasis')
+                            Batas maksimal Alpha {{ $maxAlpha }}x telah tercapai. Kasus ini diproses oleh Wakasis & pemanggilan orang tua.
+                        @elseif($statusAlpha['kode'] === 'sp2')
+                            Alpha telah mencapai {{ $alphaCount }}x. Diproses oleh Guru BK dengan Surat Peringatan 2 (SP2).
+                        @elseif($statusAlpha['kode'] === 'sp1')
+                            Alpha telah mencapai {{ $alphaCount }}x. Diproses oleh Wali Kelas & BK dengan Surat Peringatan 1 (SP1).
+                        @else
+                            Perhatian: Anak Anda telah mencatat {{ $alphaCount }}x Alpha pada periode ini.
+                        @endif
+                    </p>
+                </div>
+            @endif
+
+            <p class="text-xs text-slate-400">
+                Hitungan Alpha berlaku untuk Tahun Pelajaran {{ $tahunAjaran }}.
+            </p>
         </div>
 
         <p class="text-center text-xs text-slate-400">
