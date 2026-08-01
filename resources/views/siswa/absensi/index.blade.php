@@ -39,6 +39,7 @@
                     'hadir'     => ['bg-green-50 text-green-700 border-green-200',   'Hadir',     'bg-green-100'],
                     'izin'      => ['bg-blue-50 text-blue-700 border-blue-200',      'Izin',      'bg-blue-100'],
                     'sakit'     => ['bg-purple-50 text-purple-700 border-purple-200','Sakit',     'bg-purple-100'],
+                    'dispensasi'=> ['bg-orange-50 text-orange-700 border-orange-200','Dispensasi','bg-orange-100'],
                     'alpha'     => ['bg-red-50 text-red-700 border-red-200',         'Alpha',     'bg-red-100'],
                 ];
                 [$badgeClass, $statusLabel, $bgClass] = $statusConfig[$todayAttendance->status] ?? ['bg-gray-50 text-gray-700 border-gray-200', $todayAttendance->status, 'bg-gray-100'];
@@ -104,13 +105,39 @@
             <form method="POST"
                   action="{{ route('siswa.absensi.store') }}"
                   enctype="multipart/form-data"
-                  x-data="attendanceForm({ geofenceActive: @js($geofenceActive), maxPhotoKb: 300 })"
+                  x-data="attendanceForm({ geofenceActive: @js($geofenceActive), maxPhotoKb: 1024 })"
                   @submit="validateBeforeSubmit($event)">
                 @csrf
                 <input x-ref="selfieInput" type="file" name="selfie" accept="image/jpeg,image/webp" class="hidden">
                 <input type="hidden" name="latitude" x-model="latitude">
                 <input type="hidden" name="longitude" x-model="longitude">
                 <input type="hidden" name="accuracy" x-model="accuracy">
+
+                <div class="mb-5 space-y-2">
+                    <p class="text-sm font-medium text-gray-700">Status Kehadiran</p>
+                    <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                        <label class="flex cursor-pointer items-center justify-center gap-2 rounded-xl border p-3 transition-colors"
+                               :class="selectedStatus === 'hadir' ? 'border-primary bg-primary/5 text-primary' : 'border-gray-200 bg-white hover:bg-gray-50 text-gray-700'">
+                            <input type="radio" name="status" value="hadir" x-model="selectedStatus" class="sr-only">
+                            <span class="text-sm font-bold">Hadir</span>
+                        </label>
+                        <label class="flex cursor-pointer items-center justify-center gap-2 rounded-xl border p-3 transition-colors"
+                               :class="selectedStatus === 'sakit' ? 'border-purple-600 bg-purple-50 text-purple-700' : 'border-gray-200 bg-white hover:bg-gray-50 text-gray-700'">
+                            <input type="radio" name="status" value="sakit" x-model="selectedStatus" class="sr-only">
+                            <span class="text-sm font-bold">Sakit</span>
+                        </label>
+                        <label class="flex cursor-pointer items-center justify-center gap-2 rounded-xl border p-3 transition-colors"
+                               :class="selectedStatus === 'izin' ? 'border-blue-600 bg-blue-50 text-blue-700' : 'border-gray-200 bg-white hover:bg-gray-50 text-gray-700'">
+                            <input type="radio" name="status" value="izin" x-model="selectedStatus" class="sr-only">
+                            <span class="text-sm font-bold">Izin</span>
+                        </label>
+                        <label class="flex cursor-pointer items-center justify-center gap-2 rounded-xl border p-3 transition-colors"
+                               :class="selectedStatus === 'dispensasi' ? 'border-orange-600 bg-orange-50 text-orange-700' : 'border-gray-200 bg-white hover:bg-gray-50 text-gray-700'">
+                            <input type="radio" name="status" value="dispensasi" x-model="selectedStatus" class="sr-only">
+                            <span class="text-sm font-bold">Dispensasi</span>
+                        </label>
+                    </div>
+                </div>
 
                 <div class="flex flex-col gap-5 sm:flex-row sm:items-start">
                     {{-- Selfie preview --}}
@@ -236,6 +263,7 @@
                                        x-cloak
                                        x-show="cameraReady && !previewUrl"
                                        class="h-full w-full object-cover"
+                                       :class="facingMode === 'user' ? 'scale-x-[-1]' : ''"
                                        playsinline
                                        muted></video>
                                 <img x-cloak x-show="previewUrl"
@@ -272,6 +300,13 @@
                                             :disabled="compressing"
                                             class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60">
                                         <span x-text="compressing ? 'Memproses...' : 'Ambil Selfie'"></span>
+                                    </button>
+                                    <button type="button"
+                                            x-cloak
+                                            x-show="cameraReady && !previewUrl"
+                                            @click="toggleCamera()"
+                                            class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
+                                        Tukar Kamera
                                     </button>
                                     <button type="button"
                                             x-cloak
@@ -386,6 +421,8 @@
             locationMessage: '',
             locationDistance: null,
             locationChecking: false,
+            selectedStatus: 'hadir',
+            facingMode: 'user',
 
             get canSubmit() {
                 return this.selfieReady && !this.compressing;
@@ -398,6 +435,10 @@
 
                 if (!this.gpsReady || this.gpsLoading || this.locationChecking) {
                     return false;
+                }
+
+                if (this.selectedStatus !== 'hadir') {
+                    return true; // Any location is fine if not 'hadir'
                 }
 
                 return ['inside', 'tolerance'].includes(this.locationStatus);
@@ -421,7 +462,9 @@
                 }
 
                 if (this.locationStatus === 'outside') {
-                    return 'Lokasi Anda di luar area absensi.';
+                    return this.selectedStatus === 'hadir' 
+                        ? 'Lokasi Anda di luar area absensi.' 
+                        : 'Lokasi Anda di luar area, namun diperbolehkan untuk status ' + this.selectedStatus + '.';
                 }
 
                 if (['inside', 'tolerance'].includes(this.locationStatus)) {
@@ -537,7 +580,7 @@
                 try {
                     this.stream = await navigator.mediaDevices.getUserMedia({
                         video: {
-                            facingMode: 'user',
+                            facingMode: this.facingMode,
                             width: { ideal: 640 },
                             height: { ideal: 853 },
                         },
@@ -597,12 +640,19 @@
                 const canvas = this.$refs.canvas;
                 const sourceWidth = video.videoWidth || 640;
                 const sourceHeight = video.videoHeight || 853;
-                const maxLongSide = 720;
+                const maxLongSide = 1280;
                 const scale = Math.min(1, maxLongSide / Math.max(sourceWidth, sourceHeight));
 
                 canvas.width = Math.round(sourceWidth * scale);
                 canvas.height = Math.round(sourceHeight * scale);
-                canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+                
+                const ctx = canvas.getContext('2d');
+                if (this.facingMode === 'user') {
+                    ctx.translate(canvas.width, 0);
+                    ctx.scale(-1, 1);
+                }
+                
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
                 const qualities = [0.62, 0.55, 0.48, 0.42];
 
@@ -651,8 +701,14 @@
 
                 if (!this.selfieReady) {
                     event.preventDefault();
-                    this.error = 'Ambil selfie dulu sebelum absen.';
+                    this.error = 'Ambil selfie/foto bukti dulu sebelum absen.';
                 }
+            },
+            
+            toggleCamera() {
+                this.facingMode = this.facingMode === 'user' ? 'environment' : 'user';
+                this.stopCamera();
+                this.startCamera();
             },
         };
     }
