@@ -85,4 +85,126 @@ class Pengaturan extends Model
 
         return implode(', ', $names).' dan '.$last;
     }
+
+    public static function modePeriode(): string
+    {
+        $mode = static::get('period_mode', 'tahun_ajaran');
+
+        return in_array($mode, ['tahun_ajaran', 'semester'], true) ? $mode : 'tahun_ajaran';
+    }
+
+    public static function tahunAjaran(): string
+    {
+        return (string) static::get('academic_year', '2025/2026');
+    }
+
+    public static function semester(): string
+    {
+        $sem = static::get('semester_period', 'ganjil');
+
+        return in_array($sem, ['ganjil', 'genap'], true) ? $sem : 'ganjil';
+    }
+
+    /**
+     * Rentang tanggal periode aktif [mulai, selesai].
+     *
+     * @return array{0: Carbon, 1: Carbon}
+     */
+    public static function rentangTanggalPeriodeAktif(): array
+    {
+        $startDateRaw = static::get('period_start_date');
+        $endDateRaw = static::get('period_end_date');
+
+        try {
+            $start = $startDateRaw ? Carbon::parse($startDateRaw)->startOfDay() : today()->subMonths(6)->startOfDay();
+            $end = $endDateRaw ? Carbon::parse($endDateRaw)->endOfDay() : today()->endOfDay();
+        } catch (\Throwable) {
+            $start = today()->subMonths(6)->startOfDay();
+            $end = today()->endOfDay();
+        }
+
+        if ($end->lessThan($start)) {
+            $temp = $start;
+            $start = $end->copy()->startOfDay();
+            $end = $temp->copy()->endOfDay();
+        }
+
+        return [$start, $end];
+    }
+
+    public static function batasMaksimalAlpha(): int
+    {
+        $val = static::get('max_alpha_limit', 6);
+
+        return is_numeric($val) && (int) $val > 0 ? (int) $val : 6;
+    }
+
+    /**
+     * Ambang batas peringatan alpha: sp1, sp2, wakasis.
+     *
+     * @return array{sp1: int, sp2: int, wakasis: int}
+     */
+    public static function ambangPeringatanAlpha(): array
+    {
+        return [
+            'sp1' => (int) static::get('alpha_sp1_threshold', 3),
+            'sp2' => (int) static::get('alpha_sp2_threshold', 4),
+            'wakasis' => (int) static::get('alpha_wakasis_threshold', 6),
+        ];
+    }
+
+    /**
+     * Status & info peringatan alpha untuk seorang siswa berdasarkan jumlah alpha-nya.
+     *
+     * @return array{kode: string, label: string, warna: string, sisa: int}
+     */
+    public static function statusPeringatanAlpha(int $jumlahAlpha): array
+    {
+        $max = static::batasMaksimalAlpha();
+        $ambang = static::ambangPeringatanAlpha();
+        $sisa = max(0, $max - $jumlahAlpha);
+
+        if ($jumlahAlpha >= $ambang['wakasis']) {
+            return [
+                'kode' => 'wakasis',
+                'label' => 'Batas Wakasis (Dikembalikan)',
+                'warna' => 'red',
+                'sisa' => $sisa,
+            ];
+        }
+
+        if ($jumlahAlpha >= $ambang['sp2']) {
+            return [
+                'kode' => 'sp2',
+                'label' => 'SP 2 (Guru BK)',
+                'warna' => 'rose',
+                'sisa' => $sisa,
+            ];
+        }
+
+        if ($jumlahAlpha >= $ambang['sp1']) {
+            return [
+                'kode' => 'sp1',
+                'label' => 'SP 1 (Wali Kelas & BK)',
+                'warna' => 'amber',
+                'sisa' => $sisa,
+            ];
+        }
+
+        if ($jumlahAlpha >= 1) {
+            return [
+                'kode' => 'wali_kelas',
+                'label' => 'Perhatian Wali Kelas',
+                'warna' => 'yellow',
+                'sisa' => $sisa,
+            ];
+        }
+
+        return [
+            'kode' => 'normal',
+            'label' => 'Aman',
+            'warna' => 'emerald',
+            'sisa' => $sisa,
+        ];
+    }
 }
