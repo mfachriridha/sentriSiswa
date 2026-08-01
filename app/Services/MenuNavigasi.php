@@ -74,7 +74,6 @@ class MenuNavigasi
             ['label' => 'Siswa', 'route' => 'admin.siswa.index', 'icon' => 'siswa', 'aktif' => ['admin.siswa.*'], 'grup' => 'Manajemen Data'],
             ['label' => 'Kelas', 'route' => 'admin.kelas.index', 'icon' => 'kelas', 'aktif' => ['admin.kelas.*'], 'grup' => 'Manajemen Data'],
             ['label' => 'Waktu Absen', 'route' => 'admin.pengaturan.waktu-absen.index', 'icon' => 'jam', 'aktif' => ['admin.pengaturan.waktu-absen.*'], 'grup' => 'Konfigurasi'],
-            ['label' => 'Periode & Alpha', 'route' => 'admin.pengaturan.periode-absen.index', 'icon' => 'dokumen-peringatan', 'aktif' => ['admin.pengaturan.periode-absen.*'], 'grup' => 'Konfigurasi'],
             ['label' => 'Lokasi Absen', 'route' => 'admin.pengaturan.lokasi-absen.index', 'icon' => 'lokasi', 'aktif' => ['admin.pengaturan.lokasi-absen.*'], 'grup' => 'Konfigurasi'],
             ['label' => 'WhatsApp API', 'route' => 'admin.pengaturan.whatsapp.index', 'icon' => 'chat', 'aktif' => ['admin.pengaturan.whatsapp.*'], 'grup' => 'Konfigurasi'],
             ['label' => 'Profil', 'route' => 'admin.profil', 'icon' => 'profil', 'aktif' => ['admin.profil', 'admin.profil.*'], 'grup' => 'Akun'],

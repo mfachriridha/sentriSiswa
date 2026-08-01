@@ -16,64 +16,6 @@ use Illuminate\View\View;
 
 class PengaturanController extends Controller
 {
-    public function academicPeriod(): View
-    {
-        return view('admin.pengaturan.academic-period', [
-            'academicYear' => Pengaturan::tahunAjaran(),
-            'periodMode' => Pengaturan::modePeriode(),
-            'semesterPeriod' => Pengaturan::semester(),
-            'startDate' => Pengaturan::get('period_start_date', '2025-07-01'),
-            'endDate' => Pengaturan::get('period_end_date', '2026-06-30'),
-            'maxAlphaLimit' => Pengaturan::batasMaksimalAlpha(),
-            'thresholds' => Pengaturan::ambangPeringatanAlpha(),
-            'updatedAt' => Pengaturan::get('academic_period_updated_at'),
-        ]);
-    }
-
-    public function academicPeriodUpdate(Request $request): RedirectResponse
-    {
-        $validated = $request->validate([
-            'academic_year' => ['required', 'string', 'max:20', 'regex:/^\d{4}[\/\-]\d{4}$/'],
-            'period_mode' => ['required', Rule::in(['tahun_ajaran', 'semester'])],
-            'semester_period' => ['required', Rule::in(['ganjil', 'genap'])],
-            'period_start_date' => ['required', 'date'],
-            'period_end_date' => ['required', 'date', 'after_or_equal:period_start_date'],
-            'max_alpha_limit' => ['required', 'integer', 'min:1', 'max:100'],
-            'alpha_sp1_threshold' => ['required', 'integer', 'min:1', 'max:100'],
-            'alpha_sp2_threshold' => ['required', 'integer', 'min:1', 'max:100'],
-            'alpha_wakasis_threshold' => ['required', 'integer', 'min:1', 'max:100'],
-        ], [
-            'academic_year.required' => 'Tahun pelajaran wajib diisi.',
-            'academic_year.regex' => 'Format Tahun Pelajaran harus berupa YYYY/YYYY atau YYYY-YYYY (contoh: 2025/2026).',
-            'period_mode.required' => 'Mode periode wajib dipilih.',
-            'semester_period.required' => 'Semester wajib dipilih.',
-            'period_start_date.required' => 'Tanggal mulai periode wajib diisi.',
-            'period_end_date.required' => 'Tanggal selesai periode wajib diisi.',
-            'period_end_date.after_or_equal' => 'Tanggal selesai harus pada atau setelah tanggal mulai.',
-            'max_alpha_limit.required' => 'Batas maksimal alpha wajib diisi.',
-            'max_alpha_limit.min' => 'Batas maksimal alpha minimal 1.',
-        ]);
-
-        if ($validated['alpha_sp1_threshold'] > $validated['alpha_sp2_threshold'] || $validated['alpha_sp2_threshold'] > $validated['alpha_wakasis_threshold']) {
-            return back()->withErrors([
-                'alpha_sp1_threshold' => 'Urutan ambang batas harus logis: SP1 <= SP2 <= Wakasis.',
-            ])->withInput();
-        }
-
-        Pengaturan::set('academic_year', $validated['academic_year']);
-        Pengaturan::set('period_mode', $validated['period_mode']);
-        Pengaturan::set('semester_period', $validated['semester_period']);
-        Pengaturan::set('period_start_date', $validated['period_start_date']);
-        Pengaturan::set('period_end_date', $validated['period_end_date']);
-        Pengaturan::set('max_alpha_limit', (string) $validated['max_alpha_limit']);
-        Pengaturan::set('alpha_sp1_threshold', (string) $validated['alpha_sp1_threshold']);
-        Pengaturan::set('alpha_sp2_threshold', (string) $validated['alpha_sp2_threshold']);
-        Pengaturan::set('alpha_wakasis_threshold', (string) $validated['alpha_wakasis_threshold']);
-        Pengaturan::set('academic_period_updated_at', now()->toDateTimeString());
-
-        return redirect()->route('admin.pengaturan.periode-absen.index')->with('success', 'Konfigurasi periode dan batas alpha berhasil disimpan.');
-    }
-
     public function attendanceTime(): View
     {
         $startTime = Pengaturan::get('attendance_start_time', '06:30');
