@@ -60,27 +60,25 @@
 </div>
 
 @if($stats['status_alpha']['kode'] !== 'normal')
-    <div class="mb-5 rounded-xl border p-4 {{ match($stats['status_alpha']['kode']) {
-        'wakasis' => 'border-red-300 bg-red-100 text-red-900',
-        'sp2' => 'border-rose-300 bg-rose-50 text-rose-900',
-        'sp1' => 'border-amber-300 bg-amber-50 text-amber-900',
-        default => 'border-yellow-300 bg-yellow-50 text-yellow-900',
+    <div class="mb-5 rounded-2xl border p-5 sm:p-6 text-sm shadow-sm transition-all {{ match($stats['status_alpha']['kode']) {
+        'wakasis' => 'border-red-200 bg-red-50/80 text-red-900',
+        'sp2' => 'border-rose-200 bg-rose-50/80 text-rose-900',
+        'sp1' => 'border-amber-200 bg-amber-50/80 text-amber-900',
+        default => 'border-yellow-200 bg-yellow-50/80 text-yellow-900',
     } }}">
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 mb-2">
             <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.07 19h13.86a2 2 0 001.74-2.99L13.74 4a2 2 0 00-3.48 0L3.33 16.01A2 2 0 005.07 19z"/>
             </svg>
-            <p class="text-sm font-bold">Status Peringatan Alpha: {{ $stats['status_alpha']['label'] }}</p>
+            <p class="text-base font-bold">Peringatan Presensi Siswa</p>
         </div>
-        <p class="mt-1 text-xs">
+        <p class="leading-relaxed">
             @if($stats['status_alpha']['kode'] === 'wakasis')
-                Perhatian: Akumulasi Alpha telah mencapai atau melebihi {{ $stats['max_alpha'] }}x. Kasus ini diproses oleh Wakasis dan pemanggilan orang tua untuk dikembalikan ke orang tua.
-            @elseif($stats['status_alpha']['kode'] === 'sp2')
-                Perhatian: Akumulasi Alpha telah mencapai {{ $stats['alpha'] }}x. Kasus ini diproses oleh Guru BK dengan menerbitkan Surat Peringatan 2 (SP2) dan pemanggilan orang tua.
-            @elseif($stats['status_alpha']['kode'] === 'sp1')
-                Perhatian: Akumulasi Alpha telah mencapai {{ $stats['alpha'] }}x. Diproses oleh Wali Kelas & Guru BK dengan menerbitkan Surat Peringatan 1 (SP1) dan pemanggilan orang tua.
+                Kamu telah mencapai batas maksimal {{ $stats['max_alpha'] }}x Alpha. Diharapkan untuk segera menghubungi Wali Kelas atau pihak Sekolah untuk tindak lanjut presensi.
+            @elseif($stats['status_alpha']['kode'] === 'sp2' || $stats['status_alpha']['kode'] === 'sp1')
+                Akumulasi Alpha kamu telah mencapai {{ $stats['alpha'] }}x dari batas maksimal {{ $stats['max_alpha'] }}x. Diharapkan untuk berkoordinasi dengan Wali Kelas terkait presensimu.
             @else
-                Peringatan: Kamu sudah mencatat {{ $stats['alpha'] }}x Alpha. Wali kelas akan melakukan konfirmasi kepada orang tua. Jaga presensimu agar tidak bertambah.
+                Kamu saat ini tercatat {{ $stats['alpha'] }}x Alpha (Sisa jatah: {{ $stats['sisa_alpha'] }}x dari {{ $stats['max_alpha'] }}x). Mohon untuk selalu hadir tepat waktu dan menjaga konsistensi presensimu.
             @endif
         </p>
     </div>
