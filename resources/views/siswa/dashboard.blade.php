@@ -42,11 +42,49 @@
         <p class="text-xs font-semibold uppercase text-gray-500">Izin/Sakit/Disp</p>
         <p class="mt-1 text-xl font-bold text-blue-600">{{ $stats['izin_sakit'] }}</p>
     </div>
-    <div class="rounded-xl border border-gray-200 bg-white p-4">
-        <p class="text-xs font-semibold uppercase text-gray-500">Alpha</p>
-        <p class="mt-1 text-xl font-bold text-red-600">{{ $stats['alpha'] }}</p>
+    <div class="col-span-2 rounded-xl border border-red-200 bg-red-50/50 p-4">
+        <div class="flex items-center justify-between">
+            <p class="text-xs font-semibold uppercase text-red-700">Akumulasi Alpha</p>
+            <span class="inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium bg-white text-red-700 border border-red-200 shadow-sm">
+                Sisa Jatah: {{ $stats['sisa_alpha'] }}x
+            </span>
+        </div>
+        <div class="mt-1 flex items-baseline gap-2">
+            <p class="text-2xl font-bold text-red-600">{{ $stats['alpha'] }}</p>
+            <span class="text-sm font-semibold text-gray-500">/ {{ $stats['max_alpha'] }} kali</span>
+        </div>
+        <p class="mt-1 text-xs text-gray-500">
+            Tahun Pelajaran {{ $stats['tahun_ajaran'] }} ({{ $stats['mode_periode'] === 'tahun_ajaran' ? 'Per 1 Tahun' : 'Semester '.ucfirst($stats['semester']) }})
+        </p>
     </div>
 </div>
+
+@if($stats['status_alpha']['kode'] !== 'normal')
+    <div class="mb-5 rounded-xl border p-4 {{ match($stats['status_alpha']['kode']) {
+        'wakasis' => 'border-red-300 bg-red-100 text-red-900',
+        'sp2' => 'border-rose-300 bg-rose-50 text-rose-900',
+        'sp1' => 'border-amber-300 bg-amber-50 text-amber-900',
+        default => 'border-yellow-300 bg-yellow-50 text-yellow-900',
+    } }}">
+        <div class="flex items-center gap-2">
+            <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.07 19h13.86a2 2 0 001.74-2.99L13.74 4a2 2 0 00-3.48 0L3.33 16.01A2 2 0 005.07 19z"/>
+            </svg>
+            <p class="text-sm font-bold">Status Peringatan Alpha: {{ $stats['status_alpha']['label'] }}</p>
+        </div>
+        <p class="mt-1 text-xs">
+            @if($stats['status_alpha']['kode'] === 'wakasis')
+                Perhatian: Akumulasi Alpha telah mencapai atau melebihi {{ $stats['max_alpha'] }}x. Kasus ini diproses oleh Wakasis dan pemanggilan orang tua untuk dikembalikan ke orang tua.
+            @elseif($stats['status_alpha']['kode'] === 'sp2')
+                Perhatian: Akumulasi Alpha telah mencapai {{ $stats['alpha'] }}x. Kasus ini diproses oleh Guru BK dengan menerbitkan Surat Peringatan 2 (SP2) dan pemanggilan orang tua.
+            @elseif($stats['status_alpha']['kode'] === 'sp1')
+                Perhatian: Akumulasi Alpha telah mencapai {{ $stats['alpha'] }}x. Diproses oleh Wali Kelas & Guru BK dengan menerbitkan Surat Peringatan 1 (SP1) dan pemanggilan orang tua.
+            @else
+                Peringatan: Kamu sudah mencatat {{ $stats['alpha'] }}x Alpha. Wali kelas akan melakukan konfirmasi kepada orang tua. Jaga presensimu agar tidak bertambah.
+            @endif
+        </p>
+    </div>
+@endif
 
 <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
     <x-shortcut-card :href="route('siswa.absensi')" title="Absensi" description="Catat kehadiran harian dan lihat status hari ini.">
