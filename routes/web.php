@@ -117,6 +117,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('kelas', KelasController::class)->parameters(['kelas' => 'kelas']);
     Route::get('/pengaturan/waktu-absen', [PengaturanController::class, 'attendanceTime'])->name('pengaturan.waktu-absen.index');
     Route::put('/pengaturan/waktu-absen', [PengaturanController::class, 'attendanceTimeUpdate'])->name('pengaturan.waktu-absen.update');
+    Route::get('/pengaturan/periode-absen', [PengaturanController::class, 'academicPeriod'])->name('pengaturan.periode-absen.index');
+    Route::put('/pengaturan/periode-absen', [PengaturanController::class, 'academicPeriodUpdate'])->name('pengaturan.periode-absen.update');
     Route::get('/pengaturan/lokasi-absen', [PengaturanController::class, 'attendanceLocation'])->name('pengaturan.lokasi-absen.index');
     Route::put('/pengaturan/lokasi-absen', [PengaturanController::class, 'attendanceLocationUpdate'])->name('pengaturan.lokasi-absen.update');
     Route::put('/pengaturan/lokasi-absen/tolerance', [PengaturanController::class, 'attendanceLocationTolerance'])->name('pengaturan.lokasi-absen.tolerance');
