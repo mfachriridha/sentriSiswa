@@ -7,6 +7,7 @@ use App\Models\Absensi;
 use App\Models\Kelas;
 use App\Models\PelanggaranSiswa;
 use App\Models\PengajuanPoin;
+use App\Models\Pengaturan;
 use App\Models\ProfilSiswa;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -56,12 +57,22 @@ class DashboardController extends Controller
 
         if ($user->isKesiswaan()) {
             $studentIds = ProfilSiswa::whereHas('pengguna', fn ($query) => $query->where('status', 'registered'))->pluck('nisn');
+            [$startDate, $endDate] = Pengaturan::rentangTanggalPeriodeAktif();
+            $thresholdSp1 = Pengaturan::ambangPeringatanAlpha()['sp1'];
+
+            $alphaWarningCount = ProfilSiswa::whereHas('pengguna', fn ($q) => $q->where('status', 'registered'))
+                ->whereHas('absensi', function ($q) use ($startDate, $endDate) {
+                    $q->where('status', 'alpha')
+                        ->whereBetween('tanggal', [$startDate->toDateString(), $endDate->toDateString()]);
+                }, '>=', $thresholdSp1)
+                ->count();
 
             $summary['kesiswaan'] = [
                 'classes' => Kelas::count(),
                 'students' => $studentIds->count(),
                 'approved' => PelanggaranSiswa::disetujui()->count(),
                 'pengajuan_poin_pending' => PengajuanPoin::where('status', 'pending')->count(),
+                'alpha_warning' => $alphaWarningCount,
             ];
         }
 
