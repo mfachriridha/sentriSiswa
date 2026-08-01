@@ -37,10 +37,10 @@ class AttendanceReportMessageBuilder
             ->keyBy('profil_siswa_id');
 
         $sudahAbsen = $studentProfiles->filter(fn ($sp) => $attendances->has($sp->nisn)
-            && in_array($attendances[$sp->nisn]->status, ['hadir', 'izin', 'sakit']));
+            && in_array($attendances[$sp->nisn]->status, ['hadir', 'izin', 'sakit', 'dispensasi']));
 
         $belumAbsen = $studentProfiles->reject(fn ($sp) => $attendances->has($sp->nisn)
-            && in_array($attendances[$sp->nisn]->status, ['hadir', 'izin', 'sakit']));
+            && in_array($attendances[$sp->nisn]->status, ['hadir', 'izin', 'sakit', 'dispensasi']));
 
         $sudahCount = $sudahAbsen->count();
         $belumCount = $belumAbsen->count();

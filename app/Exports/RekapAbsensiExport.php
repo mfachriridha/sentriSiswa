@@ -38,6 +38,7 @@ class RekapAbsensiExport implements FromArray, WithHeadings, WithStrictNullCompa
             'Hadir',
             'Izin',
             'Sakit',
+            'Dispensasi',
             'Alpha',
         ];
     }
