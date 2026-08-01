@@ -33,7 +33,7 @@ class PengaturanController extends Controller
     public function academicPeriodUpdate(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'academic_year' => ['required', 'string', 'max:20'],
+            'academic_year' => ['required', 'string', 'max:20', 'regex:/^\d{4}[\/\-]\d{4}$/'],
             'period_mode' => ['required', Rule::in(['tahun_ajaran', 'semester'])],
             'semester_period' => ['required', Rule::in(['ganjil', 'genap'])],
             'period_start_date' => ['required', 'date'],
@@ -44,6 +44,7 @@ class PengaturanController extends Controller
             'alpha_wakasis_threshold' => ['required', 'integer', 'min:1', 'max:100'],
         ], [
             'academic_year.required' => 'Tahun pelajaran wajib diisi.',
+            'academic_year.regex' => 'Format Tahun Pelajaran harus berupa YYYY/YYYY atau YYYY-YYYY (contoh: 2025/2026).',
             'period_mode.required' => 'Mode periode wajib dipilih.',
             'semester_period.required' => 'Semester wajib dipilih.',
             'period_start_date.required' => 'Tanggal mulai periode wajib diisi.',
