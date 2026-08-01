@@ -51,6 +51,7 @@ class ClassRosterController extends Controller
             'hadir' => 0,
             'izin' => 0,
             'sakit' => 0,
+            'dispensasi' => 0,
             'alpha' => 0,
             'belum_absen' => 0,
         ];
@@ -78,7 +79,7 @@ class ClassRosterController extends Controller
             ->get()
             ->keyBy('profil_siswa_id');
 
-        $stats = ['hadir' => 0, 'izin' => 0, 'sakit' => 0, 'alpha' => 0, 'belum_absen' => 0];
+        $stats = ['hadir' => 0, 'izin' => 0, 'sakit' => 0, 'dispensasi' => 0, 'alpha' => 0, 'belum_absen' => 0];
         foreach ($studentIds as $id) {
             $status = $attendances->get($id)?->status ?? 'belum_absen';
             $stats[$status]++;

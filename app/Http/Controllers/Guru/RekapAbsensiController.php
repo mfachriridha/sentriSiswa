@@ -62,6 +62,7 @@ class RekapAbsensiController extends Controller
                 $stat['hadir'],
                 $stat['izin'],
                 $stat['sakit'],
+                $stat['dispensasi'],
                 $stat['alpha'],
             ];
         })->values()->all();
@@ -165,7 +166,7 @@ class RekapAbsensiController extends Controller
     /**
      * @param  Collection<int, ProfilSiswa>  $students
      * @param  Collection<int, Collection<int, Absensi>>  $attendances
-     * @return array<int, array{hadir: int, izin: int, sakit: int, alpha: int}>
+     * @return array<int, array{hadir: int, izin: int, sakit: int, dispensasi: int, alpha: int}>
      */
     private function calculateStats(Collection $students, Collection $attendances): array
     {
@@ -173,12 +174,13 @@ class RekapAbsensiController extends Controller
 
         foreach ($students as $student) {
             $studentAttendances = $attendances->get($student->nisn, collect());
-            $finalAttendances = $studentAttendances->whereIn('status', ['hadir', 'izin', 'sakit', 'alpha']);
+            $finalAttendances = $studentAttendances->whereIn('status', ['hadir', 'izin', 'sakit', 'dispensasi', 'alpha']);
 
             $stats[$student->nisn] = [
                 'hadir' => $finalAttendances->where('status', 'hadir')->count(),
                 'izin' => $finalAttendances->where('status', 'izin')->count(),
                 'sakit' => $finalAttendances->where('status', 'sakit')->count(),
+                'dispensasi' => $finalAttendances->where('status', 'dispensasi')->count(),
                 'alpha' => $finalAttendances->where('status', 'alpha')->count(),
             ];
         }

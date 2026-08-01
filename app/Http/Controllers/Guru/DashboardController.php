@@ -32,7 +32,7 @@ class DashboardController extends Controller
                 'class_name' => $user->kelasWali->nama,
                 'students' => $profileIds->count(),
                 'hadir' => $todayAttendances->where('status', 'hadir')->count(),
-                'izin_sakit' => $todayAttendances->whereIn('status', ['izin', 'sakit'])->count(),
+                'izin_sakit' => $todayAttendances->whereIn('status', ['izin', 'sakit', 'dispensasi'])->count(),
                 'alpha' => $todayAttendances->where('status', 'alpha')->count(),
                 'belum_absen' => $notSubmitted,
             ];
