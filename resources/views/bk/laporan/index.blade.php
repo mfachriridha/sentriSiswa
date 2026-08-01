@@ -88,11 +88,15 @@
                     <th class="px-4 py-2.5 text-center text-xs font-medium uppercase tracking-wider text-gray-500">S</th>
                     <th class="px-4 py-2.5 text-center text-xs font-medium uppercase tracking-wider text-gray-500">D</th>
                     <th class="px-4 py-2.5 text-center text-xs font-medium uppercase tracking-wider text-gray-500">A</th>
+                    <th class="px-4 py-2.5 text-center text-xs font-medium uppercase tracking-wider text-gray-500">Status Alpha</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200 bg-white">
                 @forelse($students as $index => $student)
-                    @php $stat = $stats[$student->nisn]; @endphp
+                    @php
+                        $stat = $stats[$student->nisn];
+                        $warningInfo = \App\Models\Pengaturan::statusPeringatanAlpha($stat['alpha']);
+                    @endphp
                     <tr class="hover:bg-gray-50">
                         <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-900">{{ $students->firstItem() + $index }}</td>
                         <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-500">{{ $student->nis ?? '-' }}</td>
@@ -103,10 +107,25 @@
                         <td class="whitespace-nowrap px-4 py-3 text-center text-sm font-medium text-purple-600">{{ $stat['sakit'] }}</td>
                         <td class="whitespace-nowrap px-4 py-3 text-center text-sm font-medium text-orange-600">{{ $stat['dispensasi'] }}</td>
                         <td class="whitespace-nowrap px-4 py-3 text-center text-sm font-medium text-red-600">{{ $stat['alpha'] }}</td>
+                        <td class="whitespace-nowrap px-4 py-3 text-center text-sm font-medium">
+                            @if($warningInfo['kode'] !== 'normal')
+                                <span class="inline-flex items-center rounded px-2 py-0.5 text-xs font-semibold
+                                    {{ match($warningInfo['kode']) {
+                                        'wakasis' => 'bg-red-100 text-red-800 border border-red-200',
+                                        'sp2' => 'bg-rose-100 text-rose-800 border border-rose-200',
+                                        'sp1' => 'bg-amber-100 text-amber-800 border border-amber-200',
+                                        default => 'bg-yellow-100 text-yellow-800 border border-yellow-200',
+                                    } }}">
+                                    {{ $warningInfo['label'] }}
+                                </span>
+                            @else
+                                <span class="text-xs text-gray-400">Aman</span>
+                            @endif
+                        </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="9" class="px-6 py-12 text-center text-sm text-gray-500">Belum ada data absensi untuk periode ini.</td>
+                        <td colspan="10" class="px-6 py-12 text-center text-sm text-gray-500">Belum ada data absensi untuk periode ini.</td>
                     </tr>
                 @endforelse
             </tbody>

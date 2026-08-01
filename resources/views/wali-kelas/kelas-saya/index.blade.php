@@ -91,7 +91,8 @@
                         <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">No</th>
                         <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">NIS</th>
                         <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Nama</th>
-                        <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Status</th>
+                        <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Status Hari Ini</th>
+                        <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Alpha (Periode)</th>
                         <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Jam Absen</th>
                         <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Selfie</th>
                         <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Aksi</th>
@@ -103,6 +104,8 @@
                             $attendance = $attendances->get($student->nisn);
                             $status = $attendance?->status ?? 'belum_absen';
                             [$badgeClass, $statusLabel] = $statusConfig[$status];
+                            $alphaCount = $periodAlphaCounts->get($student->nisn, 0);
+                            $warningInfo = \App\Models\Pengaturan::statusPeringatanAlpha($alphaCount);
                         @endphp
                         <tr class="hover:bg-gray-50">
                             <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-900">{{ $index + 1 }}</td>
@@ -114,6 +117,24 @@
                                 <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {{ $badgeClass }}">
                                     {{ $statusLabel }}
                                 </span>
+                            </td>
+                            <td class="whitespace-nowrap px-4 py-3 text-sm">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="font-bold text-red-600">{{ $alphaCount }}</span>
+                                    <span class="text-xs text-gray-500">/ {{ $maxAlpha ?? 6 }}x</span>
+                                    <span class="text-xs text-gray-400">(Sisa {{ max(0, ($maxAlpha ?? 6) - $alphaCount) }}x)</span>
+                                </div>
+                                @if($warningInfo['kode'] !== 'normal')
+                                    <span class="mt-0.5 inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-semibold
+                                        {{ match($warningInfo['kode']) {
+                                            'wakasis' => 'bg-red-100 text-red-800 border border-red-200',
+                                            'sp2' => 'bg-rose-100 text-rose-800 border border-rose-200',
+                                            'sp1' => 'bg-amber-100 text-amber-800 border border-amber-200',
+                                            default => 'bg-yellow-100 text-yellow-800 border border-yellow-200',
+                                        } }}">
+                                        {{ $warningInfo['label'] }}
+                                    </span>
+                                @endif
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-500">
                                 {{ $attendance?->waktu_masuk?->format('H:i') ?? '-' }}

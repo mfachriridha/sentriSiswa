@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Guru\AttendanceRecapFilterRequest;
 use App\Models\Absensi;
 use App\Models\Kelas;
+use App\Models\Pengaturan;
 use App\Models\ProfilSiswa;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
@@ -157,9 +158,11 @@ class AbsensiRecapController extends Controller
             return [$start, $end];
         }
 
+        [$startPeriode, $endPeriode] = Pengaturan::rentangTanggalPeriodeAktif();
+
         return [
-            $validated['mulai'] ?? now()->startOfMonth()->toDateString(),
-            $validated['selesai'] ?? now()->toDateString(),
+            $validated['mulai'] ?? $startPeriode->toDateString(),
+            $validated['selesai'] ?? $endPeriode->toDateString(),
         ];
     }
 

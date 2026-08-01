@@ -61,7 +61,22 @@ class ClassRosterController extends Controller
             $stats[$status]++;
         }
 
-        return view('wali-kelas.kelas-saya.index', compact('class', 'students', 'attendances', 'stats', 'isWeekday', 'activeDaysLabel'));
+        [$startDate, $endDate] = Pengaturan::rentangTanggalPeriodeAktif();
+        $periodAlphaCounts = Absensi::query()
+            ->whereIn('profil_siswa_id', $studentIds)
+            ->where('status', 'alpha')
+            ->whereBetween('tanggal', [$startDate->toDateString(), $endDate->toDateString()])
+            ->selectRaw('profil_siswa_id, COUNT(*) as total_alpha')
+            ->groupBy('profil_siswa_id')
+            ->pluck('total_alpha', 'profil_siswa_id');
+
+        $maxAlpha = Pengaturan::batasMaksimalAlpha();
+        $tahunAjaran = Pengaturan::tahunAjaran();
+
+        return view('wali-kelas.kelas-saya.index', compact(
+            'class', 'students', 'attendances', 'stats', 'isWeekday', 'activeDaysLabel',
+            'periodAlphaCounts', 'maxAlpha', 'tahunAjaran'
+        ));
     }
 
     public function statusAbsensi(): JsonResponse
