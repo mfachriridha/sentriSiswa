@@ -9,6 +9,7 @@ use App\Models\PelanggaranSiswa;
 use App\Models\PengajuanPoin;
 use App\Models\Pengaturan;
 use App\Models\Pengguna;
+use App\Models\ProfilGuru;
 use App\Models\ProfilSiswa;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
@@ -27,7 +28,8 @@ use Illuminate\Support\Facades\Storage;
  * jadi aman dijalankan di atas data impor yang asli. Aman pula dijalankan berkali-
  * kali: tiap tahap memeriksa dulu, dan angka acaknya dikunci supaya hasilnya sama.
  *
- * Guru tidak disentuh sama sekali.
+ * Guru selain wali kelas tidak disentuh. Wali kelas didaftarkan dengan
+ * email walas001@sentrisiswa.test dst. dan password123.
  *
  * Jalankan: php artisan db:seed --class=SekolahAktifSeeder
  */
@@ -45,6 +47,7 @@ class SekolahAktifSeeder extends Seeder
         mt_srand(20260712);
 
         $siswa = $this->siswaYangDilibatkan();
+        $waliKelas = $this->waliKelasYangDilibatkan();
 
         if ($siswa->isEmpty()) {
             $this->command?->warn('Tidak ada siswa yang bisa dihidupkan. Impor data siswa lebih dulu.');
@@ -54,10 +57,62 @@ class SekolahAktifSeeder extends Seeder
 
         $this->command?->info("Menghidupkan {$siswa->count()} siswa di semua kelas.");
 
+        $this->daftarkanWaliKelas($waliKelas);
         $this->daftarkanSiswa($siswa);
         $this->catatAbsensi($siswa);
         $this->catatPelanggaran($siswa);
         $this->buatPengajuanPoin();
+    }
+
+    /**
+     * Seluruh wali kelas yang ikut dihidupkan.
+     *
+     * @return Collection<int, ProfilGuru>
+     */
+    private function waliKelasYangDilibatkan(): Collection
+    {
+        return ProfilGuru::query()
+            ->with('pengguna')
+            ->whereHas('pengguna', fn ($query) => $query->where('peran', 'wali_kelas'))
+            ->orderBy('nip')
+            ->get();
+    }
+
+    /** @param Collection<int, ProfilGuru> $waliKelas */
+    private function daftarkanWaliKelas(Collection $waliKelas): void
+    {
+        $belumDaftar = $waliKelas->filter(fn (ProfilGuru $g): bool => $g->pengguna?->status !== 'registered');
+
+        if ($belumDaftar->isEmpty()) {
+            $this->command?->line('  Wali kelas terdaftar: 0 (semuanya sudah punya akun)');
+
+            return;
+        }
+
+        // Kata sandinya sama untuk semua, jadi cukup di-hash sekali. Meng-hash
+        // berulang kali akan makan waktu tanpa manfaat apa pun.
+        $sandi = Hash::make('password123');
+
+        // Nomor urut emailnya diambil dari posisi wali kelas di daftar PENUH (bukan
+        // cuma yang belum daftar), supaya urutannya stabil walau seeder diulang.
+        $nomorUrut = $waliKelas->values()->mapWithKeys(fn (ProfilGuru $g, int $i): array => [$g->nip => $i + 1]);
+
+        DB::transaction(function () use ($belumDaftar, $sandi, $nomorUrut): void {
+            foreach ($belumDaftar as $profil) {
+                $nomor = str_pad((string) $nomorUrut[$profil->nip], 3, '0', STR_PAD_LEFT);
+
+                DB::table('pengguna')
+                    ->where('id', $profil->pengguna_id)
+                    ->update([
+                        'status' => 'registered',
+                        'email' => "walas{$nomor}@sentrisiswa.test",
+                        'password' => $sandi,
+                        'diperbarui_pada' => now(),
+                    ]);
+            }
+        });
+
+        $this->command?->line("  Wali kelas didaftarkan: {$belumDaftar->count()}");
     }
 
     /**
@@ -129,11 +184,29 @@ class SekolahAktifSeeder extends Seeder
         $antrean = [];
 
         foreach ($siswa->values() as $urutan => $profil) {
-            $pola = $this->polaKehadiran($urutan);
+            $maxAlphaSiswa = match (true) {
+                $urutan % 10 < 6 => 0,
+                $urutan % 10 < 8 => 1,
+                $urutan % 10 === 8 => 3,
+                default => 6,
+            };
+            $alphaRecorded = 0;
             $selfie = $potret ? $this->potretSiswa($profil->nisn) : null;
 
             foreach ($tanggal as $tanggalAbsen) {
-                $status = $pola[$tanggalAbsen->dayOfYear % count($pola)];
+                $status = 'hadir';
+
+                if ($maxAlphaSiswa > 0 && $alphaRecorded < $maxAlphaSiswa) {
+                    $interval = (int) max(1, floor($tanggal->count() / $maxAlphaSiswa));
+                    if (($tanggalAbsen->dayOfYear + $urutan) % $interval === 0) {
+                        $status = 'alpha';
+                        $alphaRecorded++;
+                    }
+                }
+
+                if ($status === 'hadir' && ($urutan + $tanggalAbsen->day) % 7 === 0) {
+                    $status = ($urutan % 2 === 0) ? 'izin' : 'sakit';
+                }
 
                 // Hari ini sengaja dibuat beragam supaya papan pantau "hari ini"
                 // tidak kelihatan janggal: ada yang sudah hadir, ada yang memang
