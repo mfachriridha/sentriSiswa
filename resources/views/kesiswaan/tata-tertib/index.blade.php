@@ -29,7 +29,7 @@
                 Publikasikan
             </label>
             <button type="submit" class="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-dark">
-                Upload
+                Unggah
             </button>
         </div>
     </form>

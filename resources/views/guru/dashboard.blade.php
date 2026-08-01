@@ -16,7 +16,7 @@
             <p class="mt-1 text-xl font-bold text-green-600">{{ $summary['homeroom']['hadir'] }}</p>
         </div>
         <div class="rounded-xl border border-gray-200 bg-white p-4">
-            <p class="text-xs font-semibold uppercase text-gray-500">Izin/Sakit</p>
+            <p class="text-xs font-semibold uppercase text-gray-500">Izin/Sakit/Disp</p>
             <p class="mt-1 text-xl font-bold text-blue-600">{{ $summary['homeroom']['izin_sakit'] }}</p>
         </div>
         <div class="rounded-xl border border-gray-200 bg-white p-4">

@@ -56,6 +56,7 @@
                             'hadir' => ['bg-green-50 text-green-700', 'Hadir'],
                             'izin' => ['bg-blue-50 text-blue-700', 'Izin'],
                             'sakit' => ['bg-purple-50 text-purple-700', 'Sakit'],
+                            'dispensasi' => ['bg-orange-50 text-orange-700', 'Dispensasi'],
                             'alpha' => ['bg-red-50 text-red-700', 'Alpha'],
                         ];
                         [$badgeClass, $statusLabel] = $statusConfig[$attendance->status] ?? ['bg-gray-50 text-gray-700', $attendance->status];

@@ -34,6 +34,7 @@
             ['status' => 'hadir', 'label' => 'Hadir', 'class' => 'border-green-200 bg-green-50 text-green-700'],
             ['status' => 'izin', 'label' => 'Izin', 'class' => 'border-blue-200 bg-blue-50 text-blue-700'],
             ['status' => 'sakit', 'label' => 'Sakit', 'class' => 'border-purple-200 bg-purple-50 text-purple-700'],
+            ['status' => 'dispensasi', 'label' => 'Dispensasi', 'class' => 'border-orange-200 bg-orange-50 text-orange-700'],
             ['status' => 'alpha', 'label' => 'Alpha', 'class' => 'border-red-200 bg-red-50 text-red-700'],
             ['status' => 'belum_absen', 'label' => 'Belum Absen', 'class' => 'border-gray-200 bg-gray-50 text-gray-700'],
         ];
@@ -77,6 +78,7 @@
                 'hadir' => ['bg-green-100 text-green-800', 'Hadir'],
                 'izin' => ['bg-blue-100 text-blue-800', 'Izin'],
                 'sakit' => ['bg-purple-100 text-purple-800', 'Sakit'],
+                'dispensasi' => ['bg-orange-100 text-orange-800', 'Dispensasi'],
                 'alpha' => ['bg-red-100 text-red-800', 'Alpha'],
                 'belum_absen' => ['bg-gray-100 text-gray-800', 'Belum Absen'],
             ];
@@ -174,6 +176,7 @@
                 <option value="hadir">Hadir</option>
                 <option value="izin">Izin</option>
                 <option value="sakit">Sakit</option>
+                <option value="dispensasi">Dispensasi</option>
                 <option value="alpha">Alpha</option>
             </select>
 

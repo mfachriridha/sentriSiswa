@@ -48,7 +48,7 @@
                 <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
                 <select id="status" name="status" class="mt-1 w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
                     <option value="">Semua Status</option>
-                    @foreach (['hadir' => 'Hadir', 'izin' => 'Izin', 'sakit' => 'Sakit', 'alpha' => 'Alpha'] as $value => $label)
+                    @foreach (['hadir' => 'Hadir', 'izin' => 'Izin', 'sakit' => 'Sakit', 'dispensasi' => 'Dispensasi', 'alpha' => 'Alpha'] as $value => $label)
                         <option value="{{ $value }}" {{ $statusFilter === $value ? 'selected' : '' }}>{{ $label }}</option>
                     @endforeach
                 </select>
@@ -76,6 +76,7 @@
                     <th class="px-4 py-2.5 text-center text-xs font-medium uppercase tracking-wider text-gray-500">H</th>
                     <th class="px-4 py-2.5 text-center text-xs font-medium uppercase tracking-wider text-gray-500">I</th>
                     <th class="px-4 py-2.5 text-center text-xs font-medium uppercase tracking-wider text-gray-500">S</th>
+                    <th class="px-4 py-2.5 text-center text-xs font-medium uppercase tracking-wider text-gray-500">D</th>
                     <th class="px-4 py-2.5 text-center text-xs font-medium uppercase tracking-wider text-gray-500">A</th>
                 </tr>
             </thead>
@@ -91,11 +92,12 @@
                         <td class="whitespace-nowrap px-4 py-3 text-center text-sm font-medium text-green-600">{{ $stat['hadir'] }}</td>
                         <td class="whitespace-nowrap px-4 py-3 text-center text-sm font-medium text-blue-600">{{ $stat['izin'] }}</td>
                         <td class="whitespace-nowrap px-4 py-3 text-center text-sm font-medium text-purple-600">{{ $stat['sakit'] }}</td>
+                        <td class="whitespace-nowrap px-4 py-3 text-center text-sm font-medium text-orange-600">{{ $stat['dispensasi'] }}</td>
                         <td class="whitespace-nowrap px-4 py-3 text-center text-sm font-medium text-red-600">{{ $stat['alpha'] }}</td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="px-6 py-12 text-center text-sm text-gray-500">Belum ada siswa di kelas ini.</td>
+                        <td colspan="8" class="px-6 py-12 text-center text-sm text-gray-500">Belum ada siswa di kelas ini.</td>
                     </tr>
                 @endforelse
             </tbody>
@@ -112,6 +114,7 @@
         <span>H: Hadir</span>
         <span>I: Izin</span>
         <span>S: Sakit</span>
+        <span>D: Dispensasi</span>
         <span>A: Alpha</span>
     </div>
 </div>

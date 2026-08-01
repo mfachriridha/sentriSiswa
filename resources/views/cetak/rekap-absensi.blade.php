@@ -28,6 +28,7 @@
             <th class="border border-slate-300 px-2 py-1.5 text-center">Hadir</th>
             <th class="border border-slate-300 px-2 py-1.5 text-center">Izin</th>
             <th class="border border-slate-300 px-2 py-1.5 text-center">Sakit</th>
+            <th class="border border-slate-300 px-2 py-1.5 text-center">Disp</th>
             <th class="border border-slate-300 px-2 py-1.5 text-center">Alpha</th>
         </tr>
     </thead>
@@ -46,11 +47,12 @@
                 <td class="border border-slate-300 px-2 py-1.5 text-center">{{ $stat['hadir'] }}</td>
                 <td class="border border-slate-300 px-2 py-1.5 text-center">{{ $stat['izin'] }}</td>
                 <td class="border border-slate-300 px-2 py-1.5 text-center">{{ $stat['sakit'] }}</td>
+                <td class="border border-slate-300 px-2 py-1.5 text-center">{{ $stat['dispensasi'] }}</td>
                 <td class="border border-slate-300 px-2 py-1.5 text-center">{{ $stat['alpha'] }}</td>
             </tr>
         @empty
             <tr>
-                <td class="border border-slate-300 px-2 py-4 text-center text-slate-500" colspan="{{ $tampilkanKelas ? 8 : 7 }}">
+                <td class="border border-slate-300 px-2 py-4 text-center text-slate-500" colspan="{{ $tampilkanKelas ? 9 : 8 }}">
                     Tidak ada data.
                 </td>
             </tr>

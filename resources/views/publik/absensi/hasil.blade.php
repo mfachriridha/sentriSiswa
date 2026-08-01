@@ -10,6 +10,7 @@
             'hadir' => ['Hadir', 'bg-green-50 text-green-700 border-green-200'],
             'izin' => ['Izin', 'bg-indigo-50 text-indigo-700 border-indigo-200'],
             'sakit' => ['Sakit', 'bg-blue-50 text-blue-700 border-blue-200'],
+            'dispensasi' => ['Dispensasi', 'bg-orange-50 text-orange-700 border-orange-200'],
             'alpha' => ['Tidak Hadir', 'bg-red-50 text-red-700 border-red-200'],
             'belum_absen' => ['Belum Absen', 'bg-slate-100 text-slate-600 border-slate-200'],
         ];
