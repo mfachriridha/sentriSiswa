@@ -76,7 +76,7 @@
                     <span class="block text-sm font-medium text-gray-500">Alpha (Periode)</span>
                     <div class="mt-1 flex items-center gap-1.5">
                         <span class="text-2xl font-bold text-red-600">{{ $periodAlphaCount ?? 0 }}</span>
-                        <span class="text-xs text-gray-500">/ {{ $maxAlpha ?? 6 }}x</span>
+                        <span class="text-xs text-gray-500">kali</span>
                     </div>
                 </div>
                 <div>

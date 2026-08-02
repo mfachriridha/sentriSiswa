@@ -121,8 +121,7 @@
                             <td class="whitespace-nowrap px-4 py-3 text-sm">
                                 <div class="flex items-center gap-1.5">
                                     <span class="font-bold text-red-600">{{ $alphaCount }}</span>
-                                    <span class="text-xs text-gray-500">/ {{ $maxAlpha ?? 6 }}x</span>
-                                    <span class="text-xs text-gray-400">(Sisa {{ max(0, ($maxAlpha ?? 6) - $alphaCount) }}x)</span>
+                                    <span class="text-xs text-gray-500">kali</span>
                                 </div>
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-500">

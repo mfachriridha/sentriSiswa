@@ -42,16 +42,11 @@
         <p class="text-xs font-semibold uppercase text-gray-500">Izin/Sakit/Disp</p>
         <p class="mt-1 text-xl font-bold text-blue-600">{{ $stats['izin_sakit'] }}</p>
     </div>
-    <div class="col-span-2 rounded-xl border border-red-200 bg-red-50/50 p-4">
-        <div class="flex items-center justify-between">
-            <p class="text-xs font-semibold uppercase text-red-700">Akumulasi Alpha</p>
-            <span class="inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium bg-white text-red-700 border border-red-200 shadow-sm">
-                Sisa Jatah: {{ $stats['sisa_alpha'] }}x
-            </span>
-        </div>
-        <div class="mt-1 flex items-baseline gap-2">
+    <div class="col-span-2 rounded-xl border border-red-200 bg-red-50/70 p-4">
+        <p class="text-xs font-semibold uppercase tracking-wide text-red-700">Akumulasi Alpha</p>
+        <div class="mt-1 flex items-baseline gap-1.5">
             <p class="text-2xl font-bold text-red-600">{{ $stats['alpha'] }}</p>
-            <span class="text-sm font-semibold text-gray-500">/ {{ $stats['max_alpha'] }} kali</span>
+            <span class="text-xs font-medium text-red-500">kali</span>
         </div>
     </div>
 </div>
@@ -71,11 +66,11 @@
         </div>
         <p class="leading-relaxed">
             @if($stats['status_alpha']['kode'] === 'wakasis')
-                Kamu telah mencapai batas maksimal {{ $stats['max_alpha'] }}x Alpha. Diharapkan untuk segera menghubungi Wali Kelas atau pihak Sekolah untuk tindak lanjut presensi.
+                Kamu telah mencatat {{ $stats['alpha'] }}x Alpha. Diharapkan untuk segera menghubungi Wali Kelas atau pihak Sekolah untuk tindak lanjut presensi.
             @elseif($stats['status_alpha']['kode'] === 'sp2' || $stats['status_alpha']['kode'] === 'sp1')
-                Akumulasi Alpha kamu telah mencapai {{ $stats['alpha'] }}x dari batas maksimal {{ $stats['max_alpha'] }}x. Diharapkan untuk berkoordinasi dengan Wali Kelas terkait presensimu.
+                Akumulasi Alpha kamu telah mencapai {{ $stats['alpha'] }}x. Diharapkan untuk berkoordinasi dengan Wali Kelas terkait presensimu.
             @else
-                Kamu saat ini tercatat {{ $stats['alpha'] }}x Alpha (Sisa jatah: {{ $stats['sisa_alpha'] }}x dari {{ $stats['max_alpha'] }}x). Mohon untuk selalu hadir tepat waktu dan menjaga konsistensi presensimu.
+                Kamu saat ini tercatat {{ $stats['alpha'] }}x Alpha. Mohon untuk selalu hadir tepat waktu dan menjaga konsistensi presensimu.
             @endif
         </p>
     </div>

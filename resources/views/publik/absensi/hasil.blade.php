@@ -80,19 +80,18 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-4 pb-5 border-b border-slate-100">
-                <div>
-                    <p class="text-sm font-medium text-slate-500">Sisa Poin Disiplin</p>
+            <div class="grid grid-cols-2 gap-3 pb-5 border-b border-slate-100">
+                <div class="rounded-xl border border-slate-200 bg-slate-50/70 p-3.5">
+                    <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Sisa Poin Disiplin</p>
                     <p class="mt-1 text-2xl font-bold {{ $warnaPoin }}">
                         {{ $poin }}<span class="text-xs font-normal text-slate-400">/100</span>
                     </p>
                 </div>
-                <div>
-                    <p class="text-sm font-medium text-slate-500">Akumulasi Alpha</p>
+                <div class="rounded-xl border border-red-200 bg-red-50/70 p-3.5">
+                    <p class="text-xs font-semibold uppercase tracking-wide text-red-700">Akumulasi Alpha</p>
                     <p class="mt-1 text-2xl font-bold text-red-600">
-                        {{ $alphaCount }}<span class="text-xs font-normal text-slate-400">/{{ $maxAlpha }}x</span>
+                        {{ $alphaCount }} <span class="text-xs font-normal text-red-500">kali</span>
                     </p>
-                    <p class="text-xs text-red-600 font-medium">Sisa Jatah: {{ $sisaAlpha }}x</p>
                 </div>
             </div>
 
@@ -117,11 +116,11 @@
                     </p>
                     <p class="leading-relaxed">
                         @if($statusAlpha['kode'] === 'wakasis')
-                            <strong class="font-semibold">{{ $siswa->pengguna->nama }}</strong> telah mencapai batas maksimal {{ $maxAlpha }}x Alpha. Diharapkan Orang Tua/Wali dapat segera menghubungi Wali Kelas atau pihak Sekolah untuk tindak lanjut presensi.
+                            <strong class="font-semibold">{{ $siswa->pengguna->nama }}</strong> telah mencatat {{ $alphaCount }}x Alpha. Diharapkan Orang Tua/Wali dapat segera menghubungi Wali Kelas atau pihak Sekolah untuk tindak lanjut presensi.
                         @elseif($statusAlpha['kode'] === 'sp2' || $statusAlpha['kode'] === 'sp1')
-                            Akumulasi Alpha <strong class="font-semibold">{{ $siswa->pengguna->nama }}</strong> telah mencapai {{ $alphaCount }}x dari batas maksimal {{ $maxAlpha }}x. Diharapkan Orang Tua/Wali dapat menghubungi Wali Kelas untuk konfirmasi presensi.
+                            Akumulasi Alpha <strong class="font-semibold">{{ $siswa->pengguna->nama }}</strong> telah mencapai {{ $alphaCount }}x. Diharapkan Orang Tua/Wali dapat menghubungi Wali Kelas untuk konfirmasi presensi.
                         @else
-                            <strong class="font-semibold">{{ $siswa->pengguna->nama }}</strong> saat ini tercatat {{ $alphaCount }}x Alpha (Sisa jatah: {{ $sisaAlpha }}x dari {{ $maxAlpha }}x). Mohon bantu ingatkan <strong class="font-semibold">{{ $siswa->pengguna->nama }}</strong> agar selalu hadir tepat waktu.
+                            <strong class="font-semibold">{{ $siswa->pengguna->nama }}</strong> saat ini tercatat {{ $alphaCount }}x Alpha. Mohon bantu ingatkan <strong class="font-semibold">{{ $siswa->pengguna->nama }}</strong> agar selalu hadir tepat waktu.
                         @endif
                     </p>
                 </div>
