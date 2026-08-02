@@ -67,7 +67,7 @@
                     <th class="px-4 py-3 font-semibold text-gray-600">Kelas</th>
                     <th class="px-4 py-3 font-semibold text-gray-600">Status</th>
                     <th class="px-4 py-3 font-semibold text-gray-600">Kehadiran (%)</th>
-                    <th class="px-4 py-3 font-semibold text-gray-600">Alpha (Periode)</th>
+                    <th class="px-4 py-3 font-semibold text-gray-600">Alpha</th>
                     <th class="px-4 py-3 font-semibold text-gray-600">Sisa Poin</th>
                     <th class="px-4 py-3 font-semibold text-gray-600">Aksi</th>
                 </tr>

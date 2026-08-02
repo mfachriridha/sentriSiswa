@@ -73,7 +73,7 @@
                     <span class="mt-1 block text-2xl font-bold {{ $points > 75 ? 'text-green-600' : ($points > 50 ? 'text-amber-600' : 'text-red-600') }}">{{ $points }}</span>
                 </div>
                 <div>
-                    <span class="block text-sm font-medium text-gray-500">Alpha (Periode)</span>
+                    <span class="block text-sm font-medium text-gray-500">Alpha</span>
                     <div class="mt-1 flex items-center gap-1.5">
                         <span class="text-2xl font-bold text-red-600">{{ $periodAlphaCount ?? 0 }}</span>
                         <span class="text-xs text-gray-500">kali</span>

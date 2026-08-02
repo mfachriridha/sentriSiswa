@@ -92,7 +92,7 @@
                         <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">NIS</th>
                         <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Nama</th>
                         <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Status Hari Ini</th>
-                        <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Alpha (Periode)</th>
+                        <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Alpha</th>
                         <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Jam Absen</th>
                         <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Selfie</th>
                         <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Aksi</th>

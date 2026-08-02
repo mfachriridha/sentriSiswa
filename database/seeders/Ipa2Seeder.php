@@ -152,7 +152,7 @@ class Ipa2Seeder extends Seeder
                         'nama_pelanggaran' => $sData['alasan_poin'],
                     ],
                     [
-                        'dicatat_oleh_id' => $walasUser->id,
+                        'dicatat_oleh_id' => $kesiswaanUser->id,
                         'tanggal_pelanggaran' => Carbon::today()->subDays(5)->format('Y-m-d'),
                         'kategori_pelanggaran' => 'ringan',
                         'pengurangan_poin' => $sData['pengurangan_poin'],
