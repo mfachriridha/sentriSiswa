@@ -95,12 +95,11 @@
         <form id="terimaForm" method="POST" class="px-5 py-4">
             @csrf
             @method('PUT')
-            <label for="jumlah_poin" class="block text-sm font-medium text-gray-700">
-                Poin Tambahan Baku <span class="text-red-500">*</span>
-            </label>
-            <input id="jumlah_poin" name="jumlah_poin" type="number" min="1" max="100" required
-                   class="mt-1.5 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/20">
-            <p class="mt-1 text-xs text-gray-500">Poin baku terisi otomatis berdasarkan kategori pengajuan.</p>
+            <div class="rounded-xl border border-green-200 bg-green-50/80 p-4 text-center">
+                <p class="text-xs font-semibold uppercase tracking-wide text-green-700">Nilai Tambahan Poin Baku</p>
+                <p id="terimaPoinBadge" class="mt-1 text-3xl font-bold text-green-700">+0 Poin</p>
+            </div>
+            <input type="hidden" id="jumlah_poin" name="jumlah_poin" value="">
             <div class="mt-5 flex justify-end gap-3">
                 <button type="button" onclick="closeTerimaModal()"
                         class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
@@ -162,7 +161,8 @@
     function openTerimaModal(id, studentName, categoryName, pointAmount) {
         document.getElementById('terimaForm').action = terimaRoutes[id];
         document.getElementById('terimaStudentName').textContent = 'Siswa: ' + studentName;
-        document.getElementById('terimaCategoryName').textContent = 'Kategori: 🏆 ' + categoryName + ' (+' + pointAmount + ' Poin)';
+        document.getElementById('terimaCategoryName').textContent = 'Kategori: 🏆 ' + categoryName;
+        document.getElementById('terimaPoinBadge').textContent = '+' + pointAmount + ' Poin';
         document.getElementById('jumlah_poin').value = pointAmount;
         const modal = document.getElementById('terimaModal');
         modal.classList.remove('hidden');
