@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             ViolationTypeSeeder::class,
             KategoriPengajuanPoinSeeder::class,
+            Ipa2Seeder::class,
         ]);
     }
 
