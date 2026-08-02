@@ -37,7 +37,7 @@ test('nisn yang tidak dikenal ditolak beserta alasannya', function () {
     $this->from($link)
         ->followingRedirects()
         ->post($link.'/cek', ['nisn' => '9999999999'])
-        ->assertSee('Data siswa tidak ditemukan. Periksa kembali NISN-nya.')
+        ->assertSee('Data siswa tidak ditemukan. Periksa kembali NISN atau NIS-nya.')
         ->assertDontSee('Sisa Poin');
 });
 
@@ -55,7 +55,7 @@ test('nisn anak dari kelas lain tidak bisa dilihat lewat link kelas ini', functi
     $this->from($link)
         ->followingRedirects()
         ->post($link.'/cek', ['nisn' => $siswaLain->nisn])
-        ->assertSee('Data siswa tidak ditemukan. Periksa kembali NISN-nya.')
+        ->assertSee('Data siswa tidak ditemukan. Periksa kembali NISN atau NIS-nya.')
         ->assertDontSee('Budi Santoso');
 });
 

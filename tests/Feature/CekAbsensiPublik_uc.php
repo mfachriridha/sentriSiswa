@@ -46,6 +46,20 @@ test('orang tua melihat absensi anaknya lengkap dengan jam dan foto selfienya', 
         ->assertSee('Sisa Poin');
 });
 
+test('orang tua bisa melihat absensi anaknya menggunakan NIS', function () {
+    Carbon::setTestNow('2026-07-06 08:00:00');
+    [, $kelas, $siswa] = kelasBerisiSiswa();
+    catatKehadiranBerselfie($siswa->nisn, '2026-07-06', '06:45');
+
+    $link = linkAbsensiOrangTua($kelas->id, '2026-07-06');
+
+    $this->followingRedirects()
+        ->post($link.'/cek', ['nisn' => $siswa->nis])
+        ->assertSee('Ahmad Fauzi')
+        ->assertSee('10 IPA 1')
+        ->assertSee('Hadir');
+});
+
 // TS.CAP.002 / TC.CAP.002.001 — Positive
 test('sisa poin anak yang pernah melanggar ikut tampil apa adanya', function () {
     Carbon::setTestNow('2026-07-06 08:00:00');

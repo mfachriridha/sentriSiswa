@@ -33,16 +33,23 @@ class AbsensiPublikController extends Controller
 
         $request->validate([
             'nisn' => ['required', 'string'],
+        ], [
+            'nisn.required' => 'NISN atau NIS wajib diisi.',
         ]);
+
+        $query = $request->string('nisn')->trim()->value();
 
         $siswa = ProfilSiswa::with(['pengguna', 'kelas'])
             ->where('kelas_id', $aksesToken->kelas_id)
-            ->where('nisn', $request->string('nisn')->trim()->value())
+            ->where(function ($q) use ($query) {
+                $q->where('nisn', $query)
+                    ->orWhere('nis', $query);
+            })
             ->first();
 
         if (! $siswa) {
             return back()
-                ->withErrors(['nisn' => 'Data siswa tidak ditemukan. Periksa kembali NISN-nya.'])
+                ->withErrors(['nisn' => 'Data siswa tidak ditemukan. Periksa kembali NISN atau NIS-nya.'])
                 ->withInput();
         }
 
