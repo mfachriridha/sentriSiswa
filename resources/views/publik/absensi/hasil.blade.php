@@ -97,7 +97,7 @@
 
             @if($statusAlpha['kode'] !== 'normal')
                 <div class="rounded-2xl border p-5 sm:p-6 text-sm shadow-sm transition-all {{ match($statusAlpha['kode']) {
-                    'wakasis' => 'border-red-200 bg-red-50/80 text-red-900',
+                    'dikembalikan' => 'border-red-200 bg-red-50/80 text-red-900',
                     'sp2' => 'border-rose-200 bg-rose-50/80 text-rose-900',
                     'sp1' => 'border-amber-200 bg-amber-50/80 text-amber-900',
                     default => 'border-yellow-200 bg-yellow-50/80 text-yellow-900',
@@ -106,7 +106,7 @@
                         <svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.07 19h13.86a2 2 0 001.74-2.99L13.74 4a2 2 0 00-3.48 0L3.33 16.01A2 2 0 005.07 19z"/>
                         </svg>
-                        @if($statusAlpha['kode'] === 'wakasis')
+                        @if($statusAlpha['kode'] === 'dikembalikan')
                             Pemberitahuan Penting Presensi
                         @elseif($statusAlpha['kode'] === 'sp2' || $statusAlpha['kode'] === 'sp1')
                             Perhatian Presensi Siswa
@@ -115,10 +115,12 @@
                         @endif
                     </p>
                     <p class="leading-relaxed">
-                        @if($statusAlpha['kode'] === 'wakasis')
-                            <strong class="font-semibold">{{ $siswa->pengguna->nama }}</strong> telah mencatat {{ $alphaCount }}x Alpha. Diharapkan Orang Tua/Wali dapat segera menghubungi Wali Kelas atau pihak Sekolah untuk tindak lanjut presensi.
-                        @elseif($statusAlpha['kode'] === 'sp2' || $statusAlpha['kode'] === 'sp1')
-                            Akumulasi Alpha <strong class="font-semibold">{{ $siswa->pengguna->nama }}</strong> telah mencapai {{ $alphaCount }}x. Diharapkan Orang Tua/Wali dapat menghubungi Wali Kelas untuk konfirmasi presensi.
+                        @if($statusAlpha['kode'] === 'dikembalikan')
+                            <strong class="font-semibold">{{ $siswa->pengguna->nama }}</strong> telah mencapai batas maksimal {{ $alphaCount }}x Alpha. Diharapkan Orang Tua/Wali dapat segera menghadap ke sekolah untuk proses pengembalian siswa kepada Orang Tua/Wali.
+                        @elseif($statusAlpha['kode'] === 'sp2')
+                            Akumulasi Alpha <strong class="font-semibold">{{ $siswa->pengguna->nama }}</strong> telah mencapai {{ $alphaCount }}x (SP 2). Diharapkan Orang Tua/Wali dapat menghadap ke sekolah untuk penandatanganan Surat Perjanjian 2 bersama Wali Kelas & Guru BK.
+                        @elseif($statusAlpha['kode'] === 'sp1')
+                            Akumulasi Alpha <strong class="font-semibold">{{ $siswa->pengguna->nama }}</strong> telah mencapai 3x (SP 1). Diharapkan Orang Tua/Wali dapat menghadap ke sekolah untuk penandatanganan Surat Perjanjian 1 bersama Wali Kelas & Guru BK.
                         @else
                             <strong class="font-semibold">{{ $siswa->pengguna->nama }}</strong> saat ini tercatat {{ $alphaCount }}x Alpha. Mohon bantu ingatkan <strong class="font-semibold">{{ $siswa->pengguna->nama }}</strong> agar selalu hadir tepat waktu.
                         @endif

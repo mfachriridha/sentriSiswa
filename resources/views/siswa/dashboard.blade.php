@@ -53,7 +53,7 @@
 
 @if($stats['status_alpha']['kode'] !== 'normal')
     <div class="mb-5 rounded-2xl border p-5 sm:p-6 text-sm shadow-sm transition-all {{ match($stats['status_alpha']['kode']) {
-        'wakasis' => 'border-red-200 bg-red-50/80 text-red-900',
+        'dikembalikan' => 'border-red-200 bg-red-50/80 text-red-900',
         'sp2' => 'border-rose-200 bg-rose-50/80 text-rose-900',
         'sp1' => 'border-amber-200 bg-amber-50/80 text-amber-900',
         default => 'border-yellow-200 bg-yellow-50/80 text-yellow-900',
@@ -65,10 +65,12 @@
             <p class="text-base font-bold">Peringatan Presensi Siswa</p>
         </div>
         <p class="leading-relaxed">
-            @if($stats['status_alpha']['kode'] === 'wakasis')
-                Kamu telah mencatat {{ $stats['alpha'] }}x Alpha. Diharapkan untuk segera menghubungi Wali Kelas atau pihak Sekolah untuk tindak lanjut presensi.
-            @elseif($stats['status_alpha']['kode'] === 'sp2' || $stats['status_alpha']['kode'] === 'sp1')
-                Akumulasi Alpha kamu telah mencapai {{ $stats['alpha'] }}x. Diharapkan untuk berkoordinasi dengan Wali Kelas terkait presensimu.
+            @if($stats['status_alpha']['kode'] === 'dikembalikan')
+                Kamu telah mencapai batas maksimal {{ $stats['alpha'] }}x Alpha. Diharapkan hadir bersama Orang Tua/Wali ke sekolah untuk proses pengembalian siswa kepada Orang Tua/Wali.
+            @elseif($stats['status_alpha']['kode'] === 'sp2')
+                Akumulasi Alpha kamu telah mencapai {{ $stats['alpha'] }}x (SP 2). Diharapkan Orang Tua/Wali dapat hadir ke sekolah untuk penandatanganan Surat Perjanjian 2.
+            @elseif($stats['status_alpha']['kode'] === 'sp1')
+                Akumulasi Alpha kamu telah mencapai 3x (SP 1). Diharapkan Orang Tua/Wali dapat hadir ke sekolah untuk penandatanganan Surat Perjanjian 1.
             @else
                 Kamu saat ini tercatat {{ $stats['alpha'] }}x Alpha. Mohon untuk selalu hadir tepat waktu dan menjaga konsistensi presensimu.
             @endif

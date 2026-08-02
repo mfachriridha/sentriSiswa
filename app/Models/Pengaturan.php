@@ -130,7 +130,7 @@ class Pengaturan extends Model
         return [
             'sp1' => (int) static::get('alpha_sp1_threshold', 3),
             'sp2' => (int) static::get('alpha_sp2_threshold', 4),
-            'wakasis' => (int) static::get('alpha_wakasis_threshold', 6),
+            'dikembalikan' => (int) static::get('alpha_wakasis_threshold', 6),
         ];
     }
 
@@ -145,10 +145,10 @@ class Pengaturan extends Model
         $ambang = static::ambangPeringatanAlpha();
         $sisa = max(0, $max - $jumlahAlpha);
 
-        if ($jumlahAlpha >= $ambang['wakasis']) {
+        if ($jumlahAlpha >= $ambang['dikembalikan']) {
             return [
-                'kode' => 'wakasis',
-                'label' => 'Batas Wakasis (Dikembalikan)',
+                'kode' => 'dikembalikan',
+                'label' => 'Batas Maksimal (Dikembalikan)',
                 'warna' => 'red',
                 'sisa' => $sisa,
             ];
