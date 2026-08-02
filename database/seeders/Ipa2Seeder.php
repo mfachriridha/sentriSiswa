@@ -4,8 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\Absensi;
 use App\Models\Kelas;
+use App\Models\PelanggaranSiswa;
 use App\Models\Pengguna;
-use App\Models\ProfilGuru;
 use App\Models\ProfilSiswa;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
@@ -15,29 +15,31 @@ class Ipa2Seeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Buat / Dapatkan Kelas 10 IPA 2
-        $kelas = Kelas::firstOrCreate(
-            ['nama' => '10 IPA 2'],
-            ['tingkat' => '10']
-        );
-
-        // 2. Akun Wali Kelas
+        // 1. Akun Wali Kelas
         $walasUser = Pengguna::updateOrCreate(
             ['email' => 'walasipa2@sentrisiswa.test'],
             [
                 'nama' => 'Budi Santoso, S.Pd.',
                 'password' => Hash::make('password123'),
-                'peran' => 'walikelas',
+                'peran' => 'wali_kelas',
                 'status' => 'registered',
             ]
         );
-        ProfilGuru::updateOrCreate(
+        $walasUser->profilGuru()->updateOrCreate(
             ['pengguna_id' => $walasUser->id],
             [
                 'nip' => '198501012010011001',
-                'tipe_guru' => 'walikelas',
-                'kelas_id' => $kelas->id,
+                'tipe_guru' => 'wali_kelas',
                 'tingkat' => '10',
+            ]
+        );
+
+        // 2. Buat / Dapatkan Kelas 10 IPA 2 & tautkan wali kelas
+        $kelas = Kelas::updateOrCreate(
+            ['nama' => '10 IPA 2'],
+            [
+                'tingkat' => '10',
+                'wali_kelas_id' => $walasUser->id,
             ]
         );
 
@@ -51,7 +53,7 @@ class Ipa2Seeder extends Seeder
                 'status' => 'registered',
             ]
         );
-        ProfilGuru::updateOrCreate(
+        $kesiswaanUser->profilGuru()->updateOrCreate(
             ['pengguna_id' => $kesiswaanUser->id],
             [
                 'nip' => '197505052000031002',
@@ -69,7 +71,7 @@ class Ipa2Seeder extends Seeder
                 'status' => 'registered',
             ]
         );
-        ProfilGuru::updateOrCreate(
+        $bkUser->profilGuru()->updateOrCreate(
             ['pengguna_id' => $bkUser->id],
             [
                 'nip' => '198812122015022003',
@@ -78,39 +80,42 @@ class Ipa2Seeder extends Seeder
             ]
         );
 
-        // 5. Data 4 Siswa (Terdaftar, Nama Asli, Variasi Poin)
+        // 5. Data 4 Siswa (Terdaftar, Nama Asli)
         $siswaList = [
             [
                 'email' => 'siswa01@sentrisiswa.test',
                 'nama' => 'Andi Pratama',
                 'nisn' => '1000000001',
                 'nis' => '10001',
-                'poin' => 100,
                 'jenis_kelamin' => 'L',
+                'pengurangan_poin' => 0,
             ],
             [
                 'email' => 'siswa02@sentrisiswa.test',
                 'nama' => 'Bunga Lestari',
                 'nisn' => '1000000002',
                 'nis' => '10002',
-                'poin' => 95,
                 'jenis_kelamin' => 'P',
+                'pengurangan_poin' => 5,
+                'alasan_poin' => 'Terlambat Masuk Sekolah',
             ],
             [
                 'email' => 'siswa03@sentrisiswa.test',
                 'nama' => 'Citra Dewi',
                 'nisn' => '1000000003',
                 'nis' => '10003',
-                'poin' => 85,
                 'jenis_kelamin' => 'P',
+                'pengurangan_poin' => 15,
+                'alasan_poin' => 'Tidak Mengikuti Apel Pagi & Seragam Tidak Lengkap',
             ],
             [
                 'email' => 'siswa04@sentrisiswa.test',
                 'nama' => 'Doni Wijaya',
                 'nisn' => '1000000004',
                 'nis' => '10004',
-                'poin' => 75,
                 'jenis_kelamin' => 'L',
+                'pengurangan_poin' => 25,
+                'alasan_poin' => 'Keluar Lingkungan Sekolah Tanpa Izin',
             ],
         ];
 
@@ -133,12 +138,30 @@ class Ipa2Seeder extends Seeder
                     'pengguna_id' => $user->id,
                     'nis' => $sData['nis'],
                     'kelas_id' => $kelas->id,
-                    'poin' => $sData['poin'],
                     'jenis_kelamin' => $sData['jenis_kelamin'],
                 ]
             );
 
             $profilSiswaModels[$sData['nisn']] = $profil;
+
+            // Jika ada pengurangan poin, catat pelanggaran terkonfirmasi agar sisa poin beragam
+            if ($sData['pengurangan_poin'] > 0) {
+                PelanggaranSiswa::updateOrCreate(
+                    [
+                        'profil_siswa_id' => $sData['nisn'],
+                        'nama_pelanggaran' => $sData['alasan_poin'],
+                    ],
+                    [
+                        'dicatat_oleh_id' => $walasUser->id,
+                        'tanggal_pelanggaran' => Carbon::today()->subDays(5)->format('Y-m-d'),
+                        'kategori_pelanggaran' => 'ringan',
+                        'pengurangan_poin' => $sData['pengurangan_poin'],
+                        'status' => 'approved',
+                        'disetujui_oleh_id' => $kesiswaanUser->id,
+                        'disetujui_pada' => Carbon::now(),
+                    ]
+                );
+            }
         }
 
         // 6. Generate Absensi 15 Hari Terakhir (Senin - Jumat) dengan Variasi Status
