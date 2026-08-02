@@ -36,9 +36,6 @@ class DashboardController extends Controller
             'max_alpha' => $maxAlpha,
             'sisa_alpha' => max(0, $maxAlpha - $alphaCount),
             'status_alpha' => $statusAlpha,
-            'tahun_ajaran' => Pengaturan::tahunAjaran(),
-            'mode_periode' => Pengaturan::modePeriode(),
-            'semester' => Pengaturan::semester(),
         ];
 
         $identitas = [

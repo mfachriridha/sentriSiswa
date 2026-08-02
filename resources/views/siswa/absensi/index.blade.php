@@ -176,7 +176,7 @@
                                 </div>
                                 <div class="mt-2 space-y-1 text-xs">
                                     <p x-cloak x-show="gpsLoading" class="text-gray-500">Mengambil lokasi...</p>
-                                    <p x-cloak x-show="gpsError" x-text="gpsError" class="text-red-600"></p>
+                                    <p x-cloak x-show="gpsError && selectedStatus === 'hadir'" x-text="gpsError" class="text-red-600"></p>
                                     <template x-if="gpsReady">
                                         <div>
                                             <p x-cloak x-show="locationStatus" class="font-medium" :class="{
@@ -239,17 +239,17 @@
                 <div x-cloak
                      x-show="modalOpen"
                      x-transition.opacity
-                     class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 p-4"
+                     class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 p-3 sm:p-4"
                      @keydown.escape.window="cancelSelfieModal()">
-                    <div class="w-full max-w-3xl rounded-2xl bg-white shadow-xl" @click.outside="cancelSelfieModal()">
-                        <div class="flex items-start justify-between gap-4 border-b border-gray-200 px-4 py-3">
+                    <div class="flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl bg-white shadow-xl" @click.outside="cancelSelfieModal()">
+                        <div class="flex shrink-0 items-start justify-between gap-4 border-b border-gray-200 px-4 py-3">
                             <div>
-                                <h3 class="text-lg font-semibold text-gray-900">Ambil Selfie Absensi</h3>
-                                <p class="mt-1 text-sm text-gray-500">Pastikan wajah terlihat jelas sebelum menekan Absen Sekarang.</p>
+                                <h3 class="text-base font-semibold text-gray-900 sm:text-lg">Ambil Selfie Absensi</h3>
+                                <p class="mt-0.5 text-xs text-gray-500 sm:text-sm">Pastikan wajah terlihat jelas sebelum menekan Absen Sekarang.</p>
                             </div>
                             <button type="button"
                                     @click="cancelSelfieModal()"
-                                    class="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600">
+                                    class="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600">
                                 <span class="sr-only">Tutup</span>
                                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -257,81 +257,83 @@
                             </button>
                         </div>
 
-                        <div class="grid gap-6 px-4 py-3 md:grid-cols-[260px_1fr]">
-                            <div class="relative aspect-[3/4] overflow-hidden rounded-xl border border-gray-200 bg-gray-100">
-                                <video x-ref="video"
-                                       x-cloak
-                                       x-show="cameraReady && !previewUrl"
-                                       class="h-full w-full object-cover"
-                                       :class="facingMode === 'user' ? 'scale-x-[-1]' : ''"
-                                       playsinline
-                                       muted></video>
-                                <img x-cloak x-show="previewUrl"
-                                     :src="previewUrl"
-                                     alt="Preview selfie"
-                                     class="h-full w-full object-cover">
-                                <div x-cloak x-show="!cameraReady && !previewUrl" class="flex h-full items-center justify-center p-4 text-center text-sm text-gray-500">
-                                    Kamera belum aktif
-                                </div>
-                            </div>
-
-                            <div class="flex flex-col justify-between gap-5">
-                                <div class="space-y-3">
-                                    <p class="text-sm font-medium text-gray-700">Ambil selfie dari kamera perangkat ini.</p>
-                                    <p class="text-sm text-gray-500">Foto akan dikompresi otomatis maksimal 300 KB.</p>
-                                    <p x-cloak x-show="compressedSizeKb" class="text-sm text-gray-500">
-                                        Ukuran foto: <span x-text="compressedSizeKb"></span> KB
-                                    </p>
-                                    <p x-cloak x-show="error" x-text="error" class="text-sm text-red-600"></p>
+                        <div class="flex-1 overflow-y-auto px-4 py-3">
+                            <div class="grid gap-4 md:grid-cols-[240px_1fr] md:gap-6">
+                                <div class="relative mx-auto aspect-[3/4] max-h-[220px] w-full overflow-hidden rounded-xl border border-gray-200 bg-gray-100 sm:max-h-[300px]">
+                                    <video x-ref="video"
+                                           x-cloak
+                                           x-show="cameraReady && !previewUrl"
+                                           class="h-full w-full object-cover"
+                                           :style="facingMode === 'user' ? 'transform: scaleX(-1)' : ''"
+                                           playsinline
+                                           muted></video>
+                                    <img x-cloak x-show="previewUrl"
+                                         :src="previewUrl"
+                                         alt="Preview selfie"
+                                         class="h-full w-full object-cover">
+                                    <div x-cloak x-show="!cameraReady && !previewUrl" class="flex h-full items-center justify-center p-4 text-center text-xs text-gray-500 sm:text-sm">
+                                        Kamera belum aktif
+                                    </div>
                                 </div>
 
-                                <div class="flex flex-wrap gap-3">
-                                    <button type="button"
-                                            x-cloak
-                                            x-show="!cameraReady && !previewUrl"
-                                            @click="startCamera()"
-                                            class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
-                                        Nyalakan Kamera
-                                    </button>
-                                    <button type="button"
-                                            x-cloak
-                                            x-show="cameraReady"
-                                            @click="captureSelfie()"
-                                            :disabled="compressing"
-                                            class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60">
-                                        <span x-text="compressing ? 'Memproses...' : 'Ambil Selfie'"></span>
-                                    </button>
-                                    <button type="button"
-                                            x-cloak
-                                            x-show="cameraReady && !previewUrl"
-                                            @click="toggleCamera()"
-                                            class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
-                                        Tukar Kamera
-                                    </button>
-                                    <button type="button"
-                                            x-cloak
-                                            x-show="previewUrl"
-                                            @click="resetSelfie()"
-                                            class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
-                                        Ulangi
-                                    </button>
+                                <div class="flex flex-col justify-between gap-4">
+                                    <div class="space-y-2 text-xs sm:text-sm">
+                                        <p class="font-medium text-gray-700">Ambil selfie dari kamera perangkat ini.</p>
+                                        <p class="text-gray-500">Foto akan dikompresi otomatis maksimal 300 KB.</p>
+                                        <p x-cloak x-show="compressedSizeKb" class="text-gray-500">
+                                            Ukuran foto: <span x-text="compressedSizeKb"></span> KB
+                                        </p>
+                                        <p x-cloak x-show="error" x-text="error" class="font-medium text-red-600"></p>
+                                    </div>
+
+                                    <div class="flex flex-wrap gap-2 sm:gap-3">
+                                        <button type="button"
+                                                x-cloak
+                                                x-show="!cameraReady && !previewUrl"
+                                                @click="startCamera()"
+                                                class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-3.5 py-2 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 sm:text-sm">
+                                            Nyalakan Kamera
+                                        </button>
+                                        <button type="button"
+                                                x-cloak
+                                                x-show="cameraReady"
+                                                @click="captureSelfie()"
+                                                :disabled="compressing"
+                                                class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-3.5 py-2 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60 sm:text-sm">
+                                            <span x-text="compressing ? 'Memproses...' : 'Ambil Selfie'"></span>
+                                        </button>
+                                        <button type="button"
+                                                x-cloak
+                                                x-show="cameraReady && !previewUrl"
+                                                @click="toggleCamera()"
+                                                class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-3.5 py-2 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 sm:text-sm">
+                                            Tukar Kamera
+                                        </button>
+                                        <button type="button"
+                                                x-cloak
+                                                x-show="previewUrl"
+                                                @click="resetSelfie()"
+                                                class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-3.5 py-2 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 sm:text-sm">
+                                            Ulangi
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="border-t border-gray-200 px-4 py-3">
-                            <p x-cloak x-show="previewUrl" class="mb-3 text-xs font-medium text-amber-700">
+                        <div class="shrink-0 border-t border-gray-200 bg-gray-50 px-4 py-3">
+                            <p x-cloak x-show="previewUrl" class="mb-2 text-xs font-medium text-amber-700">
                                 Setelah ditekan, absen hari ini tidak bisa diubah sendiri. Kalau salah, hubungi wali kelas.
                             </p>
-                            <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                            <div class="flex gap-2 sm:justify-end">
                                 <button type="button"
                                         @click="cancelSelfieModal()"
-                                        class="inline-flex items-center justify-center rounded-lg border border-gray-300 px-5 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50">
+                                        class="inline-flex flex-1 items-center justify-center rounded-lg border border-gray-300 px-4 py-2 text-xs font-medium text-gray-700 transition-colors hover:bg-white sm:flex-none sm:text-sm">
                                     Batal
                                 </button>
                                 <button type="submit"
                                         :disabled="!canSubmit"
-                                        class="inline-flex items-center justify-center rounded-lg bg-primary px-5 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:cursor-not-allowed disabled:bg-gray-300">
+                                        class="inline-flex flex-1 items-center justify-center rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:cursor-not-allowed disabled:bg-gray-300 sm:flex-none sm:text-sm">
                                     Absen Sekarang
                                 </button>
                             </div>
@@ -424,11 +426,31 @@
             selectedStatus: 'hadir',
             facingMode: 'user',
 
+            init() {
+                this.$watch('selectedStatus', (newStatus) => {
+                    if (newStatus !== 'hadir') {
+                        this.gpsError = '';
+                    }
+                });
+            },
+
+            get isMobileDevice() {
+                return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+            },
+
             get canSubmit() {
                 return this.selfieReady && !this.compressing;
             },
 
             get canOpenSelfieModal() {
+                if (this.selectedStatus === 'hadir' && !this.isMobileDevice) {
+                    return false;
+                }
+
+                if (this.selectedStatus !== 'hadir') {
+                    return true; // Sakit, Izin, Dispensasi boleh dari mana saja / peranti apa saja
+                }
+
                 if (!this.geofenceActive) {
                     return true;
                 }
@@ -437,16 +459,20 @@
                     return false;
                 }
 
-                if (this.selectedStatus !== 'hadir') {
-                    return true; // Any location is fine if not 'hadir'
-                }
-
                 return ['inside', 'tolerance'].includes(this.locationStatus);
             },
 
             get openDisabledMessage() {
+                if (this.selectedStatus === 'hadir' && !this.isMobileDevice) {
+                    return 'Absensi Hadir wajib dilakukan dari HP / Smartphone.';
+                }
+
                 if (!this.geofenceActive) {
                     return 'Lokasi GPS tidak diwajibkan. Silakan lanjut absen.';
+                }
+
+                if (this.selectedStatus !== 'hadir') {
+                    return 'Status ' + this.selectedStatus + ' diperbolehkan tanpa verifikasi lokasi sekolah.';
                 }
 
                 if (this.gpsLoading) {
@@ -462,9 +488,7 @@
                 }
 
                 if (this.locationStatus === 'outside') {
-                    return this.selectedStatus === 'hadir' 
-                        ? 'Lokasi Anda di luar area absensi.' 
-                        : 'Lokasi Anda di luar area, namun diperbolehkan untuk status ' + this.selectedStatus + '.';
+                    return 'Lokasi Anda di luar area absensi.';
                 }
 
                 if (['inside', 'tolerance'].includes(this.locationStatus)) {
@@ -492,6 +516,7 @@
             getGpsLocation() {
                 this.gpsError = '';
                 this.gpsLoading = true;
+                this.gpsReady = false;
                 this.locationStatus = '';
                 this.locationMessage = '';
                 this.locationDistance = null;
@@ -502,13 +527,53 @@
                     return;
                 }
 
+                // Cek 1: Deteksi Ekstensi Pemalsu Lokasi (seperti Location Guard / Geolocation Tamper JS)
+                try {
+                    const fnStr = navigator.geolocation.getCurrentPosition.toString();
+                    if (!fnStr.includes('[native code]')) {
+                        this.gpsLoading = false;
+                        this.gpsReady = false;
+                        this.gpsError = 'Ekstensi pemalsu lokasi terdeteksi di browser! Harap matikan ekstensi lokasi dan gunakan browser standar.';
+                        return;
+                    }
+                } catch (e) {}
+
+                // Ambil data posisi & telemetri hardware dari browser peranti
                 navigator.geolocation.getCurrentPosition((position) => {
-                    this.latitude = String(position.coords.latitude);
-                    this.longitude = String(position.coords.longitude);
-                    this.accuracy = String(position.coords.accuracy || 0);
+                    const coords = position.coords;
+                    const lat = coords.latitude;
+                    const lng = coords.longitude;
+                    const acc = coords.accuracy || 0;
+                    const alt = coords.altitude;
+                    const altAcc = coords.altitudeAccuracy;
+                    const speed = coords.speed;
+
+                    // Cek 2: Akurasi ekstrim 0 atau persis 1.0 (khas mock provider tertentu)
+                    if (acc === 0 || acc === 1) {
+                        this.gpsLoading = false;
+                        this.gpsReady = false;
+                        this.gpsError = 'Sinyal GPS tidak valid. Pastikan perangkat menggunakan GPS asli.';
+                        return;
+                    }
+
+                    // Cek 3: Telemetri Hardware Satelit (Altitude & Speed Check)
+                    // Aplikasi Fake GPS 2D di Android menyuntikkan titik buatan tanpa metadata altitude, altitudeAccuracy, & speed (semuanya null).
+                    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+                    if (isMobile && alt === null && altAcc === null && speed === null) {
+                        this.gpsLoading = false;
+                        this.gpsReady = false;
+                        this.gpsError = 'Indikasi Fake GPS terdeteksi! (Metadata telemetri satelit tidak ditemukan). Harap matikan aplikasi pemalsu lokasi dan gunakan GPS asli peranti.';
+                        return;
+                    }
+
+                    this.latitude = String(lat);
+                    this.longitude = String(lng);
+                    this.accuracy = String(acc);
                     this.gpsReady = true;
                     this.gpsLoading = false;
                     this.gpsError = '';
+
+                    // Lanjutkan ke verifikasi geofence area sekolah di server
                     this.checkLocation();
                 }, (error) => {
                     this.gpsLoading = false;

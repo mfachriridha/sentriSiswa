@@ -71,11 +71,10 @@ class ClassRosterController extends Controller
             ->pluck('total_alpha', 'profil_siswa_id');
 
         $maxAlpha = Pengaturan::batasMaksimalAlpha();
-        $tahunAjaran = Pengaturan::tahunAjaran();
 
         return view('wali-kelas.kelas-saya.index', compact(
             'class', 'students', 'attendances', 'stats', 'isWeekday', 'activeDaysLabel',
-            'periodAlphaCounts', 'maxAlpha', 'tahunAjaran'
+            'periodAlphaCounts', 'maxAlpha'
         ));
     }
 

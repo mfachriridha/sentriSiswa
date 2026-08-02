@@ -38,7 +38,14 @@
                     <tr>
                         <td class="px-4 py-3">{{ $pengajuan->dibuat_pada->translatedFormat('d F Y') }}</td>
                         <td class="px-4 py-3">{{ $pengajuan->profilSiswa?->pengguna?->nama ?? '-' }}<div class="text-xs text-gray-500">{{ $pengajuan->profilSiswa?->kelas?->nama ?? '-' }}</div></td>
-                        <td class="px-4 py-3">{{ $pengajuan->alasan }}</td>
+                        <td class="px-4 py-3">
+                            @if($pengajuan->kategori)
+                                <span class="inline-flex items-center gap-1 rounded bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-700 border border-blue-200 mb-1">
+                                    🏆 {{ $pengajuan->kategori->nama }}
+                                </span>
+                            @endif
+                            <div class="text-sm text-gray-900">{{ $pengajuan->alasan }}</div>
+                        </td>
                         <td class="px-4 py-3 font-semibold text-green-600">{{ $pengajuan->jumlah_poin !== null ? '+'.$pengajuan->jumlah_poin : '-' }}</td>
                         <td class="px-4 py-3 font-medium text-gray-900">{{ $pengajuan->profilSiswa?->poin ?? '-' }}</td>
                         <td class="px-4 py-3">{{ $statusLabels[$pengajuan->status] ?? $pengajuan->status }}</td>

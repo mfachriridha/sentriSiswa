@@ -472,6 +472,20 @@ function rekapBarisSiswa(TestResponse $respons, string $nama): array
         preg_match_all('/<td[^>]*>(.*?)<\/td>/s', $baris, $sel);
 
         $nilai = array_map(fn (string $isi): string => trim(strip_tags($isi)), $sel[1]);
+
+        // Filter nilai numerik murni untuk kolom statistik (H, I, S, D, A)
+        $angka = array_values(array_filter($nilai, fn ($v) => is_numeric($v)));
+
+        // Jika ada 5 kolom numerik (Hadir, Izin, Sakit, Dispensasi, Alpha)
+        if (count($angka) >= 5) {
+            return [
+                'hadir' => (int) $angka[0],
+                'izin' => (int) $angka[1],
+                'sakit' => (int) $angka[2],
+                'alpha' => (int) end($angka),
+            ];
+        }
+
         [$hadir, $izin, $sakit, $alpha] = array_slice($nilai, -4);
 
         return [

@@ -84,16 +84,16 @@
         </div>
     @endif
 
-    <nav class="fixed inset-x-0 bottom-0 z-30 border-t border-gray-200 bg-white pb-[env(safe-area-inset-bottom)] shadow-[0_-1px_3px_rgba(0,0,0,0.05)]">
+    <nav class="fixed inset-x-0 bottom-0 z-30 border-t border-gray-200 bg-white pb-[env(safe-area-inset-bottom,0px)] shadow-[0_-1px_3px_rgba(0,0,0,0.05)]">
         <ul class="flex items-stretch">
             @foreach ($menuUtama as $item)
                 @php $aktif = request()->routeIs(...$item['aktif']); @endphp
                 <li class="flex-1">
                     <a href="{{ route($item['route']) }}"
-                       class="relative flex h-full flex-col items-center justify-center gap-1 px-1 py-2 text-center transition-colors
+                       class="relative flex h-full flex-col items-center justify-center gap-0.5 px-1 pt-2 pb-1.5 text-center transition-colors
                               {{ $aktif ? 'text-primary' : 'text-gray-500' }}">
                         <span class="relative">
-                            <x-nav-icon :name="$item['icon']" class="h-6 w-6 shrink-0" />
+                            <x-nav-icon :name="$item['icon']" class="h-5 w-5 shrink-0" />
                             @if (($item['badge'] ?? 0) > 0)
                                 <span class="absolute -right-2 -top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-amber-500 px-1 text-[10px] font-bold leading-none text-white">
                                     {{ $item['badge'] }}
@@ -111,10 +111,10 @@
             @if ($menuLainnya)
                 <li class="flex-1">
                     <button type="button" @click="sheetTerbuka = true"
-                            class="relative flex h-full w-full flex-col items-center justify-center gap-1 px-1 py-2 text-center transition-colors
+                            class="relative flex h-full w-full flex-col items-center justify-center gap-0.5 px-1 pt-2 pb-1.5 text-center transition-colors
                                    {{ $adaLainnyaAktif ? 'text-primary' : 'text-gray-500' }}">
                         <span class="relative">
-                            <x-nav-icon name="lainnya" class="h-6 w-6 shrink-0" />
+                            <x-nav-icon name="lainnya" class="h-5 w-5 shrink-0" />
                             @if ($badgeLainnya > 0)
                                 <span class="absolute -right-2 -top-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-amber-500 px-1 text-[10px] font-bold leading-none text-white">
                                     {{ $badgeLainnya }}

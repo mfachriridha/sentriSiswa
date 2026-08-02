@@ -53,7 +53,11 @@
                             <td class="px-4 py-3 text-gray-700 whitespace-nowrap">{{ $pengajuan->dibuat_pada->translatedFormat('d F Y') }}</td>
                             <td class="px-4 py-3">
                                 <p class="font-medium text-gray-900">{{ $pengajuan->profilSiswa?->pengguna?->nama ?? '-' }}</p>
-                                <p class="mt-1 text-xs text-gray-500">NIS: {{ $pengajuan->profilSiswa?->nis ?? '-' }}</p>
+                                @if($pengajuan->kategori)
+                                    <span class="mt-0.5 inline-flex items-center gap-1 rounded bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-700 border border-blue-200">
+                                        🏆 {{ $pengajuan->kategori->nama }}
+                                    </span>
+                                @endif
                             </td>
                             <td class="px-4 py-3 text-gray-700 whitespace-nowrap">{{ $pengajuan->profilSiswa?->kelas?->nama ?? '-' }}</td>
                             <td class="px-4 py-3 font-semibold text-green-600">{{ $pengajuan->jumlah_poin !== null ? '+'.$pengajuan->jumlah_poin : '-' }}</td>

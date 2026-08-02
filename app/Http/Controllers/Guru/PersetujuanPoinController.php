@@ -16,7 +16,7 @@ class PersetujuanPoinController extends Controller
 {
     public function persetujuan(): View
     {
-        $pending = PengajuanPoin::with(['profilSiswa.pengguna', 'profilSiswa.kelas', 'diajukanOleh'])
+        $pending = PengajuanPoin::with(['profilSiswa.pengguna', 'profilSiswa.kelas', 'diajukanOleh', 'kategori'])
             ->where('status', 'pending')
             ->latest()
             ->get();
@@ -28,7 +28,7 @@ class PersetujuanPoinController extends Controller
     {
         $status = $request->get('status', '');
 
-        $pengajuanPoin = PengajuanPoin::with(['profilSiswa.pengguna', 'profilSiswa.kelas', 'diajukanOleh', 'disetujuiOleh'])
+        $pengajuanPoin = PengajuanPoin::with(['profilSiswa.pengguna', 'profilSiswa.kelas', 'diajukanOleh', 'disetujuiOleh', 'kategori'])
             ->when($status, fn ($query) => $query->where('status', $status))
             ->latest()
             ->paginate(20)
@@ -43,9 +43,11 @@ class PersetujuanPoinController extends Controller
     {
         abort_unless($pengajuanPoin->status === 'pending', 403);
 
+        $jumlahPoin = $request->validated()['jumlah_poin'] ?? $pengajuanPoin->jumlah_poin ?? $pengajuanPoin->kategori?->poin ?? 10;
+
         $pengajuanPoin->update([
             'status' => 'approved',
-            'jumlah_poin' => $request->validated()['jumlah_poin'],
+            'jumlah_poin' => $jumlahPoin,
             'disetujui_oleh_id' => Auth::id(),
             'disetujui_pada' => now(),
             'alasan_penolakan' => null,

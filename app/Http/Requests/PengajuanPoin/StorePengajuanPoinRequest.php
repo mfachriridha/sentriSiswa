@@ -19,6 +19,7 @@ class StorePengajuanPoinRequest extends FormRequest
     {
         return [
             'profil_siswa_id' => ['required', 'string', Rule::exists('profil_siswa', 'nisn')],
+            'kategori_pengajuan_poin_id' => ['required', 'integer', Rule::exists('kategori_pengajuan_poin', 'id')],
             'alasan' => ['required', 'string', 'max:1000'],
         ];
     }
@@ -31,8 +32,10 @@ class StorePengajuanPoinRequest extends FormRequest
         return [
             'profil_siswa_id.required' => 'Siswa wajib dipilih.',
             'profil_siswa_id.exists' => 'Siswa tidak valid.',
-            'alasan.required' => 'Alasan wajib diisi.',
-            'alasan.max' => 'Alasan maksimal 1000 karakter.',
+            'kategori_pengajuan_poin_id.required' => 'Kategori prestasi wajib dipilih.',
+            'kategori_pengajuan_poin_id.exists' => 'Kategori prestasi tidak valid.',
+            'alasan.required' => 'Keterangan detail wajib diisi.',
+            'alasan.max' => 'Keterangan detail maksimal 1000 karakter.',
         ];
     }
 }

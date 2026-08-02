@@ -68,7 +68,6 @@ class AbsensiPublikController extends Controller
             'maxAlpha' => $maxAlpha,
             'sisaAlpha' => max(0, $maxAlpha - $alphaCount),
             'statusAlpha' => $statusAlpha,
-            'tahunAjaran' => Pengaturan::tahunAjaran(),
         ]);
     }
 }

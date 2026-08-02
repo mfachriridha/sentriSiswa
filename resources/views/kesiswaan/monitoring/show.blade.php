@@ -78,17 +78,6 @@
                         <span class="text-2xl font-bold text-red-600">{{ $periodAlphaCount ?? 0 }}</span>
                         <span class="text-xs text-gray-500">/ {{ $maxAlpha ?? 6 }}x</span>
                     </div>
-                    @if(isset($warningStatus) && $warningStatus['kode'] !== 'normal')
-                        <span class="mt-1 inline-flex items-center rounded px-2 py-0.5 text-xs font-semibold
-                            {{ match($warningStatus['kode']) {
-                                'wakasis' => 'bg-red-100 text-red-800 border border-red-200',
-                                'sp2' => 'bg-rose-100 text-rose-800 border border-rose-200',
-                                'sp1' => 'bg-amber-100 text-amber-800 border border-amber-200',
-                                default => 'bg-yellow-100 text-yellow-800 border border-yellow-200',
-                            } }}">
-                            {{ $warningStatus['label'] }}
-                        </span>
-                    @endif
                 </div>
                 <div>
                     <span class="block text-sm font-medium text-gray-500">Telepon</span>

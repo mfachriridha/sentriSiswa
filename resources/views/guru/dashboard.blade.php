@@ -52,7 +52,7 @@
 @endif
 
 @if (! empty($summary['kesiswaan']))
-    <div class="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+    <div class="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <div class="rounded-xl border border-gray-200 bg-white p-4">
             <p class="text-xs font-semibold uppercase text-gray-500">Kelas</p>
             <p class="mt-1 text-xl font-bold text-gray-900">{{ $summary['kesiswaan']['classes'] }}</p>
@@ -61,10 +61,6 @@
             <p class="text-xs font-semibold uppercase text-gray-500">Siswa</p>
             <p class="mt-1 text-xl font-bold text-gray-900">{{ $summary['kesiswaan']['students'] }}</p>
         </div>
-        <a href="{{ route('kesiswaan.monitoring.index') }}" class="rounded-xl border border-red-200 bg-red-50 p-4 transition hover:bg-red-100 block">
-            <p class="text-xs font-semibold uppercase text-red-600">Perhatian Alpha (≥3x)</p>
-            <p class="mt-1 text-xl font-bold text-red-700">{{ $summary['kesiswaan']['alpha_warning'] }} Siswa</p>
-        </a>
         <div class="rounded-xl border border-gray-200 bg-white p-4">
             <p class="text-xs font-semibold uppercase text-gray-500">Pelanggaran Dicatat</p>
             <p class="mt-1 text-xl font-bold text-green-600">{{ $summary['kesiswaan']['approved'] }}</p>

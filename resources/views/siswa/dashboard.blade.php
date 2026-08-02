@@ -53,9 +53,6 @@
             <p class="text-2xl font-bold text-red-600">{{ $stats['alpha'] }}</p>
             <span class="text-sm font-semibold text-gray-500">/ {{ $stats['max_alpha'] }} kali</span>
         </div>
-        <p class="mt-1 text-xs text-gray-500">
-            Tahun Pelajaran {{ $stats['tahun_ajaran'] }} ({{ $stats['mode_periode'] === 'tahun_ajaran' ? 'Per 1 Tahun' : 'Semester '.ucfirst($stats['semester']) }})
-        </p>
     </div>
 </div>
 

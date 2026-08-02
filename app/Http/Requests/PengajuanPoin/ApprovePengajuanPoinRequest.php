@@ -17,7 +17,7 @@ class ApprovePengajuanPoinRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'jumlah_poin' => ['required', 'integer', 'min:1', 'max:100'],
+            'jumlah_poin' => ['nullable', 'integer', 'min:1', 'max:100'],
         ];
     }
 

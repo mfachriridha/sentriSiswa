@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Guru;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PengajuanPoin\StorePengajuanPoinRequest;
+use App\Models\KategoriPengajuanPoin;
 use App\Models\PengajuanPoin;
 use App\Models\ProfilSiswa;
 use Illuminate\Http\RedirectResponse;
@@ -18,7 +19,7 @@ class PengajuanPoinController extends Controller
     {
         $status = $request->get('status', '');
 
-        $pengajuanPoin = PengajuanPoin::with(['profilSiswa.pengguna', 'profilSiswa.kelas', 'disetujuiOleh'])
+        $pengajuanPoin = PengajuanPoin::with(['profilSiswa.pengguna', 'profilSiswa.kelas', 'disetujuiOleh', 'kategori'])
             ->where('diajukan_oleh_id', Auth::id())
             ->when($status, fn ($query) => $query->where('status', $status))
             ->latest()
@@ -33,8 +34,9 @@ class PengajuanPoinController extends Controller
     public function create(): View
     {
         $students = $this->students();
+        $categories = KategoriPengajuanPoin::orderBy('urutan')->get()->groupBy('grup');
 
-        return view('wali-kelas.pengajuan-poin.create', compact('students'));
+        return view('wali-kelas.pengajuan-poin.create', compact('students', 'categories'));
     }
 
     public function store(StorePengajuanPoinRequest $request): RedirectResponse
@@ -43,10 +45,14 @@ class PengajuanPoinController extends Controller
         $student = ProfilSiswa::findOrFail($data['profil_siswa_id']);
         $this->authorizeOwnClass($student);
 
+        $category = KategoriPengajuanPoin::findOrFail($data['kategori_pengajuan_poin_id']);
+
         PengajuanPoin::create([
             'profil_siswa_id' => $student->nisn,
+            'kategori_pengajuan_poin_id' => $category->id,
             'diajukan_oleh_id' => Auth::id(),
             'alasan' => $data['alasan'],
+            'jumlah_poin' => $category->poin,
             'status' => 'pending',
         ]);
 

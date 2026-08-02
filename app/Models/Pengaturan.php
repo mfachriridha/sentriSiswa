@@ -86,25 +86,6 @@ class Pengaturan extends Model
         return implode(', ', $names).' dan '.$last;
     }
 
-    public static function modePeriode(): string
-    {
-        $mode = static::get('period_mode', 'tahun_ajaran');
-
-        return in_array($mode, ['tahun_ajaran', 'semester'], true) ? $mode : 'tahun_ajaran';
-    }
-
-    public static function tahunAjaran(): string
-    {
-        return (string) static::get('academic_year', '2025/2026');
-    }
-
-    public static function semester(): string
-    {
-        $sem = static::get('semester_period', 'ganjil');
-
-        return in_array($sem, ['ganjil', 'genap'], true) ? $sem : 'ganjil';
-    }
-
     /**
      * Rentang tanggal periode aktif [mulai, selesai].
      *

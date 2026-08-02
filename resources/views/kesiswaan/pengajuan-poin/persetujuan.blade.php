@@ -48,14 +48,21 @@
                         </td>
                         <td class="px-4 py-3 text-gray-700">{{ $pengajuan->profilSiswa?->kelas?->nama ?? '-' }}</td>
                         <td class="px-4 py-3 font-medium text-gray-900">{{ $pengajuan->profilSiswa?->poin ?? '-' }}</td>
-                        <td class="px-4 py-3 text-gray-700">{{ $pengajuan->alasan }}</td>
+                        <td class="px-4 py-3">
+                            @if($pengajuan->kategori)
+                                <span class="inline-flex items-center gap-1 rounded bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-700 border border-blue-200 mb-1">
+                                    🏆 {{ $pengajuan->kategori->nama }} (+{{ $pengajuan->jumlah_poin ?? $pengajuan->kategori->poin }} Poin)
+                                </span>
+                            @endif
+                            <div class="text-sm text-gray-900">{{ $pengajuan->alasan }}</div>
+                        </td>
                         <td class="px-4 py-3 text-gray-500">{{ $pengajuan->diajukanOleh?->nama ?? '-' }}</td>
                         <td class="px-4 py-3">
                             <div class="flex items-center gap-2">
                                 <button type="button"
-                                        onclick="openTerimaModal({{ $pengajuan->id }}, '{{ addslashes($pengajuan->profilSiswa?->pengguna?->nama ?? 'siswa ini') }}')"
+                                        onclick="openTerimaModal({{ $pengajuan->id }}, '{{ addslashes($pengajuan->profilSiswa?->pengguna?->nama ?? 'siswa ini') }}', '{{ addslashes($pengajuan->kategori?->nama ?? 'Prestasi') }}', {{ $pengajuan->jumlah_poin ?? $pengajuan->kategori?->poin ?? 10 }})"
                                         class="inline-flex items-center gap-1.5 rounded-lg bg-green-600 px-3 py-2 text-sm font-medium text-white hover:bg-green-700 transition-colors">
-                                    Terima
+                                    ACC / Terima (+{{ $pengajuan->jumlah_poin ?? $pengajuan->kategori?->poin ?? 10 }})
                                 </button>
                                 <button type="button"
                                         onclick="openTolakModal({{ $pengajuan->id }}, '{{ addslashes($pengajuan->profilSiswa?->pengguna?->nama ?? 'siswa ini') }}')"
@@ -81,26 +88,27 @@
 <div id="terimaModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-gray-900/60 p-4">
     <div class="w-full max-w-md rounded-2xl bg-white shadow-xl">
         <div class="border-b border-gray-200 px-5 py-4">
-            <h3 class="text-lg font-semibold text-gray-900">Terima Pengajuan Poin</h3>
-            <p id="terimaStudentName" class="mt-1 text-sm text-gray-500"></p>
+            <h3 class="text-lg font-semibold text-gray-900">ACC / Terima Pengajuan Poin</h3>
+            <p id="terimaStudentName" class="mt-1 text-sm font-medium text-gray-700"></p>
+            <p id="terimaCategoryName" class="mt-0.5 text-xs text-blue-600 font-semibold"></p>
         </div>
         <form id="terimaForm" method="POST" class="px-5 py-4">
             @csrf
             @method('PUT')
             <label for="jumlah_poin" class="block text-sm font-medium text-gray-700">
-                Jumlah Poin <span class="text-red-500">*</span>
+                Poin Tambahan Baku <span class="text-red-500">*</span>
             </label>
             <input id="jumlah_poin" name="jumlah_poin" type="number" min="1" max="100" required
-                   placeholder="Contoh: 5"
-                   class="mt-1.5 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/20">
+                   class="mt-1.5 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/20">
+            <p class="mt-1 text-xs text-gray-500">Poin baku terisi otomatis berdasarkan kategori pengajuan.</p>
             <div class="mt-5 flex justify-end gap-3">
                 <button type="button" onclick="closeTerimaModal()"
                         class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
                     Batal
                 </button>
                 <button type="submit"
-                        class="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700">
-                    Terima Pengajuan
+                        class="rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700">
+                    Setujui & Tambah Poin
                 </button>
             </div>
         </form>
@@ -151,10 +159,11 @@
         @endforeach
     };
 
-    function openTerimaModal(id, studentName) {
+    function openTerimaModal(id, studentName, categoryName, pointAmount) {
         document.getElementById('terimaForm').action = terimaRoutes[id];
-        document.getElementById('terimaStudentName').textContent = studentName;
-        document.getElementById('jumlah_poin').value = '';
+        document.getElementById('terimaStudentName').textContent = 'Siswa: ' + studentName;
+        document.getElementById('terimaCategoryName').textContent = 'Kategori: 🏆 ' + categoryName + ' (+' + pointAmount + ' Poin)';
+        document.getElementById('jumlah_poin').value = pointAmount;
         const modal = document.getElementById('terimaModal');
         modal.classList.remove('hidden');
         modal.classList.add('flex');

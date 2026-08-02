@@ -124,17 +124,6 @@
                                     <span class="text-xs text-gray-500">/ {{ $maxAlpha ?? 6 }}x</span>
                                     <span class="text-xs text-gray-400">(Sisa {{ max(0, ($maxAlpha ?? 6) - $alphaCount) }}x)</span>
                                 </div>
-                                @if($warningInfo['kode'] !== 'normal')
-                                    <span class="mt-0.5 inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-semibold
-                                        {{ match($warningInfo['kode']) {
-                                            'wakasis' => 'bg-red-100 text-red-800 border border-red-200',
-                                            'sp2' => 'bg-rose-100 text-rose-800 border border-rose-200',
-                                            'sp1' => 'bg-amber-100 text-amber-800 border border-amber-200',
-                                            default => 'bg-yellow-100 text-yellow-800 border border-yellow-200',
-                                        } }}">
-                                        {{ $warningInfo['label'] }}
-                                    </span>
-                                @endif
                             </td>
                             <td class="whitespace-nowrap px-4 py-3 text-sm text-gray-500">
                                 {{ $attendance?->waktu_masuk?->format('H:i') ?? '-' }}

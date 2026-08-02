@@ -126,10 +126,6 @@
                     </p>
                 </div>
             @endif
-
-            <p class="text-xs text-slate-400">
-                Hitungan Alpha berlaku untuk Tahun Pelajaran {{ $tahunAjaran }}.
-            </p>
         </div>
 
         <p class="text-center text-xs text-slate-400">
