@@ -52,7 +52,7 @@ test('siswa gagal absen sebelum jam absen dibuka', function () {
     siswaMasuk();
 
     $this->followingRedirects()
-        ->post('/siswa/absensi', ['selfie' => selfieAbsensi()])
+        ->post('/siswa/absensi', ['status' => 'hadir', 'selfie' => selfieAbsensi()])
         ->assertSee('Waktu absen sudah lewat atau belum dimulai.');
 });
 
@@ -62,7 +62,7 @@ test('siswa gagal absen setelah jam absen berakhir', function () {
     siswaMasuk();
 
     $this->followingRedirects()
-        ->post('/siswa/absensi', ['selfie' => selfieAbsensi()])
+        ->post('/siswa/absensi', ['status' => 'hadir', 'selfie' => selfieAbsensi()])
         ->assertSee('Waktu absen sudah lewat atau belum dimulai.');
 });
 
@@ -72,7 +72,7 @@ test('siswa gagal absen di hari yang bukan hari absensi', function () {
     siswaMasuk();
 
     $this->followingRedirects()
-        ->post('/siswa/absensi', ['selfie' => selfieAbsensi()])
+        ->post('/siswa/absensi', ['status' => 'hadir', 'selfie' => selfieAbsensi()])
         ->assertSee('Absensi hanya tersedia pada hari '.Pengaturan::labelHariAbsen().'.');
 });
 
@@ -81,10 +81,10 @@ test('siswa tidak bisa absen dua kali dalam sehari', function () {
     Carbon::setTestNow('2026-07-06 06:35:00');
     siswaMasuk();
 
-    $this->post('/siswa/absensi', ['selfie' => selfieAbsensi()]);
+    $this->post('/siswa/absensi', ['status' => 'hadir', 'selfie' => selfieAbsensi()]);
 
     $this->followingRedirects()
-        ->post('/siswa/absensi', ['selfie' => selfieAbsensi()])
+        ->post('/siswa/absensi', ['status' => 'hadir', 'selfie' => selfieAbsensi()])
         ->assertSee('Anda sudah absen hari ini.');
 });
 
@@ -117,7 +117,7 @@ test('siswa yang terlanjur dicap alpha tetap bisa absen selama jam absennya masi
     catatKehadiran($siswa->nisn, '2026-07-06', 'alpha');
 
     $this->followingRedirects()
-        ->post('/siswa/absensi', ['selfie' => selfieAbsensi()])
+        ->post('/siswa/absensi', ['status' => 'hadir', 'selfie' => selfieAbsensi()])
         ->assertSee('Absen berhasil: Hadir.')
         ->assertDontSee('Anda sudah absen hari ini.');
 
@@ -134,7 +134,7 @@ test('siswa tidak bisa menimpa status izin yang sudah ditetapkan wali kelasnya',
     catatKehadiran($siswa->nisn, '2026-07-06', 'izin');
 
     $this->followingRedirects()
-        ->post('/siswa/absensi', ['selfie' => selfieAbsensi()])
+        ->post('/siswa/absensi', ['status' => 'hadir', 'selfie' => selfieAbsensi()])
         ->assertSee('Anda sudah absen hari ini.')
         ->assertDontSee('Absen berhasil: Hadir.');
 });
@@ -147,7 +147,7 @@ test('siswa yang sudah absen tidak ikut berubah jadi alpha saat jam absen berakh
     $this->artisan('attendance:create-daily');
 
     $this->followingRedirects()
-        ->post('/siswa/absensi', ['selfie' => selfieAbsensi()])
+        ->post('/siswa/absensi', ['status' => 'hadir', 'selfie' => selfieAbsensi()])
         ->assertSee('Absen berhasil: Hadir.');
 
     Carbon::setTestNow('2026-07-06 07:05:00');

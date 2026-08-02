@@ -39,7 +39,7 @@ test('halaman absensi menampilkan status hari ini setelah siswa absen', function
     Carbon::setTestNow('2026-07-06 06:35:00');
     siswaMasuk();
 
-    $this->post('/siswa/absensi', ['selfie' => selfieAbsensi()]);
+    $this->post('/siswa/absensi', ['status' => 'hadir', 'selfie' => selfieAbsensi()]);
 
     $this->get('/siswa/absensi')
         ->assertSee('Absensi Hari Ini')
@@ -82,7 +82,7 @@ test('status absensi hari ini ikut berubah begitu siswa selesai absen', function
     $this->get('/siswa/absensi/status')
         ->assertSee('belum_absen');
 
-    $this->post('/siswa/absensi', ['selfie' => selfieAbsensi()]);
+    $this->post('/siswa/absensi', ['status' => 'hadir', 'selfie' => selfieAbsensi()]);
 
     $this->get('/siswa/absensi/status')
         ->assertSee('hadir');
