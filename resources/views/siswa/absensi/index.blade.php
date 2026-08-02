@@ -505,6 +505,7 @@
 
                 this.error = '';
                 this.modalOpen = true;
+                this.startCamera();
             },
 
             cancelSelfieModal() {
