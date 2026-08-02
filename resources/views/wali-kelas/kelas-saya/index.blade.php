@@ -6,7 +6,7 @@
 <div class="mb-6 flex items-start justify-between gap-4 flex-wrap">
     <div>
         <h1 class="text-2xl font-bold text-gray-900">Kelas Saya</h1>
-        <p class="mt-1 text-sm text-gray-500">Pantau absensi hari ini untuk kelas {{ $class->nama }}</p>
+        <p class="mt-1 text-sm text-gray-500">Pantau presensi hari ini untuk kelas {{ $class->nama }}</p>
     </div>
     @if($isWeekday && $stats['belum_absen'] > 0)
     <span class="inline-flex items-center gap-1.5 text-xs text-green-600 font-medium mt-1">

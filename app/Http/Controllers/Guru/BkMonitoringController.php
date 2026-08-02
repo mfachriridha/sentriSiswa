@@ -42,7 +42,7 @@ class BkMonitoringController extends Controller
         $classes = Kelas::where('tingkat', $grade)->orderBy('nama')->get();
         $routePrefix = 'bk.monitoring';
         $title = 'Monitoring BK';
-        $description = 'Pantau absensi dan pelanggaran siswa tingkat '.$grade.'.';
+        $description = 'Pantau presensi dan pelanggaran siswa tingkat '.$grade.'.';
 
         return view('kesiswaan.monitoring.index', compact('students', 'classes', 'search', 'filterClass', 'routePrefix', 'title', 'description'));
     }
