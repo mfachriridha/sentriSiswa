@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Rekap Absensi')
+@section('title', 'Rekap Presensi')
 
 @section('content')
 <div class="flex flex-col items-center justify-center py-20 text-center">

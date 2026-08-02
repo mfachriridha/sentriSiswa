@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
-@section('title', 'Rekap Absensi')
+@section('title', 'Rekap Presensi')
 
 @section('content')
 <div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-900">Rekap Absensi</h1>
-    <p class="mt-1 text-sm text-gray-500">Kelola absensi siswa di kelas yang Anda ampu</p>
+    <h1 class="text-2xl font-bold text-gray-900">Rekap Presensi</h1>
+    <p class="mt-1 text-sm text-gray-500">Kelola presensi siswa di kelas yang Anda ampu</p>
 </div>
 
 <div class="rounded-xl border border-gray-200 bg-white p-12 text-center">

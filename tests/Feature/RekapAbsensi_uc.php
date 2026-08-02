@@ -41,7 +41,7 @@ test('wali kelas melihat rekap kehadiran kelasnya', function () {
     catatKehadiran($siswa->nisn, '2026-07-08', 'hadir');
 
     $respons = $this->get('/wali-kelas/absensi?mulai=2026-07-06&selesai=2026-07-10')
-        ->assertSee('Rekap Absensi')
+        ->assertSee('Rekap Presensi')
         ->assertSee('10 IPA 1')
         ->assertSee('Ahmad Fauzi');
 

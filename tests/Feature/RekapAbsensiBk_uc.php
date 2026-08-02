@@ -44,7 +44,7 @@ test('guru bk melihat rekap kehadiran seluruh siswa di tingkatnya', function () 
     bkMasuk('10');
 
     $respons = $this->get('/bk/laporan?mulai=2026-07-06&selesai=2026-07-10')
-        ->assertSee('Rekap Absensi Tingkat 10')
+        ->assertSee('Rekap Presensi Tingkat 10')
         ->assertSee('Ahmad Fauzi');
 
     expect(rekapBarisSiswa($respons, 'Ahmad Fauzi'))
