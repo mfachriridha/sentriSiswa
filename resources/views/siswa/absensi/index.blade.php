@@ -278,7 +278,7 @@
 
                                 <div class="flex flex-col justify-between gap-4">
                                     <div class="space-y-2 text-xs sm:text-sm">
-                                        <p class="font-medium text-gray-700">Ambil selfie dari kamera perangkat ini.</p>
+                                        <p class="font-medium text-gray-700" x-text="facingMode === 'environment' || selectedStatus !== 'hadir' ? 'Ambil foto bukti dari kamera perangkat ini.' : 'Ambil selfie dari kamera perangkat ini.'"></p>
                                         <p class="text-gray-500">Foto akan dikompresi otomatis maksimal 300 KB.</p>
                                         <p x-cloak x-show="compressedSizeKb" class="text-gray-500">
                                             Ukuran foto: <span x-text="compressedSizeKb"></span> KB
@@ -300,7 +300,7 @@
                                                 @click="captureSelfie()"
                                                 :disabled="compressing"
                                                 class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-3.5 py-2 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60 sm:text-sm">
-                                            <span x-text="compressing ? 'Memproses...' : 'Ambil Selfie'"></span>
+                                            <span x-text="compressing ? 'Memproses...' : (facingMode === 'environment' || selectedStatus !== 'hadir' ? 'Ambil Foto' : 'Ambil Selfie')"></span>
                                         </button>
                                         <button type="button"
                                                 x-cloak
@@ -766,7 +766,7 @@
 
                 if (!this.selfieReady) {
                     event.preventDefault();
-                    this.error = 'Ambil selfie/foto bukti dulu sebelum absen.';
+                    this.error = (this.facingMode === 'environment' || this.selectedStatus !== 'hadir') ? 'Ambil foto bukti dulu sebelum absen.' : 'Ambil selfie/foto bukti dulu sebelum absen.';
                 }
             },
             
