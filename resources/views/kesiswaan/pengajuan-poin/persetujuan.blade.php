@@ -63,7 +63,7 @@
                         <td class="px-4 py-3">
                             <div class="flex items-center gap-2">
                                 <button type="button"
-                                        onclick="openTerimaModal({{ $pengajuan->id }}, '{{ addslashes($pengajuan->profilSiswa?->pengguna?->nama ?? 'siswa ini') }}', '{{ addslashes($pengajuan->kategori?->nama ?? 'Prestasi') }}', {{ $pengajuan->jumlah_poin ?? $pengajuan->kategori?->poin ?? 10 }})"
+                                        onclick="openTerimaModal({{ $pengajuan->id }}, '{{ addslashes($pengajuan->profilSiswa?->pengguna?->nama ?? 'siswa ini') }}', '{{ addslashes($pengajuan->kategori?->nama ?? 'Prestasi') }}', {{ $pengajuan->jumlah_poin ?? $pengajuan->kategori?->poin ?? 10 }}, {{ $pengajuan->profilSiswa?->poin ?? 100 }})"
                                         class="inline-flex items-center gap-1.5 rounded-lg bg-green-600 px-3.5 py-2 text-sm font-medium text-white hover:bg-green-700 transition-colors">
                                     Terima
                                 </button>
@@ -91,8 +91,9 @@
 <div id="terimaModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-gray-900/60 p-4">
     <div class="w-full max-w-md rounded-2xl bg-white shadow-xl">
         <div class="border-b border-gray-200 px-5 py-4">
-            <h3 class="text-lg font-semibold text-gray-900">ACC / Terima Pengajuan Poin</h3>
+            <h3 class="text-lg font-semibold text-gray-900">Terima Pengajuan Poin</h3>
             <p id="terimaStudentName" class="mt-1 text-sm font-medium text-gray-700"></p>
+            <p id="terimaCurrentPoints" class="mt-0.5 text-xs font-semibold text-amber-700"></p>
             <p id="terimaCategoryName" class="mt-0.5 text-xs text-blue-600 font-semibold"></p>
         </div>
         <form id="terimaForm" method="POST" class="px-5 py-4">
@@ -161,9 +162,10 @@
         @endforeach
     };
 
-    function openTerimaModal(id, studentName, categoryName, pointAmount) {
+    function openTerimaModal(id, studentName, categoryName, pointAmount, currentPoints) {
         document.getElementById('terimaForm').action = terimaRoutes[id];
         document.getElementById('terimaStudentName').textContent = 'Siswa: ' + studentName;
+        document.getElementById('terimaCurrentPoints').textContent = 'Sisa Poin Saat Ini: ' + currentPoints + ' Poin';
         document.getElementById('terimaCategoryName').textContent = 'Kategori: 🏆 ' + categoryName;
         document.getElementById('terimaPoinBadge').textContent = '+' + pointAmount + ' Poin';
         document.getElementById('jumlah_poin').value = pointAmount;
