@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('student_profile_id')->constrained()->cascadeOnDelete();
             $table->date('date');
-            $table->enum('status', ['hadir', 'terlambat', 'izin', 'sakit', 'alpha'])->default('hadir');
+            $table->enum('status', ['hadir', 'terlambat', 'izin', 'sakit', 'dispensasi', 'alpha', 'belum_absen'])->default('belum_absen');
             $table->time('check_in_time')->nullable();
             $table->timestamps();
 
