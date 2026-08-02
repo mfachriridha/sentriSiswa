@@ -473,16 +473,16 @@ function rekapBarisSiswa(TestResponse $respons, string $nama): array
 
         $nilai = array_map(fn (string $isi): string => trim(strip_tags($isi)), $sel[1]);
 
-        // Filter nilai numerik murni untuk kolom statistik (H, I, S, D, A)
-        $angka = array_values(array_filter($nilai, fn ($v) => is_numeric($v)));
+        // Kolom status (Hadir, Izin, Sakit, Dispensasi, Alpha) adalah 5 sel numerik di bagian akhir tabel (sebelum % persentase jika ada)
+        $numerik = array_values(array_filter($nilai, fn ($v) => is_numeric($v) && ! str_contains($v, '%')));
+        $stat = array_slice($numerik, -5);
 
-        // Jika ada 5 kolom numerik (Hadir, Izin, Sakit, Dispensasi, Alpha)
-        if (count($angka) >= 5) {
+        if (count($stat) === 5) {
             return [
-                'hadir' => (int) $angka[0],
-                'izin' => (int) $angka[1],
-                'sakit' => (int) $angka[2],
-                'alpha' => (int) end($angka),
+                'hadir' => (int) $stat[0],
+                'izin' => (int) $stat[1],
+                'sakit' => (int) $stat[2],
+                'alpha' => (int) $stat[4],
             ];
         }
 
