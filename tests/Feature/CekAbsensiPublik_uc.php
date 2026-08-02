@@ -42,7 +42,7 @@ test('orang tua melihat absensi anaknya lengkap dengan jam dan foto selfienya', 
         ->assertSee('10 IPA 1')
         ->assertSee('Hadir')
         ->assertSee('06:45')
-        ->assertSee('Foto diambil saat absen')
+        ->assertSee('Foto diambil saat presensi')
         ->assertSee('Sisa Poin');
 });
 
@@ -86,8 +86,8 @@ test('anak yang izin ditampilkan tanpa foto, berikut keterangannya', function ()
     $this->followingRedirects()
         ->post($link.'/cek', ['nisn' => $siswa->nisn])
         ->assertSee('Izin')
-        ->assertSee('Tidak ada foto absensi karena anak Anda izin hari ini.')
-        ->assertDontSee('Foto diambil saat absen');
+        ->assertSee('Tidak ada foto presensi karena anak Anda izin hari ini.')
+        ->assertDontSee('Foto diambil saat presensi');
 });
 
 // TS.CAP.004 / TC.CAP.004.001 — Positive
@@ -100,7 +100,7 @@ test('anak yang belum absen ditampilkan sebagai belum absen', function () {
     $this->followingRedirects()
         ->post($link.'/cek', ['nisn' => $siswa->nisn])
         ->assertSee('Belum Absen')
-        ->assertSee('Anak Anda belum melakukan absensi hari ini.');
+        ->assertSee('Anak Anda belum melakukan presensi hari ini.');
 });
 
 // TS.CAP.005 / TC.CAP.005.001 — Positive

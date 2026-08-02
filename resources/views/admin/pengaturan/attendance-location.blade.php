@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
-@section('title', 'Lokasi Absen')
+@section('title', 'Lokasi Presensi')
 
 @section('content')
 <div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-900">Lokasi Absen</h1>
-    <p class="mt-1 text-sm text-gray-500">Impor area absensi dari file KML (Google My Maps).</p>
+    <h1 class="text-2xl font-bold text-gray-900">Lokasi Presensi</h1>
+    <p class="mt-1 text-sm text-gray-500">Impor area presensi dari file KML (Google My Maps).</p>
 </div>
 
 <x-alert type="success" :message="session('success')" />

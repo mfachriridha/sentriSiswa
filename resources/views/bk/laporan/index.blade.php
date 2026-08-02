@@ -1,14 +1,14 @@
 @extends('layouts.app')
 
-@section('title', 'Rekap Absensi Tingkat ' . $bkGrade)
+@section('title', 'Rekap Presensi Tingkat ' . $bkGrade)
 
 @section('content')
 <x-alert type="error" :message="session('error')" />
 
 <div class="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
     <div>
-        <h1 class="text-2xl font-bold text-gray-900">Rekap Absensi Tingkat {{ $bkGrade }}</h1>
-        <p class="mt-1 text-sm text-gray-500">Laporan absensi seluruh siswa kelas {{ $bkGrade }} yang Anda pegang</p>
+        <h1 class="text-2xl font-bold text-gray-900">Rekap Presensi Tingkat {{ $bkGrade }}</h1>
+        <p class="mt-1 text-sm text-gray-500">Laporan presensi seluruh siswa kelas {{ $bkGrade }} yang Anda pegang</p>
     </div>
     <div class="flex flex-wrap gap-2">
         <a href="{{ route('bk.laporan.ekspor-excel', request()->query()) }}"

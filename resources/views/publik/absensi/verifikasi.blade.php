@@ -14,8 +14,8 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
                     </svg>
                 </div>
-                <h1 class="text-2xl font-bold text-slate-800">Cek Absensi Anak</h1>
-                <p class="text-slate-500 text-sm mt-1">Masukkan NISN atau NIS anak untuk melihat absensinya hari ini</p>
+                <h1 class="text-2xl font-bold text-slate-800">Cek Presensi Anak</h1>
+                <p class="text-slate-500 text-sm mt-1">Masukkan NISN atau NIS anak untuk melihat presensinya hari ini</p>
             </div>
 
             @if ($errors->any())
@@ -34,7 +34,7 @@
                 </div>
                 <button type="submit"
                         class="w-full py-3 px-6 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition active:scale-95 text-sm">
-                    Lihat Absensi
+                    Lihat Presensi
                 </button>
             </form>
 

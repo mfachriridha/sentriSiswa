@@ -1,14 +1,14 @@
 @extends('layouts.app')
 
-@section('title', 'Rekap Absensi')
+@section('title', 'Rekap Presensi')
 
 @section('content')
 <x-alert type="error" :message="session('error')" />
 
 <div class="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
     <div>
-        <h1 class="text-2xl font-bold text-gray-900">Rekap Absensi</h1>
-        <p class="mt-1 text-sm text-gray-500">Laporan absensi siswa kelas {{ $class->nama }}</p>
+        <h1 class="text-2xl font-bold text-gray-900">Rekap Presensi</h1>
+        <p class="mt-1 text-sm text-gray-500">Laporan presensi siswa kelas {{ $class->nama }}</p>
     </div>
     <div class="flex flex-wrap gap-2">
         <a href="{{ route('wali-kelas.absensi.ekspor-excel', request()->query()) }}"

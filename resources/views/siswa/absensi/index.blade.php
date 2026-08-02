@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
-@section('title', 'Absensi')
+@section('title', 'Presensi')
 
 @section('content')
 <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
     <div>
-        <h1 class="text-2xl font-bold text-gray-900">Absensi Hari Ini</h1>
+        <h1 class="text-2xl font-bold text-gray-900">Presensi Hari Ini</h1>
         <p class="mt-1 text-sm text-gray-500">{{ now()->locale('id')->translatedFormat('l, d F Y') }}</p>
     </div>
     <a href="{{ route('siswa.absensi.riwayat') }}"
@@ -22,7 +22,7 @@
 
 {{-- Time info bar --}}
 <div class="mb-5 flex flex-wrap items-center gap-x-4 gap-y-1 rounded-lg border border-gray-100 bg-gray-50 px-4 py-2.5 text-sm text-gray-500">
-    <span>Jam absen: <strong class="text-gray-700">{{ $startTime }} – {{ $endTime }}</strong></span>
+    <span>Jam presensi: <strong class="text-gray-700">{{ $startTime }} – {{ $endTime }}</strong></span>
     <span class="hidden sm:inline text-gray-300">|</span>
     <span>Waktu sekarang: <strong class="text-gray-700">{{ $currentTimeLabel }}</strong></span>
 </div>
@@ -50,7 +50,7 @@
                 <div class="shrink-0">
                     @if($todayAttendance->path_selfie)
                         <img src="{{ asset('storage/'.$todayAttendance->path_selfie) }}"
-                             alt="Selfie absensi"
+                             alt="Selfie presensi"
                              class="aspect-[3/4] w-28 rounded-xl border border-gray-200 object-cover shadow-sm">
                     @else
                         <div class="flex aspect-[3/4] w-28 items-center justify-center rounded-xl border border-dashed border-gray-200 bg-gray-50 text-center text-xs text-gray-400">
@@ -74,7 +74,7 @@
                                 <svg class="h-4 w-4 shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
-                                <span>Absen pukul <strong class="text-gray-700">{{ $todayAttendance->waktu_masuk->format('H:i') }}</strong></span>
+                                <span>Presensi pukul <strong class="text-gray-700">{{ $todayAttendance->waktu_masuk->format('H:i') }}</strong></span>
                             </div>
                         @endif
                         @if($todayAttendance->jarak_meter !== null)
@@ -85,9 +85,9 @@
                                 </svg>
                                 <span>
                                     @if($todayAttendance->jarak_meter == 0)
-                                        Di dalam area absensi
+                                        Di dalam area presensi
                                     @else
-                                        {{ number_format($todayAttendance->jarak_meter, 0) }} m dari area absensi
+                                        {{ number_format($todayAttendance->jarak_meter, 0) }} m dari area presensi
                                     @endif
                                 </span>
                             </div>
@@ -95,158 +95,150 @@
                     </div>
 
                     <div class="rounded-lg {{ $bgClass }} px-4 py-3 text-sm font-medium text-gray-700">
-                        Absensi Anda hari ini sudah tercatat. Sampai jumpa besok!
+                        Presensi Anda hari ini sudah tercatat. Sampai jumpa besok!
                     </div>
                 </div>
             </div>
 
         @elseif($canCheckIn)
-            {{-- ABSEN FORM --}}
+            {{-- PRESENSI FORM --}}
             <form method="POST"
                   action="{{ route('siswa.absensi.store') }}"
                   enctype="multipart/form-data"
                   x-data="attendanceForm({ geofenceActive: @js($geofenceActive), maxPhotoKb: 1024 })"
                   @submit="validateBeforeSubmit($event)">
                 @csrf
-                <input x-ref="selfieInput" type="file" name="selfie" accept="image/jpeg,image/webp" class="hidden">
-                <input type="hidden" name="latitude" x-model="latitude">
-                <input type="hidden" name="longitude" x-model="longitude">
-                <input type="hidden" name="accuracy" x-model="accuracy">
+                <input type="hidden" name="latitude" :value="latitude">
+                <input type="hidden" name="longitude" :value="longitude">
+                <input type="hidden" name="accuracy" :value="accuracy">
+                <input type="file" x-ref="selfieInput" name="selfie" class="hidden" accept="image/jpeg,image/png,image/webp">
 
-                <div class="mb-5 space-y-2">
-                    <p class="text-sm font-medium text-gray-700">Status Kehadiran</p>
-                    <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                        <label class="flex cursor-pointer items-center justify-center gap-2 rounded-xl border p-3 transition-colors"
-                               :class="selectedStatus === 'hadir' ? 'border-primary bg-primary/5 text-primary' : 'border-gray-200 bg-white hover:bg-gray-50 text-gray-700'">
-                            <input type="radio" name="status" value="hadir" x-model="selectedStatus" class="sr-only">
-                            <span class="text-sm font-bold">Hadir</span>
-                        </label>
-                        <label class="flex cursor-pointer items-center justify-center gap-2 rounded-xl border p-3 transition-colors"
-                               :class="selectedStatus === 'sakit' ? 'border-purple-600 bg-purple-50 text-purple-700' : 'border-gray-200 bg-white hover:bg-gray-50 text-gray-700'">
-                            <input type="radio" name="status" value="sakit" x-model="selectedStatus" class="sr-only">
-                            <span class="text-sm font-bold">Sakit</span>
-                        </label>
-                        <label class="flex cursor-pointer items-center justify-center gap-2 rounded-xl border p-3 transition-colors"
-                               :class="selectedStatus === 'izin' ? 'border-blue-600 bg-blue-50 text-blue-700' : 'border-gray-200 bg-white hover:bg-gray-50 text-gray-700'">
-                            <input type="radio" name="status" value="izin" x-model="selectedStatus" class="sr-only">
-                            <span class="text-sm font-bold">Izin</span>
-                        </label>
-                        <label class="flex cursor-pointer items-center justify-center gap-2 rounded-xl border p-3 transition-colors"
-                               :class="selectedStatus === 'dispensasi' ? 'border-orange-600 bg-orange-50 text-orange-700' : 'border-gray-200 bg-white hover:bg-gray-50 text-gray-700'">
-                            <input type="radio" name="status" value="dispensasi" x-model="selectedStatus" class="sr-only">
-                            <span class="text-sm font-bold">Dispensasi</span>
-                        </label>
-                    </div>
-                </div>
+                <div class="space-y-6">
 
-                <div class="flex flex-col gap-5 sm:flex-row sm:items-start">
-                    {{-- Selfie preview --}}
-                    <div class="shrink-0">
-                        <div class="overflow-hidden rounded-xl border border-gray-200 bg-gray-50" style="width:112px;">
-                            <div class="relative aspect-[3/4] bg-gray-100">
-                                <img x-cloak x-show="previewUrl" :src="previewUrl" alt="Preview selfie" class="h-full w-full object-cover">
-                                <div x-cloak x-show="!previewUrl" class="flex h-full items-center justify-center p-3 text-center text-xs text-gray-400">
-                                    Selfie akan muncul di sini
-                                </div>
-                            </div>
+                    {{-- 1. Status selector --}}
+                    <div>
+                        <label class="mb-2.5 block text-sm font-semibold text-gray-900">
+                            Pilih Status Kehadiran <span class="text-red-500">*</span>
+                        </label>
+                        <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                            <label class="relative flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 p-3 text-center transition-all"
+                                   :class="selectedStatus === 'hadir' ? 'border-primary bg-primary/5 text-primary shadow-sm' : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'">
+                                <input type="radio" name="status" value="hadir" x-model="selectedStatus" class="sr-only">
+                                <span class="text-sm font-bold">Hadir</span>
+                                <span class="mt-0.5 text-[11px] text-gray-500">Ada di lokasi</span>
+                            </label>
+                            <label class="relative flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 p-3 text-center transition-all"
+                                   :class="selectedStatus === 'sakit' ? 'border-purple-600 bg-purple-50 text-purple-700 shadow-sm' : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'">
+                                <input type="radio" name="status" value="sakit" x-model="selectedStatus" class="sr-only">
+                                <span class="text-sm font-bold">Sakit</span>
+                                <span class="mt-0.5 text-[11px] text-gray-500">Ada surat sakit</span>
+                            </label>
+                            <label class="relative flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 p-3 text-center transition-all"
+                                   :class="selectedStatus === 'izin' ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-sm' : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'">
+                                <input type="radio" name="status" value="izin" x-model="selectedStatus" class="sr-only">
+                                <span class="text-sm font-bold">Izin</span>
+                                <span class="mt-0.5 text-[11px] text-gray-500">Izin keperluan</span>
+                            </label>
+                            <label class="relative flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 p-3 text-center transition-all"
+                                   :class="selectedStatus === 'dispensasi' ? 'border-orange-600 bg-orange-50 text-orange-700 shadow-sm' : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'">
+                                <input type="radio" name="status" value="dispensasi" x-model="selectedStatus" class="sr-only">
+                                <span class="text-sm font-bold">Dispensasi</span>
+                                <span class="mt-0.5 text-[11px] text-gray-500">Tugas sekolah</span>
+                            </label>
                         </div>
                     </div>
 
-                    {{-- GPS + action --}}
-                    <div class="flex-1 space-y-4">
-                        @if($geofenceActive)
-                            <div class="rounded-lg border border-gray-200 bg-gray-50 p-3">
-                                <div class="flex items-center justify-between gap-3">
-                                    <div class="flex items-center gap-2">
-                                        <svg class="h-4 w-4 text-blue-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"/>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                        </svg>
-                                        <span class="text-xs font-medium text-gray-700">Lokasi GPS</span>
-                                        <span x-cloak x-show="gpsReady" class="text-xs" :class="accuracy <= 100 ? 'text-green-600' : accuracy <= 500 ? 'text-amber-600' : 'text-red-600'">
-                                            ±<span x-text="Math.round(accuracy)"></span> m
-                                        </span>
+                    {{-- 2. Verification Steps (GPS & Photo) --}}
+                    <div class="space-y-4 rounded-xl border border-gray-200 bg-gray-50/50 p-4 sm:p-5">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-sm font-bold text-gray-900">Verifikasi Kehadiran</h3>
+                            <span class="text-xs text-gray-500" x-text="selectedStatus === 'hadir' ? 'Lokasi + Foto Selfie' : 'Foto Bukti Alasan'"></span>
+                        </div>
+
+                        {{-- Step A: GPS Area Check (Hanya Wajib jika Status = Hadir) --}}
+                        <template x-if="selectedStatus === 'hadir'">
+                            <div class="space-y-3 rounded-lg border bg-white p-3.5 shadow-sm transition-colors"
+                                 :class="!geofenceActive ? 'border-blue-200' : (locationStatus === 'inside' || locationStatus === 'tolerance' ? 'border-green-200' : (locationStatus === 'outside' ? 'border-red-200' : 'border-gray-200'))">
+                                <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                                    <div>
+                                        <p class="text-xs font-semibold uppercase tracking-wider text-gray-500">1. Area Sekitar Sekolah</p>
+                                        <template x-if="!geofenceActive">
+                                            <p class="mt-0.5 text-xs text-blue-600">Verifikasi radius sekolah tidak diaktifkan.</p>
+                                        </template>
+                                        <template x-if="geofenceActive">
+                                            <p class="mt-0.5 text-xs font-medium"
+                                               :class="locationStatus === 'inside' || locationStatus === 'tolerance' ? 'text-green-600' : (locationStatus === 'outside' ? 'text-red-600' : 'text-gray-500')"
+                                               x-text="locationMessage || 'Lokasi belum diverifikasi'"></p>
+                                        </template>
                                     </div>
-                                    <button type="button"
-                                            @click="getGpsLocation()"
-                                            :disabled="gpsLoading"
-                                            class="shrink-0 inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-60">
-                                        <span x-text="gpsReady ? 'Refresh' : 'Aktifkan GPS'"></span>
-                                    </button>
-                                </div>
-                                <div class="mt-2 space-y-1 text-xs">
-                                    <p x-cloak x-show="gpsLoading" class="text-gray-500">Mengambil lokasi...</p>
-                                    <p x-cloak x-show="gpsError && selectedStatus === 'hadir'" x-text="gpsError" class="text-red-600"></p>
-                                    <template x-if="gpsReady">
-                                        <div>
-                                            <p x-cloak x-show="locationStatus" class="font-medium" :class="{
-                                                'text-green-700': locationStatus === 'inside',
-                                                'text-amber-700': locationStatus === 'tolerance',
-                                                'text-red-700': locationStatus === 'outside'
-                                            }">
-                                                <span x-text="locationMessage"></span>
-                                                <span x-cloak x-show="locationDistance !== null && locationDistance > 0" class="opacity-75">
-                                                    (<span x-text="Math.round(locationDistance)"></span> m)
-                                                </span>
-                                            </p>
-                                            <p x-cloak x-show="locationChecking" class="text-gray-500">Memeriksa lokasi...</p>
-                                            <p x-cloak x-show="accuracy > 500" class="text-amber-600">Akurasi rendah, tekan Refresh.</p>
-                                        </div>
+                                    <template x-if="geofenceActive">
+                                        <button type="button"
+                                                @click="getGpsLocation()"
+                                                :disabled="gpsLoading || locationChecking"
+                                                class="inline-flex items-center gap-1.5 self-start rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 disabled:opacity-50 sm:self-center">
+                                            <svg class="h-3.5 w-3.5 text-gray-500" :class="{ 'animate-spin': gpsLoading || locationChecking }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                            </svg>
+                                            <span x-text="gpsLoading ? 'Mengambil GPS...' : (locationChecking ? 'Memeriksa...' : 'Aktifkan / Refresh GPS')"></span>
+                                        </button>
                                     </template>
-                                    <p x-cloak x-show="!gpsLoading && !gpsError && !gpsReady" class="text-gray-400">Lokasi belum diambil.</p>
                                 </div>
+                                <p x-cloak x-show="gpsError" x-text="gpsError" class="text-xs font-medium text-red-600"></p>
                             </div>
-                        @else
-                            <div class="flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2">
-                                <svg class="h-4 w-4 shrink-0 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                </svg>
-                                <span class="text-xs font-medium text-blue-700">Lokasi GPS tidak diperlukan untuk sesi ini.</span>
+                        </template>
+
+                        {{-- Step B: Photo/Selfie Button Trigger --}}
+                        <div class="rounded-lg border bg-white p-3.5 shadow-sm transition-colors"
+                             :class="selfieReady ? 'border-green-200' : 'border-gray-200'">
+                            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                <div>
+                                    <p class="text-xs font-semibold uppercase tracking-wider text-gray-500"
+                                       x-text="selectedStatus === 'hadir' ? '2. Foto Selfie Presensi' : '2. Foto Bukti Surat / Keterangan'"></p>
+                                    <p class="mt-0.5 text-xs"
+                                       :class="selfieReady ? 'font-semibold text-green-600' : 'text-gray-500'"
+                                       x-text="selfieReady ? 'Foto siap digunakan' : (selectedStatus === 'hadir' ? 'Ambil selfie langsung dari kamera' : 'Ambil foto bukti dari kamera')"></p>
+                                </div>
+                                <button type="button"
+                                        @click="openSelfieModal()"
+                                        :disabled="!canOpenSelfieModal"
+                                        class="inline-flex items-center gap-1.5 self-start rounded-lg bg-primary px-3.5 py-2 text-xs font-semibold text-white shadow-sm transition-all hover:bg-primary-dark disabled:cursor-not-allowed disabled:bg-gray-300 disabled:shadow-none sm:self-center">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    </svg>
+                                    <span x-text="selfieReady ? 'Foto Ulang' : (selectedStatus === 'hadir' ? 'Ambil Selfie' : 'Ambil Foto Bukti')"></span>
+                                </button>
                             </div>
-                        @endif
-
-                        <div>
-                            <button type="button"
-                                    @click="openSelfieModal()"
-                                    :disabled="!canOpenSelfieModal"
-                                    class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white shadow-sm transition-colors hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:cursor-not-allowed disabled:bg-gray-300">
-                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                </svg>
-                                Absen Sekarang
-                            </button>
-                            <p class="mt-2 text-xs" :class="canOpenSelfieModal ? 'text-green-700' : 'text-amber-700'" x-text="openDisabledMessage"></p>
-                        </div>
-
-                        <div class="space-y-1 text-sm">
-                            <p x-cloak x-show="compressedSizeKb" class="text-gray-500">Ukuran foto: <span x-text="compressedSizeKb"></span> KB</p>
-                            <p x-cloak x-show="error" x-text="error" class="text-red-600"></p>
-                            @error('selfie')
-                                <p class="text-red-600">{{ $message }}</p>
-                            @enderror
-                            @error('latitude')
-                                <p class="text-red-600">{{ $message }}</p>
-                            @enderror
-                            @error('longitude')
-                                <p class="text-red-600">{{ $message }}</p>
-                            @enderror
+                            <p x-cloak x-show="!canOpenSelfieModal" x-text="openDisabledMessage" class="mt-2 text-xs text-amber-700 font-medium"></p>
                         </div>
                     </div>
+
+                    {{-- Preview Thumbnail Before Final Submit --}}
+                    <div x-cloak x-show="previewUrl" class="flex items-center gap-3 rounded-xl border border-green-200 bg-green-50/50 p-3">
+                        <img :src="previewUrl" alt="Preview foto" class="h-14 w-11 rounded-lg border border-green-200 object-cover">
+                        <div class="flex-1 text-xs">
+                            <p class="font-bold text-green-900" x-text="selectedStatus === 'hadir' ? 'Foto selfie berhasil diambil' : 'Foto bukti berhasil diambil'"></p>
+                            <p class="text-green-700">Tekan tombol di bawah untuk menyelesaikan presensi.</p>
+                        </div>
+                    </div>
+
                 </div>
 
-                {{-- Camera modal --}}
+                {{-- CAMERA MODAL (FULLSCREEN RESPONSIVE) --}}
                 <div x-cloak
                      x-show="modalOpen"
-                     x-transition.opacity
-                     class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 p-3 sm:p-4"
-                     @keydown.escape.window="cancelSelfieModal()">
-                    <div class="flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl bg-white shadow-xl" @click.outside="cancelSelfieModal()">
-                        <div class="flex shrink-0 items-start justify-between gap-4 border-b border-gray-200 px-4 py-3">
-                            <div>
-                                <h3 class="text-base font-semibold text-gray-900 sm:text-lg">Ambil Selfie Absensi</h3>
-                                <p class="mt-0.5 text-xs text-gray-500 sm:text-sm">Pastikan wajah terlihat jelas sebelum menekan Absen Sekarang.</p>
-                            </div>
+                     class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4">
+                    <div x-show="modalOpen"
+                         x-transition.opacity
+                         @click="cancelSelfieModal()"
+                         class="fixed inset-0 bg-black/60 backdrop-blur-xs"></div>
+
+                    <div x-show="modalOpen"
+                         x-transition.scale.origin.center
+                         class="relative z-10 flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+                        <div class="flex shrink-0 items-center justify-between border-b border-gray-200 px-4 py-3">
+                            <h3 class="text-sm font-bold text-gray-900"
+                                x-text="selectedStatus === 'hadir' ? 'Kamera Selfie Presensi' : 'Kamera Foto Bukti'"></h3>
                             <button type="button"
                                     @click="cancelSelfieModal()"
                                     class="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600">
@@ -257,73 +249,16 @@
                             </button>
                         </div>
 
-                        <div class="flex-1 overflow-y-auto px-4 py-3">
-                            <div class="grid gap-4 md:grid-cols-[240px_1fr] md:gap-6">
-                                <div class="relative mx-auto aspect-[3/4] max-h-[220px] w-full overflow-hidden rounded-xl border border-gray-200 bg-gray-100 sm:max-h-[300px]">
-                                    <video x-ref="video"
-                                           x-cloak
-                                           x-show="cameraReady && !previewUrl"
-                                           class="h-full w-full object-cover"
-                                           :style="facingMode === 'user' ? 'transform: scaleX(-1)' : ''"
-                                           playsinline
-                                           muted></video>
-                                    <img x-cloak x-show="previewUrl"
-                                         :src="previewUrl"
-                                         alt="Preview selfie"
-                                         class="h-full w-full object-cover">
-                                    <div x-cloak x-show="!cameraReady && !previewUrl" class="flex h-full items-center justify-center p-4 text-center text-xs text-gray-500 sm:text-sm">
-                                        Kamera belum aktif
-                                    </div>
-                                </div>
-
-                                <div class="flex flex-col justify-between gap-4">
-                                    <div class="space-y-2 text-xs sm:text-sm">
-                                        <p class="font-medium text-gray-700" x-text="facingMode === 'environment' || selectedStatus !== 'hadir' ? 'Ambil foto bukti dari kamera perangkat ini.' : 'Ambil selfie dari kamera perangkat ini.'"></p>
-                                        <p class="text-gray-500">Foto akan dikompresi otomatis maksimal 300 KB.</p>
-                                        <p x-cloak x-show="compressedSizeKb" class="text-gray-500">
-                                            Ukuran foto: <span x-text="compressedSizeKb"></span> KB
-                                        </p>
-                                        <p x-cloak x-show="error" x-text="error" class="font-medium text-red-600"></p>
-                                    </div>
-
-                                    <div class="flex flex-wrap gap-2 sm:gap-3">
-                                        <button type="button"
-                                                x-cloak
-                                                x-show="!cameraReady && !previewUrl"
-                                                @click="startCamera()"
-                                                class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-3.5 py-2 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 sm:text-sm">
-                                            Nyalakan Kamera
-                                        </button>
-                                        <button type="button"
-                                                x-cloak
-                                                x-show="cameraReady"
-                                                @click="captureSelfie()"
-                                                :disabled="compressing"
-                                                class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-3.5 py-2 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60 sm:text-sm">
-                                            <span x-text="compressing ? 'Memproses...' : (facingMode === 'environment' || selectedStatus !== 'hadir' ? 'Ambil Foto' : 'Ambil Selfie')"></span>
-                                        </button>
-                                        <button type="button"
-                                                x-cloak
-                                                x-show="cameraReady && !previewUrl"
-                                                @click="toggleCamera()"
-                                                class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-3.5 py-2 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 sm:text-sm">
-                                            Tukar Kamera
-                                        </button>
-                                        <button type="button"
-                                                x-cloak
-                                                x-show="previewUrl"
-                                                @click="resetSelfie()"
-                                                class="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-3.5 py-2 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50 sm:text-sm">
-                                            Ulangi
-                                        </button>
-                                    </div>
-                                </div>
+                        <div class="flex-1 overflow-y-auto bg-gray-50 p-4">
+                            <div class="relative mx-auto aspect-[3/4] w-full max-w-sm overflow-hidden rounded-xl border-4 border-white shadow-lg bg-gray-200">
+                                <video x-ref="video" class="h-full w-full object-cover" :style="facingMode === 'user' ? 'transform: scaleX(-1)' : ''" playsinline></video>
+                                <img x-cloak x-show="previewUrl" :src="previewUrl" class="absolute inset-0 h-full w-full object-cover">
                             </div>
                         </div>
 
                         <div class="shrink-0 border-t border-gray-200 bg-gray-50 px-4 py-3">
                             <p x-cloak x-show="previewUrl" class="mb-2 text-xs font-medium text-amber-700">
-                                Setelah ditekan, absen hari ini tidak bisa diubah sendiri. Kalau salah, hubungi wali kelas.
+                                Setelah ditekan, presensi hari ini tidak bisa diubah sendiri. Kalau salah, hubungi wali kelas.
                             </p>
                             <div class="flex gap-2 sm:justify-end">
                                 <button type="button"
@@ -334,14 +269,12 @@
                                 <button type="submit"
                                         :disabled="!canSubmit"
                                         class="inline-flex flex-1 items-center justify-center rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:cursor-not-allowed disabled:bg-gray-300 sm:flex-none sm:text-sm">
-                                    Absen Sekarang
+                                    Presensi Sekarang
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <canvas x-ref="canvas" class="hidden"></canvas>
             </form>
 
         @else
@@ -352,11 +285,11 @@
                 </svg>
                 <p class="text-sm font-medium text-gray-500">
                     @if(! $isWeekday)
-                        Absensi hanya tersedia pada hari {{ $activeDaysLabel }}.
+                        Presensi hanya tersedia pada hari {{ $activeDaysLabel }}.
                     @elseif(now()->format('H:i') < $startTime)
-                        Belum waktunya absen. Absen dimulai pukul {{ $startTime }}.
+                        Belum waktunya presensi. Presensi dimulai pukul {{ $startTime }}.
                     @else
-                        Waktu absen sudah berakhir pukul {{ $endTime }}.
+                        Waktu presensi sudah berakhir pukul {{ $endTime }}.
                     @endif
                 </p>
             </div>

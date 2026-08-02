@@ -56,28 +56,28 @@ class AttendanceReportMessageBuilder
         $tanggalLabel = now()->locale('id')->translatedFormat('d F Y');
         $waktu = now()->format('H:i').' WIB';
 
-        $message = "📋 *LAPORAN ABSENSI HARIAN*\n";
+        $message = "📋 *LAPORAN PRESENSI HARIAN*\n";
         $message .= "🏫 Kelas *{$kelas->nama}*\n";
         $message .= "👤 Wali Kelas: {$namaWaliKelas}\n";
         $message .= "📅 {$hari}, {$tanggalLabel} · {$waktu}\n";
         $message .= "\n";
         $message .= "━━━━━━━━━━━━━━━━\n";
-        $message .= "✅ Sudah absen : *{$sudahCount}* siswa\n";
-        $message .= "❌ Belum absen : *{$belumCount}* siswa\n";
+        $message .= "✅ Sudah presensi : *{$sudahCount}* siswa\n";
+        $message .= "❌ Belum presensi : *{$belumCount}* siswa\n";
         $message .= "📊 Total          : *{$totalStudents}* siswa\n";
         $message .= "━━━━━━━━━━━━━━━━\n";
 
         if ($belumCount === 0) {
-            $message .= "\n🎉 Seluruh siswa telah absen hari ini!\n";
+            $message .= "\n🎉 Seluruh siswa telah presensi hari ini!\n";
         } else {
-            $message .= "\n📌 *Belum absen:*\n";
+            $message .= "\n📌 *Belum presensi:*\n";
             foreach ($belumAbsen as $sp) {
                 $message .= '• '.($sp->pengguna?->nama ?? 'Siswa NISN '.$sp->nisn)."\n";
             }
         }
 
-        // Isinya hasil absensi, bukan formulir input.
-        $message .= "\n🔗 Cek hasil absensi:\n{$linkAbsensi}\n";
+        // Isinya hasil presensi, bukan formulir input.
+        $message .= "\n🔗 Cek hasil presensi:\n{$linkAbsensi}\n";
 
         return [
             'telepon_penerima' => $waliKelas?->profilGuru?->telepon,

@@ -22,7 +22,7 @@
         {{-- Status hari ini: yang paling dicari orang tua saat membuka link. --}}
         <div class="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
             <div class="bg-primary px-6 py-5 text-white">
-                <p class="text-primary-content/70 text-xs font-medium uppercase tracking-wider mb-1">Absensi Hari Ini</p>
+                <p class="text-primary-content/70 text-xs font-medium uppercase tracking-wider mb-1">Presensi Hari Ini</p>
                 <h1 class="text-lg font-bold">{{ $aksesToken->tanggal->translatedFormat('l, d F Y') }}</h1>
             </div>
 
@@ -39,10 +39,10 @@
 
                 @if ($absensi?->path_selfie)
                     <img src="{{ asset('storage/' . $absensi->path_selfie) }}"
-                         alt="Foto absensi {{ $siswa->pengguna->nama }}"
+                         alt="Foto presensi {{ $siswa->pengguna->nama }}"
                          class="w-full rounded-2xl border border-slate-100 object-cover aspect-[4/5] max-h-96">
                     <p class="text-center text-xs text-slate-400 mt-2">
-                        Foto diambil saat absen
+                        Foto diambil saat presensi
                         @if ($absensi->waktu_masuk)
                             pukul {{ $absensi->waktu_masuk->format('H:i') }} WIB
                         @endif
@@ -51,11 +51,11 @@
                     <div class="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-6 py-10 text-center">
                         <p class="text-sm text-slate-500">
                             @if (! $absensi || $absensi->status === 'belum_absen')
-                                Anak Anda belum melakukan absensi hari ini.
+                                Anak Anda belum melakukan presensi hari ini.
                             @elseif ($absensi->status === 'alpha')
                                 Anak Anda tidak hadir tanpa keterangan hari ini.
                             @else
-                                Tidak ada foto absensi karena anak Anda {{ strtolower($statusLabel) }} hari ini.
+                                Tidak ada foto presensi karena anak Anda {{ strtolower($statusLabel) }} hari ini.
                             @endif
                         </p>
                     </div>

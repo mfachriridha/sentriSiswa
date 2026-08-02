@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Waktu Absen')
+@section('title', 'Waktu Presensi')
 
 @section('content')
 @php
@@ -9,8 +9,8 @@
 @endphp
 
 <div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-900">Waktu Absen</h1>
-    <p class="mt-1 text-sm text-gray-500">Konfigurasi jam mulai, jam selesai, dan hari aktif absensi.</p>
+    <h1 class="text-2xl font-bold text-gray-900">Waktu Presensi</h1>
+    <p class="mt-1 text-sm text-gray-500">Konfigurasi jam mulai, jam selesai, dan hari aktif presensi.</p>
 </div>
 
 {{-- Tanpa ini, admin menyimpan konfigurasi lalu tidak melihat konfirmasi apa
