@@ -55,7 +55,7 @@ class LinkPublikCommand extends Command
 
         foreach ($kelases as $kelas) {
             $tokenObj = TokenAksesAbsensi::buatAtauPerbarui($kelas->id, $tanggalHariIni);
-            $url = route('absensi.publik.show', $tokenObj->token);
+            $url = route('absensi.publik', $tokenObj->token);
 
             $this->line("<fg=yellow;options=bold>📌 Kelas {$kelas->nama}:</>");
             $this->line("<fg=green>{$url}</>");
