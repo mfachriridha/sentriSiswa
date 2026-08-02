@@ -78,7 +78,7 @@ test('pengajuan ditolak ketika alasan tidak diisi', function () {
     $this->from('/wali-kelas/pengajuan-poin/buat')
         ->followingRedirects()
         ->post('/wali-kelas/pengajuan-poin', pengajuanPoinSah($siswa, ['alasan' => '']))
-        ->assertSee('Alasan wajib diisi.');
+        ->assertSee('Keterangan detail wajib diisi.');
 });
 
 // TS.PPW.005 / TC.PPW.005.001 — Negative
