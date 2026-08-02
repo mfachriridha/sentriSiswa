@@ -64,8 +64,8 @@
                             <div class="flex items-center gap-2">
                                 <button type="button"
                                         onclick="openTerimaModal({{ $pengajuan->id }}, '{{ addslashes($pengajuan->profilSiswa?->pengguna?->nama ?? 'siswa ini') }}', '{{ addslashes($pengajuan->kategori?->nama ?? 'Prestasi') }}', {{ $pengajuan->jumlah_poin ?? $pengajuan->kategori?->poin ?? 10 }})"
-                                        class="inline-flex items-center gap-1.5 rounded-lg bg-green-600 px-3 py-2 text-sm font-medium text-white hover:bg-green-700 transition-colors">
-                                    ACC / Terima (+{{ $pengajuan->jumlah_poin ?? $pengajuan->kategori?->poin ?? 10 }})
+                                        class="inline-flex items-center gap-1.5 rounded-lg bg-green-600 px-3.5 py-2 text-sm font-medium text-white hover:bg-green-700 transition-colors">
+                                    Terima
                                 </button>
                                 <button type="button"
                                         onclick="openTolakModal({{ $pengajuan->id }}, '{{ addslashes($pengajuan->profilSiswa?->pengguna?->nama ?? 'siswa ini') }}')"
