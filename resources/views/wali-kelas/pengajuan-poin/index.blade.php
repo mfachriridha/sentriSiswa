@@ -27,7 +27,8 @@
                 <tr>
                     <th class="px-4 py-3">Tanggal</th>
                     <th class="px-4 py-3">Siswa</th>
-                    <th class="px-4 py-3">Alasan</th>
+                    <th class="px-4 py-3">Kategori</th>
+                    <th class="px-4 py-3">Keterangan</th>
                     <th class="px-4 py-3">Jumlah Poin</th>
                     <th class="px-4 py-3">Sisa Poin</th>
                     <th class="px-4 py-3">Status</th>
@@ -40,18 +41,20 @@
                         <td class="px-4 py-3">{{ $pengajuan->profilSiswa?->pengguna?->nama ?? '-' }}<div class="text-xs text-gray-500">{{ $pengajuan->profilSiswa?->kelas?->nama ?? '-' }}</div></td>
                         <td class="px-4 py-3">
                             @if($pengajuan->kategori)
-                                <span class="inline-flex items-center gap-1 rounded bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-700 border border-blue-200 mb-1">
+                                <span class="inline-flex items-center gap-1 rounded-md bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700 border border-blue-200">
                                     🏆 {{ $pengajuan->kategori->nama }}
                                 </span>
+                            @else
+                                <span class="text-xs text-gray-400">-</span>
                             @endif
-                            <div class="text-sm text-gray-900">{{ $pengajuan->alasan }}</div>
                         </td>
+                        <td class="px-4 py-3 text-gray-900">{{ $pengajuan->alasan }}</td>
                         <td class="px-4 py-3 font-semibold text-green-600">{{ $pengajuan->jumlah_poin !== null ? '+'.$pengajuan->jumlah_poin : '-' }}</td>
                         <td class="px-4 py-3 font-medium text-gray-900">{{ $pengajuan->profilSiswa?->poin ?? '-' }}</td>
                         <td class="px-4 py-3">{{ $statusLabels[$pengajuan->status] ?? $pengajuan->status }}</td>
                     </tr>
                 @empty
-                    <tr><td colspan="6" class="px-6 py-16 text-center text-sm text-gray-500">Belum ada pengajuan.</td></tr>
+                    <tr><td colspan="7" class="px-6 py-16 text-center text-sm text-gray-500">Belum ada pengajuan.</td></tr>
                 @endforelse
             </tbody>
         </table>

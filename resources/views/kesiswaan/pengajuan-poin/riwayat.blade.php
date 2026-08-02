@@ -33,6 +33,8 @@
                         <th class="px-4 py-3 text-gray-600 font-semibold">Tanggal</th>
                         <th class="px-4 py-3 text-gray-600 font-semibold">Siswa</th>
                         <th class="px-4 py-3 text-gray-600 font-semibold">Kelas</th>
+                        <th class="px-4 py-3 text-gray-600 font-semibold">Kategori</th>
+                        <th class="px-4 py-3 text-gray-600 font-semibold">Keterangan</th>
                         <th class="px-4 py-3 text-gray-600 font-semibold">Jumlah Poin</th>
                         <th class="px-4 py-3 text-gray-600 font-semibold">Status</th>
                         <th class="px-4 py-3 text-gray-600 font-semibold">Diajukan Oleh</th>
@@ -53,13 +55,19 @@
                             <td class="px-4 py-3 text-gray-700 whitespace-nowrap">{{ $pengajuan->dibuat_pada->translatedFormat('d F Y') }}</td>
                             <td class="px-4 py-3">
                                 <p class="font-medium text-gray-900">{{ $pengajuan->profilSiswa?->pengguna?->nama ?? '-' }}</p>
-                                @if($pengajuan->kategori)
-                                    <span class="mt-0.5 inline-flex items-center gap-1 rounded bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-700 border border-blue-200">
-                                        🏆 {{ $pengajuan->kategori->nama }}
-                                    </span>
-                                @endif
+                                <p class="mt-0.5 text-xs text-gray-500">NIS: {{ $pengajuan->profilSiswa?->nis ?? '-' }}</p>
                             </td>
                             <td class="px-4 py-3 text-gray-700 whitespace-nowrap">{{ $pengajuan->profilSiswa?->kelas?->nama ?? '-' }}</td>
+                            <td class="px-4 py-3">
+                                @if($pengajuan->kategori)
+                                    <span class="inline-flex items-center gap-1 rounded-md bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700 border border-blue-200">
+                                        🏆 {{ $pengajuan->kategori->nama }}
+                                    </span>
+                                @else
+                                    <span class="text-xs text-gray-400">-</span>
+                                @endif
+                            </td>
+                            <td class="px-4 py-3 text-gray-900">{{ $pengajuan->alasan }}</td>
                             <td class="px-4 py-3 font-semibold text-green-600">{{ $pengajuan->jumlah_poin !== null ? '+'.$pengajuan->jumlah_poin : '-' }}</td>
                             <td class="px-4 py-3">
                                 <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium {{ $badge }}">
@@ -78,7 +86,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="px-6 py-16 text-center text-sm text-gray-500">Belum ada riwayat pengajuan poin.</td>
+                            <td colspan="10" class="px-6 py-16 text-center text-sm text-gray-500">Belum ada riwayat pengajuan poin.</td>
                         </tr>
                     @endforelse
                 </tbody>

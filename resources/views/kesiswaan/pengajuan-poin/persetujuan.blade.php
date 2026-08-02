@@ -33,7 +33,8 @@
                     <th class="px-4 py-3 text-gray-600 font-semibold">Siswa</th>
                     <th class="px-4 py-3 text-gray-600 font-semibold">Kelas</th>
                     <th class="px-4 py-3 text-gray-600 font-semibold">Sisa Poin</th>
-                    <th class="px-4 py-3 text-gray-600 font-semibold">Alasan</th>
+                    <th class="px-4 py-3 text-gray-600 font-semibold">Kategori</th>
+                    <th class="px-4 py-3 text-gray-600 font-semibold">Keterangan</th>
                     <th class="px-4 py-3 text-gray-600 font-semibold">Diajukan Oleh</th>
                     <th class="px-4 py-3 text-gray-600 font-semibold">Aksi</th>
                 </tr>
@@ -50,12 +51,14 @@
                         <td class="px-4 py-3 font-medium text-gray-900">{{ $pengajuan->profilSiswa?->poin ?? '-' }}</td>
                         <td class="px-4 py-3">
                             @if($pengajuan->kategori)
-                                <span class="inline-flex items-center gap-1 rounded bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-700 border border-blue-200 mb-1">
+                                <span class="inline-flex items-center gap-1 rounded-md bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700 border border-blue-200">
                                     🏆 {{ $pengajuan->kategori->nama }} (+{{ $pengajuan->jumlah_poin ?? $pengajuan->kategori->poin }} Poin)
                                 </span>
+                            @else
+                                <span class="text-xs text-gray-400">-</span>
                             @endif
-                            <div class="text-sm text-gray-900">{{ $pengajuan->alasan }}</div>
                         </td>
+                        <td class="px-4 py-3 text-gray-900">{{ $pengajuan->alasan }}</td>
                         <td class="px-4 py-3 text-gray-500">{{ $pengajuan->diajukanOleh?->nama ?? '-' }}</td>
                         <td class="px-4 py-3">
                             <div class="flex items-center gap-2">
@@ -74,7 +77,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="px-6 py-16 text-center text-sm text-gray-500">
+                        <td colspan="8" class="px-6 py-16 text-center text-sm text-gray-500">
                             Tidak ada pengajuan poin yang menunggu persetujuan.
                         </td>
                     </tr>
@@ -96,7 +99,7 @@
             @csrf
             @method('PUT')
             <div class="rounded-xl border border-green-200 bg-green-50/80 p-4 text-center">
-                <p class="text-xs font-semibold uppercase tracking-wide text-green-700">Nilai Tambahan Poin Baku</p>
+                <p class="text-xs font-semibold uppercase tracking-wide text-green-700">Tambahan Poin</p>
                 <p id="terimaPoinBadge" class="mt-1 text-3xl font-bold text-green-700">+0 Poin</p>
             </div>
             <input type="hidden" id="jumlah_poin" name="jumlah_poin" value="">
