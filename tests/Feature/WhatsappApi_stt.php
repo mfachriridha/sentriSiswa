@@ -155,6 +155,6 @@ test('kirim ulang laporan absensi menyusun ulang isi pesan dari kondisi absensi 
     // sudah hadir), bukan teks lama yang masih menyebut siswa itu belum absen.
     $this->followingRedirects()
         ->post("/admin/pengaturan/whatsapp/riwayat/{$pesan->id}/kirim-ulang")
-        ->assertSee('Seluruh siswa telah absen hari ini')
+        ->assertSee('Seluruh siswa telah presensi hari ini')
         ->assertDontSee('Isi lama');
 });
