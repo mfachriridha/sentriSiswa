@@ -42,8 +42,8 @@ test('halaman absensi menampilkan status hari ini setelah siswa absen', function
     $this->post('/siswa/absensi', ['status' => 'hadir', 'selfie' => selfieAbsensi()]);
 
     $this->get('/siswa/absensi')
-        ->assertSee('Absensi Hari Ini')
-        ->assertSee('Absensi Anda hari ini sudah tercatat. Sampai jumpa besok!');
+        ->assertSee('Presensi Hari Ini')
+        ->assertSee('Presensi Anda hari ini sudah tercatat. Sampai jumpa besok!');
 });
 
 // TS.ABS.008 / TC.ABS.008.001 — Positive
@@ -52,7 +52,7 @@ test('halaman absensi memberi tahu siswa bahwa hari ini bukan hari absensi', fun
     siswaMasuk();
 
     $this->get('/siswa/absensi')
-        ->assertSee('Absensi hanya tersedia pada hari Senin, Selasa, Rabu, Kamis dan Jumat.');
+        ->assertSee('Presensi hanya tersedia pada hari Senin, Selasa, Rabu, Kamis dan Jumat.');
 });
 
 // TS.ABS.009 / TC.ABS.009.001 — Positive
@@ -61,7 +61,7 @@ test('halaman absensi memberi tahu siswa bahwa waktunya belum tiba', function ()
     siswaMasuk();
 
     $this->get('/siswa/absensi')
-        ->assertSee('Belum waktunya absen. Absen dimulai pukul 06:30.');
+        ->assertSee('Belum waktunya presensi. Presensi dimulai pukul 06:30.');
 });
 
 // TS.ABS.010 / TC.ABS.010.001 — Positive
@@ -70,7 +70,7 @@ test('halaman absensi memberi tahu siswa bahwa waktunya sudah berakhir', functio
     siswaMasuk();
 
     $this->get('/siswa/absensi')
-        ->assertSee('Waktu absen sudah berakhir pukul 07:00.');
+        ->assertSee('Waktu presensi sudah berakhir pukul 07:00.');
 });
 
 // TS.ABS.016 / TC.ABS.016.001 — Positive — penyegar status tanpa memuat ulang halaman

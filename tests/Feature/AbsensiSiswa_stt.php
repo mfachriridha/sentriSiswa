@@ -73,7 +73,7 @@ test('siswa gagal absen di hari yang bukan hari absensi', function () {
 
     $this->followingRedirects()
         ->post('/siswa/absensi', ['status' => 'hadir', 'selfie' => selfieAbsensi()])
-        ->assertSee('Absensi hanya tersedia pada hari '.Pengaturan::labelHariAbsen().'.');
+        ->assertSee('Presensi hanya tersedia pada hari '.Pengaturan::labelHariAbsen().'.');
 });
 
 // TS.ABS.005 / TC.ABS.005.001 — Negative — hadir → absen lagi
@@ -96,7 +96,7 @@ test('siswa yang tidak absen sampai jam absen berakhir tercatat alpha', function
     // Sekolah menyiapkan catatan harian tiap pagi: semua siswa "belum absen".
     $this->artisan('attendance:create-daily');
 
-    $this->get('/siswa/absensi')->assertSee('Belum waktunya absen. Absen dimulai pukul 06:30.');
+    $this->get('/siswa/absensi')->assertSee('Belum waktunya presensi. Presensi dimulai pukul 06:30.');
 
     // Jam absen lewat tanpa siswa itu absen sama sekali.
     Carbon::setTestNow('2026-07-06 07:05:00');
