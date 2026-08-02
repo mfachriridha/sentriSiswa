@@ -40,7 +40,7 @@ test('absen pukul 06:29 ditolak', function () {
     siswaMasuk();
 
     $this->followingRedirects()
-        ->post('/siswa/absensi', ['selfie' => selfieAbsensi()])
+        ->post('/siswa/absensi', ['status' => 'hadir', 'selfie' => selfieAbsensi()])
         ->assertSee('Waktu absen sudah lewat atau belum dimulai.');
 });
 
@@ -50,7 +50,7 @@ test('absen pukul 06:30 diterima dan tercatat hadir', function () {
     siswaMasuk();
 
     $this->followingRedirects()
-        ->post('/siswa/absensi', ['selfie' => selfieAbsensi()])
+        ->post('/siswa/absensi', ['status' => 'hadir', 'selfie' => selfieAbsensi()])
         ->assertSee('Absen berhasil: Hadir.');
 });
 
@@ -60,7 +60,7 @@ test('absen pukul 07:00 masih diterima dan tercatat hadir', function () {
     siswaMasuk();
 
     $this->followingRedirects()
-        ->post('/siswa/absensi', ['selfie' => selfieAbsensi()])
+        ->post('/siswa/absensi', ['status' => 'hadir', 'selfie' => selfieAbsensi()])
         ->assertSee('Absen berhasil: Hadir.');
 });
 
@@ -70,7 +70,7 @@ test('absen pukul 07:01 ditolak', function () {
     siswaMasuk();
 
     $this->followingRedirects()
-        ->post('/siswa/absensi', ['selfie' => selfieAbsensi()])
+        ->post('/siswa/absensi', ['status' => 'hadir', 'selfie' => selfieAbsensi()])
         ->assertSee('Waktu absen sudah lewat atau belum dimulai.');
 });
 
@@ -80,17 +80,17 @@ test('selfie berukuran tepat 300 KB diterima', function () {
     siswaMasuk();
 
     $this->followingRedirects()
-        ->post('/siswa/absensi', ['selfie' => selfieAbsensi(300)])
+        ->post('/siswa/absensi', ['status' => 'hadir', 'selfie' => selfieAbsensi(300)])
         ->assertSee('Absen berhasil: Hadir.');
 });
 
 // TS.ABS.013 / TC.ABS.013.002 — Negative — di atas batas ukuran selfie
-test('selfie berukuran lebih dari 300 KB ditolak', function () {
+test('selfie berukuran lebih dari 1 mb ditolak', function () {
     Carbon::setTestNow('2026-07-06 06:35:00');
     siswaMasuk();
 
     $this->from('/siswa/absensi')
         ->followingRedirects()
-        ->post('/siswa/absensi', ['selfie' => selfieAbsensi(301)])
-        ->assertSee('Ukuran foto maksimal 300 KB.');
+        ->post('/siswa/absensi', ['status' => 'hadir', 'selfie' => selfieAbsensi(1025)])
+        ->assertSee('Ukuran foto maksimal 1 MB.');
 });

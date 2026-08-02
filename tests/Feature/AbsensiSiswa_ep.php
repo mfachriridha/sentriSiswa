@@ -39,7 +39,7 @@ test('siswa absen tepat waktu dan tercatat hadir', function () {
     siswaMasuk();
 
     $this->followingRedirects()
-        ->post('/siswa/absensi', ['selfie' => selfieAbsensi()])
+        ->post('/siswa/absensi', ['status' => 'hadir', 'selfie' => selfieAbsensi()])
         ->assertSee('Absen berhasil: Hadir.');
 });
 
@@ -51,6 +51,7 @@ test('absensi ditolak ketika berkas selfienya bukan gambar', function () {
     $this->from('/siswa/absensi')
         ->followingRedirects()
         ->post('/siswa/absensi', [
+            'status' => 'hadir',
             'selfie' => UploadedFile::fake()->create('catatan.pdf', 50, 'application/pdf'),
         ])
         ->assertSee('File harus berupa gambar.');
