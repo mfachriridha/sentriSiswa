@@ -60,6 +60,8 @@ class BkMonitoringController extends Controller
 
         abort_unless($monitoring->kelas?->tingkat === $grade, 403);
 
+        [$startDate, $endDate] = Pengaturan::rentangTanggalPeriodeAktif();
+
         $monitoring->load([
             'pengguna',
             'kelas',
@@ -68,8 +70,19 @@ class BkMonitoringController extends Controller
             'absensi' => fn ($query) => $query->latest('tanggal')->take(30),
         ]);
 
+        $periodAlphaCount = Absensi::where('profil_siswa_id', $monitoring->nisn)
+            ->where('status', 'alpha')
+            ->whereBetween('tanggal', [$startDate->toDateString(), $endDate->toDateString()])
+            ->count();
+
+        $maxAlpha = Pengaturan::batasMaksimalAlpha();
+        $warningStatus = Pengaturan::statusPeringatanAlpha($periodAlphaCount);
+
         return view('kesiswaan.monitoring.show', [
             'student' => $monitoring,
+            'periodAlphaCount' => $periodAlphaCount,
+            'maxAlpha' => $maxAlpha,
+            'warningStatus' => $warningStatus,
             'backRoute' => route('bk.monitoring.index'),
             'createViolationRoute' => null,
         ]);
