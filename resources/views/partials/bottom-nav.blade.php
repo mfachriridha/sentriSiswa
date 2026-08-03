@@ -84,8 +84,8 @@
         </div>
     @endif
 
-    <nav class="fixed inset-x-0 bottom-0 z-30 border-t border-gray-200 bg-white shadow-[0_-1px_3px_rgba(0,0,0,0.05)]">
-        <ul class="flex h-14 items-stretch">
+    <nav class="fixed inset-x-0 bottom-0 z-30 h-14 border-t border-gray-200 bg-white shadow-[0_-1px_3px_rgba(0,0,0,0.05)]">
+        <ul class="flex h-full items-stretch">
             @foreach ($menuUtama as $item)
                 @php $aktif = request()->routeIs(...$item['aktif']); @endphp
                 <li class="flex-1">
@@ -129,6 +129,5 @@
                 </li>
             @endif
         </ul>
-        <div class="h-[env(safe-area-inset-bottom,0px)] bg-white"></div>
     </nav>
 </div>
