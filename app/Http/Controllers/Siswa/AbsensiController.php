@@ -169,7 +169,7 @@ class AbsensiController extends Controller
 
         $polygon = $this->attendancePolygon();
 
-        if ($polygon !== null) {
+        if ($polygon !== null && $statusSubmitted === 'hadir') {
             $rules['latitude'] = ['required', 'numeric', 'between:-90,90'];
             $rules['longitude'] = ['required', 'numeric', 'between:-180,180'];
             $rules['accuracy'] = ['required', 'numeric'];
@@ -182,9 +182,9 @@ class AbsensiController extends Controller
             'selfie.image' => 'File harus berupa gambar.',
             'selfie.mimes' => 'Format foto harus JPEG atau WebP.',
             'selfie.max' => 'Ukuran foto maksimal 1 MB.',
-            'latitude.required' => 'Lokasi GPS wajib diaktifkan untuk absen.',
+            'latitude.required' => 'Lokasi GPS wajib diaktifkan untuk presensi Hadir.',
             'latitude.numeric' => 'Data GPS tidak valid.',
-            'longitude.required' => 'Lokasi GPS wajib diaktifkan untuk absen.',
+            'longitude.required' => 'Lokasi GPS wajib diaktifkan untuk presensi Hadir.',
             'longitude.numeric' => 'Data GPS tidak valid.',
             'accuracy.required' => 'Akurasi GPS wajib tersedia.',
             'accuracy.numeric' => 'Data GPS tidak valid.',
@@ -195,7 +195,7 @@ class AbsensiController extends Controller
         $accuracy = null;
         $distanceMeters = null;
 
-        if ($polygon !== null) {
+        if ($polygon !== null && isset($validated['latitude'], $validated['longitude'], $validated['accuracy']) && $validated['latitude'] !== null) {
             $latitude = (float) $validated['latitude'];
             $longitude = (float) $validated['longitude'];
             $accuracy = (float) $validated['accuracy'];

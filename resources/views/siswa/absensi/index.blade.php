@@ -536,7 +536,7 @@
                     return;
                 }
 
-                // Cek 1: Deteksi Ekstensi Pemalsu Lokasi (seperti Location Guard / Geolocation Tamper JS)
+                // Cek 1: Deteksi Ekstensi Pemalsu Lokasi
                 try {
                     const fnStr = navigator.geolocation.getCurrentPosition.toString();
                     if (!fnStr.includes('[native code]')) {
@@ -547,59 +547,74 @@
                     }
                 } catch (e) {}
 
-                // Ambil data posisi & telemetri hardware dari browser peranti
-                navigator.geolocation.getCurrentPosition((position) => {
-                    const coords = position.coords;
-                    const lat = coords.latitude;
-                    const lng = coords.longitude;
-                    const acc = coords.accuracy || 0;
-                    const alt = coords.altitude;
-                    const altAcc = coords.altitudeAccuracy;
-                    const speed = coords.speed;
+                const tryGetPosition = (highAccuracy) => {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => this.handleGpsSuccess(position),
+                        (error) => {
+                            if (highAccuracy && (error.code === error.TIMEOUT || error.code === error.POSITION_UNAVAILABLE)) {
+                                tryGetPosition(false);
+                            } else {
+                                this.handleGpsError(error);
+                            }
+                        },
+                        {
+                            enableHighAccuracy: highAccuracy,
+                            timeout: highAccuracy ? 8000 : 15000,
+                            maximumAge: highAccuracy ? 0 : 30000,
+                        }
+                    );
+                };
 
-                    // Cek 2: Akurasi ekstrim 0 atau persis 1.0 (khas mock provider tertentu)
-                    if (acc === 0 || acc === 1) {
-                        this.gpsLoading = false;
-                        this.gpsReady = false;
-                        this.gpsError = 'Sinyal GPS tidak valid. Pastikan perangkat menggunakan GPS asli.';
-                        return;
-                    }
+                tryGetPosition(!this.allowDesktop);
+            },
 
-                    // Cek 3: Telemetri Hardware Satelit (Altitude & Speed Check)
-                    // Aplikasi Fake GPS 2D di Android menyuntikkan titik buatan tanpa metadata altitude, altitudeAccuracy, & speed (semuanya null).
-                    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-                    if (isMobile && alt === null && altAcc === null && speed === null) {
-                        this.gpsLoading = false;
-                        this.gpsReady = false;
-                        this.gpsError = 'Indikasi Fake GPS terdeteksi! (Metadata telemetri satelit tidak ditemukan). Harap matikan aplikasi pemalsu lokasi dan gunakan GPS asli peranti.';
-                        return;
-                    }
+            handleGpsSuccess(position) {
+                const coords = position.coords;
+                const lat = coords.latitude;
+                const lng = coords.longitude;
+                const acc = coords.accuracy || 0;
+                const alt = coords.altitude;
+                const altAcc = coords.altitudeAccuracy;
+                const speed = coords.speed;
 
-                    this.latitude = String(lat);
-                    this.longitude = String(lng);
-                    this.accuracy = String(acc);
-                    this.gpsReady = true;
-                    this.gpsLoading = false;
-                    this.gpsError = '';
-
-                    // Lanjutkan ke verifikasi geofence area sekolah di server
-                    this.checkLocation();
-                }, (error) => {
+                // Cek 2: Akurasi ekstrim 0 atau persis 1.0 (khas mock provider tertentu)
+                if ((acc === 0 || acc === 1) && !this.allowDesktop) {
                     this.gpsLoading = false;
                     this.gpsReady = false;
+                    this.gpsError = 'Sinyal GPS tidak valid. Pastikan perangkat menggunakan GPS asli.';
+                    return;
+                }
 
-                    if (error.code === error.PERMISSION_DENIED) {
-                        this.gpsError = 'Izin lokasi ditolak. Aktifkan izin lokasi di pengaturan browser.';
-                    } else if (error.code === error.TIMEOUT) {
-                        this.gpsError = 'Waktu habis saat mengambil lokasi. Tekan Refresh Lokasi.';
-                    } else {
-                        this.gpsError = 'Gagal mengambil lokasi. Pastikan GPS dan izin lokasi aktif.';
-                    }
-                }, {
-                    enableHighAccuracy: true,
-                    timeout: 15000,
-                    maximumAge: 0,
-                });
+                // Cek 3: Telemetri Hardware Satelit (Altitude & Speed Check)
+                const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+                if (isMobile && !this.allowDesktop && alt === null && altAcc === null && speed === null) {
+                    this.gpsLoading = false;
+                    this.gpsReady = false;
+                    this.gpsError = 'Indikasi Fake GPS terdeteksi! (Metadata telemetri satelit tidak ditemukan). Harap matikan aplikasi pemalsu lokasi dan gunakan GPS asli peranti.';
+                    return;
+                }
+
+                this.latitude = String(lat);
+                this.longitude = String(lng);
+                this.accuracy = String(acc);
+                this.gpsReady = true;
+                this.gpsLoading = false;
+                this.gpsError = '';
+
+                this.checkLocation();
+            },
+
+            handleGpsError(error) {
+                this.gpsLoading = false;
+                this.gpsReady = false;
+
+                if (error.code === error.PERMISSION_DENIED) {
+                    this.gpsError = 'Izin lokasi ditolak. Aktifkan izin lokasi di pengaturan browser.';
+                } else if (error.code === error.TIMEOUT) {
+                    this.gpsError = 'Waktu habis saat mengambil lokasi. Tekan Refresh Lokasi.';
+                } else {
+                    this.gpsError = 'Gagal mengambil lokasi. Pastikan GPS dan izin lokasi aktif.';
+                }
             },
 
             async checkLocation() {
@@ -655,8 +670,9 @@
                     this.stream = await navigator.mediaDevices.getUserMedia({
                         video: {
                             facingMode: this.facingMode,
-                            width: { ideal: 640 },
-                            height: { ideal: 853 },
+                            aspectRatio: { ideal: 0.75 },
+                            width: { ideal: 720 },
+                            height: { ideal: 960 },
                         },
                         audio: false,
                     });
@@ -712,21 +728,40 @@
             async captureCompressedBlob() {
                 const video = this.$refs.video;
                 const canvas = this.$refs.canvas;
-                const sourceWidth = video.videoWidth || 640;
-                const sourceHeight = video.videoHeight || 853;
-                const maxLongSide = 1280;
-                const scale = Math.min(1, maxLongSide / Math.max(sourceWidth, sourceHeight));
+                const sw = video.videoWidth || 720;
+                const sh = video.videoHeight || 960;
 
-                canvas.width = Math.round(sourceWidth * scale);
-                canvas.height = Math.round(sourceHeight * scale);
-                
+                // Hitung crop tengah dengan rasio Portrait 3:4
+                let cropW, cropH, cropX, cropY;
+
+                if (sw / sh > 3 / 4) {
+                    // Video lebih lebar (landscape sensor) -> crop bagian tengah secara horizontal
+                    cropH = sh;
+                    cropW = Math.round(sh * (3 / 4));
+                    cropX = Math.round((sw - cropW) / 2);
+                    cropY = 0;
+                } else {
+                    // Video lebih tinggi -> crop bagian tengah secara vertikal
+                    cropW = sw;
+                    cropH = Math.round(sw * (4 / 3));
+                    cropX = 0;
+                    cropY = Math.round((sh - cropH) / 2);
+                }
+
+                const maxLongSide = 960;
+                const scale = Math.min(1, maxLongSide / Math.max(cropW, cropH));
+
+                canvas.width = Math.round(cropW * scale);
+                canvas.height = Math.round(cropH * scale);
+
                 const ctx = canvas.getContext('2d');
+
                 if (this.facingMode === 'user') {
                     ctx.translate(canvas.width, 0);
                     ctx.scale(-1, 1);
                 }
-                
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                ctx.drawImage(video, cropX, cropY, cropW, cropH, 0, 0, canvas.width, canvas.height);
 
                 const qualities = [0.62, 0.55, 0.48, 0.42];
 
