@@ -8,7 +8,6 @@ use App\Models\PelanggaranSiswa;
 use App\Models\PengajuanPoin;
 use App\Models\Pengaturan;
 use App\Models\Pengguna;
-use App\Models\Pengguna;
 use App\Models\Presensi;
 use App\Models\ProfilGuru;
 use App\Models\ProfilSiswa;
