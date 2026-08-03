@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Guru;
 
 use App\Http\Controllers\Controller;
 use App\Models\Kelas;
+use App\Models\Pengaturan;
 use App\Models\ProfilSiswa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
