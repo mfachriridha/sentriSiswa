@@ -48,7 +48,7 @@ function konfigurasiWaktuAbsenSah(array $ubahan = []): array
 test('admin berhasil menyimpan konfigurasi waktu absen yang sah', function () {
     adminWaktuAbsen();
 
-    $this->get('/admin/pengaturan/waktu-absen')->assertSee('Waktu Absen');
+    $this->get('/admin/pengaturan/waktu-absen')->assertSee('Waktu Presensi');
 
     $this->followingRedirects()
         ->put('/admin/pengaturan/waktu-absen', konfigurasiWaktuAbsenSah())

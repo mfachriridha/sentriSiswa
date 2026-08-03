@@ -22,7 +22,7 @@ test('alasan kosong ditolak', function () {
     $this->from('/wali-kelas/pengajuan-poin/buat')
         ->followingRedirects()
         ->post('/wali-kelas/pengajuan-poin', pengajuanPoinSah($siswa, ['alasan' => '']))
-        ->assertSee('Alasan wajib diisi.');
+        ->assertSee('Keterangan detail wajib diisi.');
 });
 
 // TS.PPW.010 / TC.PPW.010.002 — Positive — tepat di batas bawah, 1 karakter
@@ -59,5 +59,5 @@ test('alasan sepanjang 1001 karakter ditolak', function () {
     $this->from('/wali-kelas/pengajuan-poin/buat')
         ->followingRedirects()
         ->post('/wali-kelas/pengajuan-poin', pengajuanPoinSah($siswa, ['alasan' => str_repeat('a', 1001)]))
-        ->assertSee('Alasan maksimal 1000 karakter.');
+        ->assertSee('Keterangan detail maksimal 1000 karakter.');
 });

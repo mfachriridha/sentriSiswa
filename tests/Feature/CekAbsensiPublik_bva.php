@@ -30,7 +30,7 @@ test('link masih bisa dibuka semenit sebelum hari itu berakhir', function () {
 
     Carbon::setTestNow('2026-07-06 23:59:00');
 
-    $this->get($link)->assertSee('Cek Absensi Anak');
+    $this->get($link)->assertSee('Cek Presensi Anak');
 
     $this->followingRedirects()
         ->post($link.'/cek', ['nisn' => $siswa->nisn])
@@ -49,7 +49,7 @@ test('link tidak bisa dibuka lagi setelah harinya berganti', function () {
 
     $this->get($link)
         ->assertSee('Link Kedaluwarsa')
-        ->assertDontSee('Cek Absensi Anak');
+        ->assertDontSee('Cek Presensi Anak');
 
     $this->followingRedirects()
         ->post($link.'/cek', ['nisn' => $siswa->nisn])

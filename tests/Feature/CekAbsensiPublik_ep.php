@@ -69,7 +69,7 @@ test('nisn yang dikosongkan ditolak', function () {
     $this->from($link)
         ->followingRedirects()
         ->post($link.'/cek', ['nisn' => ''])
-        ->assertSee('Cek Absensi Anak')
+        ->assertSee('Cek Presensi Anak')
         ->assertDontSee('Sisa Poin');
 });
 
@@ -80,5 +80,5 @@ test('link yang tidak dikenal tidak membuka absensi siapa pun', function () {
 
     $this->get('/absensi/publik/link-yang-tidak-pernah-dikirim')
         ->assertSee('Link Kedaluwarsa')
-        ->assertDontSee('Cek Absensi Anak');
+        ->assertDontSee('Cek Presensi Anak');
 });

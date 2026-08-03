@@ -64,7 +64,7 @@ function berkasAreaSekolah(string $namaBerkas = 'area-sekolah.kml'): UploadedFil
 test('admin berhasil mengunggah berkas area absensi', function () {
     adminLokasiAbsen();
 
-    $this->get('/admin/pengaturan/lokasi-absen')->assertSee('Lokasi Absen');
+    $this->get('/admin/pengaturan/lokasi-absen')->assertSee('Lokasi Presensi');
 
     $this->followingRedirects()
         ->put('/admin/pengaturan/lokasi-absen', [

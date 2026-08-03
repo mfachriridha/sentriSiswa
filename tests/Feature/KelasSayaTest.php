@@ -72,11 +72,11 @@ test('wali kelas otomatis membuat record presensi baru jika mengedit tanggal lam
     $this->actingAs($teacherUser)
         ->put("/wali-kelas/kelas-saya/{$studentProfile->nisn}/absensi", [
             'status' => 'izin',
-            'tanggal' => '2026-07-05',
+            'tanggal' => '2026-07-07',
         ])
-        ->assertRedirect('/wali-kelas/kelas-saya?tanggal=2026-07-05');
+        ->assertRedirect('/wali-kelas/kelas-saya?tanggal=2026-07-07');
 
-    $presensi = Presensi::where('profil_siswa_id', $studentProfile->nisn)->whereDate('tanggal', '2026-07-05')->first();
+    $presensi = Presensi::where('profil_siswa_id', $studentProfile->nisn)->whereDate('tanggal', '2026-07-07')->first();
     expect($presensi)->not->toBeNull()
         ->and($presensi->status)->toBe('izin');
 });

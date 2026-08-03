@@ -25,21 +25,6 @@ uses(RefreshDatabase::class);
 |
 */
 
-/** Isian pengajuan poin yang sah. */
-function pengajuanPoinSah(ProfilSiswa $siswa, array $ubahan = []): array
-{
-    $kategori = \App\Models\KategoriPengajuanPoin::firstOrCreate(
-        ['nama' => 'Lomba Cerdas Cermat'],
-        ['grup' => 'Lomba Eksternal', 'poin' => 20, 'urutan' => 1]
-    );
-
-    return array_merge([
-        'profil_siswa_id' => $siswa->nisn,
-        'kategori_pengajuan_poin_id' => $kategori->id,
-        'alasan' => 'Menjadi juara pertama lomba cerdas cermat tingkat kabupaten.',
-    ], $ubahan);
-}
-
 // TS.PPW.001 / TC.PPW.001.001 — Positive
 test('wali kelas mengirim pengajuan penambahan poin untuk siswa di kelasnya', function () {
     [, , $siswa] = waliKelasDenganKelas();

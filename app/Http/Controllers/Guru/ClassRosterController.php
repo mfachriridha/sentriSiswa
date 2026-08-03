@@ -127,6 +127,12 @@ class ClassRosterController extends Controller
             $targetDate = now()->toDateString();
         }
 
+        $carbonDate = Carbon::parse($targetDate);
+        if (! Pengaturan::hariAbsenAktif($carbonDate)) {
+            return redirect()->route('wali-kelas.kelas-saya', ['tanggal' => $targetDate])
+                ->with('error', 'Absensi hanya tersedia pada hari '.Pengaturan::labelHariAbsen().'.');
+        }
+
         $attendance = Presensi::query()
             ->where('profil_siswa_id', $profilSiswa->nisn)
             ->whereDate('tanggal', $targetDate)
@@ -142,10 +148,12 @@ class ClassRosterController extends Controller
         $attendance->status = $request->validated('status');
         $attendance->save();
 
-        $tanggalFormatted = Carbon::parse($targetDate)->locale('id')->translatedFormat('d F Y');
+        $message = ($targetDate === now()->toDateString())
+            ? 'Status absensi hari ini berhasil diperbarui.'
+            : 'Status presensi tanggal '.$carbonDate->locale('id')->translatedFormat('d F Y').' berhasil diperbarui.';
 
         return redirect()->route('wali-kelas.kelas-saya', ['tanggal' => $targetDate])
-            ->with('success', 'Status presensi tanggal '.$tanggalFormatted.' berhasil diperbarui.');
+            ->with('success', $message);
     }
 
     public function show(ProfilSiswa $profilSiswa): View
