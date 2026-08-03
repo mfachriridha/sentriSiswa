@@ -84,13 +84,13 @@
         </div>
     @endif
 
-    <nav class="fixed inset-x-0 bottom-0 z-30 border-t border-gray-200 bg-white pb-[env(safe-area-inset-bottom,0px)] shadow-[0_-1px_3px_rgba(0,0,0,0.05)]">
-        <ul class="flex items-stretch">
+    <nav class="fixed inset-x-0 bottom-0 z-30 border-t border-gray-200 bg-white shadow-[0_-1px_3px_rgba(0,0,0,0.05)]">
+        <ul class="flex h-14 items-stretch">
             @foreach ($menuUtama as $item)
                 @php $aktif = request()->routeIs(...$item['aktif']); @endphp
                 <li class="flex-1">
                     <a href="{{ route($item['route']) }}"
-                       class="relative flex h-full flex-col items-center justify-center gap-0.5 px-1 pt-2 pb-1.5 text-center transition-colors
+                       class="relative flex h-full flex-col items-center justify-center gap-0.5 px-1 text-center transition-colors
                               {{ $aktif ? 'text-primary' : 'text-gray-500' }}">
                         <span class="relative">
                             <x-nav-icon :name="$item['icon']" class="h-5 w-5 shrink-0" />
@@ -111,7 +111,7 @@
             @if ($menuLainnya)
                 <li class="flex-1">
                     <button type="button" @click="sheetTerbuka = true"
-                            class="relative flex h-full w-full flex-col items-center justify-center gap-0.5 px-1 pt-2 pb-1.5 text-center transition-colors
+                            class="relative flex h-full w-full flex-col items-center justify-center gap-0.5 px-1 text-center transition-colors
                                    {{ $adaLainnyaAktif ? 'text-primary' : 'text-gray-500' }}">
                         <span class="relative">
                             <x-nav-icon name="lainnya" class="h-5 w-5 shrink-0" />
@@ -129,5 +129,6 @@
                 </li>
             @endif
         </ul>
+        <div class="h-[env(safe-area-inset-bottom,0px)] bg-white"></div>
     </nav>
 </div>
