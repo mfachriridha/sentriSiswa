@@ -129,6 +129,64 @@
             @endif
         </div>
 
+        {{-- Card Riwayat Pelanggaran Siswa --}}
+        <div class="bg-white rounded-2xl shadow-xl border border-slate-100 p-6 space-y-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-red-100 text-red-600">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-base font-bold text-slate-800">Riwayat Pelanggaran</h2>
+                        <p class="text-xs text-slate-500">Catatan kedisiplinan yang tercatat di sekolah</p>
+                    </div>
+                </div>
+                <span class="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
+                    {{ $pelanggaran->count() }} Catatan
+                </span>
+            </div>
+
+            @if ($pelanggaran->isEmpty())
+                <div class="rounded-xl border border-dashed border-emerald-200 bg-emerald-50/60 p-4 text-center">
+                    <div class="mx-auto mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+                        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                    </div>
+                    <p class="text-sm font-semibold text-emerald-800">Tidak Ada Catatan Pelanggaran</p>
+                    <p class="text-xs text-emerald-600 mt-0.5">Anak Anda memiliki catatan kedisiplinan yang sangat baik!</p>
+                </div>
+            @else
+                <div class="space-y-2.5 max-h-80 overflow-y-auto pr-1">
+                    @foreach ($pelanggaran as $item)
+                        <div class="flex items-start justify-between gap-3 rounded-xl border border-slate-100 bg-slate-50/70 p-3.5 text-xs">
+                            <div class="min-w-0 flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="font-bold text-slate-800 text-sm truncate">{{ $item->nama_pelanggaran }}</span>
+                                </div>
+                                <p class="text-slate-500 font-medium">
+                                    {{ $item->tanggal_pelanggaran?->translatedFormat('d M Y') }}
+                                    @if ($item->kategori_pelanggaran)
+                                        &middot; <span class="capitalize">{{ $item->kategori_pelanggaran }}</span>
+                                    @endif
+                                </p>
+                                @if ($item->catatan)
+                                    <p class="mt-1 text-slate-600 italic bg-white/80 p-2 rounded-lg border border-slate-100">
+                                        "{{ $item->catatan }}"
+                                    </p>
+                                @endif
+                            </div>
+                            <span class="shrink-0 rounded-md bg-red-100 px-2 py-1 font-bold text-red-700 border border-red-200">
+                                -{{ $item->pengurangan_poin }} Poin
+                            </span>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+        </div>
+
         <p class="text-center text-xs text-slate-400">
             Link ini hanya berlaku sampai akhir hari ini.
         </p>

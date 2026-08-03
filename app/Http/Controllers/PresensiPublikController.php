@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PelanggaranSiswa;
 use App\Models\Pengaturan;
 use App\Models\Presensi;
 use App\Models\ProfilSiswa;
@@ -66,6 +67,12 @@ class PresensiPublikController extends Controller
         $maxAlpha = Pengaturan::batasMaksimalAlpha();
         $statusAlpha = Pengaturan::statusPeringatanAlpha($alphaCount);
 
+        $pelanggaran = PelanggaranSiswa::query()
+            ->where('profil_siswa_id', $siswa->nisn)
+            ->disetujui()
+            ->latest('tanggal_pelanggaran')
+            ->get();
+
         return view('publik.absensi.hasil', [
             'siswa' => $siswa,
             'absensi' => $absensi,
@@ -75,6 +82,7 @@ class PresensiPublikController extends Controller
             'maxAlpha' => $maxAlpha,
             'sisaAlpha' => max(0, $maxAlpha - $alphaCount),
             'statusAlpha' => $statusAlpha,
+            'pelanggaran' => $pelanggaran,
         ]);
     }
 }
