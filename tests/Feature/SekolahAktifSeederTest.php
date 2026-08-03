@@ -1,12 +1,12 @@
 <?php
 
-use App\Models\Absensi;
 use App\Models\JenisPelanggaran;
 use App\Models\Kelas;
 use App\Models\PelanggaranSiswa;
 use App\Models\PengajuanPoin;
 use App\Models\Pengaturan;
 use App\Models\Pengguna;
+use App\Models\Presensi;
 use App\Models\ProfilSiswa;
 use Database\Seeders\SekolahAktifSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;

@@ -32,7 +32,7 @@
     {{-- MAIN COLUMN: status / form --}}
     <div class="rounded-xl border border-gray-200 bg-white p-5 sm:p-6">
 
-        @if($todayAttendance && $todayAttendance->status !== 'belum_absen')
+        @if($todayAttendance && in_array($todayAttendance->status, ['hadir', 'izin', 'sakit', 'dispensasi'], true))
             {{-- POST-ATTENDANCE: success card --}}
             @php
                 $statusConfig = [
@@ -113,12 +113,23 @@
                 <input type="hidden" name="longitude" x-model="longitude">
                 <input type="hidden" name="accuracy" x-model="accuracy">
 
-                @if(! $isHadirWindow)
+                @if($todayAttendance?->status === 'alpha')
+                    <div class="mb-4 flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-800">
+                        <svg class="h-4 w-4 shrink-0 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span>Status presensi Anda hari ini tercatat <strong>Alpha</strong>. Anda tetap dapat mengunggah bukti perizinan (Sakit, Izin, atau Dispensasi) untuk memperbarui status Anda.</span>
+                    </div>
+                @elseif(! $isHadirWindow)
                     <div class="mb-4 flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
                         <svg class="h-4 w-4 shrink-0 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
-                        <span>Waktu presensi Hadir ({{ $startTime }} – {{ $endTime }}) telah berakhir. Anda tetap dapat mengunggah bukti perizinan (Sakit, Izin, atau Dispensasi).</span>
+                        @if(now()->format('H:i') < $startTime)
+                            <span>Belum waktunya presensi. Presensi dimulai pukul {{ $startTime }}.</span>
+                        @else
+                            <span>Waktu presensi Hadir ({{ $startTime }} – {{ $endTime }}) telah berakhir. Anda tetap dapat mengunggah bukti perizinan (Sakit, Izin, atau Dispensasi).</span>
+                        @endif
                     </div>
                 @endif
 

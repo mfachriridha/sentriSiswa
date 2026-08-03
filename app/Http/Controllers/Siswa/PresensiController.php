@@ -27,13 +27,15 @@ class PresensiController extends Controller
         $startTime = Pengaturan::get('attendance_start_time', '06:30');
         $endTime = Pengaturan::get('attendance_end_time', '07:00');
 
+        $allowDesktop = (bool) Pengaturan::get('attendance_allow_desktop', false);
+
         $now = now();
         $currentTime = $now->format('H:i');
         $currentTimeLabel = $now->format('H:i');
         $isWeekday = Pengaturan::hariAbsenAktif($now);
-        $isHadirWindow = $isWeekday && $currentTime >= $startTime && $currentTime <= $endTime;
+        $isHadirWindow = ($isWeekday && $currentTime >= $startTime && $currentTime <= $endTime) || $allowDesktop;
         $isFinalStatus = $todayAttendance && in_array($todayAttendance->status, ['hadir', 'izin', 'sakit', 'dispensasi'], true);
-        $canCheckIn = $isWeekday && $isHadirWindow && ! $isFinalStatus;
+        $canCheckIn = ($isWeekday || $allowDesktop) && ! $isFinalStatus;
         $activeDaysLabel = Pengaturan::labelHariAbsen();
 
         $geofenceData = Pengaturan::get('attendance_geofence_data');
@@ -85,7 +87,7 @@ class PresensiController extends Controller
         $absensi = $profile?->presensi()->whereDate('tanggal', now()->toDateString())->first();
 
         return response()->json([
-            'sudah_absen' => $absensi && $absensi->status !== 'belum_absen',
+            'sudah_absen' => $absensi && in_array($absensi->status, ['hadir', 'izin', 'sakit', 'dispensasi'], true),
             'status' => $absensi?->status ?? 'belum_absen',
         ]);
     }
@@ -142,9 +144,10 @@ class PresensiController extends Controller
         $startTime = Pengaturan::get('attendance_start_time', '06:30');
         $endTime = Pengaturan::get('attendance_end_time', '07:00');
         $currentTime = now()->format('H:i');
+        $allowDesktop = (bool) Pengaturan::get('attendance_allow_desktop', false);
 
         $statusSubmitted = $request->input('status');
-        if ($statusSubmitted === 'hadir') {
+        if ($statusSubmitted === 'hadir' && ! $allowDesktop) {
             if ($currentTime < $startTime || $currentTime > $endTime) {
                 return redirect()->route('siswa.absensi')->with('error', 'Waktu absen sudah lewat atau belum dimulai.');
             }
