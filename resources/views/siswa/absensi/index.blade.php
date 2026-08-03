@@ -267,8 +267,8 @@
                         </div>
 
                         <div class="flex-1 overflow-y-auto px-4 py-3">
-                            <div class="grid gap-4 md:grid-cols-[240px_1fr] md:gap-6">
-                                <div class="relative mx-auto aspect-[3/4] max-h-[220px] w-full overflow-hidden rounded-xl border border-gray-200 bg-gray-100 sm:max-h-[300px]">
+                            <div class="grid gap-4 sm:grid-cols-[220px_1fr] sm:gap-6 items-center">
+                                <div class="relative mx-auto aspect-[3/4] w-full max-w-[200px] sm:max-w-[220px] overflow-hidden rounded-2xl border border-gray-200 bg-gray-100 shadow-inner">
                                     <video x-ref="video"
                                            x-cloak
                                            x-show="cameraReady && !previewUrl"
@@ -666,14 +666,23 @@
                     return;
                 }
 
+                const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+                const videoConstraints = {
+                    facingMode: this.facingMode,
+                    aspectRatio: { ideal: 0.75 },
+                };
+
+                if (isMobile) {
+                    videoConstraints.height = { ideal: 1280 };
+                    videoConstraints.width = { ideal: 720 };
+                } else {
+                    videoConstraints.width = { ideal: 960 };
+                    videoConstraints.height = { ideal: 720 };
+                }
+
                 try {
                     this.stream = await navigator.mediaDevices.getUserMedia({
-                        video: {
-                            facingMode: this.facingMode,
-                            aspectRatio: { ideal: 0.75 },
-                            width: { ideal: 720 },
-                            height: { ideal: 960 },
-                        },
+                        video: videoConstraints,
                         audio: false,
                     });
                     this.$refs.video.srcObject = this.stream;
