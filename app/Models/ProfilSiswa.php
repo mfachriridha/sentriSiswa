@@ -71,26 +71,50 @@ class ProfilSiswa extends Model
 
     public function getPoinAttribute(): int
     {
-        $deductions = 0;
+        $violations = $this->relationLoaded('pelanggaranSiswa')
+            ? $this->pelanggaranSiswa->where('status', 'approved')
+            : $this->pelanggaranSiswa()->disetujui()->get();
 
-        if (array_key_exists('pelanggaran_siswa_sum_pengurangan_poin', $this->attributes)) {
-            $deductions = (int) $this->attributes['pelanggaran_siswa_sum_pengurangan_poin'];
-        } elseif ($this->relationLoaded('pelanggaranSiswa')) {
-            $deductions = $this->pelanggaranSiswa->where('status', 'approved')->sum('pengurangan_poin');
-        } else {
-            $deductions = (int) $this->pelanggaranSiswa()->disetujui()->sum('pengurangan_poin');
+        $additions = $this->relationLoaded('pengajuanPoin')
+            ? $this->pengajuanPoin->where('status', 'approved')
+            : $this->pengajuanPoin()->disetujui()->get();
+
+        $events = collect();
+
+        foreach ($violations as $v) {
+            $ts = $v->disetujui_pada?->timestamp
+                ?? ($v->tanggal_pelanggaran ? $v->tanggal_pelanggaran->timestamp : ($v->dibuat_pada?->timestamp ?? 0));
+
+            $events->push([
+                'timestamp' => $ts,
+                'id' => $v->id ?? 0,
+                'type' => 'deduction',
+                'amount' => (int) $v->pengurangan_poin,
+            ]);
         }
 
-        $additions = 0;
+        foreach ($additions as $a) {
+            $ts = $a->disetujui_pada?->timestamp ?? ($a->dibuat_pada?->timestamp ?? 0);
 
-        if (array_key_exists('pengajuan_poin_sum_jumlah_poin', $this->attributes)) {
-            $additions = (int) $this->attributes['pengajuan_poin_sum_jumlah_poin'];
-        } elseif ($this->relationLoaded('pengajuanPoin')) {
-            $additions = $this->pengajuanPoin->where('status', 'approved')->sum('jumlah_poin');
-        } else {
-            $additions = (int) $this->pengajuanPoin()->disetujui()->sum('jumlah_poin');
+            $events->push([
+                'timestamp' => $ts,
+                'id' => $a->id ?? 0,
+                'type' => 'addition',
+                'amount' => (int) $a->jumlah_poin,
+            ]);
         }
 
-        return max(0, min(100, 100 - $deductions + $additions));
+        $events = $events->sortBy(fn ($item) => [$item['timestamp'], $item['id']]);
+
+        $poin = 100;
+        foreach ($events as $event) {
+            if ($event['type'] === 'deduction') {
+                $poin = max(0, $poin - $event['amount']);
+            } else {
+                $poin = min(100, $poin + $event['amount']);
+            }
+        }
+
+        return $poin;
     }
 }
