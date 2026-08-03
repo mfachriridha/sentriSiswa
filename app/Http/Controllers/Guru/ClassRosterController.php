@@ -172,8 +172,24 @@ class ClassRosterController extends Controller
             'absensi' => fn ($query) => $query->latest('tanggal')->take(30),
         ]);
 
+        [$startDate, $endDate] = Pengaturan::rentangTanggalPeriodeAktif();
+
+        $startStr = $startDate->format('Y-m-d 00:00:00');
+        $endStr = $endDate->format('Y-m-d 23:59:59');
+
+        $periodAlphaCount = Presensi::where('profil_siswa_id', $profilSiswa->nisn)
+            ->where('status', 'alpha')
+            ->whereBetween('tanggal', [$startStr, $endStr])
+            ->count();
+
+        $maxAlpha = Pengaturan::batasMaksimalAlpha();
+        $warningStatus = Pengaturan::statusPeringatanAlpha($periodAlphaCount);
+
         return view('kesiswaan.monitoring.show', [
             'student' => $profilSiswa,
+            'periodAlphaCount' => $periodAlphaCount,
+            'maxAlpha' => $maxAlpha,
+            'warningStatus' => $warningStatus,
             'backRoute' => route('wali-kelas.kelas-saya'),
             'backLabel' => 'Kembali ke Kelas Saya',
             'createViolationRoute' => null,

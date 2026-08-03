@@ -20,6 +20,9 @@ class DashboardController extends Controller
         $summary = [];
         [$startDate, $endDate] = Pengaturan::rentangTanggalPeriodeAktif();
 
+        $startStr = $startDate->format('Y-m-d 00:00:00');
+        $endStr = $endDate->format('Y-m-d 23:59:59');
+
         if ($user->isWaliKelas() && $user->kelasWali) {
             $profileIds = $user->kelasWali->siswa()
                 ->whereHas('pengguna', fn ($query) => $query->where('status', 'registered'))
@@ -33,16 +36,20 @@ class DashboardController extends Controller
             $homeroomAlphaStudents = ProfilSiswa::with(['pengguna', 'kelas'])
                 ->where('kelas_id', $user->kelasWali->id)
                 ->whereHas('pengguna', fn ($q) => $q->where('status', 'registered'))
-                ->withCount(['absensi as alpha_count' => fn ($q) => $q->where('status', 'alpha')->whereBetween('tanggal', [$startDate->toDateString(), $endDate->toDateString()])])
-                ->having('alpha_count', '>=', 1)
-                ->orderByDesc('alpha_count')
+                ->whereHas('absensi', function ($q) use ($startStr, $endStr) {
+                    $q->where('status', 'alpha')
+                        ->whereBetween('tanggal', [$startStr, $endStr]);
+                })
+                ->withCount(['absensi as alpha_count' => fn ($q) => $q->where('status', 'alpha')->whereBetween('tanggal', [$startStr, $endStr])])
                 ->get()
+                ->sortByDesc('alpha_count')
                 ->map(function ($student) {
                     $student->status_alpha = Pengaturan::statusPeringatanAlpha($student->alpha_count);
-                    $student->detail_url = route('wali-kelas.kelas-saya');
+                    $student->detail_url = route('wali-kelas.kelas-saya.show', $student->nisn);
 
                     return $student;
-                });
+                })
+                ->values();
 
             $summary['homeroom'] = [
                 'class_name' => $user->kelasWali->nama,
@@ -64,16 +71,20 @@ class DashboardController extends Controller
             $bkAlphaStudents = ProfilSiswa::with(['pengguna', 'kelas'])
                 ->whereHas('kelas', fn ($q) => $q->where('tingkat', $grade))
                 ->whereHas('pengguna', fn ($q) => $q->where('status', 'registered'))
-                ->withCount(['absensi as alpha_count' => fn ($q) => $q->where('status', 'alpha')->whereBetween('tanggal', [$startDate->toDateString(), $endDate->toDateString()])])
-                ->having('alpha_count', '>=', 1)
-                ->orderByDesc('alpha_count')
+                ->whereHas('absensi', function ($q) use ($startStr, $endStr) {
+                    $q->where('status', 'alpha')
+                        ->whereBetween('tanggal', [$startStr, $endStr]);
+                })
+                ->withCount(['absensi as alpha_count' => fn ($q) => $q->where('status', 'alpha')->whereBetween('tanggal', [$startStr, $endStr])])
                 ->get()
+                ->sortByDesc('alpha_count')
                 ->map(function ($student) {
                     $student->status_alpha = Pengaturan::statusPeringatanAlpha($student->alpha_count);
                     $student->detail_url = route('bk.monitoring.show', $student->nisn);
 
                     return $student;
-                });
+                })
+                ->values();
 
             $summary['bk'] = [
                 'grade' => $grade,
@@ -91,24 +102,28 @@ class DashboardController extends Controller
             $thresholdSp1 = Pengaturan::ambangPeringatanAlpha()['sp1'];
 
             $alphaWarningCount = ProfilSiswa::whereHas('pengguna', fn ($q) => $q->where('status', 'registered'))
-                ->whereHas('absensi', function ($q) use ($startDate, $endDate) {
+                ->whereHas('absensi', function ($q) use ($startStr, $endStr) {
                     $q->where('status', 'alpha')
-                        ->whereBetween('tanggal', [$startDate->toDateString(), $endDate->toDateString()]);
+                        ->whereBetween('tanggal', [$startStr, $endStr]);
                 }, '>=', $thresholdSp1)
                 ->count();
 
             $kesiswaanAlphaStudents = ProfilSiswa::with(['pengguna', 'kelas'])
                 ->whereHas('pengguna', fn ($q) => $q->where('status', 'registered'))
-                ->withCount(['absensi as alpha_count' => fn ($q) => $q->where('status', 'alpha')->whereBetween('tanggal', [$startDate->toDateString(), $endDate->toDateString()])])
-                ->having('alpha_count', '>=', 1)
-                ->orderByDesc('alpha_count')
+                ->whereHas('absensi', function ($q) use ($startStr, $endStr) {
+                    $q->where('status', 'alpha')
+                        ->whereBetween('tanggal', [$startStr, $endStr]);
+                })
+                ->withCount(['absensi as alpha_count' => fn ($q) => $q->where('status', 'alpha')->whereBetween('tanggal', [$startStr, $endStr])])
                 ->get()
+                ->sortByDesc('alpha_count')
                 ->map(function ($student) {
                     $student->status_alpha = Pengaturan::statusPeringatanAlpha($student->alpha_count);
                     $student->detail_url = route('kesiswaan.monitoring.show', $student->nisn);
 
                     return $student;
-                });
+                })
+                ->values();
 
             $summary['kesiswaan'] = [
                 'classes' => Kelas::count(),

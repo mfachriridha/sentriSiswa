@@ -17,7 +17,7 @@ afterEach(function () {
 function createHomeroomTeacherWithClass(): array
 {
     $teacherUser = Pengguna::factory()->homeroom()->create(['status' => 'registered']);
-    $teacherProfile = ProfilGuru::factory()->create(['pengguna_id' => $teacherUser->id]);
+    $teacherProfile = ProfilGuru::factory()->create(['pengguna_id' => $teacherUser->id, 'tipe_guru' => 'wali_kelas']);
     $class = Kelas::create(['nama' => '10 IPA 1', 'tingkat' => '10', 'wali_kelas_id' => $teacherUser->id]);
 
     $studentUser = Pengguna::factory()->student()->create(['status' => 'registered', 'nama' => 'Budi Santoso']);
@@ -79,4 +79,37 @@ test('wali kelas otomatis membuat record presensi baru jika mengedit tanggal lam
     $presensi = Presensi::where('profil_siswa_id', $studentProfile->nisn)->whereDate('tanggal', '2026-07-07')->first();
     expect($presensi)->not->toBeNull()
         ->and($presensi->status)->toBe('izin');
+});
+
+test('dashboard wali kelas mengarahkan link detail siswa alpha ke halaman detail siswa yang benar', function () {
+    Carbon::setTestNow('2026-07-06 08:00:00');
+    [$teacherUser, $class, $studentProfile] = createHomeroomTeacherWithClass();
+
+    Presensi::create([
+        'profil_siswa_id' => $studentProfile->nisn,
+        'tanggal' => '2026-07-06',
+        'status' => 'alpha',
+    ]);
+
+    $this->actingAs($teacherUser)
+        ->get('/wali-kelas/dashboard')
+        ->assertSuccessful()
+        ->assertSee('/wali-kelas/kelas-saya/'.$studentProfile->nisn);
+});
+
+test('halaman detail siswa wali kelas menampilkan jumlah alpha siswa yang sesuai', function () {
+    Carbon::setTestNow('2026-07-06 08:00:00');
+    [$teacherUser, $class, $studentProfile] = createHomeroomTeacherWithClass();
+
+    Presensi::create([
+        'profil_siswa_id' => $studentProfile->nisn,
+        'tanggal' => '2026-07-06',
+        'status' => 'alpha',
+    ]);
+
+    $this->actingAs($teacherUser)
+        ->get("/wali-kelas/kelas-saya/{$studentProfile->nisn}")
+        ->assertSuccessful()
+        ->assertSee('Budi Santoso')
+        ->assertSeeInOrder(['1', 'kali']);
 });
