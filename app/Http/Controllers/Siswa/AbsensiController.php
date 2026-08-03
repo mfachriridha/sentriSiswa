@@ -60,6 +60,8 @@ class AbsensiController extends Controller
             'alpha' => $monthAttendances->where('status', 'alpha')->count(),
         ];
 
+        $allowDesktop = (bool) Pengaturan::get('attendance_allow_desktop', false);
+
         return view('siswa.absensi.index', compact(
             'todayAttendance',
             'startTime',
@@ -73,6 +75,7 @@ class AbsensiController extends Controller
             'currentTimeLabel',
             'isWeekday',
             'activeDaysLabel',
+            'allowDesktop',
         ));
     }
 

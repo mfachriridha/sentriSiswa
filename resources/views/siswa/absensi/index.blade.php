@@ -105,7 +105,7 @@
             <form method="POST"
                   action="{{ route('siswa.absensi.store') }}"
                   enctype="multipart/form-data"
-                  x-data="attendanceForm({ geofenceActive: @js($geofenceActive), maxPhotoKb: 1024, isHadirWindow: @js($isHadirWindow), startTime: @js($startTime), endTime: @js($endTime) })"
+                  x-data="attendanceForm({ geofenceActive: @js($geofenceActive), maxPhotoKb: 1024, isHadirWindow: @js($isHadirWindow), startTime: @js($startTime), endTime: @js($endTime), allowDesktop: @js($allowDesktop) })"
                   @submit="validateBeforeSubmit($event)">
                 @csrf
                 <input x-ref="selfieInput" type="file" name="selfie" accept="image/jpeg,image/webp" class="hidden">
@@ -425,6 +425,7 @@
             isHadirWindow: config.isHadirWindow,
             startTime: config.startTime,
             endTime: config.endTime,
+            allowDesktop: config.allowDesktop,
             gpsReady: false,
             gpsLoading: false,
             gpsError: '',
@@ -447,7 +448,7 @@
             },
 
             get isMobileDevice() {
-                return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+                return this.allowDesktop || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
             },
 
             get canSubmit() {
