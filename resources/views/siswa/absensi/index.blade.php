@@ -267,20 +267,20 @@
                         </div>
 
                         <div class="flex-1 overflow-y-auto px-4 py-3">
-                            <div class="grid gap-4 sm:grid-cols-[220px_1fr] sm:gap-6 items-center">
-                                <div class="relative mx-auto aspect-[3/4] w-full max-w-[200px] sm:max-w-[220px] overflow-hidden rounded-2xl border border-gray-200 bg-gray-100 shadow-inner">
+                            <div class="grid gap-4 sm:grid-cols-[260px_1fr] sm:gap-6 items-center">
+                                <div class="relative mx-auto w-full max-w-[260px] sm:max-w-[280px] overflow-hidden rounded-2xl border border-gray-200 bg-gray-900 shadow-inner">
                                     <video x-ref="video"
                                            x-cloak
                                            x-show="cameraReady && !previewUrl"
-                                           class="h-full w-full object-cover"
+                                           class="h-auto w-full max-h-[360px] object-contain mx-auto"
                                            :style="facingMode === 'user' ? 'transform: scaleX(-1)' : ''"
                                            playsinline
                                            muted></video>
                                     <img x-cloak x-show="previewUrl"
                                          :src="previewUrl"
                                          alt="Preview selfie"
-                                         class="h-full w-full object-cover">
-                                    <div x-cloak x-show="!cameraReady && !previewUrl" class="flex h-full items-center justify-center p-4 text-center text-xs text-gray-500 sm:text-sm">
+                                         class="h-auto w-full max-h-[360px] object-contain mx-auto">
+                                    <div x-cloak x-show="!cameraReady && !previewUrl" class="flex aspect-[3/4] items-center justify-center p-4 text-center text-xs text-gray-400 sm:text-sm">
                                         Kamera belum aktif
                                     </div>
                                 </div>
@@ -666,23 +666,11 @@
                     return;
                 }
 
-                const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-                const videoConstraints = {
-                    facingMode: this.facingMode,
-                    aspectRatio: { ideal: 0.75 },
-                };
-
-                if (isMobile) {
-                    videoConstraints.height = { ideal: 1280 };
-                    videoConstraints.width = { ideal: 720 };
-                } else {
-                    videoConstraints.width = { ideal: 960 };
-                    videoConstraints.height = { ideal: 720 };
-                }
-
                 try {
                     this.stream = await navigator.mediaDevices.getUserMedia({
-                        video: videoConstraints,
+                        video: {
+                            facingMode: this.facingMode,
+                        },
                         audio: false,
                     });
                     this.$refs.video.srcObject = this.stream;
@@ -737,31 +725,14 @@
             async captureCompressedBlob() {
                 const video = this.$refs.video;
                 const canvas = this.$refs.canvas;
-                const sw = video.videoWidth || 720;
-                const sh = video.videoHeight || 960;
-
-                // Hitung crop tengah dengan rasio Portrait 3:4
-                let cropW, cropH, cropX, cropY;
-
-                if (sw / sh > 3 / 4) {
-                    // Video lebih lebar (landscape sensor) -> crop bagian tengah secara horizontal
-                    cropH = sh;
-                    cropW = Math.round(sh * (3 / 4));
-                    cropX = Math.round((sw - cropW) / 2);
-                    cropY = 0;
-                } else {
-                    // Video lebih tinggi -> crop bagian tengah secara vertikal
-                    cropW = sw;
-                    cropH = Math.round(sw * (4 / 3));
-                    cropX = 0;
-                    cropY = Math.round((sh - cropH) / 2);
-                }
+                const sw = video.videoWidth || 640;
+                const sh = video.videoHeight || 480;
 
                 const maxLongSide = 960;
-                const scale = Math.min(1, maxLongSide / Math.max(cropW, cropH));
+                const scale = Math.min(1, maxLongSide / Math.max(sw, sh));
 
-                canvas.width = Math.round(cropW * scale);
-                canvas.height = Math.round(cropH * scale);
+                canvas.width = Math.round(sw * scale);
+                canvas.height = Math.round(sh * scale);
 
                 const ctx = canvas.getContext('2d');
 
@@ -770,7 +741,7 @@
                     ctx.scale(-1, 1);
                 }
 
-                ctx.drawImage(video, cropX, cropY, cropW, cropH, 0, 0, canvas.width, canvas.height);
+                ctx.drawImage(video, 0, 0, sw, sh, 0, 0, canvas.width, canvas.height);
 
                 const qualities = [0.62, 0.55, 0.48, 0.42];
 
