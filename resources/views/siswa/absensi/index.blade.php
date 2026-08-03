@@ -377,8 +377,8 @@
         <h2 class="mb-4 text-base font-semibold text-gray-900">Ringkasan Bulan Ini</h2>
 
         @php
-            $totalDays = $stats['hadir'] + $stats['izin'] + $stats['sakit'] + $stats['alpha'];
-            $pct = $totalDays > 0 ? round($stats['hadir'] / $totalDays * 100) : 0;
+            $totalDays = $stats['hadir'] + $stats['dispensasi'] + $stats['izin'] + $stats['sakit'] + $stats['alpha'];
+            $pct = $totalDays > 0 ? round(($stats['hadir'] + $stats['dispensasi']) / $totalDays * 100) : 0;
         @endphp
 
         <div class="mb-4 rounded-lg bg-gray-50 p-3 text-center">
@@ -391,13 +391,17 @@
                 <span class="text-sm font-medium text-green-700">Hadir</span>
                 <span class="text-lg font-bold text-green-700">{{ $stats['hadir'] }}</span>
             </div>
-            <div class="flex items-center justify-between rounded-lg border border-blue-100 bg-blue-50 px-3 py-2.5">
-                <span class="text-sm font-medium text-blue-700">Izin</span>
-                <span class="text-lg font-bold text-blue-700">{{ $stats['izin'] }}</span>
+            <div class="flex items-center justify-between rounded-lg border border-orange-100 bg-orange-50 px-3 py-2.5">
+                <span class="text-sm font-medium text-orange-700">Dispensasi</span>
+                <span class="text-lg font-bold text-orange-700">{{ $stats['dispensasi'] }}</span>
             </div>
             <div class="flex items-center justify-between rounded-lg border border-purple-100 bg-purple-50 px-3 py-2.5">
                 <span class="text-sm font-medium text-purple-700">Sakit</span>
                 <span class="text-lg font-bold text-purple-700">{{ $stats['sakit'] }}</span>
+            </div>
+            <div class="flex items-center justify-between rounded-lg border border-blue-100 bg-blue-50 px-3 py-2.5">
+                <span class="text-sm font-medium text-blue-700">Izin</span>
+                <span class="text-lg font-bold text-blue-700">{{ $stats['izin'] }}</span>
             </div>
             <div class="flex items-center justify-between rounded-lg border border-red-100 bg-red-50 px-3 py-2.5">
                 <span class="text-sm font-medium text-red-700">Alpha</span>
