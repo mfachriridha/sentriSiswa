@@ -72,6 +72,84 @@
     </div>
 @endif
 
+@php
+    $alphaList = collect();
+    if (auth()->user()->isWaliKelas() && !empty($summary['homeroom']['alpha_students'])) {
+        $alphaList = $summary['homeroom']['alpha_students'];
+    } elseif (auth()->user()->isBk() && !empty($summary['bk']['alpha_students'])) {
+        $alphaList = $summary['bk']['alpha_students'];
+    } elseif (auth()->user()->isKesiswaan() && !empty($summary['kesiswaan']['alpha_students'])) {
+        $alphaList = $summary['kesiswaan']['alpha_students'];
+    }
+@endphp
+
+@if ($alphaList->isNotEmpty())
+    <div class="mb-6 rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+        <div class="mb-4 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-red-100 text-red-600">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-base font-bold text-gray-900">Siswa Memiliki Catatan Alpha</h2>
+                    <p class="text-xs text-gray-500">Daftar siswa yang memiliki ketidakhadiran tanpa keterangan (Alpha &ge; 1 kali)</p>
+                </div>
+            </div>
+            <span class="rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700 border border-red-100">
+                {{ $alphaList->count() }} Siswa
+            </span>
+        </div>
+
+        <div class="max-h-96 space-y-2.5 overflow-y-auto pr-1">
+            @foreach ($alphaList as $student)
+                @php
+                    $warn = $student->status_alpha;
+                    $badgeBg = match ($warn['kode']) {
+                        'dikembalikan' => 'bg-red-100 text-red-800 border-red-200',
+                        'sp2' => 'bg-rose-100 text-rose-800 border-rose-200',
+                        'sp1' => 'bg-amber-100 text-amber-800 border-amber-200',
+                        'wali_kelas' => 'bg-yellow-100 text-yellow-800 border-yellow-200',
+                        default => 'bg-gray-100 text-gray-700 border-gray-200',
+                    };
+                @endphp
+                <div class="flex flex-col gap-3 rounded-lg border border-gray-100 bg-gray-50/60 p-3 sm:flex-row sm:items-center sm:justify-between hover:bg-gray-50 transition-colors">
+                    <div class="flex items-center gap-3 min-w-0">
+                        @if ($student->foto)
+                            <img src="{{ asset('storage/'.$student->foto) }}" alt="{{ $student->pengguna->nama }}" class="h-10 w-10 shrink-0 rounded-full object-cover border border-gray-200">
+                        @else
+                            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
+                                {{ strtoupper(substr($student->pengguna->nama ?? 'S', 0, 1)) }}
+                            </div>
+                        @endif
+                        <div class="min-w-0">
+                            <p class="truncate text-sm font-semibold text-gray-900">{{ $student->pengguna->nama }}</p>
+                            <p class="truncate text-xs text-gray-500">{{ $student->kelas->nama ?? '-' }} &middot; NISN: {{ $student->nisn }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between sm:justify-end gap-3 shrink-0">
+                        <div class="flex items-center gap-2">
+                            <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold {{ $badgeBg }}">
+                                {{ $warn['label'] }}
+                            </span>
+                            <span class="inline-flex items-center gap-1 rounded-md bg-red-100 px-2.5 py-1 text-xs font-bold text-red-700 border border-red-200">
+                                {{ $student->alpha_count }}x Alpha
+                            </span>
+                        </div>
+                        <a href="{{ $student->detail_url }}" class="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline">
+                            Detail
+                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </div>
+@endif
+
 <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
     @if (auth()->user()->isWaliKelas())
         <x-shortcut-card :href="route('wali-kelas.kelas-saya')" title="Kelas Saya" description="Pantau status absensi harian siswa.">
