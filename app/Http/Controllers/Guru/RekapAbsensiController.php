@@ -154,7 +154,7 @@ class RekapAbsensiController extends Controller
 
     /**
      * @param  Collection<int, ProfilSiswa>  $students
-     * @return Collection<int, Collection<int, Absensi>>
+     * @return Collection<int, Collection<int, Presensi>>
      */
     private function attendancesByStudent(Collection $students, string $startDate, string $endDate): Collection
     {
@@ -168,7 +168,7 @@ class RekapAbsensiController extends Controller
 
     /**
      * @param  Collection<int, ProfilSiswa>  $students
-     * @param  Collection<int, Collection<int, Absensi>>  $attendances
+     * @param  Collection<int, Collection<int, Presensi>>  $attendances
      * @return array<int, array{hadir: int, izin: int, sakit: int, dispensasi: int, alpha: int}>
      */
     private function calculateStats(Collection $students, Collection $attendances): array
