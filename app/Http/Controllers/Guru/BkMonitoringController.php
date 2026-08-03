@@ -15,6 +15,8 @@ class BkMonitoringController extends Controller
     public function index(Request $request): View
     {
         $grade = Auth::user()->profilGuru?->tingkat;
+        $search = $request->get('search', '');
+        $filterClass = $request->get('kelas_id', '');
         [$startDate, $endDate] = Pengaturan::rentangTanggalPeriodeAktif();
 
         $query = ProfilSiswa::with(['pengguna', 'kelas'])
