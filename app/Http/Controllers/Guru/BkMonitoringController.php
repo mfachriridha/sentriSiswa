@@ -14,8 +14,7 @@ class BkMonitoringController extends Controller
     public function index(Request $request): View
     {
         $grade = Auth::user()->profilGuru?->tingkat;
-        $search = $request->get('search', '');
-        $filterClass = $request->get('kelas_id', '');
+        [$startDate, $endDate] = Pengaturan::rentangTanggalPeriodeAktif();
 
         $query = ProfilSiswa::with(['pengguna', 'kelas'])
             ->whereHas('pengguna', fn ($query) => $query->where('status', 'registered'))
@@ -24,6 +23,10 @@ class BkMonitoringController extends Controller
             ->with(['absensi' => fn ($query) => $query->whereDate('tanggal', today())])
             ->withCount(['absensi as total_attendances'])
             ->withCount(['absensi as present_attendances' => fn ($query) => $query->where('status', 'hadir')])
+            ->withCount(['absensi as period_alpha_count' => function ($query) use ($startDate, $endDate) {
+                $query->where('status', 'alpha')
+                    ->whereBetween('tanggal', [$startDate->toDateString(), $endDate->toDateString()]);
+            }])
             ->whereHas('kelas', fn ($query) => $query->where('tingkat', $grade));
 
         if ($search) {
@@ -40,11 +43,12 @@ class BkMonitoringController extends Controller
 
         $students = $query->paginate(25)->withQueryString();
         $classes = Kelas::where('tingkat', $grade)->orderBy('nama')->get();
+        $maxAlpha = Pengaturan::batasMaksimalAlpha();
         $routePrefix = 'bk.monitoring';
         $title = 'Monitoring BK';
         $description = 'Pantau presensi dan pelanggaran siswa tingkat '.$grade.'.';
 
-        return view('kesiswaan.monitoring.index', compact('students', 'classes', 'search', 'filterClass', 'routePrefix', 'title', 'description'));
+        return view('kesiswaan.monitoring.index', compact('students', 'classes', 'search', 'filterClass', 'routePrefix', 'title', 'description', 'maxAlpha'));
     }
 
     public function show(ProfilSiswa $monitoring): View
