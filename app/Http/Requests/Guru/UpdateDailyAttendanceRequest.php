@@ -25,6 +25,7 @@ class UpdateDailyAttendanceRequest extends FormRequest
     {
         return [
             'status' => ['required', Rule::in(['hadir', 'izin', 'sakit', 'dispensasi', 'alpha'])],
+            'tanggal' => ['nullable', 'date', 'after_or_equal:2025-01-01', 'before_or_equal:today'],
         ];
     }
 }

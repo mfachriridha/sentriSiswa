@@ -6,9 +6,11 @@
 <div class="mb-6 flex items-start justify-between gap-4 flex-wrap">
     <div>
         <h1 class="text-2xl font-bold text-gray-900">Kelas Saya</h1>
-        <p class="mt-1 text-sm text-gray-500">Pantau presensi hari ini untuk kelas {{ $class->nama }}</p>
+        <p class="mt-1 text-sm text-gray-500">
+            Pantau dan kelola presensi {{ $isToday ? 'hari ini' : \Illuminate\Support\Carbon::parse($selectedDate)->locale('id')->translatedFormat('d F Y') }} untuk kelas {{ $class->nama }}
+        </p>
     </div>
-    @if($isWeekday && $stats['belum_absen'] > 0)
+    @if($isToday && $isWeekday && $stats['belum_absen'] > 0)
     <span class="inline-flex items-center gap-1.5 text-xs text-green-600 font-medium mt-1">
         <span class="relative flex h-2 w-2">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
@@ -24,7 +26,7 @@
 
 @unless($isWeekday)
     <div class="mb-6 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700">
-        Hari ini bukan hari aktif absensi. Absensi siswa hanya tersedia pada hari {{ $activeDaysLabel }}.
+        Hari ini bukan hari aktif absensi. Absensi harian otomatis hanya tersedia pada hari {{ $activeDaysLabel }}.
     </div>
 @endunless
 
@@ -53,11 +55,17 @@
         <div>
             <h2 class="text-lg font-semibold text-gray-900">{{ $class->nama }}</h2>
             <p class="mt-1 text-sm text-gray-500">
-                {{ now()->locale('id')->translatedFormat('l, d F Y') }} • {{ $students->count() }} siswa
+                {{ \Illuminate\Support\Carbon::parse($selectedDate)->locale('id')->translatedFormat('l, d F Y') }} • {{ $students->count() }} siswa
             </p>
         </div>
 
-        <form method="GET" action="{{ route('wali-kelas.kelas-saya') }}" class="flex gap-2">
+        <form method="GET" action="{{ route('wali-kelas.kelas-saya') }}" class="flex flex-wrap gap-2 items-center">
+            <div>
+                <label for="tanggal" class="sr-only">Pilih Tanggal</label>
+                <input id="tanggal" type="date" name="tanggal" value="{{ $selectedDate }}" min="2025-01-01" max="{{ now()->toDateString() }}"
+                       onchange="this.form.submit()"
+                       class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
+            </div>
             <input type="text" name="search" value="{{ request('search') }}"
                    placeholder="Cari nama atau NIS..."
                    class="rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20">
@@ -91,7 +99,9 @@
                         <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">No</th>
                         <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">NIS</th>
                         <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Nama</th>
-                        <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Status Hari Ini</th>
+                        <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                            Status {{ $isToday ? 'Hari Ini' : \Illuminate\Support\Carbon::parse($selectedDate)->locale('id')->translatedFormat('d/m/Y') }}
+                        </th>
                         <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Alpha</th>
                         <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Jam Absen</th>
                         <th class="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Selfie</th>
@@ -146,18 +156,14 @@
                                 <div class="flex items-center gap-2">
                                 <a href="{{ route('wali-kelas.kelas-saya.show', $student) }}"
                                    class="inline-flex items-center rounded-lg border border-gray-300 px-2.5 py-1 text-xs font-medium text-gray-600 hover:bg-gray-50 transition-colors">Detail</a>
-                                @if($isWeekday)
-                                    <button type="button"
-                                            data-update-url="{{ route('wali-kelas.kelas-saya.absensi.update', $student) }}"
-                                            data-current-status="{{ $status === 'belum_absen' ? 'hadir' : $status }}"
-                                            data-student-name="{{ $student->pengguna->nama }}"
-                                            onclick="openEditModal(this.dataset.updateUrl, this.dataset.currentStatus, this.dataset.studentName)"
-                                            class="inline-flex items-center rounded-lg border border-primary/30 px-2.5 py-1 text-xs font-medium text-primary hover:bg-primary/5 transition-colors">
-                                        Edit
-                                    </button>
-                                @else
-                                    <span class="text-gray-400">-</span>
-                                @endif
+                                <button type="button"
+                                        data-update-url="{{ route('wali-kelas.kelas-saya.absensi.update', ['profilSiswa' => $student, 'tanggal' => $selectedDate]) }}"
+                                        data-current-status="{{ $status === 'belum_absen' ? 'hadir' : $status }}"
+                                        data-student-name="{{ $student->pengguna->nama }}"
+                                        onclick="openEditModal(this.dataset.updateUrl, this.dataset.currentStatus, this.dataset.studentName)"
+                                        class="inline-flex items-center rounded-lg border border-primary/30 px-2.5 py-1 text-xs font-medium text-primary hover:bg-primary/5 transition-colors">
+                                    Edit
+                                </button>
                                 </div>
                             </td>
                         </tr>
@@ -171,13 +177,16 @@
 <div id="editModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-gray-900/60 p-4">
     <div class="w-full max-w-md rounded-2xl bg-white shadow-xl">
         <div class="border-b border-gray-200 px-4 py-3">
-            <h3 class="text-lg font-semibold text-gray-900">Edit Status Absensi Hari Ini</h3>
+            <h3 class="text-lg font-semibold text-gray-900">
+                Edit Status Presensi ({{ \Illuminate\Support\Carbon::parse($selectedDate)->locale('id')->translatedFormat('d F Y') }})
+            </h3>
             <p id="modalStudentName" class="mt-1 text-sm text-gray-500"></p>
         </div>
 
         <form id="editForm" method="POST" class="px-4 py-3">
             @csrf
             @method('PUT')
+            <input type="hidden" name="tanggal" value="{{ $selectedDate }}">
 
             <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
             <select id="status" name="status"
@@ -220,8 +229,8 @@
 
 @push('scripts')
 <script>
-    // Polling status absensi setiap 30 detik (hanya jika masih ada yang belum absen)
-    @if($isWeekday && $stats['belum_absen'] > 0)
+    // Polling status absensi setiap 30 detik (hanya jika hari ini dan masih ada yang belum absen)
+    @if($isToday && $isWeekday && $stats['belum_absen'] > 0)
     (function () {
         const statusUrl = "{{ route('wali-kelas.kelas-saya.status-absensi') }}";
         let timer = setInterval(async function () {

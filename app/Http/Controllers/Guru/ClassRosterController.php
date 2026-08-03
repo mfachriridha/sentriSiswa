@@ -10,6 +10,7 @@ use App\Models\ProfilSiswa;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
@@ -23,13 +24,18 @@ class ClassRosterController extends Controller
             return view('wali-kelas.kelas-saya.empty');
         }
 
-        $today = now()->toDateString();
+        $selectedDate = $request->query('tanggal', now()->toDateString());
+        if (! is_string($selectedDate) || ! preg_match('/^\d{4}-\d{2}-\d{2}$/', $selectedDate) || $selectedDate < '2025-01-01' || $selectedDate > now()->toDateString()) {
+            $selectedDate = now()->toDateString();
+        }
+
+        $isToday = ($selectedDate === now()->toDateString());
         $isWeekday = Pengaturan::hariAbsenAktif();
         $activeDaysLabel = Pengaturan::labelHariAbsen();
         $studentIds = $class->siswa()->pluck('profil_siswa.nisn');
         $attendances = Presensi::query()
             ->whereIn('profil_siswa_id', $studentIds)
-            ->whereDate('tanggal', $today)
+            ->whereDate('tanggal', $selectedDate)
             ->get()
             ->keyBy('profil_siswa_id');
 
@@ -74,7 +80,7 @@ class ClassRosterController extends Controller
 
         return view('wali-kelas.kelas-saya.index', compact(
             'class', 'students', 'attendances', 'stats', 'isWeekday', 'activeDaysLabel',
-            'periodAlphaCounts', 'maxAlpha'
+            'periodAlphaCounts', 'maxAlpha', 'selectedDate', 'isToday'
         ));
     }
 
@@ -116,26 +122,30 @@ class ClassRosterController extends Controller
             abort(403);
         }
 
-        if (! Pengaturan::hariAbsenAktif()) {
-            return redirect()->route('wali-kelas.kelas-saya')->with('error', 'Absensi hanya tersedia pada hari '.Pengaturan::labelHariAbsen().'.');
+        $targetDate = $request->input('tanggal') ?: $request->query('tanggal', now()->toDateString());
+        if (! is_string($targetDate) || ! preg_match('/^\d{4}-\d{2}-\d{2}$/', $targetDate) || $targetDate < '2025-01-01' || $targetDate > now()->toDateString()) {
+            $targetDate = now()->toDateString();
         }
 
         $attendance = Presensi::query()
             ->where('profil_siswa_id', $profilSiswa->nisn)
-            ->whereDate('tanggal', now()->toDateString())
+            ->whereDate('tanggal', $targetDate)
             ->first();
 
         if (! $attendance) {
             $attendance = new Presensi([
                 'profil_siswa_id' => $profilSiswa->nisn,
-                'tanggal' => now()->toDateString(),
+                'tanggal' => $targetDate,
             ]);
         }
 
         $attendance->status = $request->validated('status');
         $attendance->save();
 
-        return redirect()->route('wali-kelas.kelas-saya')->with('success', 'Status absensi hari ini berhasil diperbarui.');
+        $tanggalFormatted = Carbon::parse($targetDate)->locale('id')->translatedFormat('d F Y');
+
+        return redirect()->route('wali-kelas.kelas-saya', ['tanggal' => $targetDate])
+            ->with('success', 'Status presensi tanggal '.$tanggalFormatted.' berhasil diperbarui.');
     }
 
     public function show(ProfilSiswa $profilSiswa): View

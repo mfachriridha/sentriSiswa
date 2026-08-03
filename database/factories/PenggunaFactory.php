@@ -70,4 +70,11 @@ class PenggunaFactory extends Factory
             'peran' => 'siswa',
         ]);
     }
+
+    public function teacher(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'peran' => 'guru',
+        ]);
+    }
 }
