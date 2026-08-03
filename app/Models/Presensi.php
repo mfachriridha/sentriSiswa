@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable(['profil_siswa_id', 'tanggal', 'status', 'waktu_masuk', 'path_selfie', 'latitude', 'longitude', 'akurasi', 'jarak_meter'])]
-class Absensi extends Model
+class Presensi extends Model
 {
     protected $table = 'absensi';
 

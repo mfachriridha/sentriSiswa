@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Guru;
 use App\Exports\RekapAbsensiExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Guru\AttendanceRecapFilterRequest;
-use App\Models\Absensi;
 use App\Models\Pengaturan;
+use App\Models\Presensi;
 use App\Models\ProfilSiswa;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
@@ -158,7 +158,7 @@ class RekapAbsensiController extends Controller
      */
     private function attendancesByStudent(Collection $students, string $startDate, string $endDate): Collection
     {
-        return Absensi::query()
+        return Presensi::query()
             ->whereDate('tanggal', '>=', $startDate)
             ->whereDate('tanggal', '<=', $endDate)
             ->whereIn('profil_siswa_id', $students->pluck('nisn'))

@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Guru;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Guru\UpdateDailyAttendanceRequest;
-use App\Models\Absensi;
 use App\Models\Pengaturan;
+use App\Models\Presensi;
 use App\Models\ProfilSiswa;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -62,7 +62,7 @@ class ClassRosterController extends Controller
         }
 
         [$startDate, $endDate] = Pengaturan::rentangTanggalPeriodeAktif();
-        $periodAlphaCounts = Absensi::query()
+        $periodAlphaCounts = Presensi::query()
             ->whereIn('profil_siswa_id', $studentIds)
             ->where('status', 'alpha')
             ->whereBetween('tanggal', [$startDate->toDateString(), $endDate->toDateString()])
@@ -88,7 +88,7 @@ class ClassRosterController extends Controller
 
         $today = now()->toDateString();
         $studentIds = $class->siswa()->pluck('profil_siswa.nisn');
-        $attendances = Absensi::whereIn('profil_siswa_id', $studentIds)
+        $attendances = Presensi::whereIn('profil_siswa_id', $studentIds)
             ->whereDate('tanggal', $today)
             ->get()
             ->keyBy('profil_siswa_id');
@@ -120,13 +120,13 @@ class ClassRosterController extends Controller
             return redirect()->route('wali-kelas.kelas-saya')->with('error', 'Absensi hanya tersedia pada hari '.Pengaturan::labelHariAbsen().'.');
         }
 
-        $attendance = Absensi::query()
+        $attendance = Presensi::query()
             ->where('profil_siswa_id', $profilSiswa->nisn)
             ->whereDate('tanggal', now()->toDateString())
             ->first();
 
         if (! $attendance) {
-            $attendance = new Absensi([
+            $attendance = new Presensi([
                 'profil_siswa_id' => $profilSiswa->nisn,
                 'tanggal' => now()->toDateString(),
             ]);

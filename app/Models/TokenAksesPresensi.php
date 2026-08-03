@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Str;
 
-class TokenAksesAbsensi extends Model
+class TokenAksesPresensi extends Model
 {
     protected $table = 'token_akses_absensi';
 

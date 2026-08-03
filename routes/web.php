@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\AbsensiPublikController;
 use App\Http\Controllers\Admin\Auth\LoginController as AdminLoginController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\GuruController;
@@ -15,9 +14,9 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\OtpController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ResetPasswordController;
-use App\Http\Controllers\Bk\AbsensiRecapController as BkAbsensiRecapController;
 use App\Http\Controllers\Bk\DashboardController as BkDashboardController;
 use App\Http\Controllers\Bk\MonitoringController as BkMonitoringController;
+use App\Http\Controllers\Bk\PresensiRecapController as BkAbsensiRecapController;
 use App\Http\Controllers\Bk\ProfilController as BkProfilController;
 use App\Http\Controllers\Kesiswaan\DashboardController as KesiswaanDashboardController;
 use App\Http\Controllers\Kesiswaan\JenisPelanggaranController;
@@ -27,14 +26,15 @@ use App\Http\Controllers\Kesiswaan\PelanggaranSiswaController;
 use App\Http\Controllers\Kesiswaan\PengajuanPoinController as KesiswaanPengajuanPoinController;
 use App\Http\Controllers\Kesiswaan\ProfilController as KesiswaanProfilController;
 use App\Http\Controllers\Kesiswaan\TataTertibController;
-use App\Http\Controllers\Siswa\AbsensiController as SiswaAbsensiController;
+use App\Http\Controllers\PresensiPublikController as AbsensiPublikController;
 use App\Http\Controllers\Siswa\DashboardController as SiswaDashboardController;
+use App\Http\Controllers\Siswa\PresensiController as SiswaAbsensiController;
 use App\Http\Controllers\Siswa\ProfilController as SiswaProfilController;
 use App\Http\Controllers\Siswa\TataTertibController as SiswaTataTertibController;
-use App\Http\Controllers\WaliKelas\AbsensiController as WaliKelasAbsensiController;
 use App\Http\Controllers\WaliKelas\DashboardController as WaliKelasDashboardController;
 use App\Http\Controllers\WaliKelas\KelasSayaController;
 use App\Http\Controllers\WaliKelas\PengajuanPoinController as WaliKelasPengajuanPoinController;
+use App\Http\Controllers\WaliKelas\PresensiController as WaliKelasAbsensiController;
 use App\Http\Controllers\WaliKelas\ProfilController as WaliKelasProfilController;
 use App\Http\Controllers\WaliKelas\RiwayatPelanggaranController;
 use App\Models\Kelas;

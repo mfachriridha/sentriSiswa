@@ -2,16 +2,16 @@
 
 use App\Exports\ArrayExport;
 use App\Mail\OtpMail;
-use App\Models\Absensi;
 use App\Models\JenisPelanggaran;
 use App\Models\Kelas;
 use App\Models\PelanggaranSiswa;
 use App\Models\PengajuanPoin;
 use App\Models\Pengguna;
+use App\Models\Presensi;
 use App\Models\ProfilGuru;
 use App\Models\ProfilSiswa;
 use App\Models\TataTertib;
-use App\Models\TokenAksesAbsensi;
+use App\Models\TokenAksesPresensi;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -192,7 +192,7 @@ function siswaLainDiKelas(int $kelasId, string $nama, string $nisn, string $nis)
 /** Mencatat kehadiran seorang siswa pada tanggal tertentu. */
 function catatKehadiran(string $nisn, string $tanggal, string $status): void
 {
-    Absensi::create([
+    Presensi::create([
         'profil_siswa_id' => $nisn,
         'tanggal' => $tanggal,
         'status' => $status,
@@ -203,9 +203,9 @@ function catatKehadiran(string $nisn, string $tanggal, string $status): void
  * Mencatat kehadiran lengkap dengan jam absen dan foto selfie-nya, seperti hasil
  * siswa yang benar-benar absen sendiri lewat aplikasi.
  */
-function catatKehadiranBerselfie(string $nisn, string $tanggal, string $jamMasuk = '06:45'): Absensi
+function catatKehadiranBerselfie(string $nisn, string $tanggal, string $jamMasuk = '06:45'): Presensi
 {
-    return Absensi::create([
+    return Presensi::create([
         'profil_siswa_id' => $nisn,
         'tanggal' => $tanggal,
         'status' => 'hadir',
@@ -327,7 +327,7 @@ function guruBelumPunyaAkun(string $nip): void
 /** Link cek absensi yang dikirim ke WhatsApp wali kelas untuk diteruskan ke orang tua. */
 function linkAbsensiOrangTua(int $kelasId, string $tanggal): string
 {
-    $token = TokenAksesAbsensi::buatAtauPerbarui($kelasId, $tanggal);
+    $token = TokenAksesPresensi::buatAtauPerbarui($kelasId, $tanggal);
 
     return "/absensi/publik/{$token->token}";
 }

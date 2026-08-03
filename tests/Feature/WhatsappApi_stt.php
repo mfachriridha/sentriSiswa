@@ -1,9 +1,9 @@
 <?php
 
-use App\Models\Absensi;
 use App\Models\Pengaturan;
 use App\Models\Pengguna;
 use App\Models\PesanWhatsapp;
+use App\Models\Presensi;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 
@@ -143,7 +143,7 @@ test('kirim ulang laporan absensi menyusun ulang isi pesan dari kondisi absensi 
 
     // Wali kelas mengoreksi status siswa dari Alpha jadi Hadir setelah laporan
     // pertama terkirim.
-    Absensi::where('profil_siswa_id', $siswa->nisn)
+    Presensi::where('profil_siswa_id', $siswa->nisn)
         ->whereDate('tanggal', '2026-07-06')
         ->update(['status' => 'hadir']);
 

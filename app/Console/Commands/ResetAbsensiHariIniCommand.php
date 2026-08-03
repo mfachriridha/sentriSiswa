@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Absensi;
+use App\Models\Presensi;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
 
@@ -36,7 +36,7 @@ class ResetAbsensiHariIniCommand extends Command
 
         $tanggal = now()->toDateString();
 
-        $query = Absensi::whereDate('tanggal', $tanggal);
+        $query = Presensi::whereDate('tanggal', $tanggal);
 
         $siswaFilter = $this->option('siswa');
         if ($siswaFilter) {

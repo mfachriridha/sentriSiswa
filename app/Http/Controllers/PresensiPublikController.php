@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Absensi;
 use App\Models\Pengaturan;
+use App\Models\Presensi;
 use App\Models\ProfilSiswa;
-use App\Models\TokenAksesAbsensi;
+use App\Models\TokenAksesPresensi;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-class AbsensiPublikController extends Controller
+class PresensiPublikController extends Controller
 {
     public function show(string $token): View
     {
-        $aksesToken = TokenAksesAbsensi::where('token', $token)->first();
+        $aksesToken = TokenAksesPresensi::where('token', $token)->first();
 
         if (! $aksesToken || $aksesToken->sudahExpired()) {
             return view('publik.absensi.expired');
@@ -25,7 +25,7 @@ class AbsensiPublikController extends Controller
 
     public function cek(Request $request, string $token): View|RedirectResponse
     {
-        $aksesToken = TokenAksesAbsensi::where('token', $token)->first();
+        $aksesToken = TokenAksesPresensi::where('token', $token)->first();
 
         if (! $aksesToken || $aksesToken->sudahExpired()) {
             return view('publik.absensi.expired');
@@ -53,12 +53,12 @@ class AbsensiPublikController extends Controller
                 ->withInput();
         }
 
-        $absensi = Absensi::where('profil_siswa_id', $siswa->nisn)
+        $absensi = Presensi::where('profil_siswa_id', $siswa->nisn)
             ->where('tanggal', $aksesToken->tanggal)
             ->first();
 
         [$startDate, $endDate] = Pengaturan::rentangTanggalPeriodeAktif();
-        $alphaCount = Absensi::where('profil_siswa_id', $siswa->nisn)
+        $alphaCount = Presensi::where('profil_siswa_id', $siswa->nisn)
             ->where('status', 'alpha')
             ->whereBetween('tanggal', [$startDate->toDateString(), $endDate->toDateString()])
             ->count();

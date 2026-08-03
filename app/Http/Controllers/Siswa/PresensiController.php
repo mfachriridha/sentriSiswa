@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
-class AbsensiController extends Controller
+class PresensiController extends Controller
 {
     public function index(): View
     {
@@ -22,7 +22,7 @@ class AbsensiController extends Controller
         $profile = $student->profilSiswa;
 
         $today = now()->toDateString();
-        $todayAttendance = $profile?->absensi()->whereDate('tanggal', $today)->first();
+        $todayAttendance = $profile?->presensi()->whereDate('tanggal', $today)->first();
 
         $startTime = Pengaturan::get('attendance_start_time', '06:30');
         $endTime = Pengaturan::get('attendance_end_time', '07:00');
@@ -47,7 +47,7 @@ class AbsensiController extends Controller
 
         $currentMonth = $now->month;
         $currentYear = $now->year;
-        $monthAttendances = $profile?->absensi()
+        $monthAttendances = $profile?->presensi()
             ->whereMonth('tanggal', $currentMonth)
             ->whereYear('tanggal', $currentYear)
             ->get() ?? collect();
@@ -62,7 +62,7 @@ class AbsensiController extends Controller
 
         $allowDesktop = (bool) Pengaturan::get('attendance_allow_desktop', false);
 
-        return view('siswa.absensi.index', compact(
+        return view('siswa.presensi.index', compact(
             'todayAttendance',
             'startTime',
             'endTime',
@@ -82,7 +82,7 @@ class AbsensiController extends Controller
     public function statusHariIni(): JsonResponse
     {
         $profile = Auth::user()->profilSiswa;
-        $absensi = $profile?->absensi()->whereDate('tanggal', now()->toDateString())->first();
+        $absensi = $profile?->presensi()->whereDate('tanggal', now()->toDateString())->first();
 
         return response()->json([
             'sudah_absen' => $absensi && $absensi->status !== 'belum_absen',
@@ -118,19 +118,16 @@ class AbsensiController extends Controller
         }
 
         $today = now()->toDateString();
-        $attendance = $profile->absensi()->whereDate('tanggal', $today)->first();
+        $attendance = $profile->presensi()->whereDate('tanggal', $today)->first();
 
         if (! $attendance) {
-            // Dua request nyaris bersamaan (double-tap) bisa sama-sama lolos cek "belum
-            // ada row" di atas - constraint unique di DB yang jaga integritasnya, di sini
-            // tinggal ambil ulang baris yang menang, bukan biarkan exception-nya bocor.
             try {
-                $attendance = $profile->absensi()->create([
+                $attendance = $profile->presensi()->create([
                     'tanggal' => $today,
                     'status' => 'belum_absen',
                 ]);
             } catch (QueryException $e) {
-                $attendance = $profile->absensi()->whereDate('tanggal', $today)->first();
+                $attendance = $profile->presensi()->whereDate('tanggal', $today)->first();
 
                 if (! $attendance) {
                     throw $e;
@@ -138,12 +135,6 @@ class AbsensiController extends Controller
             }
         }
 
-        // Yang ditolak adalah siswa yang kehadirannya memang sudah tercatat. Siswa
-        // yang terlanjur dicap Alpha tetap boleh absen selama jam absennya masih
-        // dibuka - misalnya karena admin memperpanjang jamnya, atau karena perintah
-        // terjadwal sempat mendahului siswa yang sedang mengirim selfie-nya.
-        //
-        // Izin, Sakit, dan Dispensasi tidak bisa ditimpa siswa: itu wewenang wali kelas.
         if (in_array($attendance->status, ['hadir', 'izin', 'sakit', 'dispensasi'], strict: true)) {
             return redirect()->route('siswa.absensi')->with('error', 'Anda sudah absen hari ini.');
         }
@@ -208,8 +199,6 @@ class AbsensiController extends Controller
             $distanceMeters = $locationCheck['distance_meters'];
         }
 
-        // Siapa pun yang berhasil absen di dalam jam absen tercatat hadir. Yang di
-        // luar jam absen sudah ditolak sebelum sampai sini.
         $selfiePath = $request->file('selfie')->store('attendance-selfies/'.$profile->nisn, 'public');
 
         $attendance->update([
@@ -232,17 +221,11 @@ class AbsensiController extends Controller
         return redirect()->route('siswa.absensi')->with('success', 'Absen berhasil: '.$statusLabels[$validated['status']].'.');
     }
 
-    /**
-     * @return list<array{lat: float, lng: float}>|null
-     */
     private function attendancePolygon(): ?array
     {
         return app(PemeriksaLokasiAbsensi::class)->poligon();
     }
 
-    /**
-     * @return array{allowed: bool, status: string, distance_meters: float|null, message: string}
-     */
     private function evaluateLocation(float $latitude, float $longitude): array
     {
         return app(PemeriksaLokasiAbsensi::class)->periksa($latitude, $longitude);
@@ -260,7 +243,7 @@ class AbsensiController extends Controller
 
         $month = Carbon::createFromFormat('Y-m', $selectedMonth)->startOfMonth();
 
-        $attendances = $profile?->absensi()
+        $attendances = $profile?->presensi()
             ->whereDate('tanggal', '>=', $month->toDateString())
             ->whereDate('tanggal', '<=', $month->copy()->endOfMonth()->toDateString())
             ->latest('tanggal')
@@ -268,8 +251,6 @@ class AbsensiController extends Controller
 
         $monthLabel = $month->translatedFormat('F Y');
 
-        // 12 bulan terakhir. Bulan yang lagi dipilih selalu ikut masuk walau di luar
-        // rentang itu (mis. dibuka lewat URL), biar pilihannya gak ke-reset diam-diam.
         $monthOptions = collect(range(0, 11))
             ->map(fn (int $back): Carbon => now()->startOfMonth()->subMonths($back))
             ->push($month)
@@ -278,6 +259,6 @@ class AbsensiController extends Controller
             ->mapWithKeys(fn (Carbon $date): array => [$date->format('Y-m') => $date->translatedFormat('F Y')])
             ->all();
 
-        return view('siswa.absensi.riwayat', compact('attendances', 'monthLabel', 'selectedMonth', 'monthOptions'));
+        return view('siswa.presensi.riwayat', compact('attendances', 'monthLabel', 'selectedMonth', 'monthOptions'));
     }
 }

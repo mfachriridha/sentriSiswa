@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Kelas;
-use App\Models\TokenAksesAbsensi;
+use App\Models\TokenAksesPresensi;
 use Illuminate\Console\Command;
 
 class LinkPublikCommand extends Command
@@ -54,7 +54,7 @@ class LinkPublikCommand extends Command
         $this->newLine();
 
         foreach ($kelases as $kelas) {
-            $tokenObj = TokenAksesAbsensi::buatAtauPerbarui($kelas->id, $tanggalHariIni);
+            $tokenObj = TokenAksesPresensi::buatAtauPerbarui($kelas->id, $tanggalHariIni);
             $url = route('absensi.publik', $tokenObj->token);
 
             $this->line("<fg=yellow;options=bold>📌 Kelas {$kelas->nama}:</>");

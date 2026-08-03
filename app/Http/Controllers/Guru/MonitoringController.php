@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Guru;
 
 use App\Http\Controllers\Controller;
-use App\Models\Absensi;
 use App\Models\Kelas;
 use App\Models\Pengaturan;
+use App\Models\Presensi;
 use App\Models\ProfilSiswa;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -69,7 +69,7 @@ class MonitoringController extends Controller
             'absensi' => fn ($q) => $q->latest('tanggal')->take(30),
         ]);
 
-        $periodAlphaCount = Absensi::where('profil_siswa_id', $monitoring->nisn)
+        $periodAlphaCount = Presensi::where('profil_siswa_id', $monitoring->nisn)
             ->where('status', 'alpha')
             ->whereBetween('tanggal', [$startDate->toDateString(), $endDate->toDateString()])
             ->count();

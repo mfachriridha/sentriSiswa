@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use App\Models\Absensi;
 use App\Models\Kelas;
-use App\Models\TokenAksesAbsensi;
+use App\Models\Presensi;
+use App\Models\TokenAksesPresensi;
 
 class AttendanceReportMessageBuilder
 {
@@ -31,7 +31,7 @@ class AttendanceReportMessageBuilder
         }
 
         $profileIds = $studentProfiles->pluck('nisn');
-        $attendances = Absensi::whereIn('profil_siswa_id', $profileIds)
+        $attendances = Presensi::whereIn('profil_siswa_id', $profileIds)
             ->whereDate('tanggal', $tanggal)
             ->get()
             ->keyBy('profil_siswa_id');
@@ -47,9 +47,9 @@ class AttendanceReportMessageBuilder
 
         // Token dipakai ulang kalau sudah ada buat kelas+tanggal ini, bukan
         // digenerate baru - biar link yang sudah dibagikan gak keburu invalid.
-        $aksesToken = TokenAksesAbsensi::where('kelas_id', $kelas->id)
+        $aksesToken = TokenAksesPresensi::where('kelas_id', $kelas->id)
             ->where('tanggal', $tanggal)
-            ->first() ?? TokenAksesAbsensi::buatAtauPerbarui($kelas->id, $tanggal);
+            ->first() ?? TokenAksesPresensi::buatAtauPerbarui($kelas->id, $tanggal);
         $linkAbsensi = route('absensi.publik', $aksesToken->token);
 
         $hari = now()->locale('id')->translatedFormat('l');

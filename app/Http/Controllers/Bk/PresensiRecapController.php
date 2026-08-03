@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Bk;
 use App\Exports\ArrayExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Guru\AttendanceRecapFilterRequest;
-use App\Models\Absensi;
 use App\Models\Kelas;
 use App\Models\Pengaturan;
+use App\Models\Presensi;
 use App\Models\ProfilSiswa;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
@@ -18,7 +18,7 @@ use Illuminate\View\View;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
-class AbsensiRecapController extends Controller
+class PresensiRecapController extends Controller
 {
     public function index(AttendanceRecapFilterRequest $request): View
     {
@@ -81,8 +81,6 @@ class AbsensiRecapController extends Controller
             ];
         })->values()->all();
 
-        // Berkas kosong tidak menolong siapa pun: penggunanya mengira ekspornya
-        // berhasil, lalu bingung membuka berkas yang cuma berisi judul kolom.
         if ($rows === []) {
             return redirect()
                 ->route('bk.laporan.index', $request->query())
@@ -95,11 +93,6 @@ class AbsensiRecapController extends Controller
         );
     }
 
-    /**
-     * Halaman cetak rekap tingkat. Kolom Kelas wajib ada di sini: satu tingkat
-     * berisi belasan kelas, jadi tanpa kolom itu tidak ada cara membedakan siapa
-     * dari kelas mana.
-     */
     public function cetak(AttendanceRecapFilterRequest $request): View
     {
         $bkGrade = Auth::user()->loadMissing('profilGuru')->profilGuru?->tingkat;
@@ -128,10 +121,6 @@ class AbsensiRecapController extends Controller
         ]);
     }
 
-    /**
-     * @param  Collection<int, Kelas>  $classes
-     * @return array{0: list<int>, 1: string}
-     */
     private function resolveClassIds(AttendanceRecapFilterRequest $request, Collection $classes): array
     {
         $ownClassIds = $classes->pluck('id')->toArray();
@@ -144,9 +133,6 @@ class AbsensiRecapController extends Controller
         return [$ownClassIds, ''];
     }
 
-    /**
-     * @return array{0: string, 1: string}
-     */
     private function dateRange(AttendanceRecapFilterRequest $request): array
     {
         $validated = $request->validated();
@@ -166,10 +152,6 @@ class AbsensiRecapController extends Controller
         ];
     }
 
-    /**
-     * @param  list<int>  $classIds
-     * @return Collection<int, ProfilSiswa>
-     */
     private function gradeStudents(array $classIds, ?string $studentId = null): Collection
     {
         return ProfilSiswa::query()
@@ -184,13 +166,9 @@ class AbsensiRecapController extends Controller
             ->get();
     }
 
-    /**
-     * @param  Collection<int, ProfilSiswa>  $students
-     * @return Collection<int, Collection<int, Absensi>>
-     */
     private function attendancesByStudent(Collection $students, string $startDate, string $endDate): Collection
     {
-        return Absensi::query()
+        return Presensi::query()
             ->whereDate('tanggal', '>=', $startDate)
             ->whereDate('tanggal', '<=', $endDate)
             ->whereIn('profil_siswa_id', $students->pluck('nisn'))
@@ -198,11 +176,6 @@ class AbsensiRecapController extends Controller
             ->groupBy('profil_siswa_id');
     }
 
-    /**
-     * @param  Collection<int, ProfilSiswa>  $students
-     * @param  Collection<int, Collection<int, Absensi>>  $attendances
-     * @return array<int, array{hadir: int, izin: int, sakit: int, dispensasi: int, alpha: int}>
-     */
     private function calculateStats(Collection $students, Collection $attendances): array
     {
         $stats = [];
@@ -234,13 +207,6 @@ class AbsensiRecapController extends Controller
             ->values();
     }
 
-    /**
-     * Stats dihitung di level Collection (bukan query), jadi paginasinya manual.
-     * Ekspor sengaja gak lewat sini - file ekspor harus berisi semua baris.
-     *
-     * @param  Collection<int, ProfilSiswa>  $students
-     * @return LengthAwarePaginator<int, ProfilSiswa>
-     */
     private function paginateStudents(Collection $students, AttendanceRecapFilterRequest $request): LengthAwarePaginator
     {
         $perPage = 25;

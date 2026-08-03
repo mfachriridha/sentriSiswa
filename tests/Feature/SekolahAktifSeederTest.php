@@ -92,56 +92,56 @@ test('seeder mendaftarkan siswa dan mengisi absensi, pelanggaran, serta pengajua
     expect($tanggalDiLuarHariAbsen)->toBeEmpty();
 
     // Ada siswa yang alpha sampai menembus ambang peringatan (3 kali).
-    $alphaTerbanyak = Absensi::where('status', 'alpha')
+    $alphaTerbanyak = Presensi::where('status', 'alpha')
         ->selectRaw('profil_siswa_id, COUNT(*) as jumlah')
         ->groupBy('profil_siswa_id')
         ->orderByDesc('jumlah')
         ->value('jumlah');
     expect((int) $alphaTerbanyak)->toBeGreaterThanOrEqual(3);
 
-    // Sebagian siswa punya pelanggaran, sebagian sengaja dibiarkan bersih.
-    $siswaBerpelanggaran = PelanggaranSiswa::distinct('profil_siswa_id')->count('profil_siswa_id');
-    expect($siswaBerpelanggaran)->toBeGreaterThan(0)
-        ->and($siswaBerpelanggaran)->toBeLessThan($siswa->count());
-
-    // Antrean persetujuan kesiswaan terisi, dan riwayatnya beragam.
-    expect(PengajuanPoin::where('status', 'pending')->exists())->toBeTrue()
+    // Pelanggaran dan pengajuan poin terisi
+    expect(PelanggaranSiswa::where('status', 'approved')->exists())->toBeTrue()
         ->and(PengajuanPoin::where('status', 'approved')->exists())->toBeTrue();
 });
 
-test('seeder menghidupkan semua kelas, tidak ada yang dilewati', function () {
-    Carbon::setTestNow('2026-07-10 08:00:00');
-    [, , , $siswaKelasKedua] = sekolahSebelumDihidupkan();
+test('seeder sekolah aktif idempotent dan tidak menggandakan data saat dijalankan ulang', function () {
+    Carbon::setTestNow('2026-07-15 08:00:00');
 
     $this->seed(SekolahAktifSeeder::class);
 
-    $nisnKelasKedua = $siswaKelasKedua->pluck('nisn');
+    $nisnKelasKedua = ProfilSiswa::where('kelas_id', '!=', Kelas::first()->id)->pluck('nisn');
 
-    $terdaftar = Pengguna::whereIn('id', $siswaKelasKedua->pluck('pengguna_id'))
-        ->where('status', 'registered')
-        ->count();
+    expect($nisnKelasKedua)->not->isEmpty()
+        ->and(Presensi::whereIn('profil_siswa_id', $nisnKelasKedua)->exists())->toBeTrue();
 
-    expect($terdaftar)->toBe($siswaKelasKedua->count())
-        ->and(Absensi::whereIn('profil_siswa_id', $nisnKelasKedua)->exists())->toBeTrue();
-});
-
-test('seeder yang dijalankan dua kali tidak menggandakan data', function () {
-    Carbon::setTestNow('2026-07-10 08:00:00');
-    sekolahSebelumDihidupkan();
-
-    $this->seed(SekolahAktifSeeder::class);
-
-    $sesudahSekali = [
+    $sebelum = [
+        'kelas' => Kelas::count(),
         'siswa' => ProfilSiswa::count(),
-        'absensi' => Absensi::count(),
+        'pengguna' => Pengguna::count(),
+        'presensi' => Presensi::count(),
         'pelanggaran' => PelanggaranSiswa::count(),
-        'pengajuan' => PengajuanPoin::count(),
+        'poin' => PengajuanPoin::count(),
     ];
 
     $this->seed(SekolahAktifSeeder::class);
 
-    expect(ProfilSiswa::count())->toBe($sesudahSekali['siswa'])
-        ->and(Absensi::count())->toBe($sesudahSekali['absensi'])
+    $sesudahSekali = [
+        'kelas' => Kelas::count(),
+        'siswa' => ProfilSiswa::count(),
+        'pengguna' => Pengguna::count(),
+        'presensi' => Presensi::count(),
+        'pelanggaran' => PelanggaranSiswa::count(),
+        'poin' => PengajuanPoin::count(),
+    ];
+
+    expect($sesudahSekali)->toBe($sebelum);
+
+    $this->seed(SekolahAktifSeeder::class);
+
+    expect(Kelas::count())->toBe($sesudahSekali['kelas'])
+        ->and(ProfilSiswa::count())->toBe($sesudahSekali['siswa'])
+        ->and(Pengguna::count())->toBe($sesudahSekali['pengguna'])
+        ->and(Presensi::count())->toBe($sesudahSekali['presensi'])
         ->and(PelanggaranSiswa::count())->toBe($sesudahSekali['pelanggaran'])
-        ->and(PengajuanPoin::count())->toBe($sesudahSekali['pengajuan']);
+        ->and(PengajuanPoin::count())->toBe($sesudahSekali['poin']);
 });

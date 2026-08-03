@@ -54,9 +54,14 @@ class ProfilSiswa extends Model
         return $this->belongsTo(Kelas::class, 'kelas_id');
     }
 
+    public function presensi(): HasMany
+    {
+        return $this->hasMany(Presensi::class, 'profil_siswa_id');
+    }
+
     public function absensi(): HasMany
     {
-        return $this->hasMany(Absensi::class, 'profil_siswa_id');
+        return $this->presensi();
     }
 
     public function pelanggaranSiswa(): HasMany

@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Absensi;
 use App\Models\Pengaturan;
+use App\Models\Presensi;
 use Illuminate\Console\Command;
 
 class UpdateUnmarkedAttendance extends Command
@@ -32,7 +32,7 @@ class UpdateUnmarkedAttendance extends Command
 
         $today = now()->toDateString();
 
-        $updated = Absensi::whereDate('tanggal', $today)
+        $updated = Presensi::whereDate('tanggal', $today)
             ->where('status', 'belum_absen')
             ->update(['status' => 'alpha']);
 

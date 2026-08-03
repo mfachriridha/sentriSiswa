@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Guru;
 
 use App\Http\Controllers\Controller;
-use App\Models\Absensi;
 use App\Models\Kelas;
 use App\Models\PelanggaranSiswa;
 use App\Models\PengajuanPoin;
 use App\Models\Pengaturan;
+use App\Models\Presensi;
 use App\Models\ProfilSiswa;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -24,7 +24,7 @@ class DashboardController extends Controller
             $profileIds = $user->kelasWali->siswa()
                 ->whereHas('pengguna', fn ($query) => $query->where('status', 'registered'))
                 ->pluck('nisn');
-            $todayAttendances = Absensi::whereIn('profil_siswa_id', $profileIds)
+            $todayAttendances = Presensi::whereIn('profil_siswa_id', $profileIds)
                 ->whereDate('tanggal', today())
                 ->get();
             $notSubmitted = max(0, $profileIds->count() - $todayAttendances->count())
