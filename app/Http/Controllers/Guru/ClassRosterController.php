@@ -27,7 +27,7 @@ class ClassRosterController extends Controller
         $isWeekday = Pengaturan::hariAbsenAktif();
         $activeDaysLabel = Pengaturan::labelHariAbsen();
         $studentIds = $class->siswa()->pluck('profil_siswa.nisn');
-        $attendances = Absensi::query()
+        $attendances = Presensi::query()
             ->whereIn('profil_siswa_id', $studentIds)
             ->whereDate('tanggal', $today)
             ->get()
