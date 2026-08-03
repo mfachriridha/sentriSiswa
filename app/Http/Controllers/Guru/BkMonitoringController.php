@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Guru;
 
 use App\Http\Controllers\Controller;
+use App\Models\Absensi;
 use App\Models\Kelas;
 use App\Models\Pengaturan;
 use App\Models\ProfilSiswa;
