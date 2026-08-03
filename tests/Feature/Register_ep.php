@@ -106,7 +106,7 @@ test('pendaftaran ditolak karena nomor identitas guru tidak ditemukan', function
             'peran' => 'teacher',
             'identity' => '199999999999999999',
         ])
-        ->assertSee('NIP tidak ditemukan.')
+        ->assertSee('NIP/NIK tidak ditemukan.')
         ->assertDontSee('Lengkapi Profil');
 });
 
@@ -217,7 +217,7 @@ test('guru yang salah mengetik nip dilempar balik dengan pilihan Guru yang tetap
             'peran' => 'teacher',
             'identity' => '199999999999999999',
         ])
-        ->assertSee('NIP tidak ditemukan.')
+        ->assertSee('NIP/NIK tidak ditemukan.')
         // Pilihan perannya tidak boleh berubah sendiri jadi Siswa: kalau berubah,
         // guru yang mengetik ulang NIP-nya justru dicari di data siswa, lalu
         // diberi tahu "NISN/NIS tidak ditemukan" padahal NIP-nya benar.

@@ -2,12 +2,12 @@
 
 namespace Database\Seeders;
 
-use App\Models\Absensi;
 use App\Models\JenisPelanggaran;
 use App\Models\Kelas;
 use App\Models\PelanggaranSiswa;
 use App\Models\PengajuanPoin;
 use App\Models\Pengguna;
+use App\Models\Presensi;
 use App\Models\ProfilSiswa;
 use App\Models\TataTertib;
 use Illuminate\Database\Seeder;
@@ -257,7 +257,7 @@ class DemoSchoolSeeder extends Seeder
                     $selfiePath = $this->generateSelfiePhoto($student->nisn, $date->toDateString());
                 }
 
-                Absensi::create([
+                Presensi::create([
                     'profil_siswa_id' => $student->nisn,
                     'tanggal' => $date->toDateString(),
                     'status' => $status,

@@ -64,7 +64,7 @@ test('pendaftaran ditolak karena identitas guru sudah pernah didaftarkan', funct
             'peran' => 'teacher',
             'identity' => '198501012020121002',
         ])
-        ->assertSee('NIP sudah terdaftar. Silakan masuk.');
+        ->assertSee('NIP/NIK sudah terdaftar. Silakan masuk.');
 });
 
 // TS.REG.018 / TC.REG.018.001 — Negative — akunnya sudah dipakai orang, tak bisa didaftarkan lagi

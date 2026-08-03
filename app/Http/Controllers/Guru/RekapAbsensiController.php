@@ -24,7 +24,7 @@ class RekapAbsensiController extends Controller
         $class = Auth::user()->kelasWali;
 
         if (! $class) {
-            return view('wali-kelas.absensi.empty');
+            return view('wali-kelas.presensi.empty');
         }
 
         [$startDate, $endDate] = $this->dateRange($request);
@@ -37,7 +37,7 @@ class RekapAbsensiController extends Controller
         $selectedStudent = $validated['profil_siswa_id'] ?? '';
         $selectedMonth = $validated['month'] ?? '';
 
-        return view('wali-kelas.absensi.index', compact('class', 'students', 'filterStudents', 'stats', 'startDate', 'endDate', 'statusFilter', 'selectedStudent', 'selectedMonth'));
+        return view('wali-kelas.presensi.index', compact('class', 'students', 'filterStudents', 'stats', 'startDate', 'endDate', 'statusFilter', 'selectedStudent', 'selectedMonth'));
     }
 
     public function exportExcel(AttendanceRecapFilterRequest $request): BinaryFileResponse|RedirectResponse

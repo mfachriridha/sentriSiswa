@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\Absensi;
 use App\Models\Kelas;
 use App\Models\PelanggaranSiswa;
 use App\Models\Pengguna;
+use App\Models\Presensi;
 use App\Models\ProfilSiswa;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
@@ -196,7 +196,7 @@ class Ipa2Seeder extends Seeder
                 $statusArr = $pattern[$nisn] ?? ['hadir'];
                 $status = $statusArr[$idx % count($statusArr)];
 
-                Absensi::updateOrCreate(
+                Presensi::updateOrCreate(
                     [
                         'profil_siswa_id' => $nisn,
                         'tanggal' => $tanggalStr,

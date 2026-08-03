@@ -2,13 +2,14 @@
 
 namespace Database\Seeders;
 
-use App\Models\Absensi;
 use App\Models\JenisPelanggaran;
 use App\Models\Kelas;
 use App\Models\PelanggaranSiswa;
 use App\Models\PengajuanPoin;
 use App\Models\Pengaturan;
 use App\Models\Pengguna;
+use App\Models\Pengguna;
+use App\Models\Presensi;
 use App\Models\ProfilGuru;
 use App\Models\ProfilSiswa;
 use Illuminate\Database\Seeder;
@@ -250,7 +251,7 @@ class SekolahAktifSeeder extends Seeder
 
         // Tabel absensi sudah punya indeks unik (profil_siswa_id, tanggal), jadi
         // catatan yang sudah ada diperbarui, bukan digandakan.
-        Absensi::upsert($antrean, ['profil_siswa_id', 'tanggal'], ['status', 'waktu_masuk', 'path_selfie', 'diperbarui_pada']);
+        Presensi::upsert($antrean, ['profil_siswa_id', 'tanggal'], ['status', 'waktu_masuk', 'path_selfie', 'diperbarui_pada']);
     }
 
     /**
