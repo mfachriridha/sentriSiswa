@@ -8,12 +8,23 @@
 <div class="rounded-xl border border-gray-200 bg-white p-4 lg:p-6">
     <form method="POST" action="{{ route('wali-kelas.pengajuan-poin.store') }}" class="space-y-5">
         @csrf
+        @if($students->isEmpty())
+            <div class="mb-5 flex items-center gap-3 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">
+                <svg class="h-5 w-5 shrink-0 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span>Seluruh siswa di kelas binaan Anda saat ini memiliki <strong>100 poin (maksimal)</strong>. Pengajuan penambahan poin hanya diperuntukkan bagi siswa yang poinnya di bawah 100.</span>
+            </div>
+        @endif
+
         <div>
             <label for="profil_siswa_id" class="block text-sm font-medium text-gray-700">Siswa <span class="text-red-500">*</span></label>
-            <select id="profil_siswa_id" name="profil_siswa_id" required class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm">
-                <option value="">-- Pilih Siswa --</option>
+            <select id="profil_siswa_id" name="profil_siswa_id" required class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" {{ $students->isEmpty() ? 'disabled' : '' }}>
+                <option value="">-- {{ $students->isEmpty() ? 'Tidak Ada Siswa yang Poinnya Di Bawah 100' : 'Pilih Siswa' }} --</option>
                 @foreach ($students as $student)
-                    <option value="{{ $student->nisn }}" {{ old('profil_siswa_id') == $student->nisn ? 'selected' : '' }}>{{ $student->pengguna?->nama }} (NISN: {{ $student->nisn }})</option>
+                    <option value="{{ $student->nisn }}" {{ old('profil_siswa_id') == $student->nisn ? 'selected' : '' }}>
+                        {{ $student->pengguna?->nama }} (NISN: {{ $student->nisn }}) &middot; Sisa Poin: {{ $student->poin }}/100
+                    </option>
                 @endforeach
             </select>
             @error('profil_siswa_id') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror

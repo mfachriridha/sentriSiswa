@@ -7,6 +7,7 @@ use App\Models\PengajuanPoin;
 use App\Models\Pengaturan;
 use App\Models\Pengguna;
 use App\Models\Presensi;
+use App\Models\ProfilGuru;
 use App\Models\ProfilSiswa;
 use Database\Seeders\SekolahAktifSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -38,6 +39,7 @@ function sekolahSebelumDihidupkan(): array
     $kesiswaan = Pengguna::factory()->studentAffairs()->create(['status' => 'registered']);
 
     $wali = Pengguna::factory()->homeroom()->create(['status' => 'registered']);
+    ProfilGuru::factory()->create(['pengguna_id' => $wali->id, 'tipe_guru' => 'wali_kelas', 'nip' => '198001012005011001']);
     $kelasA = Kelas::create(['nama' => '10 IPA 1', 'tingkat' => '10', 'wali_kelas_id' => $wali->id]);
     $kelasB = Kelas::create(['nama' => '11 IPA 6', 'tingkat' => '11', 'wali_kelas_id' => $wali->id]);
 
@@ -83,7 +85,7 @@ test('seeder mendaftarkan siswa dan mengisi absensi, pelanggaran, serta pengajua
     expect($belumDaftar)->toBe(0);
 
     // Absensinya terbentuk, dan hanya pada hari absensi aktif.
-    $tanggalAbsensi = Absensi::pluck('tanggal')->unique();
+    $tanggalAbsensi = Presensi::pluck('tanggal')->unique();
     expect($tanggalAbsensi)->not->toBeEmpty();
 
     $tanggalDiLuarHariAbsen = $tanggalAbsensi->filter(
@@ -106,12 +108,13 @@ test('seeder mendaftarkan siswa dan mengisi absensi, pelanggaran, serta pengajua
 
 test('seeder sekolah aktif idempotent dan tidak menggandakan data saat dijalankan ulang', function () {
     Carbon::setTestNow('2026-07-15 08:00:00');
+    [, , , $siswaB] = sekolahSebelumDihidupkan();
 
     $this->seed(SekolahAktifSeeder::class);
 
-    $nisnKelasKedua = ProfilSiswa::where('kelas_id', '!=', Kelas::first()->id)->pluck('nisn');
+    $nisnKelasKedua = $siswaB->pluck('nisn');
 
-    expect($nisnKelasKedua)->not->isEmpty()
+    expect($nisnKelasKedua)->not->toBeEmpty()
         ->and(Presensi::whereIn('profil_siswa_id', $nisnKelasKedua)->exists())->toBeTrue();
 
     $sebelum = [

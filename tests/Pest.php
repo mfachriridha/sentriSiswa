@@ -503,6 +503,10 @@ function rekapBarisSiswa(TestResponse $respons, string $nama): array
 /** Isian pengajuan poin yang sah. */
 function pengajuanPoinSah(ProfilSiswa $siswa, array $ubahan = []): array
 {
+    if ($siswa->poin >= 100) {
+        catatPelanggaran($siswa, 'Terlambat Masuk Sekolah', 'ringan', '2026-07-01', 10);
+    }
+
     $kategori = KategoriPengajuanPoin::firstOrCreate(
         ['nama' => 'Lomba Cerdas Cermat'],
         ['grup' => 'Lomba Eksternal', 'poin' => 20, 'urutan' => 1]

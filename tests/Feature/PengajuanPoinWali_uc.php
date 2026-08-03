@@ -28,19 +28,21 @@ uses(RefreshDatabase::class);
 
 // TS.PPW.002 / TC.PPW.002.001 — Positive
 test('halaman buat pengajuan hanya menawarkan siswa dari kelas wali kelas itu', function () {
-    waliKelasDenganKelas();
+    [, , $siswa] = waliKelasDenganKelas();
+    catatPelanggaran($siswa, 'Terlambat Masuk', 'ringan', '2026-07-05', 10);
 
     $kelasLain = Kelas::create(['nama' => '11 IPS 1', 'tingkat' => '11']);
     $penggunaLain = Pengguna::factory()->student()->create([
         'nama' => 'Siswa Kelas Lain',
         'status' => 'registered',
     ]);
-    ProfilSiswa::factory()->create([
+    $siswaLain = ProfilSiswa::factory()->create([
         'pengguna_id' => $penggunaLain->id,
         'nisn' => '1234567891',
         'nis' => '10002',
         'kelas_id' => $kelasLain->id,
     ]);
+    catatPelanggaran($siswaLain, 'Terlambat Masuk', 'ringan', '2026-07-05', 10);
 
     $this->get('/wali-kelas/pengajuan-poin/buat')
         ->assertSee('Ahmad Fauzi')
@@ -98,4 +100,16 @@ test('guru yang belum dipasangi kelas tidak menemukan siswa untuk diajukan', fun
     $this->get('/wali-kelas/pengajuan-poin/buat')
         ->assertSuccessful()
         ->assertDontSee('Ahmad Fauzi');
+});
+
+test('halaman buat pengajuan tidak menawarkan siswa yang sudah memiliki 100 poin', function () {
+    [, , $siswa] = waliKelasDenganKelas();
+    $siswaLain = siswaLainDiKelas($siswa->kelas_id, 'Doni Siswa Poin Kurang', '1000000099', '10099');
+    catatPelanggaran($siswaLain, 'Terlambat Masuk', 'ringan', '2026-07-05', 15);
+
+    $this->get('/wali-kelas/pengajuan-poin/buat')
+        ->assertSuccessful()
+        ->assertDontSee('Ahmad Fauzi (NISN:')
+        ->assertSee('Doni Siswa Poin Kurang')
+        ->assertSee('Sisa Poin: 85/100');
 });

@@ -164,7 +164,7 @@
                         <div class="flex items-start justify-between gap-3 rounded-xl border border-slate-100 bg-slate-50/70 p-3.5 text-xs">
                             <div class="min-w-0 flex-1">
                                 <div class="flex items-center gap-2 mb-1">
-                                    <span class="font-bold text-slate-800 text-sm truncate">{{ $item->nama_pelanggaran }}</span>
+                                    <span class="font-bold text-slate-800 text-sm break-words">{{ $item->nama_pelanggaran }}</span>
                                 </div>
                                 <p class="text-slate-500 font-medium">
                                     {{ $item->tanggal_pelanggaran?->translatedFormat('d M Y') }}

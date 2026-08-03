@@ -45,6 +45,12 @@ class PengajuanPoinController extends Controller
         $student = ProfilSiswa::findOrFail($data['profil_siswa_id']);
         $this->authorizeOwnClass($student);
 
+        if ($student->poin >= 100) {
+            return back()
+                ->withErrors(['profil_siswa_id' => 'Siswa ini sudah memiliki 100 poin (maksimal). Pengajuan penambahan poin hanya diperuntukkan bagi siswa yang poinnya di bawah 100.'])
+                ->withInput();
+        }
+
         $category = KategoriPengajuanPoin::findOrFail($data['kategori_pengajuan_poin_id']);
 
         PengajuanPoin::create([
@@ -71,8 +77,9 @@ class PengajuanPoinController extends Controller
         }
 
         return $class->siswa()
-            ->with('pengguna')
+            ->with(['pengguna', 'pelanggaranSiswa', 'pengajuanPoin'])
             ->get()
+            ->filter(fn (ProfilSiswa $profilSiswa) => $profilSiswa->poin < 100)
             ->sortBy(fn (ProfilSiswa $profilSiswa) => $profilSiswa->pengguna?->nama ?? '')
             ->values();
     }
