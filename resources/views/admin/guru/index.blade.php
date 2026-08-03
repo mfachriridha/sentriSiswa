@@ -91,7 +91,7 @@
 <x-search-filter-form
     :action="route('admin.guru.index')"
     :search="$search"
-    placeholder="Cari nama atau NIP..."
+    placeholder="Cari nama atau NIP/NIK..."
     :filters="[
         ['name' => 'peran', 'label' => 'Role', 'value' => $filterRole, 'options' => ['' => 'Semua Role', 'wali_kelas' => 'Wali Kelas', 'bk' => 'BK', 'kesiswaan' => 'Kesiswaan']],
         ['name' => 'tingkat', 'label' => 'Tingkat', 'value' => $filterGrade, 'options' => ['' => 'Semua Tingkat', '10' => '10', '11' => '11', '12' => '12']],
@@ -153,7 +153,7 @@
         <table class="min-w-full text-left text-sm">
         <thead class="border-b border-gray-200 bg-gray-50">
             <tr>
-                <th class="px-4 py-3"><x-sort-link label="NIP" column="nip" :sort="$sort" :direction="$direction" /></th>
+                <th class="px-4 py-3"><x-sort-link label="NIP / NIK" column="nip" :sort="$sort" :direction="$direction" /></th>
                 <th class="px-4 py-3"><x-sort-link label="Nama" column="nama" :sort="$sort" :direction="$direction" /></th>
                 <th class="hidden px-4 py-3 lg:table-cell"><x-sort-link label="Email" column="email" :sort="$sort" :direction="$direction" /></th>
                 <th class="hidden px-4 py-3 md:table-cell"><x-sort-link label="Role" column="peran" :sort="$sort" :direction="$direction" /></th>

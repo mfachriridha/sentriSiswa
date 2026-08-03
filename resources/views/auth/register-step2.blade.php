@@ -12,7 +12,7 @@
                 <h2 class="mt-6 text-2xl font-extrabold tracking-tight text-slate-800">Lengkapi Profil</h2>
                 <p class="mt-2 text-xs font-semibold text-slate-500">
                     @if ($role === 'teacher')
-                        NIP <span class="font-bold text-primary">{{ $identity }}</span> Terverifikasi
+                        NIP/NIK <span class="font-bold text-primary">{{ $identity }}</span> Terverifikasi
                     @else
                         NISN/NIS <span class="font-bold text-primary">{{ $identity }}</span> Terverifikasi
                     @endif

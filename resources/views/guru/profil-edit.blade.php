@@ -106,7 +106,7 @@
         {{-- Info singkat guru (read‑only) --}}
         <div class="mb-10 grid grid-cols-1 gap-6 md:grid-cols-2">
             <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
-                <p class="text-sm font-medium text-gray-500">NIP</p>
+                <p class="text-sm font-medium text-gray-500">NIP / NIK</p>
                 <p class="mt-1.5 text-sm text-gray-900">{{ $profile?->nip ?? '-' }}</p>
             </div>
             <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">

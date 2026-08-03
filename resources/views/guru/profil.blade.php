@@ -57,7 +57,7 @@
             <p class="mt-1.5 text-sm text-gray-900">{{ $teacher->nama }}</p>
         </div>
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">
-            <p class="text-sm font-medium text-gray-500">NIP</p>
+            <p class="text-sm font-medium text-gray-500">NIP / NIK</p>
             <p class="mt-1.5 text-sm text-gray-900">{{ $profile?->nip ?? '-' }}</p>
         </div>
         <div class="rounded-lg border border-gray-100 bg-gray-50 p-5">

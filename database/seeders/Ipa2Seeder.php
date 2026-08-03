@@ -186,7 +186,7 @@ class Ipa2Seeder extends Seeder
         // Siswa 4 (Doni): 3 Alpha
         $pattern = [
             '1000000001' => ['hadir', 'hadir', 'izin', 'hadir', 'hadir', 'dispensasi', 'hadir', 'hadir', 'hadir', 'hadir', 'hadir', 'hadir', 'hadir', 'hadir', 'hadir'],
-            '1000000002' => ['hadir', 'hadir', 'sakit', 'hadir', 'alpha', 'hadir', 'hadir', 'hadir', 'hadir', 'hadir', 'hadir', 'hadir', 'hadir', 'hadir', 'hadir'],
+            '1000000002' => ['hadir', 'alpha', 'sakit', 'alpha', 'alpha', 'alpha', 'alpha', 'alpha', 'hadir', 'hadir', 'hadir', 'hadir', 'hadir', 'hadir', 'hadir'],
             '1000000003' => ['hadir', 'alpha', 'hadir', 'izin', 'hadir', 'sakit', 'hadir', 'alpha', 'hadir', 'izin', 'hadir', 'hadir', 'hadir', 'hadir', 'hadir'],
             '1000000004' => ['alpha', 'hadir', 'sakit', 'hadir', 'alpha', 'dispensasi', 'hadir', 'alpha', 'hadir', 'hadir', 'hadir', 'hadir', 'hadir', 'hadir', 'hadir'],
         ];

@@ -54,7 +54,7 @@
                     <input id="identity" type="text" name="identity" value="{{ old('identity') }}" required
                            inputmode="numeric" pattern="[0-9]*" autocomplete="off"
                            class="mt-2 block w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/10 transition-all duration-300"
-                           placeholder="Masukkan NIP atau NISN/NIS">
+                           placeholder="Masukkan NIP/NIK atau NISN/NIS">
                     @error('identity')<p class="mt-1.5 text-xs text-red-500 font-semibold">{{ $message }}</p>@enderror
                 </div>
 
@@ -95,8 +95,8 @@
             });
 
             if (activeRole === 'teacher') {
-                identityLabel.textContent = 'NIP (Nomor Induk Pegawai)';
-                identityInput.placeholder = 'Masukkan 18 digit NIP Anda';
+                identityLabel.textContent = 'NIP / NIK';
+                identityInput.placeholder = 'Masukkan NIP atau NIK Anda';
             } else {
                 identityLabel.textContent = 'NISN / NIS';
                 identityInput.placeholder = 'Masukkan NISN atau NIS Anda';

@@ -27,11 +27,11 @@ class RegisterController extends Controller
         if ($role === 'teacher') {
             $profile = ProfilGuru::where('nip', $identity)->first();
             if (! $profile) {
-                return $this->kembaliKeVerifikasi('NIP tidak ditemukan.');
+                return $this->kembaliKeVerifikasi('NIP/NIK tidak ditemukan.');
             }
 
             if ($profile->pengguna && $profile->pengguna->isRegistered()) {
-                return $this->kembaliKeVerifikasi('NIP sudah terdaftar. Silakan masuk.');
+                return $this->kembaliKeVerifikasi('NIP/NIK sudah terdaftar. Silakan masuk.');
             }
         } else {
             $profile = ProfilSiswa::where('nisn', $identity)
