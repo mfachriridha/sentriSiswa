@@ -50,7 +50,7 @@
                 <div class="shrink-0">
                     @if($todayAttendance->path_selfie)
                         <img src="{{ asset('storage/'.$todayAttendance->path_selfie) }}"
-                             alt="Selfie absensi"
+                             alt="Selfie presensi"
                              class="aspect-[3/4] w-28 rounded-xl border border-gray-200 object-cover shadow-sm">
                     @else
                         <div class="flex aspect-[3/4] w-28 items-center justify-center rounded-xl border border-dashed border-gray-200 bg-gray-50 text-center text-xs text-gray-400">
@@ -85,9 +85,9 @@
                                 </svg>
                                 <span>
                                     @if($todayAttendance->jarak_meter == 0)
-                                        Di dalam area absensi
+                                        Di dalam area presensi
                                     @else
-                                        {{ number_format($todayAttendance->jarak_meter, 0) }} m dari area absensi
+                                        {{ number_format($todayAttendance->jarak_meter, 0) }} m dari area presensi
                                     @endif
                                 </span>
                             </div>
@@ -101,11 +101,11 @@
             </div>
 
         @elseif($canCheckIn)
-            {{-- ABSEN FORM --}}
+            {{-- PRESENSI FORM --}}
             <form method="POST"
                   action="{{ route('siswa.absensi.store') }}"
                   enctype="multipart/form-data"
-                  x-data="attendanceForm({ geofenceActive: @js($geofenceActive), maxPhotoKb: 1024 })"
+                  x-data="attendanceForm({ geofenceActive: @js($geofenceActive), maxPhotoKb: 1024, isHadirWindow: @js($isHadirWindow), startTime: @js($startTime), endTime: @js($endTime) })"
                   @submit="validateBeforeSubmit($event)">
                 @csrf
                 <input x-ref="selfieInput" type="file" name="selfie" accept="image/jpeg,image/webp" class="hidden">
@@ -113,12 +113,21 @@
                 <input type="hidden" name="longitude" x-model="longitude">
                 <input type="hidden" name="accuracy" x-model="accuracy">
 
+                @if(! $isHadirWindow)
+                    <div class="mb-4 flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
+                        <svg class="h-4 w-4 shrink-0 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span>Waktu presensi Hadir ({{ $startTime }} – {{ $endTime }}) telah berakhir. Anda tetap dapat mengunggah bukti perizinan (Sakit, Izin, atau Dispensasi).</span>
+                    </div>
+                @endif
+
                 <div class="mb-5 space-y-2">
                     <p class="text-sm font-medium text-gray-700">Status Kehadiran</p>
                     <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
                         <label class="flex cursor-pointer items-center justify-center gap-2 rounded-xl border p-3 transition-colors"
-                               :class="selectedStatus === 'hadir' ? 'border-primary bg-primary/5 text-primary' : 'border-gray-200 bg-white hover:bg-gray-50 text-gray-700'">
-                            <input type="radio" name="status" value="hadir" x-model="selectedStatus" class="sr-only">
+                               :class="!isHadirWindow ? 'opacity-50 cursor-not-allowed bg-gray-100 border-gray-200 text-gray-400' : selectedStatus === 'hadir' ? 'border-primary bg-primary/5 text-primary' : 'border-gray-200 bg-white hover:bg-gray-50 text-gray-700'">
+                            <input type="radio" name="status" value="hadir" x-model="selectedStatus" :disabled="!isHadirWindow" class="sr-only">
                             <span class="text-sm font-bold">Hadir</span>
                         </label>
                         <label class="flex cursor-pointer items-center justify-center gap-2 rounded-xl border p-3 transition-colors"
@@ -197,11 +206,11 @@
                                 </div>
                             </div>
                         @else
-                            <div class="flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2">
-                                <svg class="h-4 w-4 shrink-0 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            <div class="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2">
+                                <svg class="h-4 w-4 shrink-0 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
-                                <span class="text-xs font-medium text-blue-700">Lokasi GPS tidak diperlukan untuk sesi ini.</span>
+                                <span class="text-xs font-medium text-amber-700">Area lokasi presensi belum dikonfigurasi. Presensi Hadir tidak dapat dilakukan saat ini.</span>
                             </div>
                         @endif
 
@@ -413,6 +422,9 @@
             compressedSizeKb: null,
             geofenceActive: config.geofenceActive,
             maxPhotoKb: config.maxPhotoKb,
+            isHadirWindow: config.isHadirWindow,
+            startTime: config.startTime,
+            endTime: config.endTime,
             gpsReady: false,
             gpsLoading: false,
             gpsError: '',
@@ -423,7 +435,7 @@
             locationMessage: '',
             locationDistance: null,
             locationChecking: false,
-            selectedStatus: 'hadir',
+            selectedStatus: config.isHadirWindow ? 'hadir' : 'sakit',
             facingMode: 'user',
 
             init() {
@@ -443,59 +455,55 @@
             },
 
             get canOpenSelfieModal() {
-                if (this.selectedStatus === 'hadir' && !this.isMobileDevice) {
-                    return false;
+                if (this.selectedStatus === 'hadir') {
+                    if (!this.isHadirWindow) {
+                        return false;
+                    }
+                    if (!this.isMobileDevice) {
+                        return false;
+                    }
+                    if (!this.geofenceActive) {
+                        return false;
+                    }
+                    if (!this.gpsReady || this.gpsLoading || this.locationChecking) {
+                        return false;
+                    }
+                    return ['inside', 'tolerance'].includes(this.locationStatus);
                 }
 
-                if (this.selectedStatus !== 'hadir') {
-                    return true; // Sakit, Izin, Dispensasi boleh dari mana saja / peranti apa saja
-                }
-
-                if (!this.geofenceActive) {
-                    return true;
-                }
-
-                if (!this.gpsReady || this.gpsLoading || this.locationChecking) {
-                    return false;
-                }
-
-                return ['inside', 'tolerance'].includes(this.locationStatus);
+                return true; // Sakit, Izin, Dispensasi boleh dari mana saja / peranti apa saja
             },
 
             get openDisabledMessage() {
-                if (this.selectedStatus === 'hadir' && !this.isMobileDevice) {
-                    return 'Absensi Hadir wajib dilakukan dari HP / Smartphone.';
+                if (this.selectedStatus === 'hadir') {
+                    if (!this.isHadirWindow) {
+                        return 'Presensi Hadir hanya dibuka pukul ' + this.startTime + ' – ' + this.endTime + ' WIB.';
+                    }
+                    if (!this.isMobileDevice) {
+                        return 'Presensi Hadir wajib dilakukan dari HP / Smartphone.';
+                    }
+                    if (!this.geofenceActive) {
+                        return 'Area lokasi presensi belum dikonfigurasi oleh admin. Presensi Hadir belum dapat dilakukan.';
+                    }
+                    if (this.gpsLoading) {
+                        return 'Mengambil lokasi GPS...';
+                    }
+                    if (this.locationChecking) {
+                        return 'Memeriksa lokasi Anda...';
+                    }
+                    if (!this.gpsReady) {
+                        return 'Aktifkan lokasi GPS terlebih dahulu.';
+                    }
+                    if (this.locationStatus === 'outside') {
+                        return 'Lokasi Anda di luar area presensi.';
+                    }
+                    if (['inside', 'tolerance'].includes(this.locationStatus)) {
+                        return 'Lokasi valid, silakan lanjut presensi.';
+                    }
+                    return 'Tekan Aktifkan GPS untuk memeriksa lokasi.';
                 }
 
-                if (!this.geofenceActive) {
-                    return 'Lokasi GPS tidak diwajibkan. Silakan lanjut absen.';
-                }
-
-                if (this.selectedStatus !== 'hadir') {
-                    return 'Status ' + this.selectedStatus + ' diperbolehkan tanpa verifikasi lokasi sekolah.';
-                }
-
-                if (this.gpsLoading) {
-                    return 'Mengambil lokasi GPS...';
-                }
-
-                if (this.locationChecking) {
-                    return 'Memeriksa lokasi Anda...';
-                }
-
-                if (!this.gpsReady) {
-                    return 'Aktifkan lokasi GPS terlebih dahulu.';
-                }
-
-                if (this.locationStatus === 'outside') {
-                    return 'Lokasi Anda di luar area absensi.';
-                }
-
-                if (['inside', 'tolerance'].includes(this.locationStatus)) {
-                    return 'Lokasi valid, silakan lanjut absen.';
-                }
-
-                return 'Tekan Aktifkan GPS untuk memeriksa lokasi.';
+                return 'Status ' + this.selectedStatus + ' diperbolehkan tanpa verifikasi lokasi sekolah.';
             },
 
             openSelfieModal() {
@@ -505,7 +513,6 @@
 
                 this.error = '';
                 this.modalOpen = true;
-                this.startCamera();
             },
 
             cancelSelfieModal() {
@@ -767,7 +774,7 @@
 
                 if (!this.selfieReady) {
                     event.preventDefault();
-                    this.error = (this.facingMode === 'environment' || this.selectedStatus !== 'hadir') ? 'Ambil foto bukti dulu sebelum absen.' : 'Ambil selfie/foto bukti dulu sebelum absen.';
+                    this.error = (this.facingMode === 'environment' || this.selectedStatus !== 'hadir') ? 'Ambil foto bukti dulu sebelum presensi.' : 'Ambil selfie/foto bukti dulu sebelum presensi.';
                 }
             },
             

@@ -31,7 +31,9 @@ class AbsensiController extends Controller
         $currentTime = $now->format('H:i');
         $currentTimeLabel = $now->format('H:i');
         $isWeekday = Pengaturan::hariAbsenAktif($now);
-        $canCheckIn = $isWeekday && $currentTime >= $startTime && $currentTime <= $endTime;
+        $isHadirWindow = $isWeekday && $currentTime >= $startTime && $currentTime <= $endTime;
+        $isFinalStatus = $todayAttendance && in_array($todayAttendance->status, ['hadir', 'izin', 'sakit', 'dispensasi'], true);
+        $canCheckIn = $isWeekday && ! $isFinalStatus;
         $activeDaysLabel = Pengaturan::labelHariAbsen();
 
         $geofenceData = Pengaturan::get('attendance_geofence_data');
@@ -63,6 +65,7 @@ class AbsensiController extends Controller
             'startTime',
             'endTime',
             'canCheckIn',
+            'isHadirWindow',
             'stats',
             'currentMonth',
             'currentYear',
@@ -146,8 +149,11 @@ class AbsensiController extends Controller
         $endTime = Pengaturan::get('attendance_end_time', '07:00');
         $currentTime = now()->format('H:i');
 
-        if ($currentTime < $startTime || $currentTime > $endTime) {
-            return redirect()->route('siswa.absensi')->with('error', 'Waktu absen sudah lewat atau belum dimulai.');
+        $statusSubmitted = $request->input('status');
+        if ($statusSubmitted === 'hadir') {
+            if ($currentTime < $startTime || $currentTime > $endTime) {
+                return redirect()->route('siswa.absensi')->with('error', 'Waktu presensi Hadir hanya dibuka pukul '.$startTime.' – '.$endTime.' WIB.');
+            }
         }
 
         $rules = [

@@ -56,21 +56,21 @@ test('halaman absensi memberi tahu siswa bahwa hari ini bukan hari absensi', fun
 });
 
 // TS.ABS.009 / TC.ABS.009.001 — Positive
-test('halaman absensi memberi tahu siswa bahwa waktunya belum tiba', function () {
+test('halaman absensi menampilkan pemberitahuan jam presensi hadir jika diakses sebelum 06:30', function () {
     Carbon::setTestNow('2026-07-06 06:00:00');
     siswaMasuk();
 
     $this->get('/siswa/absensi')
-        ->assertSee('Belum waktunya presensi. Presensi dimulai pukul 06:30.');
+        ->assertSee('Waktu presensi Hadir (06:30 – 07:00) telah berakhir. Anda tetap dapat mengunggah bukti perizinan');
 });
 
 // TS.ABS.010 / TC.ABS.010.001 — Positive
-test('halaman absensi memberi tahu siswa bahwa waktunya sudah berakhir', function () {
+test('halaman absensi memberi tahu siswa jika waktu presensi hadir telah berakhir namun tetap dapat izin/sakit', function () {
     Carbon::setTestNow('2026-07-06 07:30:00');
     siswaMasuk();
 
     $this->get('/siswa/absensi')
-        ->assertSee('Waktu presensi sudah berakhir pukul 07:00.');
+        ->assertSee('Waktu presensi Hadir (06:30 – 07:00) telah berakhir. Anda tetap dapat mengunggah bukti perizinan');
 });
 
 // TS.ABS.016 / TC.ABS.016.001 — Positive — penyegar status tanpa memuat ulang halaman
@@ -86,4 +86,32 @@ test('status absensi hari ini ikut berubah begitu siswa selesai absen', function
 
     $this->get('/siswa/absensi/status')
         ->assertSee('hadir');
+});
+
+// TS.ABS.017 / TC.ABS.017.001 — Positive — geofence belum dikonfigurasi
+test('halaman absensi menampilkan peringatan jika area lokasi belum dikonfigurasi', function () {
+    Carbon::setTestNow('2026-07-06 06:35:00');
+    siswaMasuk();
+
+    // Pastikan attendance_geofence_data kosong (default)
+    Pengaturan::set('attendance_geofence_data', '');
+
+    $this->get('/siswa/absensi')
+        ->assertSee('Area lokasi presensi belum dikonfigurasi');
+});
+
+// TS.ABS.018 / TC.ABS.018.001 — Positive — siswa dapat mengajukan sakit di luar jam presensi
+test('siswa dapat mengajukan sakit atau izin di luar jam presensi 06:30-07:00', function () {
+    Carbon::setTestNow('2026-07-06 08:30:00');
+    siswaMasuk();
+
+    $response = $this->post('/siswa/absensi', [
+        'status' => 'sakit',
+        'selfie' => selfieAbsensi(),
+    ]);
+
+    $response->assertRedirect('/siswa/absensi');
+    $this->get('/siswa/absensi')
+        ->assertSee('Presensi Anda hari ini sudah tercatat.')
+        ->assertSee('Sakit');
 });
